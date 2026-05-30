@@ -11,9 +11,6 @@ build/
 !.env.example
 !**/.env.example
 
-# prisma client (generated on server)
-apps/web/src/generated/
-
 # uploads (prod data, not in git)
 apps/web/public/uploads/*
 !apps/web/public/uploads/.gitkeep

@@ -30,6 +30,8 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 node -v    # должно быть v21.7.3 без ошибок GLIBC
 ```
 
+На Node 21 **не запускается** `prisma generate` (Prisma 7 требует Node ≥22.12). Сгенерированный клиент лежит в git; после правок `schema.prisma` на Mac: `npm run db:generate` → commit → push.
+
 ### Ubuntu 22.04
 
 ```bash

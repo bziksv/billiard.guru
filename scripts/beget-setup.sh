@@ -51,13 +51,17 @@ echo "→ npm install…"
 cd "$WEB"
 npm install
 
-echo "→ prisma generate…"
-load_env_for_build
-npx prisma generate
+echo "→ prisma generate (пропуск на Beget, client в git)…"
+if node -e "process.exit(Number(process.versions.node.split('.')[0]) >= 22 ? 0 : 1)" 2>/dev/null; then
+  load_env_for_build
+  npx prisma generate
+else
+  echo "  Node $(node -v): используем Prisma client из git (npm run db:generate локально после смены schema)"
+fi
 
 echo "→ npm run build…"
 load_env_for_build
-NODE_ENV=production npm run build
+NODE_ENV=production npm run build:beget
 
 echo "→ Копируем static в standalone…"
 mkdir -p "$STANDALONE/.next"
