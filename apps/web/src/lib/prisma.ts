@@ -7,7 +7,8 @@ ensureDatabaseUrlFromEnvFile();
 function parseDatabaseUrl(raw: string) {
   const normalized = raw.replace(/^mysql:\/\//, "mariadb://");
   const url = new URL(normalized);
-  const host = url.hostname === "localhost" ? "127.0.0.1" : url.hostname;
+  // Beget: localhost = Unix socket; 127.0.0.1 = TCP (часто недоступен из Passenger)
+  const host = url.hostname;
   return {
     host,
     port: url.port ? Number(url.port) : 3306,
