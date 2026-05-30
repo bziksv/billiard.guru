@@ -68,6 +68,12 @@ load_env_for_build() {
   set +a
 }
 
+BEGET_DB_HOST="${BEGET_DB_HOST:-bziksv.beget.tech}"
+if grep -qE '@localhost(:3306)?/' "$WEB/.env" 2>/dev/null; then
+  echo "→ Beget: localhost недоступен из Passenger, меняем на $BEGET_DB_HOST"
+  sed -i "s/@localhost:3306/@${BEGET_DB_HOST}:3306/g; s/@localhost\//@${BEGET_DB_HOST}:3306\//g" "$WEB/.env"
+fi
+
 echo "→ npm install…"
 cd "$WEB"
 npm install
@@ -90,6 +96,12 @@ cp -r public "$STANDALONE/public"
 cp -r .next/static "$STANDALONE/.next/static"
 cp "$WEB/.env" "$STANDALONE/.env"
 ln -sfn "$WEB/.env" "$STANDALONE/.env.local"
+
+cat > "$STANDALONE/passenger-start.js" << 'EOF'
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
+require("./server.js");
+EOF
 
 echo "→ Node для Passenger (копия в каталог сайта)…"
 NODE_SITE="$SITE_ROOT/.node"
@@ -123,7 +135,7 @@ cat > "$SITE_ROOT/.htaccess" << EOF
 PassengerNodejs $NODE_PATH
 PassengerAppRoot $APP_ROOT
 PassengerAppType node
-PassengerStartupFile server.js
+PassengerStartupFile passenger-start.js
 EOF
 
 echo "→ public_html → static…"
