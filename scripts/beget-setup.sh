@@ -145,6 +145,22 @@ ln -sfn "$APP_ROOT/public" "$SITE_ROOT/public_html"
 mkdir -p "$APP_ROOT/tmp"
 touch "$APP_ROOT/tmp/restart.txt"
 
+load_env_for_build
+if [ -n "${TELEGRAM_BOT_TOKEN:-}" ]; then
+  WEBHOOK_URL="${TELEGRAM_WEBHOOK_URL:-${APP_URL%/}/api/telegram/webhook}"
+  if [[ "$WEBHOOK_URL" == http://* ]] || [[ "$WEBHOOK_URL" == https://* ]]; then
+    echo "→ Telegram webhook → $WEBHOOK_URL"
+    WH_PARAMS="url=${WEBHOOK_URL}"
+    if [ -n "${TELEGRAM_WEBHOOK_SECRET:-}" ]; then
+      WH_PARAMS="${WH_PARAMS}&secret_token=${TELEGRAM_WEBHOOK_SECRET}"
+    fi
+    curl -sS "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook?${WH_PARAMS}" \
+      | grep -q '"ok":true' \
+      && echo "  ✓ webhook установлен" \
+      || echo "  ⚠ не удалось установить webhook (проверьте TELEGRAM_BOT_TOKEN)"
+  fi
+fi
+
 echo ""
 echo "Готово. Сайт: $SITE_ROOT"
 echo "Перезапуск приложения: touch $APP_ROOT/tmp/restart.txt"

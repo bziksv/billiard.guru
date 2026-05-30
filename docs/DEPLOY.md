@@ -90,12 +90,16 @@ chmod +x scripts/beget-setup.sh
 ./scripts/beget-setup.sh
 ```
 
-Скрипт собирает Next.js (standalone), создаёт `~/billiard.guru/.htaccess` и симлинк `public_html`.
+Скрипт собирает Next.js (standalone), создаёт `~/billiard.guru/.htaccess`, симлинк `public_html` и **регистрирует Telegram webhook**.
 
 ## 6. Telegram webhook
 
+Выставляется автоматически в `beget-setup.sh` (из `APP_URL` или `TELEGRAM_WEBHOOK_URL` в `.env`).
+
+Вручную с Mac:
+
 ```bash
-curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://billiard.guru/api/telegram/webhook"
+cd apps/web && npm run telegram:webhook
 ```
 
 ## Обновление после git push

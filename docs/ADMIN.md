@@ -43,21 +43,41 @@
 2. **По ссылке** `confirm_<token>` — подтверждение сразу
 3. **Просто /start** — бот покажет кнопку «📱 Подтвердить по телефону»; если номер есть в базе → подтверждение сразу
 
-### Локально (без webhook)
+### Локально (один терминал)
 
-Telegram не шлёт updates на `localhost`. Запустите **второй терминал**:
+Telegram **не может** слать updates на `localhost`. Но polling **не нужен**, если в `.env` та же Beget-база, что и на проде:
 
 ```bash
 cd apps/web
-npm run telegram:poll
+npm run dev
 ```
 
-Затем откройте ссылку подтверждения и нажмите **Start**.
+1. Открываете `http://localhost:3010`
+2. Жмёте «Войти через Telegram» — сообщение приходит в бот
+3. Нажимаете кнопку — **webhook на billiard.guru** пишет `CONFIRMED` в общую БД
+4. Браузер на localhost сам завершает вход
+
+В `.env` обязательно:
+
+```env
+DATABASE_URL=mysql://...@bziksv.beget.tech:3306/bziksv_bil
+TELEGRAM_WEBHOOK_URL=https://billiard.guru/api/telegram/webhook
+```
+
+После деплоя webhook ставится сам (`beget-setup.sh`). Вручную:
+
+```bash
+cd apps/web && npm run telegram:webhook
+```
+
+**Не запускайте** `npm run telegram:poll` — он снимает webhook и ломает вход на billiard.guru. Только офлайн с локальной БД: `npm run telegram:poll -- --force` (при Ctrl+C webhook восстанавливается).
 
 ### Production (billiard.guru)
 
+Webhook выставляется при `./scripts/beget-setup.sh`. Проверка:
+
 ```bash
-curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://billiard.guru/api/telegram/webhook"
+curl -s "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
 ```
 
 В `.env`:
