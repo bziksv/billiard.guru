@@ -16,7 +16,7 @@ function parseDatabaseUrl(raw: string) {
     password: decodeURIComponent(url.password),
     database: url.pathname.replace(/^\//, ""),
     connectionLimit: 5,
-    connectTimeout: 15_000,
+    connectTimeout: 5_000,
   };
 }
 

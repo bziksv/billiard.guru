@@ -73,20 +73,26 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ phone }),
-    });
-    const data = await res.json();
-    setLoading(false);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+        signal: AbortSignal.timeout(20_000),
+      });
+      const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.error ?? "Ошибка");
-      return;
+      if (!res.ok) {
+        setError(data.error ?? "Ошибка");
+        return;
+      }
+
+      setChallengeToken(data.challengeToken);
+    } catch {
+      setError("Сервер не ответил. Проверьте, что сайт обновлён на Beget (git pull + beget-setup.sh).");
+    } finally {
+      setLoading(false);
     }
-
-    setChallengeToken(data.challengeToken);
   }
 
   return (
