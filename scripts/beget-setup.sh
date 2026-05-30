@@ -21,14 +21,35 @@ if [ ! -f "$WEB/.env" ]; then
   exit 1
 fi
 
+if ! grep -q '^DATABASE_URL=.' "$WEB/.env"; then
+  echo "В $WEB/.env нет DATABASE_URL. Добавьте строку:"
+  echo "DATABASE_URL=mysql://bziksv_bil:...@localhost:3306/bziksv_bil"
+  exit 1
+fi
+
+load_env_for_build() {
+  eval "$(
+    node -e "
+      require('dotenv').config({ path: process.argv[1] });
+      const keys = ['DATABASE_URL', 'SESSION_SECRET', 'TELEGRAM_BOT_TOKEN', 'APP_URL', 'NEXT_PUBLIC_APP_URL'];
+      for (const key of keys) {
+        const val = process.env[key];
+        if (val) console.log('export ' + key + '=' + JSON.stringify(val));
+      }
+    " "$WEB/.env"
+  )"
+}
+
 echo "→ npm install…"
 cd "$WEB"
 npm install
 
 echo "→ prisma generate…"
+load_env_for_build
 npx prisma generate
 
 echo "→ npm run build…"
+load_env_for_build
 NODE_ENV=production npm run build
 
 echo "→ Копируем static в standalone…"
