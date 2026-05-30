@@ -21,9 +21,20 @@ if [ ! -f "$WEB/.env" ]; then
   exit 1
 fi
 
-if ! grep -q '^DATABASE_URL=.' "$WEB/.env"; then
-  echo "В $WEB/.env нет DATABASE_URL. Добавьте строку:"
-  echo "DATABASE_URL=mysql://bziksv_bil:...@localhost:3306/bziksv_bil"
+check_database_url() {
+  node -e "
+    require('dotenv').config({ path: process.argv[1] });
+    process.exit(process.env.DATABASE_URL ? 0 : 1);
+  " "$WEB/.env"
+}
+
+if ! check_database_url; then
+  echo "В $WEB/.env не найден DATABASE_URL."
+  echo "Проверьте файл (без # в начале строки, путь именно apps/web/.env):"
+  sed -n '1,8p' "$WEB/.env" | sed 's/\(DATABASE_URL=mysql:\/\/[^:]*:\)[^@]*/\1***/'
+  echo ""
+  echo "Пример:"
+  echo "DATABASE_URL=mysql://bziksv_bil:ny34%26km%21Xw%26R@localhost:3306/bziksv_bil"
   exit 1
 fi
 
