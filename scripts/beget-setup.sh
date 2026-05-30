@@ -6,21 +6,42 @@
 #   ./scripts/beget-setup.sh
 set -euo pipefail
 
-export PATH="$HOME/.local/bin:$PATH"
-
 SITE_ROOT="${SITE_ROOT:-$HOME/billiard.guru}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WEB="$REPO_ROOT/apps/web"
 STANDALONE="$WEB/.next/standalone"
 
-if ! command -v node >/dev/null 2>&1 || ! node -v >/dev/null 2>&1; then
-  echo "Node.js не найден или не запускается (ошибка GLIBC)."
-  echo "Переустановите совместимую версию:"
-  echo "  cd ~/billiard.guru/setka && ./scripts/beget-install-node.sh"
+find_working_node() {
+  local candidate dir
+  for candidate in \
+    "$SITE_ROOT/.node/bin/node" \
+    "$HOME/.local/bin/node" \
+    "$(command -v node 2>/dev/null || true)"; do
+    [ -n "$candidate" ] && [ -x "$candidate" ] || continue
+    if "$candidate" -v >/dev/null 2>&1; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+  return 1
+}
+
+NODE_BIN="$(find_working_node)" || {
+  echo "Node.js не найден или не запускается."
+  echo ""
+  echo "Сборку запускайте в Docker (там Node уже работал):"
+  echo "  ssh localhost -p 222"
   echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
-  echo "См. docs/DEPLOY.md"
+  echo "  node -v"
+  echo ""
+  echo "Если node -v падает — переустановите:"
+  echo "  cd ~/billiard.guru/setka && ./scripts/beget-install-node.sh"
   exit 1
-fi
+}
+
+dir="$(dirname "$NODE_BIN")"
+export PATH="$dir:$PATH"
+echo "→ Node: $NODE_BIN ($("$NODE_BIN" -v))"
 
 if [ ! -f "$WEB/.env" ]; then
   echo "Создайте $WEB/.env (скопируйте .env.example, localhost для DATABASE_URL)."
