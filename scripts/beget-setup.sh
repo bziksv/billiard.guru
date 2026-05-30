@@ -21,33 +21,29 @@ if [ ! -f "$WEB/.env" ]; then
   exit 1
 fi
 
-check_database_url() {
-  node -e "
-    require('dotenv').config({ path: process.argv[1] });
-    process.exit(process.env.DATABASE_URL ? 0 : 1);
-  " "$WEB/.env"
-}
-
-if ! check_database_url; then
-  echo "В $WEB/.env не найден DATABASE_URL."
-  echo "Проверьте файл (без # в начале строки, путь именно apps/web/.env):"
-  sed -n '1,8p' "$WEB/.env" | sed 's/\(DATABASE_URL=mysql:\/\/[^:]*:\)[^@]*/\1***/'
+if ! grep -E '^[[:space:]]*DATABASE_URL=.+' "$WEB/.env" | grep -qv '^[[:space:]]*#'; then
+  echo "В $WEB/.env нет строки DATABASE_URL=..."
+  echo "Сейчас в файле:"
+  sed -n '1,8p' "$WEB/.env"
   echo ""
-  echo "Пример:"
-  echo "DATABASE_URL=mysql://bziksv_bil:ny34%26km%21Xw%26R@localhost:3306/bziksv_bil"
+  echo "Пересоздайте файл — см. docs/DEPLOY.md или:"
+  echo "  cat > $WEB/.env << 'EOF'"
+  echo "  DATABASE_URL=mysql://bziksv_bil:...@localhost:3306/bziksv_bil"
+  echo "  ..."
+  echo "  EOF"
   exit 1
 fi
 
 load_env_for_build() {
   eval "$(
-    node -e "
-      require('dotenv').config({ path: process.argv[1] });
+    cd "$WEB" && node -e "
+      require('dotenv').config({ path: '.env' });
       const keys = ['DATABASE_URL', 'SESSION_SECRET', 'TELEGRAM_BOT_TOKEN', 'APP_URL', 'NEXT_PUBLIC_APP_URL'];
       for (const key of keys) {
         const val = process.env[key];
         if (val) console.log('export ' + key + '=' + JSON.stringify(val));
       }
-    " "$WEB/.env"
+    "
   )"
 }
 
