@@ -93,11 +93,28 @@ ln -sfn "$WEB/.env" "$STANDALONE/.env.local"
 
 echo "→ Node для Passenger (копия в каталог сайта)…"
 NODE_SITE="$SITE_ROOT/.node"
-mkdir -p "$NODE_SITE"
-cp -a "$HOME/.local/." "$NODE_SITE/"
-chmod -R a+rx "$NODE_SITE"
+NODE_PATH=""
 
-NODE_PATH="$(realpath "$NODE_SITE/bin/node")"
+if [[ "$(realpath "$NODE_BIN")" == "$(realpath "$NODE_SITE/bin/node" 2>/dev/null || echo "")" ]]; then
+  echo "  Уже используется $NODE_SITE/bin/node"
+  NODE_PATH="$(realpath "$NODE_SITE/bin/node")"
+elif [ -x "$HOME/.local/bin/node" ] && "$HOME/.local/bin/node" -v >/dev/null 2>&1; then
+  NODE_STAGING="$SITE_ROOT/.node.staging"
+  rm -rf "$NODE_STAGING"
+  mkdir -p "$NODE_STAGING"
+  cp -a "$HOME/.local/." "$NODE_STAGING/"
+  chmod -R a+rx "$NODE_STAGING"
+  rm -rf "${NODE_SITE}.prev"
+  if [ -d "$NODE_SITE" ]; then
+    mv "$NODE_SITE" "${NODE_SITE}.prev"
+  fi
+  mv "$NODE_STAGING" "$NODE_SITE"
+  NODE_PATH="$(realpath "$NODE_SITE/bin/node")"
+  echo "  Обновлён $NODE_PATH"
+else
+  echo "  Не удалось обновить Node, используем $NODE_BIN"
+  NODE_PATH="$(realpath "$NODE_BIN")"
+fi
 APP_ROOT="$(realpath "$STANDALONE")"
 
 echo "→ .htaccess в $SITE_ROOT…"
