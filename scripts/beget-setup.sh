@@ -6,13 +6,19 @@
 #   ./scripts/beget-setup.sh
 set -euo pipefail
 
+export PATH="$HOME/.local/bin:$PATH"
+
 SITE_ROOT="${SITE_ROOT:-$HOME/billiard.guru}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WEB="$REPO_ROOT/apps/web"
 STANDALONE="$WEB/.next/standalone"
 
-if ! command -v node >/dev/null 2>&1; then
-  echo "Node.js не найден. Установите в ~/.local — см. docs/DEPLOY.md"
+if ! command -v node >/dev/null 2>&1 || ! node -v >/dev/null 2>&1; then
+  echo "Node.js не найден или не запускается (ошибка GLIBC)."
+  echo "Переустановите совместимую версию:"
+  echo "  cd ~/billiard.guru/setka && ./scripts/beget-install-node.sh"
+  echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+  echo "См. docs/DEPLOY.md"
   exit 1
 fi
 

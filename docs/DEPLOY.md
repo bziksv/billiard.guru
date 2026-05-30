@@ -9,17 +9,38 @@ ssh bziksv@bziksv.beget.tech
 ssh localhost -p 222          # Docker-окружение, в prompt будет (docker)
 ```
 
-## 2. Node.js (если ещё нет)
+## 2. Node.js
+
+**Важно:** бинарник с nodejs.org (v20/v24) на старом Beget (Ubuntu 18.04) падает с `GLIBC_2.27 not found`. Нужна сборка Beget или Node ≤17.9.1.
+
+Проверьте ОС:
+
+```bash
+ssh localhost -p 222    # Docker
+cat /etc/os-release
+```
+
+### Ubuntu 18.04 (типичный shared-хостинг)
+
+```bash
+cd ~/billiard.guru/setka
+./scripts/beget-install-node.sh
+export PATH="$HOME/.local/bin:$PATH"
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+node -v    # должно быть v21.7.3 без ошибок GLIBC
+```
+
+### Ubuntu 22.04
 
 ```bash
 mkdir -p ~/.local && cd ~/.local
 wget https://nodejs.org/download/release/v24.15.0/node-v24.15.0-linux-x64.tar.xz
 tar xfv node-v24.15.0-linux-x64.tar.xz --strip 1
-rm node-v24.15.0-linux-x64.tar.xz
-node -v && npm -v
+export PATH="$HOME/.local/bin:$PATH"
+node -v
 ```
 
-Откройте общий доступ к `~/.local` (Панель → FTP → общий доступ), если Passenger не видит node.
+Откройте **общий доступ** к `~/.local` (Панель → FTP), иначе Passenger не увидит node — см. [инструкцию Beget](https://beget.com/ru/kb/how-to/web-apps/node-js).
 
 ## 3. Клонирование
 
