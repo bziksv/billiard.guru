@@ -44,6 +44,8 @@ node -v
 
 Откройте **общий доступ** к `~/.local` (Панель → FTP), иначе Passenger не увидит node — см. [инструкцию Beget](https://beget.com/ru/kb/how-to/web-apps/node-js).
 
+Скрипт `beget-setup.sh` копирует Node в `~/billiard.guru/.node/` — Passenger запускает его оттуда (ошибка `Permission denied` на `~/.local/bin/node`).
+
 ## 3. Клонирование
 
 Сайт должен быть создан в разделе **Сайты** (например `billiard.guru` → каталог `~/billiard.guru/`).

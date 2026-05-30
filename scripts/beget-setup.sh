@@ -67,8 +67,15 @@ echo "→ Копируем static в standalone…"
 mkdir -p "$STANDALONE/.next"
 cp -r public "$STANDALONE/public"
 cp -r .next/static "$STANDALONE/.next/static"
+cp "$WEB/.env" "$STANDALONE/.env"
 
-NODE_PATH="$(which node)"
+echo "→ Node для Passenger (копия в каталог сайта)…"
+NODE_SITE="$SITE_ROOT/.node"
+mkdir -p "$NODE_SITE"
+cp -a "$HOME/.local/." "$NODE_SITE/"
+chmod -R a+rx "$NODE_SITE"
+
+NODE_PATH="$(realpath "$NODE_SITE/bin/node")"
 APP_ROOT="$(realpath "$STANDALONE")"
 
 echo "→ .htaccess в $SITE_ROOT…"
