@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum TournamentFormat {
+  OLYMPIC
+  SWISS
+  PAIR_OLYMPIC
+  PAIR_SWISS
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELLED
+}
+
+enum RegistrationSource {
+  CLUB
+  SELF
+}
+
+enum TournamentStatus {
+  DRAFT
+  PENDING_CLUB_APPROVAL
+  OPEN
+  ACTIVE
+  FINISHED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  FINISHED
+  WALKOVER
+}
+
+enum UserRole {
+  PLAYER
+  SUPERADMIN
+}
+
+enum LoginChallengeStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  EXPIRED
+}
+
+model Country {
+  id     String @id @default(cuid())
+  nameRu String @unique @map("name_ru")
+  cities City[]
+
+  @@map("countries")
+}
+
+model City {
+  id        String  @id @default(cuid())
+  nameRu    String  @map("name_ru")
+  countryId String  @map("country_id")
+  country   Country @relation(fields: [countryId], references: [id])
+  latitude  Float?  @map("latitude")
+  longitude Float?  @map("longitude")
+  players   Player[]
+  clubs     Club[]
+
+  @@unique([countryId, nameRu])
+  @@map("cities")
+}
+
+model Club {
+  id               String   @id @default(cuid())
+  name             String
+  cityId           String   @map("city_id")
+  city             City     @relation(fields: [cityId], references: [id])
+  phone            String   @unique
+  email            String?
+  telegramId       String?  @unique @map("telegram_id")
+  telegramUsername String?  @map("telegram_username")
+  isVerified       Boolean  @default(false) @map("is_verified")
+  confirmToken     String?  @unique @map("confirm_token")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  tournaments    Tournament[]
+  registrations  TournamentRegistration[]
+  teams          TournamentTeam[]
+
+  @@map("clubs")
+}
+
+model Player {
+  id               String   @id @default(cuid())
+  firstName        String   @map("first_name")
+  lastName         String   @map("last_name")
+  middleName       String?  @map("middle_name")
+  cityId           String   @map("city_id")
+  city             City     @relation(fields: [cityId], references: [id])
+  phone            String   @unique
+  email            String?
+  birthDate        DateTime? @map("birth_date") @db.Date
+  photoUrl         String?  @map("photo_url")
+  telegramId       String?  @unique @map("telegram_id")
+  telegramUsername String?  @map("telegram_username")
+  rating           Float    @default(0)
+  role             UserRole @default(PLAYER)
+  isVerified       Boolean  @default(false) @map("is_verified")
+  confirmToken     String?  @unique @map("confirm_token")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  registrations TournamentRegistration[]
+  ratingHistory RatingChange[]
+  teamsAsPlayer1 TournamentTeam[] @relation("TeamPlayer1")
+  teamsAsPlayer2 TournamentTeam[] @relation("TeamPlayer2")
+  loginChallenges LoginChallenge[]
+
+  @@map("players")
+}
+
+model LoginChallenge {
+  id          String               @id @default(cuid())
+  token       String               @unique
+  playerId    String               @map("player_id")
+  player      Player               @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  status      LoginChallengeStatus @default(PENDING)
+  expiresAt   DateTime             @map("expires_at")
+  createdAt   DateTime             @default(now()) @map("created_at")
+  confirmedAt DateTime?            @map("confirmed_at")
+
+  @@map("login_challenges")
+}
+
+model Tournament {
+  id          String           @id @default(cuid())
+  name        String
+  description String?          @db.Text
+  clubId      String           @map("club_id")
+  club        Club             @relation(fields: [clubId], references: [id])
+  format              TournamentFormat
+  status              TournamentStatus @default(DRAFT)
+  startsAt            DateTime?        @map("starts_at")
+  clubApprovalToken   String?          @unique @map("club_approval_token")
+  publishedAt         DateTime?        @map("published_at")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  registrations TournamentRegistration[]
+  teams         TournamentTeam[]
+  matches       TournamentMatch[]
+
+  @@map("tournaments")
+}
+
+model TournamentTeam {
+  id           String             @id @default(cuid())
+  tournamentId String             @map("tournament_id")
+  tournament   Tournament         @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  name         String?
+  player1Id    String             @map("player1_id")
+  player1      Player             @relation("TeamPlayer1", fields: [player1Id], references: [id])
+  player2Id    String             @map("player2_id")
+  player2      Player             @relation("TeamPlayer2", fields: [player2Id], references: [id])
+  clubId       String?            @map("club_id")
+  club         Club?              @relation(fields: [clubId], references: [id])
+  source       RegistrationSource
+  status       RegistrationStatus @default(PENDING)
+  seed         Int?
+  swissPoints  Int                @default(0) @map("swiss_points")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  confirmedAt  DateTime?          @map("confirmed_at")
+
+  matchesAsTeam1 TournamentMatch[] @relation("MatchTeam1")
+  matchesAsTeam2 TournamentMatch[] @relation("MatchTeam2")
+  matchesWon     TournamentMatch[] @relation("MatchWinner")
+
+  @@unique([tournamentId, player1Id, player2Id])
+  @@map("tournament_teams")
+}
+
+model TournamentMatch {
+  id           String          @id @default(cuid())
+  tournamentId String          @map("tournament_id")
+  tournament   Tournament      @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  round        Int
+  slot         Int
+  team1Id      String?         @map("team1_id")
+  team1        TournamentTeam? @relation("MatchTeam1", fields: [team1Id], references: [id])
+  team2Id      String?         @map("team2_id")
+  team2        TournamentTeam? @relation("MatchTeam2", fields: [team2Id], references: [id])
+  winnerTeamId String?         @map("winner_team_id")
+  winnerTeam   TournamentTeam? @relation("MatchWinner", fields: [winnerTeamId], references: [id])
+  status       MatchStatus     @default(SCHEDULED)
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  @@unique([tournamentId, round, slot])
+  @@map("tournament_matches")
+}
+
+model TournamentRegistration {
+  id           String             @id @default(cuid())
+  tournamentId String             @map("tournament_id")
+  tournament   Tournament         @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  playerId     String             @map("player_id")
+  player       Player             @relation(fields: [playerId], references: [id])
+  clubId       String?            @map("club_id")
+  club         Club?              @relation(fields: [clubId], references: [id])
+  source       RegistrationSource
+  status       RegistrationStatus @default(PENDING)
+  createdAt    DateTime           @default(now()) @map("created_at")
+  confirmedAt  DateTime?          @map("confirmed_at")
+
+  @@unique([tournamentId, playerId])
+  @@map("tournament_registrations")
+}
+
+model RatingChange {
+  id        String   @id @default(cuid())
+  playerId  String   @map("player_id")
+  player    Player   @relation(fields: [playerId], references: [id])
+  oldRating Float    @map("old_rating")
+  newRating Float    @map("new_rating")
+  delta     Float
+  reason    String
+  matchId   String?  @map("match_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("rating_changes")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  appVersion String   @map("app_version")
+  actorType  String   @map("actor_type")
+  actorId    String?  @map("actor_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  payload    Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}

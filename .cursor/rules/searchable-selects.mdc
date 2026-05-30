@@ -1,0 +1,39 @@
+---
+description: Все поля выбора — с поиском (SearchableSelect)
+globs: apps/web/**/*.{tsx,ts}
+alwaysApply: false
+---
+
+# Поля выбора с поиском
+
+**Запрещено** использовать нативный `<select>` для выбора из списка.
+
+**Обязательно** использовать `SearchableSelect` из `@/components/ui/searchable-select`.
+
+## Когда применять
+
+- страна, город, клуб, игрок, турнир, формат
+- любой dropdown с 3+ вариантами или длинными списками
+
+## Пример
+
+```tsx
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
+<SearchableSelect
+  options={clubs.map((c) => ({ value: c.id, label: c.name }))}
+  value={clubId}
+  onChange={setClubId}
+  placeholder="Клуб"
+  searchPlaceholder="Поиск клуба…"
+  required
+/>
+```
+
+## Гео
+
+Для страны/города — компонент `CitySelect` (уже на SearchableSelect).
+
+## Новые формы
+
+При добавлении поля выбора — сразу SearchableSelect, не `<select>`.
