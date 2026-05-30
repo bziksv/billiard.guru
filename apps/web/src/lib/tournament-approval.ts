@@ -129,7 +129,6 @@ async function notifyNearbyPlayers(tournamentId: string) {
 
   await writeAuditLog({
     actorType: "system",
-    actorId: null,
     action: "tournament.notify.nearby",
     entityType: "tournament",
     entityId: tournamentId,

@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
 
     await writeAuditLog({
       actorType: "club",
-      actorId: null,
       action: "tournament.bracket.generate",
       entityType: "tournament",
       entityId: tournamentId,
@@ -88,7 +87,6 @@ export async function PATCH(request: NextRequest) {
 
     await writeAuditLog({
       actorType: "club",
-      actorId: null,
       action: "tournament.match.result",
       entityType: "tournament_match",
       entityId: data.matchId,

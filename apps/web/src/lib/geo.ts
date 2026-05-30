@@ -26,7 +26,9 @@ export function getNearbyCityIds(
   cities: CityCoords[],
   radiusKm: number,
 ): string[] {
-  if (origin.latitude == null || origin.longitude == null) {
+  const originLat = origin.latitude;
+  const originLng = origin.longitude;
+  if (originLat == null || originLng == null) {
     return [origin.id];
   }
 
@@ -36,12 +38,8 @@ export function getNearbyCityIds(
         return city.id === origin.id;
       }
       return (
-        distanceKm(
-          origin.latitude,
-          origin.longitude,
-          city.latitude,
-          city.longitude,
-        ) <= radiusKm
+        distanceKm(originLat, originLng, city.latitude, city.longitude) <=
+        radiusKm
       );
     })
     .map((city) => city.id);
