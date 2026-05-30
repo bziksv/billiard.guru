@@ -35,16 +35,10 @@ if ! grep -E '^[[:space:]]*DATABASE_URL=.+' "$WEB/.env" | grep -qv '^[[:space:]]
 fi
 
 load_env_for_build() {
-  eval "$(
-    cd "$WEB" && node -e "
-      require('dotenv').config({ path: '.env' });
-      const keys = ['DATABASE_URL', 'SESSION_SECRET', 'TELEGRAM_BOT_TOKEN', 'APP_URL', 'NEXT_PUBLIC_APP_URL'];
-      for (const key of keys) {
-        const val = process.env[key];
-        if (val) console.log('export ' + key + '=' + JSON.stringify(val));
-      }
-    "
-  )"
+  set -a
+  # shellcheck disable=SC1091
+  . "$WEB/.env"
+  set +a
 }
 
 echo "→ npm install…"
