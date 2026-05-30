@@ -20,9 +20,11 @@ export function ensureDatabaseUrlFromEnvFile() {
 
   for (const envPath of candidates) {
     if (!existsSync(envPath)) continue;
-    config({ path: envPath, override: false });
-    if (process.env.DATABASE_URL) return;
+
     const parsed = parse(readFileSync(envPath, "utf-8"));
+    config({ path: envPath, override: false });
+
+    // apps/web/.env always wins over stale shell DATABASE_URL (e.g. from ~/.zshrc)
     if (parsed.DATABASE_URL) {
       process.env.DATABASE_URL = parsed.DATABASE_URL;
       return;
