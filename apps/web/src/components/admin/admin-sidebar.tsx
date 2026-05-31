@@ -57,14 +57,12 @@ function NavLink({
       href={href}
       title={collapsed ? label : undefined}
       className={cn(
-        "flex items-center gap-3 rounded-lg text-sm transition-colors",
+        "admin-nav-item",
         collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2",
-        active
-          ? "bg-emerald-600/15 text-emerald-300"
-          : "text-zinc-300 hover:bg-zinc-800 hover:text-white",
+        active && "admin-nav-item--active",
       )}
     >
-      <Icon className={cn("h-5 w-5 shrink-0", active && "text-emerald-400")} />
+      <Icon className="h-5 w-5 shrink-0" />
       {!collapsed && <span className="truncate">{label}</span>}
     </Link>
   );
@@ -92,12 +90,12 @@ export function AdminSidebar({ userName }: { userName?: string }) {
   return (
     <aside
       className={cn(
-        "flex shrink-0 flex-col border-r border-zinc-800 bg-zinc-950 transition-[width] duration-200 ease-out",
-        collapsed ? "w-[4.25rem]" : "w-56",
-        !ready && "w-56",
+        "admin-sidebar sticky top-4 flex h-[calc(100vh-2rem)] shrink-0 flex-col overflow-hidden rounded-xl border shadow-sm transition-[width] duration-200 ease-out lg:top-6 lg:h-[calc(100vh-3rem)]",
+        collapsed ? "w-[4.25rem]" : "w-60",
+        !ready && "w-60",
       )}
     >
-      <div className={cn("border-b border-zinc-800/80 p-3", collapsed && "flex justify-center")}>
+      <div className={cn("admin-divider shrink-0 border-b p-3", collapsed && "flex justify-center")}>
         <Link
           href="/"
           title={APP_NAME}
@@ -111,11 +109,11 @@ export function AdminSidebar({ userName }: { userName?: string }) {
           {collapsed ? "B" : APP_NAME}
         </Link>
         {!collapsed && (
-          <p className="mt-0.5 text-[11px] leading-tight text-zinc-500">Админ-панель</p>
+          <p className="admin-muted mt-0.5 text-[11px] leading-tight">Админ-панель</p>
         )}
       </div>
 
-      <nav className="flex flex-1 flex-col gap-0.5 p-2">
+      <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2">
         {NAV.map((item) => (
           <NavLink
             key={item.href}
@@ -126,10 +124,10 @@ export function AdminSidebar({ userName }: { userName?: string }) {
         ))}
       </nav>
 
-      <div className="space-y-1 border-t border-zinc-800 p-2">
+      <div className="admin-sidebar-footer admin-divider mt-auto shrink-0 space-y-1 border-t p-2">
         {userName && !collapsed && (
           <div className="px-3 py-2 text-sm">
-            <p className="truncate text-zinc-300">{userName}</p>
+            <p className="truncate admin-text-secondary">{userName}</p>
             <p className="text-xs text-emerald-500">Суперадмин</p>
           </div>
         )}
@@ -151,7 +149,7 @@ export function AdminSidebar({ userName }: { userName?: string }) {
           onClick={toggleCollapsed}
           title={collapsed ? "Развернуть меню" : "Свернуть меню"}
           className={cn(
-            "flex w-full items-center rounded-lg text-sm text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200",
+            "admin-nav-muted flex w-full items-center rounded-lg text-sm transition-colors",
             collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2",
           )}
         >

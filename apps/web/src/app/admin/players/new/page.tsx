@@ -37,7 +37,7 @@ export default function NewPlayerPage() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="mb-6 text-2xl font-bold">Регистрация игрока</h1>
+      <h1 className="admin-page-title mb-6">Регистрация игрока</h1>
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-3">
           <Field label="Фамилия" name="lastName" required />
@@ -97,11 +97,11 @@ export default function NewPlayerPage() {
         </button>
       </form>
       {confirmLink && (
-        <div className="mt-6 rounded-lg border border-emerald-800 bg-emerald-950/50 p-4">
-          <p className="text-sm text-emerald-300">
+        <div className="admin-success-panel mt-6">
+          <p className="text-sm">
             Игрок должен подтвердить регистрацию через Telegram (телефон + Telegram):
           </p>
-          <a href={confirmLink} className="mt-2 block break-all text-emerald-400 underline">
+          <a href={confirmLink} className="admin-link mt-2 block break-all underline">
             {confirmLink}
           </a>
         </div>
@@ -125,13 +125,13 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1 block text-sm text-zinc-400">{label}</label>
+      <label className="admin-label">{label}</label>
       <input
         name={name}
         type={type}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+        className="admin-input w-full px-3 py-2 text-sm"
       />
     </div>
   );

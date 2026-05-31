@@ -25,10 +25,10 @@ export function AdminSortHeader<T extends string>({
       <button
         type="button"
         onClick={() => onSort(sortKey)}
-        className="inline-flex items-center gap-1 hover:text-zinc-200"
+        className="inline-flex items-center gap-1"
       >
         {label}
-        <span className={`text-xs ${active ? "text-emerald-400" : "text-zinc-600"}`}>
+        <span className={`text-xs ${active ? "admin-sort-active" : "admin-sort-idle"}`}>
           {active ? (dir === "asc" ? "↑" : "↓") : "↕"}
         </span>
       </button>

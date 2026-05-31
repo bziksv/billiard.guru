@@ -47,16 +47,16 @@ export function TournamentCard({
           label={TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
         />
       </div>
-      <p className="mt-2 text-sm text-zinc-400">
+      <p className="home-card-muted mt-2 text-sm">
         {TOURNAMENT_FORMAT_LABELS[t.format] ?? t.format}
         {" · "}
         {t.club.name}
       </p>
-      <p className="mt-1 text-sm text-zinc-500">
+      <p className="home-card-muted mt-1 text-sm">
         {formatStartsAt(t.startsAt)}
         {participants > 0 && ` · ${participants} участников`}
       </p>
-      <p className="mt-1 text-xs text-emerald-700/80">{location}</p>
+      <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400/90">{location}</p>
         {!compact && t.description && (
         <p className="home-card-body mt-3 line-clamp-3 text-sm">{t.description}</p>
       )}

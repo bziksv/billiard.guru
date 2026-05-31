@@ -11,7 +11,7 @@ export async function SiteHeader() {
   const player = await getCurrentPlayer();
 
   return (
-    <header className="site-header-shell sticky top-0 z-40 border-b backdrop-blur-xl backdrop-saturate-150">
+    <header className="site-header-shell border-b backdrop-blur-xl backdrop-saturate-150">
       <SiteContainer className="flex h-14 items-center gap-3 py-0 sm:gap-4 lg:h-16">
         <Link
           href="/"
@@ -20,7 +20,7 @@ export async function SiteHeader() {
           {APP_NAME}
         </Link>
 
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 overflow-visible">
           <SiteHeaderNav />
         </div>
 

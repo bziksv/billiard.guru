@@ -36,18 +36,23 @@ export function groupMatchesByRound(matches: BracketMatchView[]) {
     }));
 }
 
+/** Шаг и высота карточки для олимпийской сетки (px) — держать в sync с CSS .bracket-match-card */
+export const OLYMPIC_BRACKET_UNIT = 168;
+export const OLYMPIC_CARD_H = 124;
+export const OLYMPIC_LABEL_OFFSET = 28;
+
 /** Вертикальная позиция матча в олимпийской сетке (px). */
 export function olympicMatchTop(
   round: number,
   slot: number,
-  maxRound: number,
-  unit = 88,
-  cardHeight = 76,
+  _maxRound: number,
+  unit = OLYMPIC_BRACKET_UNIT,
+  cardHeight = OLYMPIC_CARD_H,
 ) {
-  const span = 2 ** (maxRound - round);
+  const span = 2 ** (round - 1);
   return (slot - 1) * span * unit + (span * unit - cardHeight) / 2;
 }
 
-export function olympicBracketHeight(maxRound: number, unit = 88) {
+export function olympicBracketHeight(maxRound: number, unit = OLYMPIC_BRACKET_UNIT) {
   return 2 ** (maxRound - 1) * unit;
 }

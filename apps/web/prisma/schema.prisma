@@ -95,6 +95,7 @@ model Club {
   phone            String   @unique
   email            String?
   photoUrl         String?  @map("photo_url")
+  galleryUrls      Json?    @map("gallery_urls")
   description      String?  @db.Text
   address          String?  @db.Text
   latitude         Float?   @map("latitude")

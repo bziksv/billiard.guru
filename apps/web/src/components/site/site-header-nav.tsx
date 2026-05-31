@@ -35,15 +35,17 @@ export function SiteHeaderNav() {
   }, []);
 
   return (
-    <nav className="flex min-w-0 items-center gap-0.5 overflow-x-auto scrollbar-none lg:gap-1">
-      {SITE_NAV_MAIN.map((item) => (
-        <NavLink
-          key={item.href}
-          href={item.href}
-          label={t(item.labelKey)}
-          active={item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)}
-        />
-      ))}
+    <div className="flex min-w-0 flex-1 items-center gap-0.5 lg:gap-1">
+      <nav className="flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto scrollbar-none lg:gap-1">
+        {SITE_NAV_MAIN.map((item) => (
+          <NavLink
+            key={item.href}
+            href={item.href}
+            label={t(item.labelKey)}
+            active={item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)}
+          />
+        ))}
+      </nav>
 
       <div ref={guideRef} className="relative shrink-0">
         <button
@@ -54,6 +56,7 @@ export function SiteHeaderNav() {
             (guideActive || guideOpen) && "site-nav-link-active",
           )}
           aria-expanded={guideOpen}
+          aria-haspopup="menu"
         >
           {t("nav.guide")}
           <span className="text-[10px] opacity-70" aria-hidden>
@@ -61,7 +64,7 @@ export function SiteHeaderNav() {
           </span>
         </button>
         {guideOpen && (
-          <div className="site-popover left-0 top-full min-w-[11rem]">
+          <div className="site-popover right-0 top-full min-w-[11rem] lg:left-0 lg:right-auto">
             {SITE_GUIDE_NAV.map((item) => (
               <Link
                 key={item.href}
@@ -78,6 +81,6 @@ export function SiteHeaderNav() {
           </div>
         )}
       </div>
-    </nav>
+    </div>
   );
 }

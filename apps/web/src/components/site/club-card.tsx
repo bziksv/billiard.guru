@@ -29,27 +29,27 @@ export function ClubCard({
           className="h-16 w-16 shrink-0 rounded-lg object-cover"
         />
       ) : (
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-2xl">
+        <div className="site-entity-thumb h-16 w-16 shrink-0 text-2xl">
           🎱
         </div>
       )}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-semibold">{club.name}</h3>
+          <h3 className="home-card-title font-semibold">{club.name}</h3>
           <StatusBadge
             status={club.isVerified ? "CONFIRMED" : "PENDING"}
             label={club.isVerified ? "Подтверждён" : "Ожидает Telegram"}
           />
         </div>
-        <p className="mt-2 text-sm text-zinc-400">
+        <p className="home-card-body mt-2 text-sm">
           {club.city.nameRu}, {club.city.country.nameRu}
         </p>
         {club.tableCount != null && club.tableCount > 0 && (
-          <p className="mt-1 text-xs text-zinc-500">{club.tableCount} столов</p>
+          <p className="home-card-muted mt-1 text-xs">{club.tableCount} столов</p>
         )}
-        {club.email && <p className="mt-1 text-sm text-zinc-500">{club.email}</p>}
+        {club.email && <p className="home-card-muted mt-1 text-sm">{club.email}</p>}
         {club._count && (
-          <p className="mt-2 text-xs text-zinc-600">Турниров: {club._count.tournaments}</p>
+          <p className="home-card-muted mt-2 text-xs">Турниров: {club._count.tournaments}</p>
         )}
       </div>
     </div>

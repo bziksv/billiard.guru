@@ -14,6 +14,7 @@ import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { StatusBadge } from "@/components/admin/status-badge";
 import type { AdminTournament } from "@/lib/tournament-admin";
+import { adminTabClass } from "@/lib/admin-ui";
 
 interface Club {
   id: string;
@@ -312,34 +313,29 @@ export default function TournamentsPage() {
     await reloadTournaments();
   }
 
-  const tabClass = (active: boolean) =>
-    active
-      ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
-      : "rounded-lg px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200";
-
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Турниры</h1>
+      <h1 className="admin-page-title">Турниры</h1>
 
-      <div className="inline-flex flex-wrap gap-1 rounded-xl border border-zinc-800 bg-zinc-950 p-1">
+      <div className="admin-tab-bar">
         <button
           type="button"
           onClick={() => setTab("create")}
-          className={tabClass(tab === "create")}
+          className={adminTabClass(tab === "create")}
         >
           Создать
         </button>
         <button
           type="button"
           onClick={() => setTab("current")}
-          className={tabClass(tab === "current")}
+          className={adminTabClass(tab === "current")}
         >
           Текущие{currentTotal > 0 ? ` (${currentTotal})` : ""}
         </button>
         <button
           type="button"
           onClick={() => setTab("finished")}
-          className={tabClass(tab === "finished")}
+          className={adminTabClass(tab === "finished")}
         >
           Завершённые{finishedTotal > 0 ? ` (${finishedTotal})` : ""}
         </button>

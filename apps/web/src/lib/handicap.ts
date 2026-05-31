@@ -59,3 +59,20 @@ export function describeHandicap(
   }
   return parts.join(", ");
 }
+
+/** Короткая подпись форы для карточки сетки. */
+export function describeHandicapShort(
+  higherRating: number,
+  lowerRating: number,
+): string {
+  const h = calculateHandicap(higherRating, lowerRating);
+  if (h.ratingDiff === 0) return "Без форы";
+  const parts: string[] = [];
+  if (h.ballsEveryGame > 0) {
+    parts.push(`${h.ballsEveryGame} в каждой партии`);
+  }
+  if (h.extraBallOnOddGames) {
+    parts.push("+1 в нечётных");
+  }
+  return parts.join(", ");
+}

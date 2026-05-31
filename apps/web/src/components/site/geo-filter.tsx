@@ -26,9 +26,11 @@ export function GeoFilterBar({ basePath }: { basePath: string }) {
   const cities = selectedCountry?.cities ?? [];
 
   function apply(nextCountry: string, nextCity: string) {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
     if (nextCountry) params.set("countryId", nextCountry);
+    else params.delete("countryId");
     if (nextCity) params.set("cityId", nextCity);
+    else params.delete("cityId");
     const q = params.toString();
     router.push(q ? `${basePath}?${q}` : basePath);
   }

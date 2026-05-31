@@ -31,48 +31,42 @@ export default function HandicapPage() {
 
   return (
     <div className="max-w-md">
-      <h1 className="mb-2 text-2xl font-bold">Калькулятор форы</h1>
-      <p className="mb-6 text-sm text-zinc-400">
+      <h1 className="admin-page-title mb-2">Калькулятор форы</h1>
+      <p className="admin-page-lead mb-6 text-sm">
         Система 0,5: разница 0,5 — 1 шар в нечётных партиях; разница 1,0 — 1
         шар в каждой партии.
       </p>
-      <div className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+      <div className="admin-card space-y-4 p-6">
         <div>
-          <label className="mb-1 block text-sm text-zinc-400">
-            Рейтинг игрока A
-          </label>
+          <label className="admin-label">Рейтинг игрока A</label>
           <input
             type="number"
             step="0.5"
             min="0"
             value={ratingA}
             onChange={(e) => setRatingA(parseFloat(e.target.value))}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2"
+            className="admin-input w-full px-3 py-2"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-zinc-400">
-            Рейтинг игрока B
-          </label>
+          <label className="admin-label">Рейтинг игрока B</label>
           <input
             type="number"
             step="0.5"
             min="0"
             value={ratingB}
             onChange={(e) => setRatingB(parseFloat(e.target.value))}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2"
+            className="admin-input w-full px-3 py-2"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm text-zinc-400">
-            Номер партии
-          </label>
+          <label className="admin-label">Номер партии</label>
           <input
             type="number"
             min="1"
             value={game}
             onChange={(e) => setGame(parseInt(e.target.value, 10))}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2"
+            className="admin-input w-full px-3 py-2"
           />
         </div>
         <button
@@ -87,12 +81,12 @@ export default function HandicapPage() {
           {loading ? "Расчёт…" : "Рассчитать"}
         </button>
         {result && (
-          <div className="rounded-lg bg-zinc-900 p-4 text-sm">
+          <div className="admin-inset p-4 text-sm">
             <p>
               Сильнейший: игрок <strong>{result.strongerPlayer}</strong>
             </p>
-            <p className="mt-2 text-zinc-300">{result.description}</p>
-            <p className="mt-2 text-emerald-400">
+            <p className="admin-text-secondary mt-2">{result.description}</p>
+            <p className="admin-stat-value mt-2 text-base">
               Фора в партии {game}: {result.handicapBalls} шар(ов)
             </p>
           </div>

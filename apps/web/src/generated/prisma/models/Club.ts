@@ -87,6 +87,7 @@ export type ClubCountAggregateOutputType = {
   phone: number
   email: number
   photoUrl: number
+  galleryUrls: number
   description: number
   address: number
   latitude: number
@@ -164,6 +165,7 @@ export type ClubCountAggregateInputType = {
   phone?: true
   email?: true
   photoUrl?: true
+  galleryUrls?: true
   description?: true
   address?: true
   latitude?: true
@@ -272,6 +274,7 @@ export type ClubGroupByOutputType = {
   phone: string
   email: string | null
   photoUrl: string | null
+  galleryUrls: runtime.JsonValue | null
   description: string | null
   address: string | null
   latitude: number | null
@@ -316,6 +319,7 @@ export type ClubWhereInput = {
   phone?: Prisma.StringFilter<"Club"> | string
   email?: Prisma.StringNullableFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
+  galleryUrls?: Prisma.JsonNullableFilter<"Club">
   description?: Prisma.StringNullableFilter<"Club"> | string | null
   address?: Prisma.StringNullableFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
@@ -343,6 +347,7 @@ export type ClubOrderByWithRelationInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  galleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -376,6 +381,7 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   cityId?: Prisma.StringFilter<"Club"> | string
   email?: Prisma.StringNullableFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
+  galleryUrls?: Prisma.JsonNullableFilter<"Club">
   description?: Prisma.StringNullableFilter<"Club"> | string | null
   address?: Prisma.StringNullableFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
@@ -401,6 +407,7 @@ export type ClubOrderByWithAggregationInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  galleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -430,6 +437,7 @@ export type ClubScalarWhereWithAggregatesInput = {
   phone?: Prisma.StringWithAggregatesFilter<"Club"> | string
   email?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
+  galleryUrls?: Prisma.JsonNullableWithAggregatesFilter<"Club">
   description?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableWithAggregatesFilter<"Club"> | number | null
@@ -450,6 +458,7 @@ export type ClubCreateInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -477,6 +486,7 @@ export type ClubUncheckedCreateInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -502,6 +512,7 @@ export type ClubUpdateInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -529,6 +540,7 @@ export type ClubUncheckedUpdateInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -555,6 +567,7 @@ export type ClubCreateManyInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -575,6 +588,7 @@ export type ClubUpdateManyMutationInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -596,6 +610,7 @@ export type ClubUncheckedUpdateManyInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -633,6 +648,7 @@ export type ClubCountOrderByAggregateInput = {
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
+  galleryUrls?: Prisma.SortOrder
   description?: Prisma.SortOrder
   address?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
@@ -853,6 +869,7 @@ export type ClubCreateWithoutCityInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -878,6 +895,7 @@ export type ClubUncheckedCreateWithoutCityInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -933,6 +951,7 @@ export type ClubScalarWhereInput = {
   phone?: Prisma.StringFilter<"Club"> | string
   email?: Prisma.StringNullableFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
+  galleryUrls?: Prisma.JsonNullableFilter<"Club">
   description?: Prisma.StringNullableFilter<"Club"> | string | null
   address?: Prisma.StringNullableFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
@@ -953,6 +972,7 @@ export type ClubCreateWithoutNewsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -979,6 +999,7 @@ export type ClubUncheckedCreateWithoutNewsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1019,6 +1040,7 @@ export type ClubUpdateWithoutNewsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1045,6 +1067,7 @@ export type ClubUncheckedUpdateWithoutNewsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1069,6 +1092,7 @@ export type ClubCreateWithoutPlayerRatingsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1095,6 +1119,7 @@ export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1135,6 +1160,7 @@ export type ClubUpdateWithoutPlayerRatingsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1161,6 +1187,7 @@ export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1185,6 +1212,7 @@ export type ClubCreateWithoutTournamentsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1211,6 +1239,7 @@ export type ClubUncheckedCreateWithoutTournamentsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1251,6 +1280,7 @@ export type ClubUpdateWithoutTournamentsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1277,6 +1307,7 @@ export type ClubUncheckedUpdateWithoutTournamentsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1301,6 +1332,7 @@ export type ClubCreateWithoutTeamsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1327,6 +1359,7 @@ export type ClubUncheckedCreateWithoutTeamsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1367,6 +1400,7 @@ export type ClubUpdateWithoutTeamsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1393,6 +1427,7 @@ export type ClubUncheckedUpdateWithoutTeamsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1417,6 +1452,7 @@ export type ClubCreateWithoutRegistrationsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1443,6 +1479,7 @@ export type ClubUncheckedCreateWithoutRegistrationsInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1483,6 +1520,7 @@ export type ClubUpdateWithoutRegistrationsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1509,6 +1547,7 @@ export type ClubUncheckedUpdateWithoutRegistrationsInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1533,6 +1572,7 @@ export type ClubCreateManyCityInput = {
   phone: string
   email?: string | null
   photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
   address?: string | null
   latitude?: number | null
@@ -1553,6 +1593,7 @@ export type ClubUpdateWithoutCityInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1578,6 +1619,7 @@ export type ClubUncheckedUpdateWithoutCityInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1603,6 +1645,7 @@ export type ClubUncheckedUpdateManyWithoutCityInput = {
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1691,6 +1734,7 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phone?: boolean
   email?: boolean
   photoUrl?: boolean
+  galleryUrls?: boolean
   description?: boolean
   address?: boolean
   latitude?: boolean
@@ -1721,6 +1765,7 @@ export type ClubSelectScalar = {
   phone?: boolean
   email?: boolean
   photoUrl?: boolean
+  galleryUrls?: boolean
   description?: boolean
   address?: boolean
   latitude?: boolean
@@ -1735,7 +1780,7 @@ export type ClubSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "cityId" | "phone" | "email" | "photoUrl" | "description" | "address" | "latitude" | "longitude" | "workingHours" | "tableCount" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
+export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "cityId" | "phone" | "email" | "photoUrl" | "galleryUrls" | "description" | "address" | "latitude" | "longitude" | "workingHours" | "tableCount" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
 export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   tournaments?: boolean | Prisma.Club$tournamentsArgs<ExtArgs>
@@ -1763,6 +1808,7 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     phone: string
     email: string | null
     photoUrl: string | null
+    galleryUrls: runtime.JsonValue | null
     description: string | null
     address: string | null
     latitude: number | null
@@ -2156,6 +2202,7 @@ export interface ClubFieldRefs {
   readonly phone: Prisma.FieldRef<"Club", 'String'>
   readonly email: Prisma.FieldRef<"Club", 'String'>
   readonly photoUrl: Prisma.FieldRef<"Club", 'String'>
+  readonly galleryUrls: Prisma.FieldRef<"Club", 'Json'>
   readonly description: Prisma.FieldRef<"Club", 'String'>
   readonly address: Prisma.FieldRef<"Club", 'String'>
   readonly latitude: Prisma.FieldRef<"Club", 'Float'>

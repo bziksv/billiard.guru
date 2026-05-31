@@ -40,16 +40,11 @@ import {
   TOURNAMENT_FORMAT_LABELS,
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
+import { adminTabClass } from "@/lib/admin-ui";
 
 type Team = AdminTournament["teams"][number] & TeamWithPlayers;
 type Match = AdminTournament["matches"][number];
 type ManageTab = "participants" | "bracket" | "protocol";
-
-function manageTabClass(active: boolean) {
-  return active
-    ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
-    : "rounded-lg px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200";
-}
 
 export function TournamentManageView({
   tournament: t,
@@ -305,11 +300,11 @@ export function TournamentManageView({
           <h2 className="mb-3 font-semibold">
             {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
           </h2>
-          <div className="inline-flex flex-wrap gap-1 rounded-xl border border-zinc-800 bg-zinc-900/50 p-1">
+          <div className="admin-tab-bar">
           <button
             type="button"
             onClick={() => setTab("participants")}
-            className={manageTabClass(tab === "participants")}
+            className={adminTabClass(tab === "participants")}
           >
             Участники
             {participantCount > 0 ? ` (${participantCount})` : ""}
@@ -317,7 +312,7 @@ export function TournamentManageView({
           <button
             type="button"
             onClick={() => setTab("bracket")}
-            className={manageTabClass(tab === "bracket")}
+            className={adminTabClass(tab === "bracket")}
           >
             Сетка
             {rounds.length > 0 ? ` · ${maxRound} ${swiss ? "тур." : "раунд."}` : ""}
@@ -325,7 +320,7 @@ export function TournamentManageView({
           <button
             type="button"
             onClick={() => setTab("protocol")}
-            className={manageTabClass(tab === "protocol")}
+            className={adminTabClass(tab === "protocol")}
           >
             Итоговый протокол
           </button>
@@ -670,13 +665,15 @@ function BracketTab({
         <>
           <p className="text-xs text-zinc-500">
             {olympic
-              ? "Клик по карточке встречи — результат."
+              ? "Имя — профиль игрока · рамка счёта или строка «Фора» — результат встречи."
               : "Зажмите фон сетки и тащите. Имя — карточка игрока, счёт / # / подвал — результат встречи."}
           </p>
           {olympic ? (
             <OlympicBracketView
               matches={bracketMatches}
               onMatchClick={setModalMatch}
+              onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
+              showMatchScore
             />
           ) : (
             <SwissBracketView

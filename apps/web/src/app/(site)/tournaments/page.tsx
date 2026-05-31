@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import { GeoFilterBar } from "@/components/site/geo-filter";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { EmptyState } from "@/components/site/site-card";
-import { TournamentCard } from "@/components/site/tournament-card";
+import { TournamentsListSection } from "@/components/site/tournaments-list-section";
+import { TournamentsTabBar } from "@/components/site/tournaments-tab-bar";
 import { getCurrentPlayer } from "@/lib/auth";
 import { getNearbyCityIds, NOTIFY_RADIUS_KM } from "@/lib/geo";
 import {
@@ -10,41 +11,99 @@ import {
   tournamentCityIdsWhere,
   tournamentGeoWhere,
   tournamentListInclude,
-  tournamentListOrderBy,
 } from "@/lib/public-queries";
 import { prisma } from "@/lib/prisma";
 import type { GeoSearchParams } from "@/lib/site";
 import { t } from "@/lib/site";
+import {
+  countTournamentsByTab,
+  filterTournamentsByTab,
+  parseTournamentTab,
+  sortTournamentsForTab,
+  tournamentTabConfig,
+} from "@/lib/tournament-tabs";
 
-function TournamentList({
-  tournaments,
+type TournamentSearchParams = GeoSearchParams & {
+  tab?: string;
+};
+
+function TournamentsPageBody({
+  tab,
+  localTournaments,
+  nearbyTournaments,
+  localSubtitle,
+  nearbySubtitle,
 }: {
-  tournaments: Awaited<
+  tab: ReturnType<typeof parseTournamentTab>;
+  localTournaments: Awaited<
     ReturnType<
       typeof prisma.tournament.findMany<{ include: typeof tournamentListInclude }>
     >
   >;
+  nearbyTournaments: Awaited<
+    ReturnType<
+      typeof prisma.tournament.findMany<{ include: typeof tournamentListInclude }>
+    >
+  >;
+  localSubtitle?: string;
+  nearbySubtitle?: string;
 }) {
+  const allTournaments = [...localTournaments, ...nearbyTournaments];
+  const counts = countTournamentsByTab(allTournaments);
+  const localFiltered = sortTournamentsForTab(
+    filterTournamentsByTab(localTournaments, tab),
+    tab,
+  );
+  const nearbyFiltered = sortTournamentsForTab(
+    filterTournamentsByTab(nearbyTournaments, tab),
+    tab,
+  );
+  const tabTotal = localFiltered.length + nearbyFiltered.length;
+  const config = tournamentTabConfig(tab);
+  const hasGeoSections = Boolean(localSubtitle || nearbySubtitle);
+
   return (
-    <ul className="space-y-4">
-      {tournaments.map((tournament) => (
-        <li key={tournament.id}>
-          <TournamentCard
-            tournament={tournament}
-            href={`/tournaments/${tournament.id}`}
+    <>
+      <TournamentsTabBar activeTab={tab} counts={counts} />
+
+      {tabTotal === 0 ? (
+        <EmptyState title={config.emptyTitle} description={config.emptyDescription} />
+      ) : hasGeoSections ? (
+        <div className="space-y-8">
+          <TournamentsListSection
+            tournaments={localFiltered}
+            tab={tab}
+            compactEmpty
+            subtitle={
+              localSubtitle
+                ? `${localSubtitle}${localFiltered.length > 0 ? ` · ${localFiltered.length}` : ""}`
+                : undefined
+            }
           />
-        </li>
-      ))}
-    </ul>
+          {nearbyFiltered.length > 0 && (
+            <TournamentsListSection
+              tournaments={nearbyFiltered}
+              tab={tab}
+              subtitle={
+                nearbySubtitle ? `${nearbySubtitle} · ${nearbyFiltered.length}` : undefined
+              }
+            />
+          )}
+        </div>
+      ) : (
+        <TournamentsListSection tournaments={localFiltered} tab={tab} />
+      )}
+    </>
   );
 }
 
 export default async function TournamentsPage({
   searchParams,
 }: {
-  searchParams: Promise<GeoSearchParams>;
+  searchParams: Promise<TournamentSearchParams>;
 }) {
   const rawParams = await searchParams;
+  const tab = parseTournamentTab(rawParams.tab);
   const player = await getCurrentPlayer();
   const hasManualGeo = Boolean(rawParams.cityId || rawParams.countryId);
   const usePlayerSections = Boolean(player && !hasManualGeo);
@@ -67,64 +126,34 @@ export default async function TournamentsPage({
       prisma.tournament.findMany({
         where: tournamentGeoWhere({ cityId: player.cityId }),
         include: tournamentListInclude,
-        orderBy: tournamentListOrderBy,
       }),
       nearbyCityIds.length > 0
         ? prisma.tournament.findMany({
             where: tournamentCityIdsWhere(nearbyCityIds),
             include: tournamentListInclude,
-            orderBy: tournamentListOrderBy,
           })
         : Promise.resolve([]),
     ]);
-
-    const nothingFound =
-      localTournaments.length === 0 && nearbyTournaments.length === 0;
 
     return (
       <>
         <PageHeader
           title={t("nav.tournaments")}
-          lead={`Сначала турниры в вашем городе (${player.city.nameRu}), ниже — в соседних городах в радиусе ${NOTIFY_RADIUS_KM} км.`}
+          lead={`Сначала турниры в ${player.city.nameRu}, затем в соседних городах (до ${NOTIFY_RADIUS_KM} км). Выберите вкладку по статусу.`}
         />
-        <PageMain className="space-y-8 pt-0">
+        <PageMain className="space-y-6 pt-0">
           <Suspense fallback={<div className="site-skeleton h-24" />}>
             <GeoFilterBar basePath="/tournaments" />
           </Suspense>
-
-          {nothingFound ? (
-            <EmptyState title={t("empty.tournaments")} />
-          ) : (
-            <>
-              <section className="space-y-4">
-                <h2 className="site-page-subtitle">
-                  В вашем городе
-                  <span className="home-card-muted ml-2 text-base font-normal">
-                    {player.city.nameRu}
-                  </span>
-                </h2>
-                {localTournaments.length === 0 ? (
-                  <p className="text-sm text-zinc-500">
-                    В {player.city.nameRu} пока нет опубликованных турниров.
-                  </p>
-                ) : (
-                  <TournamentList tournaments={localTournaments} />
-                )}
-              </section>
-
-              {nearbyTournaments.length > 0 && (
-                <section className="space-y-4">
-                  <h2 className="site-page-subtitle">
-                    Рядом
-                    <span className="home-card-muted ml-2 text-base font-normal">
-                      соседние города
-                    </span>
-                  </h2>
-                  <TournamentList tournaments={nearbyTournaments} />
-                </section>
-              )}
-            </>
-          )}
+          <Suspense fallback={<div className="site-skeleton h-10 w-full max-w-xl" />}>
+            <TournamentsPageBody
+              tab={tab}
+              localTournaments={localTournaments}
+              nearbyTournaments={nearbyTournaments}
+              localSubtitle={`В вашем городе · ${player.city.nameRu}`}
+              nearbySubtitle="Рядом · соседние города"
+            />
+          </Suspense>
         </PageMain>
       </>
     );
@@ -138,24 +167,25 @@ export default async function TournamentsPage({
   const tournaments = await prisma.tournament.findMany({
     where: tournamentGeoWhere(geo),
     include: tournamentListInclude,
-    orderBy: tournamentListOrderBy,
   });
 
   return (
     <>
       <PageHeader
         title={t("nav.tournaments")}
-        lead="Открытая регистрация, текущие и завершённые турниры. Фильтруйте по стране и городу."
+        lead="Предстоящие турниры с открытой регистрацией, идущие сейчас и завершённые. Фильтруйте по региону."
       />
       <PageMain className="space-y-6 pt-0">
         <Suspense fallback={<div className="site-skeleton h-24" />}>
           <GeoFilterBar basePath="/tournaments" />
         </Suspense>
-        {tournaments.length === 0 ? (
-          <EmptyState title={t("empty.tournaments")} />
-        ) : (
-          <TournamentList tournaments={tournaments} />
-        )}
+        <Suspense fallback={<div className="site-skeleton h-10 w-full max-w-xl" />}>
+          <TournamentsPageBody
+            tab={tab}
+            localTournaments={tournaments}
+            nearbyTournaments={[]}
+          />
+        </Suspense>
       </PageMain>
     </>
   );

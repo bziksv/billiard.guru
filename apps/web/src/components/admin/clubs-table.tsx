@@ -105,7 +105,7 @@ export function ClubsAdminTable() {
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Клубы</h1>
+        <h1 className="admin-page-title">Клубы</h1>
         <Link
           href="/admin/clubs/new"
           className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500"
@@ -135,11 +135,11 @@ export function ClubsAdminTable() {
       </AdminTableToolbar>
 
       {loading ? (
-        <p className="text-zinc-500">Загрузка…</p>
+        <p className="admin-muted">Загрузка…</p>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-800">
+        <div className="admin-table-wrap">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-950 text-zinc-400">
+            <thead className="admin-thead">
               <tr>
                 <AdminSortHeader
                   label="Название"
@@ -188,7 +188,7 @@ export function ClubsAdminTable() {
             </thead>
             <tbody>
               {rows.map((club) => (
-                <tr key={club.id} className="border-t border-zinc-800">
+                <tr key={club.id} className="admin-table-row">
                   <td className="px-4 py-3 font-medium">{club.name}</td>
                   <td className="px-4 py-3">
                     {club.city.nameRu}, {club.city.country.nameRu}
@@ -197,7 +197,7 @@ export function ClubsAdminTable() {
                   <td className="px-4 py-3">
                     {club.telegramUsername ? `@${club.telegramUsername}` : "—"}
                   </td>
-                  <td className="px-4 py-3 text-zinc-400">
+                  <td className="admin-text-secondary px-4 py-3">
                     {formatAdminDate(club.createdAt)}
                   </td>
                   <td className="px-4 py-3">
@@ -210,13 +210,13 @@ export function ClubsAdminTable() {
                     <div className="flex flex-col items-end gap-1">
                       <Link
                         href={`/admin/clubs/${club.id}`}
-                        className="text-xs text-emerald-400 hover:underline"
+                        className="admin-link text-xs hover:underline"
                       >
                         Профиль
                       </Link>
                       <Link
                         href={`/admin/clubs/${club.id}/ratings`}
-                        className="text-xs text-zinc-400 hover:underline"
+                        className="admin-link-muted text-xs hover:underline"
                       >
                         Рейтинг игроков
                       </Link>
@@ -226,7 +226,7 @@ export function ClubsAdminTable() {
               ))}
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-zinc-500">
+                  <td colSpan={7} className="admin-muted px-4 py-8 text-center">
                     {clubs.length === 0 ? "Клубов пока нет" : "Ничего не найдено"}
                   </td>
                 </tr>

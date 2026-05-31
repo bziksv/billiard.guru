@@ -2,20 +2,48 @@ import {
   groupMatchesByRound,
   olympicBracketHeight,
   olympicMatchTop,
+  OLYMPIC_BRACKET_UNIT,
+  OLYMPIC_CARD_H,
+  OLYMPIC_LABEL_OFFSET,
   type BracketMatchView,
 } from "@/lib/bracket-view";
 import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
+import type { TeamPlayer } from "@/lib/pair-tournament";
 
-const UNIT = 88;
-const CARD_H = 76;
+const UNIT = OLYMPIC_BRACKET_UNIT;
+const CARD_H = OLYMPIC_CARD_H;
+const CARD_W = 224;
+const CARD_LEFT = 8;
 const COL_W = 240;
+const LABEL_OFFSET = OLYMPIC_LABEL_OFFSET;
+
+function matchCenterY(
+  round: number,
+  slot: number,
+  maxRound: number,
+): number {
+  return (
+    olympicMatchTop(round, slot, maxRound, UNIT, CARD_H) +
+    LABEL_OFFSET +
+    CARD_H / 2
+  );
+}
+
+function lineX(colIndex: number, side: "left" | "right") {
+  const base = colIndex * COL_W + CARD_LEFT;
+  return side === "right" ? base + CARD_W : base;
+}
 
 export function OlympicBracketView({
   matches,
   onMatchClick,
+  onPlayerClick,
+  showMatchScore = false,
 }: {
   matches: BracketMatchView[];
   onMatchClick?: (match: BracketMatchView) => void;
+  onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
+  showMatchScore?: boolean;
 }) {
   const rounds = groupMatchesByRound(matches);
   if (rounds.length === 0) return null;
@@ -27,48 +55,37 @@ export function OlympicBracketView({
     <div className="overflow-x-auto pb-4">
       <div
         className="relative flex min-w-max gap-0"
-        style={{ height: totalHeight + CARD_H }}
+        style={{ height: totalHeight + CARD_H + LABEL_OFFSET }}
       >
         <svg
-          className="pointer-events-none absolute inset-0 z-0"
-          width={(rounds.length - 1) * COL_W + COL_W}
-          height={totalHeight + CARD_H}
+          className="pointer-events-none absolute inset-0 z-20 overflow-visible"
+          width={rounds.length * COL_W}
+          height={totalHeight + CARD_H + LABEL_OFFSET}
           aria-hidden
         >
-          {rounds.slice(0, -1).map(({ round, matches: roundMatches }) => {
-            const nextRound = rounds.find((r) => r.round === round + 1);
-            if (!nextRound) return null;
+          {Array.from({ length: maxRound - 1 }, (_, i) => i + 1).flatMap((round) => {
+            const slotsInRound = 2 ** (maxRound - round);
+            const colIndex = round - 1;
 
-            return roundMatches.map((match) => {
-              if (!match.team1 && !match.team2) return null;
-              const next = getNextMatchSlot(match.round, match.slot);
-              const nextMatch = nextRound.matches.find((m) => m.slot === next.slot);
-              if (!nextMatch) return null;
+            return Array.from({ length: slotsInRound }, (_, j) => {
+              const slot = j + 1;
+              const nextSlot = Math.ceil(slot / 2);
 
-              const colIndex = rounds.findIndex((r) => r.round === round);
-              const x1 = colIndex * COL_W + 224;
-              const y1 =
-                olympicMatchTop(match.round, match.slot, maxRound, UNIT, CARD_H) +
-                CARD_H / 2;
-              const x2 = (colIndex + 1) * COL_W + 16;
-              const y2 =
-                olympicMatchTop(
-                  nextMatch.round,
-                  nextMatch.slot,
-                  maxRound,
-                  UNIT,
-                  CARD_H,
-                ) +
-                CARD_H / 2;
+              const x1 = lineX(colIndex, "right");
+              const y1 = matchCenterY(round, slot, maxRound);
+              const x2 = lineX(colIndex + 1, "left");
+              const y2 = matchCenterY(round + 1, nextSlot, maxRound);
               const midX = x1 + (x2 - x1) / 2;
 
               return (
                 <path
-                  key={`${match.id}-line`}
+                  key={`r${round}-s${slot}`}
                   d={`M ${x1} ${y1} H ${midX} V ${y2} H ${x2}`}
                   fill="none"
-                  stroke="rgb(16 185 129 / 0.35)"
+                  stroke="var(--bracket-line)"
                   strokeWidth="2"
+                  strokeLinecap="square"
+                  strokeLinejoin="miter"
                 />
               );
             });
@@ -79,9 +96,9 @@ export function OlympicBracketView({
           <div
             key={round}
             className="relative z-10 shrink-0"
-            style={{ width: COL_W, height: totalHeight + CARD_H }}
+            style={{ width: COL_W, height: totalHeight + CARD_H + LABEL_OFFSET }}
           >
-            <p className="mb-3 text-center text-xs font-semibold uppercase tracking-wider text-emerald-500/80">
+            <p className="bracket-round-label mb-3 text-center text-xs font-semibold uppercase tracking-wider">
               {round === maxRound ? "Финал" : `1/${2 ** (maxRound - round)}`}
             </p>
             {roundMatches.map((match) => (
@@ -91,10 +108,15 @@ export function OlympicBracketView({
                 style={{
                   top:
                     olympicMatchTop(match.round, match.slot, maxRound, UNIT, CARD_H) +
-                    28,
+                    LABEL_OFFSET,
                 }}
               >
-                <BracketMatchCard match={match} onMatchClick={onMatchClick} />
+                <BracketMatchCard
+                  match={match}
+                  onMatchClick={onMatchClick}
+                  onPlayerClick={onPlayerClick}
+                  showMatchScore={showMatchScore}
+                />
               </div>
             ))}
           </div>
@@ -102,11 +124,4 @@ export function OlympicBracketView({
       </div>
     </div>
   );
-}
-
-function getNextMatchSlot(round: number, slot: number) {
-  return {
-    round: round + 1,
-    slot: Math.ceil(slot / 2),
-  };
 }

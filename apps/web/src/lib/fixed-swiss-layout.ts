@@ -141,7 +141,7 @@ function buildFixedTemplateEdges(
   return edges;
 }
 
-/** LLB-style: старт в центре, победа → вправо, поражение → влево. */
+/** Фикс. швейцарка: старт в центре, победа → вправо, поражение → влево. */
 export function buildFixedSwissBracketLayout(
   matches: BracketMatchView[],
 ): SwissBracketLayout {

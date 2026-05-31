@@ -5,6 +5,10 @@ import { ClubMap } from "@/components/site/club-map";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { TournamentCard } from "@/components/site/tournament-card";
+import { ClubPhotoGallery } from "@/components/site/club-photo-gallery";
+import { LinkifiedText } from "@/components/site/linkified-text";
+import { PhoneLink, TelegramLink } from "@/lib/contact-links";
+import { clubPhotoUrls } from "@/lib/club-photos";
 import { PUBLIC_TOURNAMENT_STATUSES } from "@/lib/public-display";
 import {
   tournamentListInclude,
@@ -46,6 +50,7 @@ export default async function ClubPage({
   const mapLng = club.longitude ?? club.city.longitude;
   const upcoming = club.tournaments.filter((t) => t.status !== "FINISHED");
   const past = club.tournaments.filter((t) => t.status === "FINISHED");
+  const photos = clubPhotoUrls(club);
 
   return (
     <>
@@ -57,77 +62,58 @@ export default async function ClubPage({
       <PageMain className="space-y-8 pt-0">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <SiteCard className="overflow-hidden p-0">
-            <div className="grid gap-0 md:grid-cols-[240px_minmax(0,1fr)]">
-              <div className="relative min-h-[200px] bg-zinc-900 md:min-h-full">
-                {club.photoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={club.photoUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full min-h-[200px] items-center justify-center bg-gradient-to-br from-zinc-900 to-zinc-950 text-5xl text-zinc-700">
-                    🎱
-                  </div>
-                )}
-              </div>
-              <div className="p-6">
-                <div className="flex flex-wrap items-center gap-2">
+            <ClubPhotoGallery photos={photos} alt={club.name} />
+            <div className="p-6">
+              <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge
                     status={club.isVerified ? "CONFIRMED" : "PENDING"}
                     label={club.isVerified ? "Подтверждён" : "Ожидает Telegram"}
                   />
                   {club.tableCount != null && club.tableCount > 0 && (
-                    <span className="rounded-full border border-zinc-700 px-2.5 py-0.5 text-xs text-zinc-300">
-                      {club.tableCount} столов
-                    </span>
+                    <span className="site-meta-chip">{club.tableCount} столов</span>
                   )}
                 </div>
-                <p className="mt-3 text-sm text-zinc-400">
+                <p className="home-card-body mt-3 text-sm">
                   {club.city.nameRu}, {club.city.country.nameRu}
                 </p>
                 {club.address && (
-                  <p className="mt-1 text-sm text-zinc-500">{club.address}</p>
+                  <p className="home-card-muted mt-1 text-sm">{club.address}</p>
+                )}
+                {club.phone && (
+                  <p className="mt-2 text-sm">
+                    <PhoneLink phone={club.phone} />
+                  </p>
                 )}
                 {club.email && (
                   <p className="mt-2 text-sm">
-                    <a href={`mailto:${club.email}`} className="text-emerald-400 hover:underline">
+                    <a href={`mailto:${club.email}`} className="text-emerald-600 hover:underline dark:text-emerald-400">
                       {club.email}
                     </a>
                   </p>
                 )}
                 {club.telegramUsername && (
                   <p className="mt-1 text-sm">
-                    <a
-                      href={`https://t.me/${club.telegramUsername}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-emerald-400 hover:underline"
-                    >
-                      @{club.telegramUsername}
-                    </a>
+                    <TelegramLink username={club.telegramUsername} />
                   </p>
                 )}
                 {club.description && (
-                  <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
-                    {club.description}
+                  <p className="home-card-body mt-4 whitespace-pre-wrap text-sm leading-relaxed">
+                    <LinkifiedText text={club.description} />
                   </p>
                 )}
-              </div>
             </div>
           </SiteCard>
 
           <SiteCard>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            <h2 className="home-card-muted mb-3 text-sm font-semibold uppercase tracking-wider">
               Режим работы
             </h2>
             {club.workingHours ? (
-              <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
-                {club.workingHours}
+              <p className="home-card-body whitespace-pre-wrap text-sm leading-relaxed">
+                <LinkifiedText text={club.workingHours} />
               </p>
             ) : (
-              <p className="text-sm text-zinc-500">График уточняйте у клуба.</p>
+              <p className="home-card-muted text-sm">График уточняйте у клуба.</p>
             )}
           </SiteCard>
         </div>
@@ -152,12 +138,12 @@ export default async function ClubPage({
               {club.news.map((item) => (
                 <li key={item.id}>
                   <SiteCard>
-                    <time className="text-xs text-zinc-500">
+                    <time className="home-card-muted text-xs">
                       {formatNewsDate(item.publishedAt)}
                     </time>
-                    <h3 className="mt-1 text-lg font-semibold">{item.title}</h3>
-                    <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
-                      {item.body}
+                    <h3 className="home-card-title mt-1 text-lg font-semibold">{item.title}</h3>
+                    <p className="home-card-body mt-2 whitespace-pre-wrap text-sm leading-relaxed">
+                      <LinkifiedText text={item.body} />
                     </p>
                   </SiteCard>
                 </li>

@@ -15,10 +15,10 @@ export function AdminTableToolbar({
   count?: { shown: number; total: number };
 }) {
   return (
-    <div className="mb-4 flex flex-wrap gap-3 rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+    <div className="admin-panel mb-4 flex flex-wrap gap-3 p-4">
       {children}
       {count && (
-        <p className="flex items-end pb-2 text-sm text-zinc-500">
+        <p className="admin-muted flex items-end pb-2 text-sm">
           {count.shown} из {count.total}
         </p>
       )}
@@ -36,13 +36,13 @@ export function AdminTableSearchField({
   placeholder: string;
 }) {
   return (
-    <label className="flex min-w-[200px] flex-1 flex-col gap-1 text-xs text-zinc-500">
-      Поиск
+    <label className="flex min-w-[200px] flex-1 flex-col gap-1">
+      <span className="admin-label-xs">Поиск</span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100"
+        className="admin-input px-3 py-2 text-sm"
       />
     </label>
   );
@@ -67,7 +67,7 @@ export function AdminFilterSelect({
   return (
     <SearchableSelect
       label={label}
-      labelClassName="text-xs text-zinc-500"
+      labelClassName="admin-label-xs"
       className="min-w-[160px]"
       options={options}
       value={value}

@@ -25,7 +25,7 @@ export function TournamentListCard({
   const canStart = canStartTournament(t);
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
+    <div className="admin-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -35,14 +35,14 @@ export function TournamentListCard({
               label={TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
             />
           </div>
-          <p className="mt-1 text-sm text-zinc-400">
+          <p className="admin-text-secondary mt-1 text-sm">
             {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
             {t.club.city?.nameRu ? ` · ${t.club.city.nameRu}` : ""}
           </p>
           {t.startsAt && (
-            <p className="mt-1 text-xs text-zinc-500">{formatAdminDate(t.startsAt)}</p>
+            <p className="admin-muted mt-1 text-xs">{formatAdminDate(t.startsAt)}</p>
           )}
-          <p className="mt-2 text-sm text-zinc-300">
+          <p className="admin-text-secondary mt-2 text-sm">
             {confirmed} подтверждённых
             {pending > 0 ? ` · ${pending} заявок` : ""}
           </p>
@@ -58,10 +58,7 @@ export function TournamentListCard({
               {starting ? "Запуск…" : "Начать турнир"}
             </button>
           )}
-          <Link
-            href={`/admin/tournaments/${t.id}`}
-            className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:border-emerald-600 hover:text-emerald-300"
-          >
+          <Link href={`/admin/tournaments/${t.id}`} className="admin-btn-secondary">
             {t.status === "ACTIVE" ? "Ведение" : "Управление"}
           </Link>
         </div>

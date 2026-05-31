@@ -451,6 +451,10 @@ export async function processByes(db: Db, tournamentId: string, format: string) 
 
       if (!soloTeamId) continue;
 
+      if (isOlympicFormat(format) && match.round > 1) {
+        continue;
+      }
+
       if (isSwissFormat(format)) {
         await finishSwissBye(db, match.id, soloTeamId);
       } else {
@@ -834,11 +838,12 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
   }
 
   const soloTeamId =
-    match.team1Id && !match.team2Id
+    match.round === 1 &&
+    (match.team1Id && !match.team2Id
       ? match.team1Id
       : !match.team1Id && match.team2Id
         ? match.team2Id
-        : null;
+        : null);
 
   if (soloTeamId) {
     if (input.winnerTeamId !== soloTeamId) {

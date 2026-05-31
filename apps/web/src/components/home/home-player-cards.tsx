@@ -12,10 +12,22 @@ type PlayerItem = {
   city: { nameRu: string };
 };
 
-const RANK_STYLES = [
-  "ring-2 ring-amber-400/80 shadow-amber-900/30",
-  "ring-2 ring-zinc-300/60 shadow-zinc-500/20",
-  "ring-2 ring-amber-700/60 shadow-amber-950/30",
+const RANK_CARD_CLASS = [
+  "home-player-card--rank-1",
+  "home-player-card--rank-2",
+  "home-player-card--rank-3",
+] as const;
+
+const RANK_AVATAR_CLASS = [
+  "home-player-avatar--rank-1",
+  "home-player-avatar--rank-2",
+  "home-player-avatar--rank-3",
+] as const;
+
+const RANK_BADGE_CLASS = [
+  "home-player-rank-badge--1",
+  "home-player-rank-badge--2",
+  "home-player-rank-badge--3",
 ] as const;
 
 export function HomePlayerCards({ players }: { players: PlayerItem[] }) {
@@ -33,21 +45,15 @@ export function HomePlayerCards({ players }: { players: PlayerItem[] }) {
         <Link
           key={player.id}
           href={`/players/${player.id}`}
-          className={`home-content-card-solid home-card-glow group w-[210px] shrink-0 snap-start overflow-hidden rounded-2xl ${
-            index < 3 ? RANK_STYLES[index] : ""
+          className={`home-player-card home-content-card-solid group w-[210px] shrink-0 snap-start overflow-hidden rounded-2xl ${
+            index < 3 ? RANK_CARD_CLASS[index] : ""
           }`}
         >
           <div className="home-player-header relative h-32">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-emerald-500/10 blur-2xl transition group-hover:bg-emerald-500/20" />
             <div
-              className={`absolute bottom-3 left-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl border bg-[var(--surface-inset)] text-xl font-bold text-emerald-600 ${
-                index === 0
-                  ? "border-amber-500/50"
-                  : index === 1
-                    ? "border-zinc-400/40"
-                    : index === 2
-                      ? "border-amber-800/50"
-                      : "border-[var(--border-subtle)]"
+              className={`home-player-avatar absolute bottom-3 left-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl bg-[var(--surface-inset)] text-xl font-bold ${
+                index < 3 ? RANK_AVATAR_CLASS[index] : "border-2 border-[var(--border-subtle)] text-emerald-600"
               }`}
             >
               {player.photoUrl ? (
@@ -62,14 +68,8 @@ export function HomePlayerCards({ players }: { players: PlayerItem[] }) {
               )}
             </div>
             <span
-              className={`absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-                index === 0
-                  ? "bg-amber-500/20 text-amber-600"
-                  : index === 1
-                    ? "bg-zinc-400/15 text-zinc-600"
-                    : index === 2
-                      ? "bg-amber-800/25 text-amber-700"
-                      : "bg-[var(--bg-muted)] text-[var(--text-muted)]"
+              className={`home-player-rank-badge absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+                index < 3 ? RANK_BADGE_CLASS[index] : "home-player-rank-badge--default"
               }`}
             >
               {index + 1}

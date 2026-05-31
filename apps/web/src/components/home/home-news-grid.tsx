@@ -25,9 +25,7 @@ export function HomeNewsGrid({ items }: { items: HomeNewsItem[] }) {
           style={{ animationDelay: `${index * 0.08}s` }}
         >
           {item.preview && (
-            <span className="home-card-muted absolute right-3 top-3 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2 py-0.5 text-[10px]">
-              пример
-            </span>
+            <span className="home-preview-label absolute right-3 top-3">пример</span>
           )}
           <div className="home-card-muted flex flex-wrap items-center gap-2 text-xs">
             <AuthorBadge type={item.authorType} />

@@ -195,7 +195,7 @@ export function PlayersAdminTable() {
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">Игроки</h1>
+        <h1 className="admin-page-title">Игроки</h1>
         <Link
           href="/admin/players/new"
           className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500"
@@ -225,11 +225,11 @@ export function PlayersAdminTable() {
       </AdminTableToolbar>
 
       {loading ? (
-        <p className="text-zinc-500">Загрузка…</p>
+        <p className="admin-muted">Загрузка…</p>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-800">
+        <div className="admin-table-wrap">
           <table className="w-full text-left text-sm">
-            <thead className="bg-zinc-950 text-zinc-400">
+            <thead className="admin-thead">
               <tr>
                 <AdminSortHeader
                   label="ФИО"
@@ -293,7 +293,7 @@ export function PlayersAdminTable() {
             <tbody>
               {sorted.map((player) => (
                 <Fragment key={player.id}>
-                  <tr className="border-t border-zinc-800">
+                  <tr className="admin-table-row">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {player.photoUrl ? (
@@ -304,7 +304,7 @@ export function PlayersAdminTable() {
                             className="h-8 w-8 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-700 text-xs">
+                          <div className="admin-avatar-placeholder h-8 w-8">
                             {player.firstName[0]}
                           </div>
                         )}

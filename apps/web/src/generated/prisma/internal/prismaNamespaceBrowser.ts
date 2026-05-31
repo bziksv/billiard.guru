@@ -110,6 +110,7 @@ export const ClubScalarFieldEnum = {
   phone: 'phone',
   email: 'email',
   photoUrl: 'photoUrl',
+  galleryUrls: 'galleryUrls',
   description: 'description',
   address: 'address',
   latitude: 'latitude',
@@ -355,6 +356,23 @@ export const CityOrderByRelevanceFieldEnum = {
 export type CityOrderByRelevanceFieldEnum = (typeof CityOrderByRelevanceFieldEnum)[keyof typeof CityOrderByRelevanceFieldEnum]
 
 
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+} as const
+
+export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
 export const ClubOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
@@ -470,23 +488,6 @@ export const RatingChangeOrderByRelevanceFieldEnum = {
 } as const
 
 export type RatingChangeOrderByRelevanceFieldEnum = (typeof RatingChangeOrderByRelevanceFieldEnum)[keyof typeof RatingChangeOrderByRelevanceFieldEnum]
-
-
-export const JsonNullValueFilter = {
-  DbNull: DbNull,
-  JsonNull: JsonNull,
-  AnyNull: AnyNull
-} as const
-
-export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const AuditLogOrderByRelevanceFieldEnum = {

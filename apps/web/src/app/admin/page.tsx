@@ -22,19 +22,15 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-bold">Обзор</h1>
-      <p className="mb-8 text-zinc-400">
+      <h1 className="admin-page-title mb-2">Обзор</h1>
+      <p className="admin-page-lead mb-8">
         Управление клубами, игроками и турнирами по бильярду
       </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
-          <Link
-            key={card.label}
-            href={card.href}
-            className="rounded-xl border border-zinc-800 bg-zinc-950 p-6 transition hover:border-emerald-700"
-          >
-            <p className="text-sm text-zinc-400">{card.label}</p>
-            <p className="mt-2 text-3xl font-bold text-emerald-400">{card.value}</p>
+          <Link key={card.label} href={card.href} className="admin-stat-card">
+            <p className="admin-stat-label">{card.label}</p>
+            <p className="admin-stat-value">{card.value}</p>
           </Link>
         ))}
       </div>

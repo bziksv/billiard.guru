@@ -65,9 +65,16 @@ export function MatchResultModal({
   if (!open || !match) return null;
 
   const finished = match.status === "FINISHED" || !!match.winnerTeamId;
-  const bye = Boolean(match.team1 && !match.team2);
+  const roundOneBye = Boolean(
+    match.round === 1 &&
+      ((match.team1 && !match.team2) || (!match.team1 && match.team2)),
+  );
   const team1Label = match.team1 ? teamLabel(match.team1) : "—";
-  const team2Label = match.team2 ? teamLabel(match.team2) : bye ? "× (автопроход)" : "—";
+  const team2Label = match.team2
+    ? teamLabel(match.team2)
+    : roundOneBye
+      ? "× (автопроход)"
+      : "—";
 
   async function savePartial(startOnly = false) {
     setError(null);
@@ -100,7 +107,7 @@ export function MatchResultModal({
     }
 
     let winner = winnerTeamId || undefined;
-    if (bye && match!.team1) {
+    if (roundOneBye && match!.team1) {
       winner = match!.team1.id;
     } else if (match!.team1 && match!.team2) {
       if (s1 !== null && s2 !== null) {
@@ -146,24 +153,24 @@ export function MatchResultModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+      className="bracket-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg rounded-xl border border-zinc-700 bg-zinc-950 p-6 shadow-2xl"
+        className="bracket-modal-panel w-full max-w-lg p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Встреча #{matchNumber ?? "—"}</h2>
-            <p className="mt-1 text-sm text-zinc-400">
+            <p className="bracket-modal-muted mt-1 text-sm">
               Тур {match.round} · слот {match.slot}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-200"
+            className="bracket-modal-muted hover:text-[var(--admin-text,var(--text-primary))]"
             aria-label="Закрыть"
           >
             ✕
@@ -173,33 +180,33 @@ export function MatchResultModal({
         <div className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-sm">
-              <span className="mb-1 block text-zinc-400">{team1Label}</span>
+              <span className="bracket-modal-label mb-1 block">{team1Label}</span>
               <input
                 type="number"
                 min="0"
                 value={team1Score}
                 onChange={(e) => setTeam1Score(e.target.value)}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 font-mono"
+                className="bracket-modal-input w-full px-3 py-2 font-mono"
                 placeholder="Счёт"
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block text-zinc-400">{team2Label}</span>
+              <span className="bracket-modal-label mb-1 block">{team2Label}</span>
               <input
                 type="number"
                 min="0"
                 value={team2Score}
                 onChange={(e) => setTeam2Score(e.target.value)}
-                disabled={bye}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 font-mono disabled:opacity-50"
+                disabled={roundOneBye}
+                className="bracket-modal-input w-full px-3 py-2 font-mono disabled:opacity-50"
                 placeholder="Счёт"
               />
             </label>
           </div>
 
-          {!bye && match.team1 && match.team2 && !finished && (
+          {!roundOneBye && match.team1 && match.team2 && !finished && (
             <div className="space-y-2">
-              <p className="text-xs text-zinc-500">Победитель (если счёт не указан)</p>
+              <p className="bracket-modal-muted text-xs">Победитель (если счёт не указан)</p>
               <div className="flex flex-wrap gap-2">
                 {[match.team1, match.team2].map((team) => (
                   <button
@@ -207,10 +214,8 @@ export function MatchResultModal({
                     type="button"
                     onClick={() => setWinnerTeamId(team.id)}
                     className={cn(
-                      "rounded-lg border px-3 py-1.5 text-sm",
-                      winnerTeamId === team.id
-                        ? "border-emerald-600 bg-emerald-950/40 text-emerald-300"
-                        : "border-zinc-700 text-zinc-300 hover:border-zinc-500",
+                      "bracket-modal-choice rounded-lg px-3 py-1.5 text-sm",
+                      winnerTeamId === team.id && "bracket-modal-choice--active",
                     )}
                   >
                     {teamLabel(team)}
@@ -221,18 +226,18 @@ export function MatchResultModal({
           )}
 
           <label className="block text-sm">
-            <span className="mb-1 block text-zinc-400">Начало встречи</span>
+            <span className="bracket-modal-label mb-1 block">Начало встречи</span>
             <div className="flex gap-2">
               <input
                 type="datetime-local"
                 value={startedAt}
                 onChange={(e) => setStartedAt(e.target.value)}
-                className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2"
+                className="bracket-modal-input min-w-0 flex-1 px-3 py-2"
               />
               <button
                 type="button"
                 onClick={() => setStartedAt(nowDatetimeLocal())}
-                className="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-xs hover:border-zinc-500"
+                className="bracket-modal-choice shrink-0 rounded-lg px-3 py-2 text-xs"
               >
                 Сейчас
               </button>
@@ -240,18 +245,18 @@ export function MatchResultModal({
           </label>
 
           <label className="block text-sm">
-            <span className="mb-1 block text-zinc-400">Завершение встречи</span>
+            <span className="bracket-modal-label mb-1 block">Завершение встречи</span>
             <div className="flex gap-2">
               <input
                 type="datetime-local"
                 value={finishedAt}
                 onChange={(e) => setFinishedAt(e.target.value)}
-                className="min-w-0 flex-1 rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2"
+                className="bracket-modal-input min-w-0 flex-1 px-3 py-2"
               />
               <button
                 type="button"
                 onClick={() => setFinishedAt(nowDatetimeLocal())}
-                className="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-xs hover:border-zinc-500"
+                className="bracket-modal-choice shrink-0 rounded-lg px-3 py-2 text-xs"
               >
                 Сейчас
               </button>

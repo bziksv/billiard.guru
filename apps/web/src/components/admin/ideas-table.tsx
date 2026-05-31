@@ -114,7 +114,7 @@ export function IdeasAdminTable() {
   }
 
   if (loading) {
-    return <p className="text-sm text-zinc-500">Загрузка…</p>;
+    return <p className="admin-muted text-sm">Загрузка…</p>;
   }
 
   return (
@@ -144,9 +144,9 @@ export function IdeasAdminTable() {
         />
       </AdminTableToolbar>
 
-      <div className="overflow-x-auto rounded-xl border border-zinc-800">
-        <table className="w-full min-w-[900px] text-left text-sm">
-          <thead className="bg-zinc-950 text-zinc-400">
+      <div className="admin-table-wrap admin-table-wrap--scroll">
+          <table className="w-full min-w-[900px] text-left text-sm">
+            <thead className="admin-thead">
             <tr>
               <AdminSortHeader
                 label="Идея"
@@ -182,7 +182,7 @@ export function IdeasAdminTable() {
           </thead>
           <tbody>
             {filtered.map((row) => (
-              <tr key={row.id} className="border-t border-zinc-800 align-top">
+              <tr key={row.id} className="admin-table-row align-top">
                 <td className="max-w-xs px-4 py-3">
                   <p className="font-medium">{row.title}</p>
                   <p className="mt-1 line-clamp-3 text-xs text-zinc-500">{row.body}</p>

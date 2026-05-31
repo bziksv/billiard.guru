@@ -27,7 +27,7 @@ export function LogoutButton({ collapsed = false }: { collapsed?: boolean }) {
       disabled={loading}
       title={collapsed ? "Выйти" : undefined}
       className={cn(
-        "flex w-full items-center rounded-lg text-sm text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-white disabled:cursor-not-allowed disabled:opacity-60",
+        "admin-nav-muted flex w-full items-center rounded-lg text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-60",
         collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2",
       )}
     >

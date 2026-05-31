@@ -46,7 +46,7 @@ export function HomeAnnouncements({
             <div className="flex items-start justify-between gap-2">
               <h3 className="home-card-title font-medium">{ad.title}</h3>
               {ad.preview && (
-                <span className="home-card-muted shrink-0 text-[10px]">пример</span>
+                <span className="home-preview-label shrink-0">пример</span>
               )}
             </div>
             <p className="home-card-body mt-2 text-sm">{ad.body}</p>

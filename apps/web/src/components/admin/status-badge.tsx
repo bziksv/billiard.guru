@@ -1,12 +1,12 @@
-const styles: Record<string, string> = {
-  PENDING: "bg-amber-900/50 text-amber-300",
-  CONFIRMED: "bg-emerald-900/50 text-emerald-300",
-  REJECTED: "bg-red-900/50 text-red-300",
-  CANCELLED: "bg-zinc-700 text-zinc-300",
-  DRAFT: "bg-zinc-700 text-zinc-300",
-  OPEN: "bg-blue-900/50 text-blue-300",
-  ACTIVE: "bg-emerald-900/50 text-emerald-300",
-  FINISHED: "bg-zinc-600 text-zinc-200",
+const STATUS_CLASS: Record<string, string> = {
+  PENDING: "status-badge--pending",
+  CONFIRMED: "status-badge--confirmed",
+  REJECTED: "status-badge--rejected",
+  CANCELLED: "status-badge--neutral",
+  DRAFT: "status-badge--neutral",
+  OPEN: "status-badge--open",
+  ACTIVE: "status-badge--active",
+  FINISHED: "status-badge--finished",
 };
 
 export function StatusBadge({
@@ -17,9 +17,7 @@ export function StatusBadge({
   label: string;
 }) {
   return (
-    <span
-      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${styles[status] ?? "bg-zinc-700"}`}
-    >
+    <span className={`status-badge ${STATUS_CLASS[status] ?? "status-badge--neutral"}`}>
       {label}
     </span>
   );

@@ -15,7 +15,7 @@ export default async function AdminLayout({
   const player = await getCurrentPlayer();
 
   return (
-    <div className="flex min-h-screen bg-zinc-900 text-zinc-100">
+    <div className="admin-app admin-shell flex min-h-screen gap-4 p-4 lg:gap-6 lg:p-6">
       <AdminSidebar
         userName={
           player
@@ -23,7 +23,7 @@ export default async function AdminLayout({
             : undefined
         }
       />
-      <main className="min-w-0 flex-1 overflow-auto p-6 lg:p-8">{children}</main>
+      <main className="admin-main min-w-0 flex-1 overflow-auto">{children}</main>
     </div>
   );
 }
