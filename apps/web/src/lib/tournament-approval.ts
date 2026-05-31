@@ -101,7 +101,7 @@ async function notifyNearbyPlayers(tournamentId: string) {
     include: { city: true },
   });
 
-  const link = appUrl("/cabinet");
+  const link = appUrl(`/tournaments/${tournament.id}`);
   const descriptionBlock = tournament.description
     ? `\n${tournament.description.slice(0, 300)}${tournament.description.length > 300 ? "…" : ""}`
     : "";

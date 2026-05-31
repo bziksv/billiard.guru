@@ -1,10 +1,11 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
-import { advanceWinner, generateTournamentPairing } from "@/lib/bracket-service";
+import { generateTournamentPairing, cancelMatchResult, saveMatchResult } from "@/lib/bracket-service";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
-import { matchWinnerSchema } from "@/lib/validators";
+import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { matchCancelSchema, matchResultSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
   const log = createRequestLogger(randomUUID());
@@ -46,58 +47,54 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const log = createRequestLogger(randomUUID());
   try {
-    const data = matchWinnerSchema.parse(await request.json());
-
-    const match = await prisma.tournamentMatch.findUnique({
-      where: { id: data.matchId },
-      include: { tournament: true },
-    });
-    if (!match) {
-      return NextResponse.json({ error: "Матч не найден" }, { status: 404 });
-    }
-    if (!match.team1Id || !match.team2Id) {
-      return NextResponse.json({ error: "Матч ещё не готов" }, { status: 400 });
-    }
-
-    await advanceWinner(prisma, data.matchId, data.winnerTeamId);
-
-    const finalMatch = await prisma.tournamentMatch.findUnique({
-      where: { id: data.matchId },
-      include: {
-        team1: { include: { player1: true, player2: true } },
-        team2: { include: { player1: true, player2: true } },
-        winnerTeam: { include: { player1: true, player2: true } },
-      },
-    });
-
-    const totalRounds = await prisma.tournamentMatch.groupBy({
-      by: ["round"],
-      where: { tournamentId: match.tournamentId },
-    });
-    const maxRound = Math.max(...totalRounds.map((r) => r.round), 0);
-    if (
-      match.tournament.format === "PAIR_OLYMPIC" &&
-      match.round === maxRound
-    ) {
-      await prisma.tournament.update({
-        where: { id: match.tournamentId },
-        data: { status: "FINISHED" },
-      });
-    }
+    await requireSuperAdmin();
+    const data = matchResultSchema.parse(await request.json());
+    const match = await saveMatchResult(prisma, data);
 
     await writeAuditLog({
       actorType: "club",
       action: "tournament.match.result",
       entityType: "tournament_match",
       entityId: data.matchId,
-      payload: { winnerTeamId: data.winnerTeamId },
+      payload: {
+        winnerTeamId: data.winnerTeamId,
+        team1Score: data.team1Score,
+        team2Score: data.team2Score,
+      },
     });
 
-    return NextResponse.json(finalMatch);
+    return NextResponse.json(match);
   } catch (error) {
     log.error({ error }, "Match result failed");
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     const message =
       error instanceof Error ? error.message : "Не удалось сохранить результат";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const log = createRequestLogger(randomUUID());
+  try {
+    await requireSuperAdmin();
+    const data = matchCancelSchema.parse(await request.json());
+    const match = await cancelMatchResult(prisma, data.matchId);
+
+    await writeAuditLog({
+      actorType: "club",
+      action: "tournament.match.cancel",
+      entityType: "tournament_match",
+      entityId: data.matchId,
+    });
+
+    return NextResponse.json(match);
+  } catch (error) {
+    log.error({ error }, "Match cancel failed");
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
+    const message =
+      error instanceof Error ? error.message : "Не удалось отменить результат";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

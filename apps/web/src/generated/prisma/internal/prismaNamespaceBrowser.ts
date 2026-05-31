@@ -54,14 +54,18 @@ export const ModelName = {
   Country: 'Country',
   City: 'City',
   Club: 'Club',
+  ClubNews: 'ClubNews',
   Player: 'Player',
+  ClubPlayerRating: 'ClubPlayerRating',
   LoginChallenge: 'LoginChallenge',
   Tournament: 'Tournament',
   TournamentTeam: 'TournamentTeam',
   TournamentMatch: 'TournamentMatch',
   TournamentRegistration: 'TournamentRegistration',
   RatingChange: 'RatingChange',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  Idea: 'Idea',
+  IdeaVote: 'IdeaVote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -105,6 +109,13 @@ export const ClubScalarFieldEnum = {
   cityId: 'cityId',
   phone: 'phone',
   email: 'email',
+  photoUrl: 'photoUrl',
+  description: 'description',
+  address: 'address',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  workingHours: 'workingHours',
+  tableCount: 'tableCount',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   isVerified: 'isVerified',
@@ -114,6 +125,18 @@ export const ClubScalarFieldEnum = {
 } as const
 
 export type ClubScalarFieldEnum = (typeof ClubScalarFieldEnum)[keyof typeof ClubScalarFieldEnum]
+
+
+export const ClubNewsScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ClubNewsScalarFieldEnum = (typeof ClubNewsScalarFieldEnum)[keyof typeof ClubNewsScalarFieldEnum]
 
 
 export const PlayerScalarFieldEnum = {
@@ -137,6 +160,18 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const ClubPlayerRatingScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  rating: 'rating',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClubPlayerRatingScalarFieldEnum = (typeof ClubPlayerRatingScalarFieldEnum)[keyof typeof ClubPlayerRatingScalarFieldEnum]
 
 
 export const LoginChallengeScalarFieldEnum = {
@@ -195,6 +230,10 @@ export const TournamentMatchScalarFieldEnum = {
   team1Id: 'team1Id',
   team2Id: 'team2Id',
   winnerTeamId: 'winnerTeamId',
+  team1Score: 'team1Score',
+  team2Score: 'team2Score',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
   status: 'status',
   createdAt: 'createdAt'
 } as const
@@ -245,6 +284,36 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+export const IdeaScalarFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  moderationToken: 'moderationToken',
+  likesCount: 'likesCount',
+  dislikesCount: 'dislikesCount',
+  moderatedAt: 'moderatedAt',
+  moderatedById: 'moderatedById',
+  rejectReason: 'rejectReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IdeaScalarFieldEnum = (typeof IdeaScalarFieldEnum)[keyof typeof IdeaScalarFieldEnum]
+
+
+export const IdeaVoteScalarFieldEnum = {
+  id: 'id',
+  ideaId: 'ideaId',
+  playerId: 'playerId',
+  value: 'value',
+  createdAt: 'createdAt'
+} as const
+
+export type IdeaVoteScalarFieldEnum = (typeof IdeaVoteScalarFieldEnum)[keyof typeof IdeaVoteScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -292,12 +361,26 @@ export const ClubOrderByRelevanceFieldEnum = {
   cityId: 'cityId',
   phone: 'phone',
   email: 'email',
+  photoUrl: 'photoUrl',
+  description: 'description',
+  address: 'address',
+  workingHours: 'workingHours',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   confirmToken: 'confirmToken'
 } as const
 
 export type ClubOrderByRelevanceFieldEnum = (typeof ClubOrderByRelevanceFieldEnum)[keyof typeof ClubOrderByRelevanceFieldEnum]
+
+
+export const ClubNewsOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body'
+} as const
+
+export type ClubNewsOrderByRelevanceFieldEnum = (typeof ClubNewsOrderByRelevanceFieldEnum)[keyof typeof ClubNewsOrderByRelevanceFieldEnum]
 
 
 export const PlayerOrderByRelevanceFieldEnum = {
@@ -315,6 +398,15 @@ export const PlayerOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
+
+
+export const ClubPlayerRatingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId'
+} as const
+
+export type ClubPlayerRatingOrderByRelevanceFieldEnum = (typeof ClubPlayerRatingOrderByRelevanceFieldEnum)[keyof typeof ClubPlayerRatingOrderByRelevanceFieldEnum]
 
 
 export const LoginChallengeOrderByRelevanceFieldEnum = {
@@ -408,4 +500,26 @@ export const AuditLogOrderByRelevanceFieldEnum = {
 } as const
 
 export type AuditLogOrderByRelevanceFieldEnum = (typeof AuditLogOrderByRelevanceFieldEnum)[keyof typeof AuditLogOrderByRelevanceFieldEnum]
+
+
+export const IdeaOrderByRelevanceFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  title: 'title',
+  body: 'body',
+  moderationToken: 'moderationToken',
+  moderatedById: 'moderatedById',
+  rejectReason: 'rejectReason'
+} as const
+
+export type IdeaOrderByRelevanceFieldEnum = (typeof IdeaOrderByRelevanceFieldEnum)[keyof typeof IdeaOrderByRelevanceFieldEnum]
+
+
+export const IdeaVoteOrderByRelevanceFieldEnum = {
+  id: 'id',
+  ideaId: 'ideaId',
+  playerId: 'playerId'
+} as const
+
+export type IdeaVoteOrderByRelevanceFieldEnum = (typeof IdeaVoteOrderByRelevanceFieldEnum)[keyof typeof IdeaVoteOrderByRelevanceFieldEnum]
 

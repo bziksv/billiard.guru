@@ -13,6 +13,10 @@ import {
   handleLoginTelegramMessage,
 } from "@/lib/login-challenge";
 import {
+  handleIdeaModerationCallback,
+  handleIdeaVoteCallback,
+} from "@/lib/idea-moderation";
+import {
   handleTournamentApprovalCallback,
   handleTournamentApprovalMessage,
 } from "@/lib/tournament-approval";
@@ -172,6 +176,32 @@ export async function processTelegramUpdate(
         if (handled) return;
       } catch (err) {
         logger.error({ err }, "Tournament approval callback failed");
+      }
+      return;
+    }
+    if (data.startsWith("idea_approve_") || data.startsWith("idea_reject_")) {
+      try {
+        const handled = await handleIdeaModerationCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Idea moderation callback failed");
+      }
+      return;
+    }
+    if (data.startsWith("idea_like_") || data.startsWith("idea_dislike_")) {
+      try {
+        const handled = await handleIdeaVoteCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Idea vote callback failed");
       }
       return;
     }

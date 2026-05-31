@@ -1,46 +1,163 @@
-import Link from "next/link";
-import { APP_NAME } from "@/lib/brand";
-import { LogoutButton } from "@/components/auth/logout-button";
+"use client";
 
-const NAV = [
-  { href: "/admin", label: "Обзор" },
-  { href: "/admin/clubs", label: "Клубы" },
-  { href: "/admin/players", label: "Игроки" },
-  { href: "/admin/tournaments", label: "Турниры" },
-  { href: "/admin/handicap", label: "Калькулятор форы" },
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, type ComponentType } from "react";
+import { LogoutButton } from "@/components/auth/logout-button";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+import {
+  IconCabinet,
+  IconClubs,
+  IconCollapse,
+  IconExpand,
+  IconHandicap,
+  IconIdeas,
+  IconOverview,
+  IconPlayers,
+  IconTournaments,
+} from "@/components/admin/admin-nav-icons";
+import { APP_NAME } from "@/lib/brand";
+import { cn } from "@/lib/cn";
+
+const STORAGE_KEY = "setka-admin-sidebar-collapsed";
+
+const NAV: {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+}[] = [
+  { href: "/admin", label: "Обзор", icon: IconOverview },
+  { href: "/admin/clubs", label: "Клубы", icon: IconClubs },
+  { href: "/admin/players", label: "Игроки", icon: IconPlayers },
+  { href: "/admin/tournaments", label: "Турниры", icon: IconTournaments },
+  { href: "/admin/ideas", label: "Идеи", icon: IconIdeas },
+  { href: "/admin/handicap", label: "Калькулятор форы", icon: IconHandicap },
 ];
 
-export function AdminSidebar({ userName }: { userName?: string }) {
+function isActive(href: string, pathname: string) {
+  if (href === "/admin") return pathname === "/admin";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function NavLink({
+  href,
+  label,
+  icon: Icon,
+  collapsed,
+  active,
+}: {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  collapsed: boolean;
+  active: boolean;
+}) {
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-zinc-800 bg-zinc-950 p-4">
-      <div className="mb-8">
-        <Link href="/" className="text-lg font-bold text-emerald-400">
-          {APP_NAME}
+    <Link
+      href={href}
+      title={collapsed ? label : undefined}
+      className={cn(
+        "flex items-center gap-3 rounded-lg text-sm transition-colors",
+        collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2",
+        active
+          ? "bg-emerald-600/15 text-emerald-300"
+          : "text-zinc-300 hover:bg-zinc-800 hover:text-white",
+      )}
+    >
+      <Icon className={cn("h-5 w-5 shrink-0", active && "text-emerald-400")} />
+      {!collapsed && <span className="truncate">{label}</span>}
+    </Link>
+  );
+}
+
+export function AdminSidebar({ userName }: { userName?: string }) {
+  const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === "1") setCollapsed(true);
+    setReady(true);
+  }, []);
+
+  function toggleCollapsed() {
+    setCollapsed((value) => {
+      const next = !value;
+      localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+      return next;
+    });
+  }
+
+  return (
+    <aside
+      className={cn(
+        "flex shrink-0 flex-col border-r border-zinc-800 bg-zinc-950 transition-[width] duration-200 ease-out",
+        collapsed ? "w-[4.25rem]" : "w-56",
+        !ready && "w-56",
+      )}
+    >
+      <div className={cn("border-b border-zinc-800/80 p-3", collapsed && "flex justify-center")}>
+        <Link
+          href="/"
+          title={APP_NAME}
+          className={cn(
+            "font-bold text-emerald-400 transition-opacity hover:opacity-90",
+            collapsed
+              ? "flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600/10 text-sm"
+              : "block text-lg leading-tight",
+          )}
+        >
+          {collapsed ? "B" : APP_NAME}
         </Link>
-        <p className="text-xs text-zinc-500">Админ-панель</p>
+        {!collapsed && (
+          <p className="mt-0.5 text-[11px] leading-tight text-zinc-500">Админ-панель</p>
+        )}
       </div>
-      <nav className="flex flex-col gap-1">
+
+      <nav className="flex flex-1 flex-col gap-0.5 p-2">
         {NAV.map((item) => (
-          <Link
+          <NavLink
             key={item.href}
-            href={item.href}
-            className="rounded-lg px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white"
-          >
-            {item.label}
-          </Link>
+            {...item}
+            collapsed={collapsed}
+            active={isActive(item.href, pathname)}
+          />
         ))}
       </nav>
-      <div className="mt-auto space-y-2 border-t border-zinc-800 pt-4 text-sm">
-        {userName && (
-          <p className="text-zinc-400">
-            {userName}
-            <span className="mt-0.5 block text-xs text-emerald-500">Суперадмин</span>
-          </p>
+
+      <div className="space-y-1 border-t border-zinc-800 p-2">
+        {userName && !collapsed && (
+          <div className="px-3 py-2 text-sm">
+            <p className="truncate text-zinc-300">{userName}</p>
+            <p className="text-xs text-emerald-500">Суперадмин</p>
+          </div>
         )}
-        <Link href="/cabinet" className="block text-zinc-400 hover:text-white">
-          Личный кабинет
-        </Link>
-        <LogoutButton />
+
+        <NavLink
+          href="/cabinet"
+          label="Личный кабинет"
+          icon={IconCabinet}
+          collapsed={collapsed}
+          active={pathname.startsWith("/cabinet")}
+        />
+
+        <LogoutButton collapsed={collapsed} />
+
+        <ThemeToggle variant="admin" collapsed={collapsed} showLabel />
+
+        <button
+          type="button"
+          onClick={toggleCollapsed}
+          title={collapsed ? "Развернуть меню" : "Свернуть меню"}
+          className={cn(
+            "flex w-full items-center rounded-lg text-sm text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200",
+            collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2",
+          )}
+        >
+          {collapsed ? <IconExpand /> : <IconCollapse />}
+          {!collapsed && <span>Свернуть меню</span>}
+        </button>
       </div>
     </aside>
   );

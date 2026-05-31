@@ -41,6 +41,38 @@ async function main() {
     data: { role: "SUPERADMIN" },
   });
   console.log("Superadmin: +79507775325");
+
+  const voronezh = await prisma.city.findFirst({
+    where: { nameRu: "Воронеж" },
+  });
+  if (!voronezh) {
+    throw new Error("Город Воронеж не найден — сначала выполните seed geo");
+  }
+
+  for (let i = 1; i <= 16; i++) {
+    const phone = `+790000000${String(i).padStart(2, "0")}`;
+    await prisma.player.upsert({
+      where: { phone },
+      update: {
+        firstName: "Игрок",
+        lastName: `Тест${i}`,
+        cityId: voronezh.id,
+        isVerified: true,
+        rating: i * 0.5,
+        confirmToken: null,
+      },
+      create: {
+        firstName: "Игрок",
+        lastName: `Тест${i}`,
+        cityId: voronezh.id,
+        phone,
+        isVerified: true,
+        rating: i * 0.5,
+        telegramUsername: `test_player_${i}`,
+      },
+    });
+  }
+  console.log("Test players: Тест1 … Тест16 (+79000000001 … +79000000016)");
 }
 
 main()

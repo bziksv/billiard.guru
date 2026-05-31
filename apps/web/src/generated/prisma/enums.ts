@@ -12,8 +12,10 @@
 export const TournamentFormat = {
   OLYMPIC: 'OLYMPIC',
   SWISS: 'SWISS',
+  FIXED_SWISS: 'FIXED_SWISS',
   PAIR_OLYMPIC: 'PAIR_OLYMPIC',
-  PAIR_SWISS: 'PAIR_SWISS'
+  PAIR_SWISS: 'PAIR_SWISS',
+  FIXED_PAIR_SWISS: 'FIXED_PAIR_SWISS'
 } as const
 
 export type TournamentFormat = (typeof TournamentFormat)[keyof typeof TournamentFormat]
@@ -73,3 +75,20 @@ export const LoginChallengeStatus = {
 } as const
 
 export type LoginChallengeStatus = (typeof LoginChallengeStatus)[keyof typeof LoginChallengeStatus]
+
+
+export const IdeaStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type IdeaStatus = (typeof IdeaStatus)[keyof typeof IdeaStatus]
+
+
+export const IdeaVoteValue = {
+  LIKE: 'LIKE',
+  DISLIKE: 'DISLIKE'
+} as const
+
+export type IdeaVoteValue = (typeof IdeaVoteValue)[keyof typeof IdeaVoteValue]

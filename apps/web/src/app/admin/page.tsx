@@ -4,11 +4,12 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const [clubs, players, tournaments, pending] = await Promise.all([
+  const [clubs, players, tournaments, pending, pendingIdeas] = await Promise.all([
     prisma.club.count(),
     prisma.player.count(),
     prisma.tournament.count(),
     prisma.tournamentRegistration.count({ where: { status: "PENDING" } }),
+    prisma.idea.count({ where: { status: "PENDING" } }),
   ]);
 
   const cards = [
@@ -16,6 +17,7 @@ export default async function AdminDashboard() {
     { label: "Игроки", value: players, href: "/admin/players" },
     { label: "Турниры", value: tournaments, href: "/admin/tournaments" },
     { label: "Ожидают подтверждения", value: pending, href: "/admin/tournaments" },
+    { label: "Идеи на модерации", value: pendingIdeas, href: "/admin/ideas" },
   ];
 
   return (

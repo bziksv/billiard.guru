@@ -36,6 +36,34 @@ export function tournamentApprovalKeyboard(token: string) {
   };
 }
 
+export function ideaModerationKeyboard(token: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: "✅ Одобрить", callback_data: `idea_approve_${token}` },
+        { text: "❌ Отклонить", callback_data: `idea_reject_${token}` },
+      ],
+    ],
+  };
+}
+
+export function ideaVoteKeyboard(ideaId: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: "👍 Нравится", callback_data: `idea_like_${ideaId}` },
+        { text: "👎 Не нравится", callback_data: `idea_dislike_${ideaId}` },
+      ],
+      [{ text: "Открыть на сайте", url: `${appUrlBase()}/ideas` }],
+    ],
+  };
+}
+
+function appUrlBase() {
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
+  return base.replace(/\/$/, "");
+}
+
 interface SendMessageOptions {
   replyMarkup?: object;
 }

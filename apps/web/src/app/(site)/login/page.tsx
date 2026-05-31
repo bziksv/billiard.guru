@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
+import { SiteContainer } from "@/components/site/site-container";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { APP_NAME } from "@/lib/brand";
+import { t } from "@/lib/site";
 
 function LoginForm() {
   const router = useRouter();
@@ -89,17 +90,17 @@ function LoginForm() {
 
       setChallengeToken(data.challengeToken);
     } catch {
-      setError("Сервер не ответил. Проверьте, что сайт обновлён на Beget (git pull + beget-setup.sh).");
+      setError("Сервер не ответил. Попробуйте позже.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="w-full max-w-md rounded-xl border border-zinc-800 bg-zinc-950 p-8">
-      <h1 className="text-2xl font-bold">Вход</h1>
+    <div className="site-card mx-auto w-full max-w-md p-8">
+      <h1 className="text-2xl font-bold">{t("nav.login")}</h1>
       <p className="mt-2 text-sm text-zinc-400">
-        Подтверждение через Telegram — бот пришлёт запрос «Подтвердить вход».
+        Подтверждение через Telegram — бот пришлёт «Подтвердить вход».
       </p>
 
       {!challengeToken ? (
@@ -117,13 +118,13 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading || !phoneValid}
-            className="w-full rounded-lg bg-emerald-600 py-2 text-sm font-medium hover:bg-emerald-500 disabled:opacity-50"
+            className="site-btn-primary w-full disabled:opacity-50"
           >
             {loading ? "Отправка…" : "Войти через Telegram"}
           </button>
         </form>
       ) : (
-        <div className="mt-6 space-y-3 rounded-lg border border-emerald-900 bg-emerald-950/30 p-4">
+        <div className="mt-6 space-y-3 rounded-xl border border-emerald-900/60 bg-emerald-950/30 p-4">
           <p className="text-sm text-emerald-300">
             {polling
               ? "Откройте Telegram и нажмите «Подтвердить вход»…"
@@ -156,11 +157,10 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-900 px-4 text-zinc-100">
-      <p className="mb-6 text-lg font-semibold text-emerald-400">{APP_NAME}</p>
+    <SiteContainer className="flex flex-1 flex-col items-center justify-center py-16">
       <Suspense fallback={<div className="text-zinc-500">Загрузка…</div>}>
         <LoginForm />
       </Suspense>
-    </div>
+    </SiteContainer>
   );
 }

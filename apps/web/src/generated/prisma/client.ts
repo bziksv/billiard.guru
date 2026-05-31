@@ -57,10 +57,20 @@ export type City = Prisma.CityModel
  */
 export type Club = Prisma.ClubModel
 /**
+ * Model ClubNews
+ * 
+ */
+export type ClubNews = Prisma.ClubNewsModel
+/**
  * Model Player
  * 
  */
 export type Player = Prisma.PlayerModel
+/**
+ * Model ClubPlayerRating
+ * 
+ */
+export type ClubPlayerRating = Prisma.ClubPlayerRatingModel
 /**
  * Model LoginChallenge
  * 
@@ -96,3 +106,13 @@ export type RatingChange = Prisma.RatingChangeModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model Idea
+ * 
+ */
+export type Idea = Prisma.IdeaModel
+/**
+ * Model IdeaVote
+ * 
+ */
+export type IdeaVote = Prisma.IdeaVoteModel

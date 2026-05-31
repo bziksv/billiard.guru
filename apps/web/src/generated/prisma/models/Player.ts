@@ -315,9 +315,12 @@ export type PlayerWhereInput = {
   city?: Prisma.XOR<Prisma.CityScalarRelationFilter, Prisma.CityWhereInput>
   registrations?: Prisma.TournamentRegistrationListRelationFilter
   ratingHistory?: Prisma.RatingChangeListRelationFilter
+  clubRatings?: Prisma.ClubPlayerRatingListRelationFilter
   teamsAsPlayer1?: Prisma.TournamentTeamListRelationFilter
   teamsAsPlayer2?: Prisma.TournamentTeamListRelationFilter
   loginChallenges?: Prisma.LoginChallengeListRelationFilter
+  ideas?: Prisma.IdeaListRelationFilter
+  ideaVotes?: Prisma.IdeaVoteListRelationFilter
 }
 
 export type PlayerOrderByWithRelationInput = {
@@ -341,9 +344,12 @@ export type PlayerOrderByWithRelationInput = {
   city?: Prisma.CityOrderByWithRelationInput
   registrations?: Prisma.TournamentRegistrationOrderByRelationAggregateInput
   ratingHistory?: Prisma.RatingChangeOrderByRelationAggregateInput
+  clubRatings?: Prisma.ClubPlayerRatingOrderByRelationAggregateInput
   teamsAsPlayer1?: Prisma.TournamentTeamOrderByRelationAggregateInput
   teamsAsPlayer2?: Prisma.TournamentTeamOrderByRelationAggregateInput
   loginChallenges?: Prisma.LoginChallengeOrderByRelationAggregateInput
+  ideas?: Prisma.IdeaOrderByRelationAggregateInput
+  ideaVotes?: Prisma.IdeaVoteOrderByRelationAggregateInput
   _relevance?: Prisma.PlayerOrderByRelevanceInput
 }
 
@@ -371,9 +377,12 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   city?: Prisma.XOR<Prisma.CityScalarRelationFilter, Prisma.CityWhereInput>
   registrations?: Prisma.TournamentRegistrationListRelationFilter
   ratingHistory?: Prisma.RatingChangeListRelationFilter
+  clubRatings?: Prisma.ClubPlayerRatingListRelationFilter
   teamsAsPlayer1?: Prisma.TournamentTeamListRelationFilter
   teamsAsPlayer2?: Prisma.TournamentTeamListRelationFilter
   loginChallenges?: Prisma.LoginChallengeListRelationFilter
+  ideas?: Prisma.IdeaListRelationFilter
+  ideaVotes?: Prisma.IdeaVoteListRelationFilter
 }, "id" | "phone" | "telegramId" | "confirmToken">
 
 export type PlayerOrderByWithAggregationInput = {
@@ -444,9 +453,12 @@ export type PlayerCreateInput = {
   city: Prisma.CityCreateNestedOneWithoutPlayersInput
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateInput = {
@@ -469,9 +481,12 @@ export type PlayerUncheckedCreateInput = {
   updatedAt?: Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUpdateInput = {
@@ -494,9 +509,12 @@ export type PlayerUpdateInput = {
   city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateInput = {
@@ -519,9 +537,12 @@ export type PlayerUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateManyInput = {
@@ -672,6 +693,11 @@ export type PlayerScalarRelationFilter = {
   isNot?: Prisma.PlayerWhereInput
 }
 
+export type PlayerNullableScalarRelationFilter = {
+  is?: Prisma.PlayerWhereInput | null
+  isNot?: Prisma.PlayerWhereInput | null
+}
+
 export type PlayerCreateNestedManyWithoutCityInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutCityInput, Prisma.PlayerUncheckedCreateWithoutCityInput> | Prisma.PlayerCreateWithoutCityInput[] | Prisma.PlayerUncheckedCreateWithoutCityInput[]
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutCityInput | Prisma.PlayerCreateOrConnectWithoutCityInput[]
@@ -730,6 +756,20 @@ export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
 }
 
+export type PlayerCreateNestedOneWithoutClubRatingsInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutClubRatingsInput, Prisma.PlayerUncheckedCreateWithoutClubRatingsInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutClubRatingsInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutClubRatingsNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutClubRatingsInput, Prisma.PlayerUncheckedCreateWithoutClubRatingsInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutClubRatingsInput
+  upsert?: Prisma.PlayerUpsertWithoutClubRatingsInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutClubRatingsInput, Prisma.PlayerUpdateWithoutClubRatingsInput>, Prisma.PlayerUncheckedUpdateWithoutClubRatingsInput>
+}
+
 export type PlayerCreateNestedOneWithoutLoginChallengesInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutLoginChallengesInput, Prisma.PlayerUncheckedCreateWithoutLoginChallengesInput>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutLoginChallengesInput
@@ -764,10 +804,12 @@ export type PlayerUpdateOneRequiredWithoutTeamsAsPlayer1NestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutTeamsAsPlayer1Input, Prisma.PlayerUpdateWithoutTeamsAsPlayer1Input>, Prisma.PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input>
 }
 
-export type PlayerUpdateOneRequiredWithoutTeamsAsPlayer2NestedInput = {
+export type PlayerUpdateOneWithoutTeamsAsPlayer2NestedInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutTeamsAsPlayer2Input, Prisma.PlayerUncheckedCreateWithoutTeamsAsPlayer2Input>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutTeamsAsPlayer2Input
   upsert?: Prisma.PlayerUpsertWithoutTeamsAsPlayer2Input
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
   connect?: Prisma.PlayerWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutTeamsAsPlayer2Input, Prisma.PlayerUpdateWithoutTeamsAsPlayer2Input>, Prisma.PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input>
 }
@@ -800,6 +842,34 @@ export type PlayerUpdateOneRequiredWithoutRatingHistoryNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutRatingHistoryInput, Prisma.PlayerUpdateWithoutRatingHistoryInput>, Prisma.PlayerUncheckedUpdateWithoutRatingHistoryInput>
 }
 
+export type PlayerCreateNestedOneWithoutIdeasInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIdeasInput, Prisma.PlayerUncheckedCreateWithoutIdeasInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIdeasInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutIdeasNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIdeasInput, Prisma.PlayerUncheckedCreateWithoutIdeasInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIdeasInput
+  upsert?: Prisma.PlayerUpsertWithoutIdeasInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutIdeasInput, Prisma.PlayerUpdateWithoutIdeasInput>, Prisma.PlayerUncheckedUpdateWithoutIdeasInput>
+}
+
+export type PlayerCreateNestedOneWithoutIdeaVotesInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIdeaVotesInput, Prisma.PlayerUncheckedCreateWithoutIdeaVotesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIdeaVotesInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutIdeaVotesNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutIdeaVotesInput, Prisma.PlayerUncheckedCreateWithoutIdeaVotesInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutIdeaVotesInput
+  upsert?: Prisma.PlayerUpsertWithoutIdeaVotesInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutIdeaVotesInput, Prisma.PlayerUpdateWithoutIdeaVotesInput>, Prisma.PlayerUncheckedUpdateWithoutIdeaVotesInput>
+}
+
 export type PlayerCreateWithoutCityInput = {
   id?: string
   firstName: string
@@ -819,9 +889,12 @@ export type PlayerCreateWithoutCityInput = {
   updatedAt?: Date | string
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutCityInput = {
@@ -843,9 +916,12 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   updatedAt?: Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutCityInput = {
@@ -897,7 +973,7 @@ export type PlayerScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
 }
 
-export type PlayerCreateWithoutLoginChallengesInput = {
+export type PlayerCreateWithoutClubRatingsInput = {
   id?: string
   firstName: string
   lastName: string
@@ -919,6 +995,133 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutClubRatingsInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutClubRatingsInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutClubRatingsInput, Prisma.PlayerUncheckedCreateWithoutClubRatingsInput>
+}
+
+export type PlayerUpsertWithoutClubRatingsInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutClubRatingsInput, Prisma.PlayerUncheckedUpdateWithoutClubRatingsInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutClubRatingsInput, Prisma.PlayerUncheckedCreateWithoutClubRatingsInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutClubRatingsInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutClubRatingsInput, Prisma.PlayerUncheckedUpdateWithoutClubRatingsInput>
+}
+
+export type PlayerUpdateWithoutClubRatingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutLoginChallengesInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
@@ -941,8 +1144,11 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   updatedAt?: Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutLoginChallengesInput = {
@@ -981,8 +1187,11 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
@@ -1005,8 +1214,11 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutTeamsAsPlayer1Input = {
@@ -1029,8 +1241,11 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   city: Prisma.CityCreateNestedOneWithoutPlayersInput
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
   teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
@@ -1053,8 +1268,11 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   updatedAt?: Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTeamsAsPlayer1Input = {
@@ -1082,8 +1300,11 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   city: Prisma.CityCreateNestedOneWithoutPlayersInput
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
@@ -1106,8 +1327,11 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   updatedAt?: Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
   ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTeamsAsPlayer2Input = {
@@ -1146,8 +1370,11 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
@@ -1170,8 +1397,11 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutTeamsAsPlayer2Input = {
@@ -1205,8 +1435,11 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
@@ -1229,8 +1462,11 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutRegistrationsInput = {
@@ -1252,9 +1488,12 @@ export type PlayerCreateWithoutRegistrationsInput = {
   updatedAt?: Date | string
   city: Prisma.CityCreateNestedOneWithoutPlayersInput
   ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutRegistrationsInput = {
@@ -1276,9 +1515,12 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutRegistrationsInput = {
@@ -1316,9 +1558,12 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
   ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
@@ -1340,9 +1585,12 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerCreateWithoutRatingHistoryInput = {
@@ -1364,9 +1612,12 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   updatedAt?: Date | string
   city: Prisma.CityCreateNestedOneWithoutPlayersInput
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
@@ -1388,9 +1639,12 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutRatingHistoryInput = {
@@ -1428,9 +1682,12 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
@@ -1452,9 +1709,260 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutIdeasInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutIdeasInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutIdeasInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIdeasInput, Prisma.PlayerUncheckedCreateWithoutIdeasInput>
+}
+
+export type PlayerUpsertWithoutIdeasInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutIdeasInput, Prisma.PlayerUncheckedUpdateWithoutIdeasInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIdeasInput, Prisma.PlayerUncheckedCreateWithoutIdeasInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutIdeasInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutIdeasInput, Prisma.PlayerUncheckedUpdateWithoutIdeasInput>
+}
+
+export type PlayerUpdateWithoutIdeasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutIdeasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutIdeaVotesInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+}
+
+export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+}
+
+export type PlayerCreateOrConnectWithoutIdeaVotesInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIdeaVotesInput, Prisma.PlayerUncheckedCreateWithoutIdeaVotesInput>
+}
+
+export type PlayerUpsertWithoutIdeaVotesInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutIdeaVotesInput, Prisma.PlayerUncheckedUpdateWithoutIdeaVotesInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutIdeaVotesInput, Prisma.PlayerUncheckedCreateWithoutIdeaVotesInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutIdeaVotesInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutIdeaVotesInput, Prisma.PlayerUncheckedUpdateWithoutIdeaVotesInput>
+}
+
+export type PlayerUpdateWithoutIdeaVotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
 }
 
 export type PlayerCreateManyCityInput = {
@@ -1495,9 +2003,12 @@ export type PlayerUpdateWithoutCityInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutCityInput = {
@@ -1519,9 +2030,12 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
   ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
   teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
   teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateManyWithoutCityInput = {
@@ -1551,17 +2065,23 @@ export type PlayerUncheckedUpdateManyWithoutCityInput = {
 export type PlayerCountOutputType = {
   registrations: number
   ratingHistory: number
+  clubRatings: number
   teamsAsPlayer1: number
   teamsAsPlayer2: number
   loginChallenges: number
+  ideas: number
+  ideaVotes: number
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   registrations?: boolean | PlayerCountOutputTypeCountRegistrationsArgs
   ratingHistory?: boolean | PlayerCountOutputTypeCountRatingHistoryArgs
+  clubRatings?: boolean | PlayerCountOutputTypeCountClubRatingsArgs
   teamsAsPlayer1?: boolean | PlayerCountOutputTypeCountTeamsAsPlayer1Args
   teamsAsPlayer2?: boolean | PlayerCountOutputTypeCountTeamsAsPlayer2Args
   loginChallenges?: boolean | PlayerCountOutputTypeCountLoginChallengesArgs
+  ideas?: boolean | PlayerCountOutputTypeCountIdeasArgs
+  ideaVotes?: boolean | PlayerCountOutputTypeCountIdeaVotesArgs
 }
 
 /**
@@ -1591,6 +2111,13 @@ export type PlayerCountOutputTypeCountRatingHistoryArgs<ExtArgs extends runtime.
 /**
  * PlayerCountOutputType without action
  */
+export type PlayerCountOutputTypeCountClubRatingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClubPlayerRatingWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
 export type PlayerCountOutputTypeCountTeamsAsPlayer1Args<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.TournamentTeamWhereInput
 }
@@ -1607,6 +2134,20 @@ export type PlayerCountOutputTypeCountTeamsAsPlayer2Args<ExtArgs extends runtime
  */
 export type PlayerCountOutputTypeCountLoginChallengesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LoginChallengeWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountIdeasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IdeaWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountIdeaVotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IdeaVoteWhereInput
 }
 
 
@@ -1631,9 +2172,12 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Player$registrationsArgs<ExtArgs>
   ratingHistory?: boolean | Prisma.Player$ratingHistoryArgs<ExtArgs>
+  clubRatings?: boolean | Prisma.Player$clubRatingsArgs<ExtArgs>
   teamsAsPlayer1?: boolean | Prisma.Player$teamsAsPlayer1Args<ExtArgs>
   teamsAsPlayer2?: boolean | Prisma.Player$teamsAsPlayer2Args<ExtArgs>
   loginChallenges?: boolean | Prisma.Player$loginChallengesArgs<ExtArgs>
+  ideas?: boolean | Prisma.Player$ideasArgs<ExtArgs>
+  ideaVotes?: boolean | Prisma.Player$ideaVotesArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
@@ -1664,9 +2208,12 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Player$registrationsArgs<ExtArgs>
   ratingHistory?: boolean | Prisma.Player$ratingHistoryArgs<ExtArgs>
+  clubRatings?: boolean | Prisma.Player$clubRatingsArgs<ExtArgs>
   teamsAsPlayer1?: boolean | Prisma.Player$teamsAsPlayer1Args<ExtArgs>
   teamsAsPlayer2?: boolean | Prisma.Player$teamsAsPlayer2Args<ExtArgs>
   loginChallenges?: boolean | Prisma.Player$loginChallengesArgs<ExtArgs>
+  ideas?: boolean | Prisma.Player$ideasArgs<ExtArgs>
+  ideaVotes?: boolean | Prisma.Player$ideaVotesArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -1676,9 +2223,12 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     city: Prisma.$CityPayload<ExtArgs>
     registrations: Prisma.$TournamentRegistrationPayload<ExtArgs>[]
     ratingHistory: Prisma.$RatingChangePayload<ExtArgs>[]
+    clubRatings: Prisma.$ClubPlayerRatingPayload<ExtArgs>[]
     teamsAsPlayer1: Prisma.$TournamentTeamPayload<ExtArgs>[]
     teamsAsPlayer2: Prisma.$TournamentTeamPayload<ExtArgs>[]
     loginChallenges: Prisma.$LoginChallengePayload<ExtArgs>[]
+    ideas: Prisma.$IdeaPayload<ExtArgs>[]
+    ideaVotes: Prisma.$IdeaVotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2041,9 +2591,12 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   city<T extends Prisma.CityDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CityDefaultArgs<ExtArgs>>): Prisma.Prisma__CityClient<runtime.Types.Result.GetResult<Prisma.$CityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   registrations<T extends Prisma.Player$registrationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$registrationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentRegistrationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ratingHistory<T extends Prisma.Player$ratingHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$ratingHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RatingChangePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  clubRatings<T extends Prisma.Player$clubRatingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$clubRatingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubPlayerRatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teamsAsPlayer1<T extends Prisma.Player$teamsAsPlayer1Args<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$teamsAsPlayer1Args<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentTeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   teamsAsPlayer2<T extends Prisma.Player$teamsAsPlayer2Args<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$teamsAsPlayer2Args<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentTeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loginChallenges<T extends Prisma.Player$loginChallengesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$loginChallengesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoginChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ideas<T extends Prisma.Player$ideasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$ideasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ideaVotes<T extends Prisma.Player$ideaVotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$ideaVotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2486,6 +3039,30 @@ export type Player$ratingHistoryArgs<ExtArgs extends runtime.Types.Extensions.In
 }
 
 /**
+ * Player.clubRatings
+ */
+export type Player$clubRatingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClubPlayerRating
+   */
+  select?: Prisma.ClubPlayerRatingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClubPlayerRating
+   */
+  omit?: Prisma.ClubPlayerRatingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClubPlayerRatingInclude<ExtArgs> | null
+  where?: Prisma.ClubPlayerRatingWhereInput
+  orderBy?: Prisma.ClubPlayerRatingOrderByWithRelationInput | Prisma.ClubPlayerRatingOrderByWithRelationInput[]
+  cursor?: Prisma.ClubPlayerRatingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClubPlayerRatingScalarFieldEnum | Prisma.ClubPlayerRatingScalarFieldEnum[]
+}
+
+/**
  * Player.teamsAsPlayer1
  */
 export type Player$teamsAsPlayer1Args<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2555,6 +3132,54 @@ export type Player$loginChallengesArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.LoginChallengeScalarFieldEnum | Prisma.LoginChallengeScalarFieldEnum[]
+}
+
+/**
+ * Player.ideas
+ */
+export type Player$ideasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Idea
+   */
+  select?: Prisma.IdeaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Idea
+   */
+  omit?: Prisma.IdeaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IdeaInclude<ExtArgs> | null
+  where?: Prisma.IdeaWhereInput
+  orderBy?: Prisma.IdeaOrderByWithRelationInput | Prisma.IdeaOrderByWithRelationInput[]
+  cursor?: Prisma.IdeaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IdeaScalarFieldEnum | Prisma.IdeaScalarFieldEnum[]
+}
+
+/**
+ * Player.ideaVotes
+ */
+export type Player$ideaVotesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IdeaVote
+   */
+  select?: Prisma.IdeaVoteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IdeaVote
+   */
+  omit?: Prisma.IdeaVoteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IdeaVoteInclude<ExtArgs> | null
+  where?: Prisma.IdeaVoteWhereInput
+  orderBy?: Prisma.IdeaVoteOrderByWithRelationInput | Prisma.IdeaVoteOrderByWithRelationInput[]
+  cursor?: Prisma.IdeaVoteWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IdeaVoteScalarFieldEnum | Prisma.IdeaVoteScalarFieldEnum[]
 }
 
 /**

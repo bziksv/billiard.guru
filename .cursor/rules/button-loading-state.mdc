@@ -1,0 +1,77 @@
+---
+description: Кнопки с async-действием — loading-состояние, блокировка повторного клика
+globs: apps/web/**/*.{tsx,ts}
+alwaysApply: false
+---
+
+# Состояние загрузки у кнопок
+
+Любая кнопка, которая запускает **асинхронное действие** (fetch, submit формы, удаление, сохранение, переход с API-запросом), **обязана**:
+
+1. **Блокировать повторный клик** — `disabled={loading}` (или `pending`) на время операции.
+2. **Показывать прогресс** — смена текста («Сохранение…», «Отправка…») и/или спиннер.
+3. **Сбрасывать состояние** — в `finally` или после завершения запроса (успех и ошибка).
+
+Без этого пользователь не понимает, что процесс идёт, и может отправить действие дважды.
+
+## Эталон
+
+См. `TournamentRegisterButton`, `ideas-page-client.tsx` (форма идей).
+
+```tsx
+const [loading, setLoading] = useState(false);
+
+async function handleSave() {
+  setLoading(true);
+  try {
+    const res = await fetch("/api/...", { method: "POST", ... });
+    if (!res.ok) { /* показать ошибку */ return; }
+    router.refresh();
+  } finally {
+    setLoading(false);
+  }
+}
+
+<button
+  type="button"
+  onClick={handleSave}
+  disabled={loading}
+  className="site-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
+>
+  {loading ? "Сохранение…" : "Сохранить"}
+</button>
+```
+
+## Submit-кнопки в формах
+
+- `type="submit"` — блокировать через `disabled={isSubmitting}`.
+- Не полагаться только на `preventDefault` без `disabled`: двойной Enter/клик всё равно возможен.
+
+## Визуальная обратная связь
+
+Минимум — текст «…» в процессе. Допустимо добавить `animate-spin` на иконку рядом с текстом.
+
+```tsx
+{loading && (
+  <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+)}
+```
+
+## Запрещено
+
+```tsx
+// ❌ Нет loading — можно нажать снова, нет обратной связи
+<button onClick={async () => { await fetch(...); }}>Сохранить</button>
+
+// ❌ disabled только визуально, без смены текста/анимации
+<button disabled={loading}>Сохранить</button>
+```
+
+## Исключения
+
+- Мгновенные действия без сети (скролл, toggle, открытие модалки) — loading не нужен.
+- Навигация через `<Link>` — не кнопка; для programmatic `router.push` после await — правило применяется.
+
+## Новые кнопки
+
+При добавлении кнопки с API/формой — сразу закладывать `loading` + `disabled` + текст/спиннер.

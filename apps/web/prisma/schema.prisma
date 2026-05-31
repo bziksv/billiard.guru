@@ -10,8 +10,10 @@ datasource db {
 enum TournamentFormat {
   OLYMPIC
   SWISS
+  FIXED_SWISS
   PAIR_OLYMPIC
   PAIR_SWISS
+  FIXED_PAIR_SWISS
 }
 
 enum RegistrationStatus {
@@ -52,6 +54,17 @@ enum LoginChallengeStatus {
   EXPIRED
 }
 
+enum IdeaStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum IdeaVoteValue {
+  LIKE
+  DISLIKE
+}
+
 model Country {
   id     String @id @default(cuid())
   nameRu String @unique @map("name_ru")
@@ -81,6 +94,13 @@ model Club {
   city             City     @relation(fields: [cityId], references: [id])
   phone            String   @unique
   email            String?
+  photoUrl         String?  @map("photo_url")
+  description      String?  @db.Text
+  address          String?  @db.Text
+  latitude         Float?   @map("latitude")
+  longitude        Float?   @map("longitude")
+  workingHours     String?  @map("working_hours") @db.Text
+  tableCount       Int?     @map("table_count")
   telegramId       String?  @unique @map("telegram_id")
   telegramUsername String?  @map("telegram_username")
   isVerified       Boolean  @default(false) @map("is_verified")
@@ -91,8 +111,23 @@ model Club {
   tournaments    Tournament[]
   registrations  TournamentRegistration[]
   teams          TournamentTeam[]
+  playerRatings  ClubPlayerRating[]
+  news           ClubNews[]
 
   @@map("clubs")
+}
+
+model ClubNews {
+  id          String   @id @default(cuid())
+  clubId      String   @map("club_id")
+  club        Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  title       String
+  body        String   @db.Text
+  publishedAt DateTime @default(now()) @map("published_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([clubId, publishedAt])
+  @@map("club_news")
 }
 
 model Player {
@@ -117,11 +152,28 @@ model Player {
 
   registrations TournamentRegistration[]
   ratingHistory RatingChange[]
+  clubRatings   ClubPlayerRating[]
   teamsAsPlayer1 TournamentTeam[] @relation("TeamPlayer1")
   teamsAsPlayer2 TournamentTeam[] @relation("TeamPlayer2")
   loginChallenges LoginChallenge[]
+  ideas           Idea[]
+  ideaVotes       IdeaVote[]
 
   @@map("players")
+}
+
+model ClubPlayerRating {
+  id        String   @id @default(cuid())
+  clubId    String   @map("club_id")
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  playerId  String   @map("player_id")
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  rating    Float    @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([clubId, playerId])
+  @@map("club_player_ratings")
 }
 
 model LoginChallenge {
@@ -165,8 +217,8 @@ model TournamentTeam {
   name         String?
   player1Id    String             @map("player1_id")
   player1      Player             @relation("TeamPlayer1", fields: [player1Id], references: [id])
-  player2Id    String             @map("player2_id")
-  player2      Player             @relation("TeamPlayer2", fields: [player2Id], references: [id])
+  player2Id    String?            @map("player2_id")
+  player2      Player?            @relation("TeamPlayer2", fields: [player2Id], references: [id])
   clubId       String?            @map("club_id")
   club         Club?              @relation(fields: [clubId], references: [id])
   source       RegistrationSource
@@ -180,7 +232,7 @@ model TournamentTeam {
   matchesAsTeam2 TournamentMatch[] @relation("MatchTeam2")
   matchesWon     TournamentMatch[] @relation("MatchWinner")
 
-  @@unique([tournamentId, player1Id, player2Id])
+  @@unique([tournamentId, player1Id])
   @@map("tournament_teams")
 }
 
@@ -196,6 +248,10 @@ model TournamentMatch {
   team2        TournamentTeam? @relation("MatchTeam2", fields: [team2Id], references: [id])
   winnerTeamId String?         @map("winner_team_id")
   winnerTeam   TournamentTeam? @relation("MatchWinner", fields: [winnerTeamId], references: [id])
+  team1Score   Int?            @map("team1_score")
+  team2Score   Int?            @map("team2_score")
+  startedAt    DateTime?       @map("started_at")
+  finishedAt   DateTime?       @map("finished_at")
   status       MatchStatus     @default(SCHEDULED)
   createdAt    DateTime        @default(now()) @map("created_at")
 
@@ -246,4 +302,38 @@ model AuditLog {
   createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("audit_logs")
+}
+
+model Idea {
+  id              String     @id @default(cuid())
+  authorId        String     @map("author_id")
+  author          Player     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  title           String
+  body            String     @db.Text
+  status          IdeaStatus @default(PENDING)
+  moderationToken String?    @unique @map("moderation_token")
+  likesCount      Int        @default(0) @map("likes_count")
+  dislikesCount   Int        @default(0) @map("dislikes_count")
+  moderatedAt     DateTime?  @map("moderated_at")
+  moderatedById   String?    @map("moderated_by_id")
+  rejectReason    String?    @map("reject_reason") @db.Text
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  votes IdeaVote[]
+
+  @@map("ideas")
+}
+
+model IdeaVote {
+  id        String        @id @default(cuid())
+  ideaId    String        @map("idea_id")
+  idea      Idea          @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  playerId  String        @map("player_id")
+  player    Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  value     IdeaVoteValue
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  @@unique([ideaId, playerId])
+  @@map("idea_votes")
 }

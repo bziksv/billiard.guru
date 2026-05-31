@@ -1,4 +1,5 @@
 export interface TeamPlayer {
+  id: string;
   firstName: string;
   lastName: string;
   rating: number;
@@ -8,11 +9,40 @@ export interface TeamWithPlayers {
   id: string;
   name?: string | null;
   player1: TeamPlayer;
-  player2: TeamPlayer;
+  player2?: TeamPlayer | null;
+}
+
+export function isSwissFormat(format: string): boolean {
+  return (
+    format === "SWISS" ||
+    format === "PAIR_SWISS" ||
+    format === "FIXED_SWISS" ||
+    format === "FIXED_PAIR_SWISS"
+  );
+}
+
+export function isFixedSwissFormat(format: string): boolean {
+  return format === "FIXED_SWISS" || format === "FIXED_PAIR_SWISS";
+}
+
+export function isDynamicSwissFormat(format: string): boolean {
+  return format === "SWISS" || format === "PAIR_SWISS";
+}
+
+export function isSoloFormat(format: string): boolean {
+  return (
+    format === "SWISS" ||
+    format === "FIXED_SWISS" ||
+    format === "OLYMPIC"
+  );
 }
 
 export function isSwissPairFormat(format: string): boolean {
-  return format === "PAIR_SWISS";
+  return format === "PAIR_SWISS" || format === "FIXED_PAIR_SWISS";
+}
+
+export function isOlympicFormat(format: string): boolean {
+  return format === "OLYMPIC" || format === "PAIR_OLYMPIC";
 }
 
 export function isOlympicPairFormat(format: string): boolean {
@@ -20,7 +50,10 @@ export function isOlympicPairFormat(format: string): boolean {
 }
 
 export function isPairFormat(format: string): boolean {
-  return isOlympicPairFormat(format) || isSwissPairFormat(format);
+  return (
+    isOlympicPairFormat(format) ||
+    isSwissPairFormat(format)
+  );
 }
 
 export function normalizePlayerPair(id1: string, id2: string): [string, string] {
@@ -31,11 +64,15 @@ export function normalizePlayerPair(id1: string, id2: string): [string, string] 
 }
 
 export function teamRating(team: TeamWithPlayers): number {
+  if (!team.player2) return team.player1.rating;
   return team.player1.rating + team.player2.rating;
 }
 
 export function teamLabel(team: TeamWithPlayers): string {
   if (team.name?.trim()) return team.name.trim();
+  if (!team.player2) {
+    return `${team.player1.lastName} ${team.player1.firstName}`;
+  }
   return `${team.player1.lastName} / ${team.player2.lastName}`;
 }
 

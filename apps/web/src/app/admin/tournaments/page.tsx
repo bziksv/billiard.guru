@@ -1,71 +1,44 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import {
+  AdminFilterSelect,
+  AdminTableSearchField,
+  AdminTableToolbar,
+} from "@/components/admin/admin-table-toolbar";
+import { TournamentListCard } from "@/components/admin/tournament-list-card";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import {
-  REGISTRATION_STATUS_LABELS,
-  TOURNAMENT_FORMAT_LABELS,
-  TOURNAMENT_STATUS_LABELS,
-} from "@/lib/validators";
-import { describeHandicap } from "@/lib/handicap";
-import {
-  isPairFormat,
-  isSwissPairFormat,
-  teamLabel,
-  teamRating,
-  type TeamWithPlayers,
-} from "@/lib/pair-tournament";
+import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
+import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { StatusBadge } from "@/components/admin/status-badge";
+import type { AdminTournament } from "@/lib/tournament-admin";
 
 interface Club {
   id: string;
   name: string;
+  phone?: string;
+  telegramId?: string | null;
+  city?: { id: string; nameRu: string; country: { id: string; nameRu: string } };
 }
 
-interface Player {
+interface UserProfile {
   id: string;
-  firstName: string;
-  lastName: string;
-  rating: number;
+  phone: string;
+  telegramId: string | null;
+  cityId: string;
+  countryId: string;
 }
 
-interface Registration {
+interface GeoCountry {
   id: string;
-  status: string;
-  source: string;
-  player: Player;
+  nameRu: string;
+  cities: { id: string; nameRu: string }[];
 }
 
-interface Team extends TeamWithPlayers {
-  id: string;
-  status: string;
-  seed?: number | null;
-  swissPoints?: number;
-}
 
-interface Match {
-  id: string;
-  round: number;
-  slot: number;
-  status: string;
-  team1: Team | null;
-  team2: Team | null;
-  winnerTeam: Team | null;
-}
-
-interface Tournament {
-  id: string;
-  name: string;
-  description?: string | null;
-  format: string;
-  status: string;
-  clubId: string;
-  startsAt?: string | null;
-  club: { name: string; id?: string };
-  registrations: Registration[];
-  teams: Team[];
-  matches: Match[];
-}
+interface Tournament extends AdminTournament {}
 
 const STATUS_OPTIONS = [
   { value: "DRAFT", label: "Черновик" },
@@ -76,27 +49,70 @@ const STATUS_OPTIONS = [
 ];
 
 const FORMAT_OPTIONS = [
-  { value: "OLYMPIC", label: "Олимпийская система (одиночный)" },
-  { value: "SWISS", label: "Швейцарская система (одиночный)" },
-  { value: "PAIR_OLYMPIC", label: "Парный турнир (олимпийская)" },
-  { value: "PAIR_SWISS", label: "Парный турнир (швейцарская)" },
+  { value: "OLYMPIC", label: "Олимпийская (фикс. сетка, одиночный)" },
+  { value: "SWISS", label: "Швейцарская (по турам, одиночный)" },
+  { value: "FIXED_SWISS", label: "Швейцарская (фикс. сетка, одиночный)" },
+  { value: "PAIR_OLYMPIC", label: "Парный (фикс. сетка)" },
+  { value: "PAIR_SWISS", label: "Парный швейцарская (по турам)" },
+  { value: "FIXED_PAIR_SWISS", label: "Парный швейцарская (фикс. сетка)" },
 ];
 
+const CURRENT_STATUSES = new Set([
+  "DRAFT",
+  "PENDING_CLUB_APPROVAL",
+  "OPEN",
+  "ACTIVE",
+]);
+
+function clubOwnedByUser(
+  club: Pick<Club, "phone" | "telegramId">,
+  user: UserProfile | null,
+): boolean {
+  if (!user) return true;
+  if (user.telegramId && club.telegramId === user.telegramId) return true;
+  if (club.phone === user.phone) return true;
+  return false;
+}
+
+function matchesGeoFilters(
+  tournament: Tournament,
+  countryId: string,
+  cityId: string,
+): boolean {
+  const city = tournament.club.city;
+  if (countryId && city?.country.id !== countryId) return false;
+  if (cityId && city?.id !== cityId) return false;
+  return true;
+}
+
+function matchesSearch(tournament: Tournament, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  return [tournament.name, tournament.description ?? "", tournament.club.name]
+    .join(" ")
+    .toLowerCase()
+    .includes(q);
+}
+
 export default function TournamentsPage() {
+  const router = useRouter();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
-  const [players, setPlayers] = useState<Player[]>([]);
   const [newClubId, setNewClubId] = useState("");
   const [newFormat, setNewFormat] = useState("OLYMPIC");
-  const [selectedTournament, setSelectedTournament] = useState("");
-  const [selectedPlayer, setSelectedPlayer] = useState("");
-  const [selectedPlayer2, setSelectedPlayer2] = useState("");
-  const [teamName, setTeamName] = useState("");
-  const [selectedClub, setSelectedClub] = useState("");
-  const [regSource, setRegSource] = useState<"CLUB" | "SELF">("CLUB");
-  const [regError, setRegError] = useState<string | null>(null);
   const [createMessage, setCreateMessage] = useState<string | null>(null);
-  const [bracketLoading, setBracketLoading] = useState<string | null>(null);
+  const [startingId, setStartingId] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [geoCountries, setGeoCountries] = useState<GeoCountry[]>([]);
+  const [listSearch, setListSearch] = useState("");
+  const [listCountryId, setListCountryId] = useState("");
+  const [listCityId, setListCityId] = useState("");
+  const [myClubsOnly, setMyClubsOnly] = useState(true);
+  const [listStatus, setListStatus] = useState("");
+  const [listFormat, setListFormat] = useState("");
+  const [finishedSearch, setFinishedSearch] = useState("");
+  const [filtersReady, setFiltersReady] = useState(false);
+  const [tab, setTab] = useState<"create" | "current" | "finished">("current");
 
   async function reloadTournaments() {
     const t = await fetch("/api/tournaments").then((r) => r.json());
@@ -107,41 +123,129 @@ export default function TournamentsPage() {
     Promise.all([
       fetch("/api/tournaments").then((r) => r.json()),
       fetch("/api/clubs").then((r) => r.json()),
-      fetch("/api/players").then((r) => r.json()),
-    ]).then(([t, c, p]) => {
-      setTournaments(t);
-      setClubs(c);
-      setPlayers(p);
+      fetch("/api/auth/me").then((r) => r.json()),
+      fetch("/api/geo").then((r) => r.json()),
+    ]).then(([t, c, me, geo]) => {
+      setTournaments(Array.isArray(t) ? t : []);
+      setClubs(Array.isArray(c) ? c : []);
+      setGeoCountries(Array.isArray(geo) ? geo : []);
+
+      const user = me?.user as UserProfile | undefined;
+      if (user) {
+        setUserProfile(user);
+        setListCountryId(user.countryId);
+        setListCityId(user.cityId);
+      }
+      setFiltersReady(true);
     });
   }, []);
 
+  const myClubs = useMemo(
+    () => clubs.filter((c) => clubOwnedByUser(c, userProfile)),
+    [clubs, userProfile],
+  );
+
   const clubOptions = useMemo(
+    () => myClubs.map((c) => ({ value: c.id, label: c.name })),
+    [myClubs],
+  );
+
+  const allClubOptions = useMemo(
     () => clubs.map((c) => ({ value: c.id, label: c.name })),
     [clubs],
   );
 
-  const tournamentOptions = useMemo(
-    () => tournaments.map((t) => ({ value: t.id, label: t.name })),
-    [tournaments],
+  useEffect(() => {
+    if (!filtersReady || newClubId) return;
+    if (myClubs.length === 1) {
+      setNewClubId(myClubs[0].id);
+    }
+  }, [filtersReady, myClubs, newClubId]);
+
+  const currentStatusFilterOptions = useMemo(
+    () => [
+      { value: "", label: "Все" },
+      ...STATUS_OPTIONS.filter((o) => CURRENT_STATUSES.has(o.value)),
+    ],
+    [],
   );
 
-  const playerOptions = useMemo(
+  const countryFilterOptions = useMemo(
+    () => [
+      { value: "", label: "Все страны" },
+      ...geoCountries.map((c) => ({ value: c.id, label: c.nameRu })),
+    ],
+    [geoCountries],
+  );
+
+  const cityFilterOptions = useMemo(() => {
+    const cities =
+      geoCountries.find((c) => c.id === listCountryId)?.cities ?? [];
+    return [
+      { value: "", label: "Все города" },
+      ...cities.map((city) => ({ value: city.id, label: city.nameRu })),
+    ];
+  }, [geoCountries, listCountryId]);
+
+  const currentTournaments = useMemo(() => {
+    return tournaments.filter((t) => {
+      if (!CURRENT_STATUSES.has(t.status)) return false;
+      if (myClubsOnly && userProfile && !clubOwnedByUser(t.club, userProfile)) {
+        return false;
+      }
+      if (!matchesGeoFilters(t, listCountryId, listCityId)) return false;
+      if (listStatus && t.status !== listStatus) return false;
+      if (listFormat && t.format !== listFormat) return false;
+      return matchesSearch(t, listSearch);
+    });
+  }, [
+    tournaments,
+    myClubsOnly,
+    userProfile,
+    listCountryId,
+    listCityId,
+    listStatus,
+    listFormat,
+    listSearch,
+  ]);
+
+  const finishedTournaments = useMemo(() => {
+    return tournaments.filter((t) => {
+      if (t.status !== "FINISHED") return false;
+      if (myClubsOnly && userProfile && !clubOwnedByUser(t.club, userProfile)) {
+        return false;
+      }
+      if (!matchesGeoFilters(t, listCountryId, listCityId)) return false;
+      return matchesSearch(t, finishedSearch);
+    });
+  }, [
+    tournaments,
+    myClubsOnly,
+    userProfile,
+    listCountryId,
+    listCityId,
+    finishedSearch,
+  ]);
+
+  const currentTotal = useMemo(
     () =>
-      players.map((p) => ({
-        value: p.id,
-        label: `${p.lastName} ${p.firstName} (рейтинг ${p.rating})`,
-      })),
-    [players],
+      tournaments.filter(
+        (t) =>
+          CURRENT_STATUSES.has(t.status) &&
+          (!myClubsOnly || !userProfile || clubOwnedByUser(t.club, userProfile)),
+      ).length,
+    [tournaments, myClubsOnly, userProfile],
   );
 
-  const selectedTournamentData = useMemo(
-    () => tournaments.find((t) => t.id === selectedTournament),
-    [tournaments, selectedTournament],
+  const finishedTotal = useMemo(
+    () =>
+      tournaments.filter(
+        (t) =>
+          t.status === "FINISHED" &&
+          (!myClubsOnly || !userProfile || clubOwnedByUser(t.club, userProfile)),
+      ).length,
+    [tournaments, myClubsOnly, userProfile],
   );
-
-  const isPairSelected = selectedTournamentData
-    ? isPairFormat(selectedTournamentData.format)
-    : false;
 
   async function createTournament(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -172,123 +276,93 @@ export default function TournamentsPage() {
       data.message ??
         "Турнир создан. Владельцу клуба отправлен запрос в Telegram.",
     );
+    setTab("current");
   }
 
-  async function registerParticipant() {
-    if (!selectedTournament) return;
-    setRegError(null);
-
-    if (isPairSelected) {
-      if (!selectedPlayer || !selectedPlayer2) {
-        setRegError("Выберите двух игроков в команде");
-        return;
-      }
-      const res = await fetch("/api/tournaments/teams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tournamentId: selectedTournament,
-          player1Id: selectedPlayer,
-          player2Id: selectedPlayer2,
-          name: teamName || undefined,
-          clubId: regSource === "CLUB" ? selectedClub : undefined,
-          source: regSource,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setRegError(data.error ?? "Ошибка регистрации");
-        return;
-      }
-      setSelectedPlayer("");
-      setSelectedPlayer2("");
-      setTeamName("");
-    } else {
-      if (!selectedPlayer) return;
-      const res = await fetch("/api/tournaments/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tournamentId: selectedTournament,
-          playerId: selectedPlayer,
-          clubId: regSource === "CLUB" ? selectedClub : undefined,
-          source: regSource,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setRegError(data.error ?? "Ошибка регистрации");
-        return;
-      }
-      setSelectedPlayer("");
-    }
-
-    await reloadTournaments();
-  }
-
-  async function confirmRegistration(id: string) {
-    await fetch("/api/tournaments/register", {
+  async function startTournament(id: string) {
+    setStartingId(id);
+    const res = await fetch(`/api/tournaments/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status: "CONFIRMED" }),
-    });
-    await reloadTournaments();
-  }
-
-  async function confirmTeam(id: string) {
-    await fetch("/api/tournaments/teams", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, status: "CONFIRMED" }),
-    });
-    await reloadTournaments();
-  }
-
-  async function generateBracket(tournamentId: string) {
-    setBracketLoading(tournamentId);
-    const res = await fetch("/api/tournaments/bracket", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tournamentId }),
+      body: JSON.stringify({ status: "ACTIVE" }),
     });
     const data = await res.json();
-    setBracketLoading(null);
+    setStartingId(null);
     if (!res.ok) {
-      alert(data.error ?? "Не удалось сформировать сетку");
+      alert(data.error ?? "Не удалось начать турнир");
+      return;
+    }
+    router.push(`/admin/tournaments/${id}`);
+  }
+
+  async function deleteTournament(id: string, name: string) {
+    if (
+      !confirm(
+        `Удалить турнир «${name}»?\n\nРегистрации, команды и матчи будут удалены без возможности восстановления.`,
+      )
+    ) {
+      return;
+    }
+    const res = await fetch(`/api/tournaments/${id}`, { method: "DELETE" });
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error ?? "Не удалось удалить турнир");
       return;
     }
     await reloadTournaments();
   }
 
-  async function setMatchWinner(matchId: string, winnerTeamId: string) {
-    const res = await fetch("/api/tournaments/bracket", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ matchId, winnerTeamId }),
-    });
-    if (!res.ok) {
-      const data = await res.json();
-      alert(data.error ?? "Ошибка");
-      return;
-    }
-    await reloadTournaments();
-  }
+  const tabClass = (active: boolean) =>
+    active
+      ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
+      : "rounded-lg px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200";
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold">Турниры</h1>
 
-      <section className="max-w-xl rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-        <h2 className="mb-4 font-semibold">Создать турнир</h2>
-        <form onSubmit={createTournament} className="space-y-3">
+      <div className="inline-flex flex-wrap gap-1 rounded-xl border border-zinc-800 bg-zinc-950 p-1">
+        <button
+          type="button"
+          onClick={() => setTab("create")}
+          className={tabClass(tab === "create")}
+        >
+          Создать
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("current")}
+          className={tabClass(tab === "current")}
+        >
+          Текущие{currentTotal > 0 ? ` (${currentTotal})` : ""}
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("finished")}
+          className={tabClass(tab === "finished")}
+        >
+          Завершённые{finishedTotal > 0 ? ` (${finishedTotal})` : ""}
+        </button>
+      </div>
+
+      {tab === "create" && (
+      <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+        <h2 className="mb-1 text-lg font-semibold">Создать турнир</h2>
+        <p className="mb-5 text-sm text-zinc-500">
+          После создания владельцу клуба в Telegram уйдёт запрос на публикацию.
+        </p>
+        <form
+          onSubmit={createTournament}
+          className="grid max-w-3xl gap-3 sm:grid-cols-2"
+        >
           <input
             name="name"
             required
             placeholder="Название турнира"
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            className="sm:col-span-2 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
           />
           <SearchableSelect
-            options={clubOptions}
+            options={clubOptions.length > 0 ? clubOptions : allClubOptions}
             value={newClubId}
             onChange={setNewClubId}
             placeholder="Клуб-организатор"
@@ -307,526 +381,244 @@ export default function TournamentsPage() {
             name="description"
             rows={4}
             placeholder="Описание турнира (формат игры, призовой фонд, правила…)"
-            className="w-full resize-y rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            className="sm:col-span-2 w-full resize-y rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
           />
           <input
             name="startsAt"
             type="datetime-local"
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            className="sm:col-span-2 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
           />
-          <button
-            type="submit"
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500"
-          >
-            Создать
-          </button>
-          {createMessage && (
-            <p
-              className={`text-sm ${createMessage.includes("ошиб") || createMessage.includes("Ошиб") ? "text-red-400" : "text-emerald-400"}`}
+          <div className="sm:col-span-2 flex flex-wrap items-center gap-4">
+            <button
+              type="submit"
+              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500"
             >
-              {createMessage}
-            </p>
-          )}
-          <p className="text-xs text-zinc-500">
-            После создания владельцу клуба в Telegram уйдёт запрос на публикацию.
-          </p>
+              Создать
+            </button>
+            {createMessage && (
+              <p
+                className={`text-sm ${createMessage.includes("ошиб") || createMessage.includes("Ошиб") ? "text-red-400" : "text-emerald-400"}`}
+              >
+                {createMessage}
+              </p>
+            )}
+          </div>
         </form>
       </section>
+      )}
 
-      <section className="max-w-xl rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-        <h2 className="mb-4 font-semibold">
-          {isPairSelected ? "Регистрация команды (пара)" : "Регистрация участника"}
-        </h2>
-        <div className="space-y-3">
-          <SearchableSelect
-            options={tournamentOptions}
-            value={selectedTournament}
-            onChange={setSelectedTournament}
-            placeholder="Турнир"
-            searchPlaceholder="Поиск турнира…"
-          />
-          {isPairSelected ? (
-            <>
-              <SearchableSelect
-                options={playerOptions}
-                value={selectedPlayer}
-                onChange={setSelectedPlayer}
-                placeholder="Игрок 1"
-                searchPlaceholder="Поиск игрока…"
-              />
-              <SearchableSelect
-                options={playerOptions.filter((p) => p.value !== selectedPlayer)}
-                value={selectedPlayer2}
-                onChange={setSelectedPlayer2}
-                placeholder="Игрок 2 (партнёр)"
-                searchPlaceholder="Поиск игрока…"
-              />
-              <input
-                value={teamName}
-                onChange={(e) => setTeamName(e.target.value)}
-                placeholder="Название команды (необязательно)"
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-              />
-            </>
-          ) : (
-            <SearchableSelect
-              options={playerOptions}
-              value={selectedPlayer}
-              onChange={setSelectedPlayer}
-              placeholder="Игрок"
-              searchPlaceholder="Поиск игрока…"
-            />
-          )}
-          <div className="flex gap-4 text-sm">
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                checked={regSource === "CLUB"}
-                onChange={() => setRegSource("CLUB")}
-              />
-              Клуб регистрирует
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                checked={regSource === "SELF"}
-                onChange={() => setRegSource("SELF")}
-              />
-              Самостоятельно
-            </label>
-          </div>
-          {regSource === "CLUB" && (
-            <SearchableSelect
-              options={clubOptions}
-              value={selectedClub}
-              onChange={setSelectedClub}
-              placeholder="Клуб"
-              searchPlaceholder="Поиск клуба…"
-            />
-          )}
-          {regError && <p className="text-sm text-red-400">{regError}</p>}
-          <button
-            onClick={registerParticipant}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500"
-          >
-            Зарегистрировать
-          </button>
-          <p className="text-xs text-zinc-500">
-            {isPairSelected
-              ? "Команда из двух игроков. Подтвердите регистрацию в списке ниже."
-              : "Игрок подтверждает участие через Telegram"}
-          </p>
-        </div>
-      </section>
-
+      {tab === "current" && (
       <section>
-        <h2 className="mb-4 font-semibold">Список турниров</h2>
-        <div className="space-y-4">
-          {tournaments.map((t) => (
-            <TournamentCard
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold">Текущие турниры</h2>
+            <p className="mt-1 text-sm text-zinc-500">
+              Черновики, ожидающие публикации, открытая регистрация и идущие
+              турниры ваших клубов.
+            </p>
+          </div>
+        </div>
+
+        <AdminTableToolbar
+          count={{ shown: currentTournaments.length, total: currentTotal }}
+        >
+          <AdminTableSearchField
+            value={listSearch}
+            onChange={setListSearch}
+            placeholder="Название, клуб, описание…"
+          />
+          <AdminFilterSelect
+            label="Страна"
+            options={countryFilterOptions}
+            value={listCountryId}
+            onChange={(id) => {
+              setListCountryId(id);
+              setListCityId("");
+            }}
+          />
+          <AdminFilterSelect
+            label="Город"
+            options={cityFilterOptions}
+            value={listCityId}
+            onChange={setListCityId}
+            placeholder={listCountryId ? "Все города" : "Сначала страна"}
+          />
+          <AdminFilterSelect
+            label="Статус"
+            options={currentStatusFilterOptions}
+            value={listStatus}
+            onChange={setListStatus}
+          />
+          <AdminFilterSelect
+            label="Формат"
+            options={[{ value: "", label: "Все" }, ...FORMAT_OPTIONS]}
+            value={listFormat}
+            onChange={setListFormat}
+          />
+          <label className="flex min-w-[160px] items-end gap-2 pb-2 text-sm text-zinc-300">
+            <input
+              type="checkbox"
+              checked={myClubsOnly}
+              onChange={(e) => setMyClubsOnly(e.target.checked)}
+              className="rounded border-zinc-600"
+            />
+            Только мои клубы
+          </label>
+        </AdminTableToolbar>
+
+        <div className="space-y-3">
+          {currentTournaments.map((t) => (
+            <TournamentListCard
               key={t.id}
               tournament={t}
-              clubOptions={clubOptions}
-              bracketLoading={bracketLoading === t.id}
-              onConfirmRegistration={confirmRegistration}
-              onConfirmTeam={confirmTeam}
-              onGenerateBracket={() => generateBracket(t.id)}
-              onSetWinner={setMatchWinner}
-              onUpdated={reloadTournaments}
+              starting={startingId === t.id}
+              onStart={startTournament}
             />
           ))}
+          {currentTournaments.length === 0 && (
+            <p className="rounded-xl border border-dashed border-zinc-800 py-10 text-center text-sm text-zinc-500">
+              {currentTotal === 0
+                ? "Текущих турниров пока нет"
+                : "Ничего не найдено по фильтрам"}
+            </p>
+          )}
         </div>
       </section>
+      )}
+
+      {tab === "finished" && (
+      <section>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Завершённые турниры</h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Архив прошедших турниров ваших клубов.
+          </p>
+        </div>
+
+        <AdminTableToolbar
+          count={{ shown: finishedTournaments.length, total: finishedTotal }}
+        >
+          <AdminTableSearchField
+            value={finishedSearch}
+            onChange={setFinishedSearch}
+            placeholder="Название, клуб…"
+          />
+          <AdminFilterSelect
+            label="Страна"
+            options={countryFilterOptions}
+            value={listCountryId}
+            onChange={(id) => {
+              setListCountryId(id);
+              setListCityId("");
+            }}
+          />
+          <AdminFilterSelect
+            label="Город"
+            options={cityFilterOptions}
+            value={listCityId}
+            onChange={setListCityId}
+            placeholder={listCountryId ? "Все города" : "Сначала страна"}
+          />
+          <label className="flex min-w-[160px] items-end gap-2 pb-2 text-sm text-zinc-300">
+            <input
+              type="checkbox"
+              checked={myClubsOnly}
+              onChange={(e) => setMyClubsOnly(e.target.checked)}
+              className="rounded border-zinc-600"
+            />
+            Только мои клубы
+          </label>
+        </AdminTableToolbar>
+
+        <div className="overflow-x-auto rounded-xl border border-zinc-800">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="border-b border-zinc-800 bg-zinc-950 text-xs uppercase tracking-wide text-zinc-500">
+              <tr>
+                <th className="px-4 py-3 font-medium">Турнир</th>
+                <th className="px-4 py-3 font-medium">Клуб</th>
+                <th className="px-4 py-3 font-medium">Город</th>
+                <th className="px-4 py-3 font-medium">Формат</th>
+                <th className="px-4 py-3 font-medium">Дата</th>
+                <th className="px-4 py-3 font-medium" />
+              </tr>
+            </thead>
+            <tbody>
+              {finishedTournaments.map((t) => (
+                <FinishedTournamentRow
+                  key={t.id}
+                  tournament={t}
+                  onDelete={() => deleteTournament(t.id, t.name)}
+                />
+              ))}
+            </tbody>
+          </table>
+          {finishedTournaments.length === 0 && (
+            <p className="py-10 text-center text-sm text-zinc-500">
+              {finishedTotal === 0
+                ? "Завершённых турниров пока нет"
+                : "Ничего не найдено по фильтрам"}
+            </p>
+          )}
+        </div>
+      </section>
+      )}
     </div>
   );
 }
 
-function TournamentCard({
+function FinishedTournamentRow({
   tournament: t,
-  clubOptions,
-  bracketLoading,
-  onConfirmRegistration,
-  onConfirmTeam,
-  onGenerateBracket,
-  onSetWinner,
-  onUpdated,
+  onDelete,
 }: {
   tournament: Tournament;
-  clubOptions: { value: string; label: string }[];
-  bracketLoading: boolean;
-  onConfirmRegistration: (id: string) => void;
-  onConfirmTeam: (id: string) => void;
-  onGenerateBracket: () => void;
-  onSetWinner: (matchId: string, winnerTeamId: string) => void;
-  onUpdated: () => void;
+  onDelete: () => void;
 }) {
-  const [editing, setEditing] = useState(false);
-  const [editName, setEditName] = useState(t.name);
-  const [editDescription, setEditDescription] = useState(t.description ?? "");
-  const [editClubId, setEditClubId] = useState(t.clubId);
-  const [editFormat, setEditFormat] = useState(t.format);
-  const [editStatus, setEditStatus] = useState(t.status);
-  const [editStartsAt, setEditStartsAt] = useState(
-    t.startsAt ? t.startsAt.slice(0, 16) : "",
-  );
-  const [editError, setEditError] = useState<string | null>(null);
-  const [editSaving, setEditSaving] = useState(false);
-
-  async function saveEdit() {
-    setEditSaving(true);
-    setEditError(null);
-    const res = await fetch(`/api/tournaments/${t.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: editName,
-        description: editDescription,
-        clubId: editClubId,
-        format: editFormat,
-        status: editStatus,
-        startsAt: editStartsAt || null,
-      }),
-    });
-    const data = await res.json();
-    setEditSaving(false);
-    if (!res.ok) {
-      setEditError(data.error ?? "Ошибка сохранения");
-      return;
-    }
-    setEditing(false);
-    onUpdated();
-  }
-  const pair = isPairFormat(t.format);
-  const swiss = isSwissPairFormat(t.format);
-  const confirmedTeams = t.teams.filter((team) => team.status === "CONFIRMED");
-  const maxRound = t.matches.reduce((max, m) => Math.max(max, m.round), 0);
-  const currentRoundOpen = t.matches.some(
-    (m) => m.round === maxRound && !m.winnerTeam && m.status !== "FINISHED",
-  );
-  const standings = useMemo(
-    () =>
-      [...confirmedTeams].sort(
-        (a, b) =>
-          (b.swissPoints ?? 0) - (a.swissPoints ?? 0) ||
-          teamRating(b) - teamRating(a),
-      ),
-    [confirmedTeams],
-  );
-  const rounds = useMemo(() => {
-    const map = new Map<number, Match[]>();
-    for (const match of t.matches) {
-      const list = map.get(match.round) ?? [];
-      list.push(match);
-      map.set(match.round, list);
-    }
-    return [...map.entries()].sort(([a], [b]) => a - b);
-  }, [t.matches]);
-  const finalRound = rounds.at(-1)?.[0];
+  const [deleting, setDeleting] = useState(false);
 
   return (
-    <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
-      <div className="flex flex-wrap items-center gap-3">
-        <h3 className="font-semibold">{t.name}</h3>
-        <StatusBadge
-          status={t.status}
-          label={TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
-        />
-        <span className="text-sm text-zinc-400">
-          {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
-        </span>
-        <button
-          type="button"
-          onClick={() => setEditing((v) => !v)}
-          className="ml-auto text-xs text-emerald-400 hover:underline"
-        >
-          {editing ? "Закрыть" : "Редактировать"}
-        </button>
-      </div>
-      {editing && (
-        <div className="mt-4 space-y-3 rounded-lg border border-zinc-700 bg-zinc-900 p-4">
-          <input
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-            placeholder="Название"
-          />
-          <textarea
-            value={editDescription}
-            onChange={(e) => setEditDescription(e.target.value)}
-            rows={4}
-            className="w-full resize-y rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-            placeholder="Описание"
-          />
-          <SearchableSelect
-            options={clubOptions}
-            value={editClubId}
-            onChange={setEditClubId}
-            placeholder="Клуб"
-            searchPlaceholder="Поиск клуба…"
-          />
-          <SearchableSelect
-            options={FORMAT_OPTIONS}
-            value={editFormat}
-            onChange={setEditFormat}
-            placeholder="Формат"
-            searchPlaceholder="Формат…"
-          />
-          <SearchableSelect
-            options={STATUS_OPTIONS}
-            value={editStatus}
-            onChange={setEditStatus}
-            placeholder="Статус"
-            searchPlaceholder="Статус…"
-          />
-          <input
-            type="datetime-local"
-            value={editStartsAt}
-            onChange={(e) => setEditStartsAt(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-          />
-          {editError && <p className="text-sm text-red-400">{editError}</p>}
+    <tr className="border-b border-zinc-800/80 last:border-0 hover:bg-zinc-950/50">
+      <td className="px-4 py-3 font-medium">{t.name}</td>
+      <td className="px-4 py-3 text-zinc-300">{t.club.name}</td>
+      <td className="px-4 py-3 text-zinc-400">
+        {t.club.city?.nameRu ?? "—"}
+      </td>
+      <td className="px-4 py-3 text-zinc-400">
+        {TOURNAMENT_FORMAT_LABELS[t.format] ?? t.format}
+      </td>
+      <td className="px-4 py-3 text-zinc-400">
+        {t.startsAt ? formatAdminDate(t.startsAt) : "—"}
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex items-center justify-end gap-3">
+          <Link
+            href={`/admin/tournaments/${t.id}`}
+            className="text-xs text-emerald-400 hover:underline"
+          >
+            Открыть
+          </Link>
+          <Link
+            href={`/tournaments/${t.id}`}
+            className="text-xs text-zinc-400 hover:underline"
+          >
+            На сайте
+          </Link>
           <button
             type="button"
-            onClick={saveEdit}
-            disabled={editSaving}
-            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
+            disabled={deleting}
+            onClick={async () => {
+              setDeleting(true);
+              try {
+                await onDelete();
+              } finally {
+                setDeleting(false);
+              }
+            }}
+            className="text-xs text-red-400 hover:underline disabled:opacity-50"
           >
-            {editSaving ? "Сохранение…" : "Сохранить"}
+            {deleting ? "…" : "Удалить"}
           </button>
         </div>
-      )}
-      {!editing && t.description && (
-        <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-300">
-          {t.description}
-        </p>
-      )}
-
-      {pair && (
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <button
-            onClick={onGenerateBracket}
-            disabled={
-              bracketLoading ||
-              confirmedTeams.length < 2 ||
-              (swiss && maxRound > 0 && currentRoundOpen)
-            }
-            className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm hover:bg-emerald-600 disabled:opacity-50"
-          >
-            {bracketLoading
-              ? "Формируем…"
-              : swiss
-                ? maxRound === 0
-                  ? "Сформировать 1-й тур"
-                  : `Сформировать тур ${maxRound + 1}`
-                : "Сформировать сетку"}
-          </button>
-          <span className="text-xs text-zinc-500">
-            Подтверждённых команд: {confirmedTeams.length}
-            {confirmedTeams.length < 2 && " (минимум 2)"}
-            {swiss && maxRound > 0 && currentRoundOpen && " · завершите текущий тур"}
-          </span>
-        </div>
-      )}
-
-      {swiss && standings.length > 0 && (
-        <div className="mt-4">
-          <p className="mb-2 text-xs uppercase tracking-wide text-zinc-500">
-            Таблица
-          </p>
-          <ul className="space-y-1">
-            {standings.map((team, index) => (
-              <li
-                key={team.id}
-                className="flex items-center justify-between rounded-lg bg-zinc-900 px-3 py-1.5 text-sm"
-              >
-                <span>
-                  {index + 1}. {teamLabel(team)}
-                </span>
-                <span className="text-zinc-400">
-                  {team.swissPoints ?? 0} очк.
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {pair && t.teams.length > 0 && (
-        <ul className="mt-3 space-y-2">
-          {t.teams.map((team) => (
-            <li
-              key={team.id}
-              className="flex items-center justify-between rounded-lg bg-zinc-900 px-3 py-2 text-sm"
-            >
-              <span>
-                {team.seed ? `#${team.seed} · ` : ""}
-                {teamLabel(team)} — {team.player1.lastName} &{" "}
-                {team.player2.lastName} (сумма рейтингов {teamRating(team)})
-              </span>
-              <div className="flex items-center gap-2">
-                <StatusBadge
-                  status={team.status}
-                  label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
-                />
-                {team.status === "PENDING" && (
-                  <button
-                    onClick={() => onConfirmTeam(team.id)}
-                    className="text-xs text-emerald-400 hover:underline"
-                  >
-                    Подтвердить
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {!pair && t.registrations.length > 0 && (
-        <ul className="mt-3 space-y-2">
-          {t.registrations.map((r) => (
-            <li
-              key={r.id}
-              className="flex items-center justify-between rounded-lg bg-zinc-900 px-3 py-2 text-sm"
-            >
-              <span>
-                {r.player.lastName} {r.player.firstName} — рейтинг{" "}
-                {r.player.rating}
-              </span>
-              <div className="flex items-center gap-2">
-                <StatusBadge
-                  status={r.status}
-                  label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
-                />
-                {r.status === "PENDING" && (
-                  <button
-                    onClick={() => onConfirmRegistration(r.id)}
-                    className="text-xs text-emerald-400 hover:underline"
-                  >
-                    Подтвердить
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {pair && rounds.length > 0 && (
-        <div className="mt-4 space-y-4">
-          <h4 className="text-sm font-semibold text-zinc-300">
-            {swiss ? "Туры" : "Сетка"}
-          </h4>
-          {rounds.map(([round, matches]) => (
-            <div key={round}>
-              <p className="mb-2 text-xs uppercase tracking-wide text-zinc-500">
-                {swiss
-                  ? `Тур ${round}`
-                  : round === finalRound
-                    ? "Финал"
-                    : `Раунд ${round}`}
-              </p>
-              <div className="space-y-2">
-                {matches.map((match) => (
-                  <MatchRow
-                    key={match.id}
-                    match={match}
-                    onSetWinner={onSetWinner}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MatchRow({
-  match,
-  onSetWinner,
-}: {
-  match: Match;
-  onSetWinner: (matchId: string, winnerTeamId: string) => void;
-}) {
-  const team1 = match.team1;
-  const team2 = match.team2;
-  const finished = match.status === "FINISHED" || !!match.winnerTeam;
-
-  if (!team1 && !team2) {
-    return (
-      <div className="rounded-lg bg-zinc-900/50 px-3 py-2 text-sm text-zinc-500">
-        Матч {match.slot} — ожидание пар
-      </div>
-    );
-  }
-
-  const handicap =
-    team1 && team2
-      ? describeHandicap(teamRating(team1), teamRating(team2))
-      : null;
-
-  return (
-    <div className="rounded-lg bg-zinc-900 px-3 py-2 text-sm">
-      <div className="flex flex-wrap items-center gap-2">
-        <TeamSide
-          team={team1}
-          isWinner={match.winnerTeam?.id === team1?.id}
-          canPick={!finished && !!team1 && !!team2}
-          onPick={() => team1 && onSetWinner(match.id, team1.id)}
-        />
-        <span className="text-zinc-500">vs</span>
-        <TeamSide
-          team={team2}
-          isWinner={match.winnerTeam?.id === team2?.id}
-          canPick={!finished && !!team1 && !!team2}
-          onPick={() => team2 && onSetWinner(match.id, team2.id)}
-        />
-        {finished && match.winnerTeam && (
-          <span className="text-xs text-emerald-400">✓</span>
-        )}
-        {!team2 && team1 && !finished && (
-          <span className="text-xs text-zinc-500">(автопроход)</span>
-        )}
-      </div>
-      {handicap && handicap !== "Без форы" && (
-        <p className="mt-1 text-xs text-zinc-500">Фора: {handicap}</p>
-      )}
-    </div>
-  );
-}
-
-function TeamSide({
-  team,
-  isWinner,
-  canPick,
-  onPick,
-}: {
-  team: Team | null;
-  isWinner: boolean;
-  canPick: boolean;
-  onPick: () => void;
-}) {
-  if (!team) {
-    return <span className="text-zinc-500">—</span>;
-  }
-
-  const label = `${teamLabel(team)} (${teamRating(team)})`;
-
-  if (canPick) {
-    return (
-      <button
-        type="button"
-        onClick={onPick}
-        className="rounded border border-zinc-700 px-2 py-0.5 hover:border-emerald-600 hover:text-emerald-400"
-      >
-        {label}
-      </button>
-    );
-  }
-
-  return (
-    <span className={isWinner ? "font-medium text-emerald-300" : ""}>{label}</span>
+      </td>
+    </tr>
   );
 }

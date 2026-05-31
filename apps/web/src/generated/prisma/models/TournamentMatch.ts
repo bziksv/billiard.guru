@@ -29,11 +29,15 @@ export type AggregateTournamentMatch = {
 export type TournamentMatchAvgAggregateOutputType = {
   round: number | null
   slot: number | null
+  team1Score: number | null
+  team2Score: number | null
 }
 
 export type TournamentMatchSumAggregateOutputType = {
   round: number | null
   slot: number | null
+  team1Score: number | null
+  team2Score: number | null
 }
 
 export type TournamentMatchMinAggregateOutputType = {
@@ -44,6 +48,10 @@ export type TournamentMatchMinAggregateOutputType = {
   team1Id: string | null
   team2Id: string | null
   winnerTeamId: string | null
+  team1Score: number | null
+  team2Score: number | null
+  startedAt: Date | null
+  finishedAt: Date | null
   status: $Enums.MatchStatus | null
   createdAt: Date | null
 }
@@ -56,6 +64,10 @@ export type TournamentMatchMaxAggregateOutputType = {
   team1Id: string | null
   team2Id: string | null
   winnerTeamId: string | null
+  team1Score: number | null
+  team2Score: number | null
+  startedAt: Date | null
+  finishedAt: Date | null
   status: $Enums.MatchStatus | null
   createdAt: Date | null
 }
@@ -68,6 +80,10 @@ export type TournamentMatchCountAggregateOutputType = {
   team1Id: number
   team2Id: number
   winnerTeamId: number
+  team1Score: number
+  team2Score: number
+  startedAt: number
+  finishedAt: number
   status: number
   createdAt: number
   _all: number
@@ -77,11 +93,15 @@ export type TournamentMatchCountAggregateOutputType = {
 export type TournamentMatchAvgAggregateInputType = {
   round?: true
   slot?: true
+  team1Score?: true
+  team2Score?: true
 }
 
 export type TournamentMatchSumAggregateInputType = {
   round?: true
   slot?: true
+  team1Score?: true
+  team2Score?: true
 }
 
 export type TournamentMatchMinAggregateInputType = {
@@ -92,6 +112,10 @@ export type TournamentMatchMinAggregateInputType = {
   team1Id?: true
   team2Id?: true
   winnerTeamId?: true
+  team1Score?: true
+  team2Score?: true
+  startedAt?: true
+  finishedAt?: true
   status?: true
   createdAt?: true
 }
@@ -104,6 +128,10 @@ export type TournamentMatchMaxAggregateInputType = {
   team1Id?: true
   team2Id?: true
   winnerTeamId?: true
+  team1Score?: true
+  team2Score?: true
+  startedAt?: true
+  finishedAt?: true
   status?: true
   createdAt?: true
 }
@@ -116,6 +144,10 @@ export type TournamentMatchCountAggregateInputType = {
   team1Id?: true
   team2Id?: true
   winnerTeamId?: true
+  team1Score?: true
+  team2Score?: true
+  startedAt?: true
+  finishedAt?: true
   status?: true
   createdAt?: true
   _all?: true
@@ -215,6 +247,10 @@ export type TournamentMatchGroupByOutputType = {
   team1Id: string | null
   team2Id: string | null
   winnerTeamId: string | null
+  team1Score: number | null
+  team2Score: number | null
+  startedAt: Date | null
+  finishedAt: Date | null
   status: $Enums.MatchStatus
   createdAt: Date
   _count: TournamentMatchCountAggregateOutputType | null
@@ -250,6 +286,10 @@ export type TournamentMatchWhereInput = {
   team1Id?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
   team2Id?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
   winnerTeamId?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
+  team1Score?: Prisma.IntNullableFilter<"TournamentMatch"> | number | null
+  team2Score?: Prisma.IntNullableFilter<"TournamentMatch"> | number | null
+  startedAt?: Prisma.DateTimeNullableFilter<"TournamentMatch"> | Date | string | null
+  finishedAt?: Prisma.DateTimeNullableFilter<"TournamentMatch"> | Date | string | null
   status?: Prisma.EnumMatchStatusFilter<"TournamentMatch"> | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFilter<"TournamentMatch"> | Date | string
   tournament?: Prisma.XOR<Prisma.TournamentScalarRelationFilter, Prisma.TournamentWhereInput>
@@ -266,6 +306,10 @@ export type TournamentMatchOrderByWithRelationInput = {
   team1Id?: Prisma.SortOrderInput | Prisma.SortOrder
   team2Id?: Prisma.SortOrderInput | Prisma.SortOrder
   winnerTeamId?: Prisma.SortOrderInput | Prisma.SortOrder
+  team1Score?: Prisma.SortOrderInput | Prisma.SortOrder
+  team2Score?: Prisma.SortOrderInput | Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  finishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   tournament?: Prisma.TournamentOrderByWithRelationInput
@@ -287,6 +331,10 @@ export type TournamentMatchWhereUniqueInput = Prisma.AtLeast<{
   team1Id?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
   team2Id?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
   winnerTeamId?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
+  team1Score?: Prisma.IntNullableFilter<"TournamentMatch"> | number | null
+  team2Score?: Prisma.IntNullableFilter<"TournamentMatch"> | number | null
+  startedAt?: Prisma.DateTimeNullableFilter<"TournamentMatch"> | Date | string | null
+  finishedAt?: Prisma.DateTimeNullableFilter<"TournamentMatch"> | Date | string | null
   status?: Prisma.EnumMatchStatusFilter<"TournamentMatch"> | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFilter<"TournamentMatch"> | Date | string
   tournament?: Prisma.XOR<Prisma.TournamentScalarRelationFilter, Prisma.TournamentWhereInput>
@@ -303,6 +351,10 @@ export type TournamentMatchOrderByWithAggregationInput = {
   team1Id?: Prisma.SortOrderInput | Prisma.SortOrder
   team2Id?: Prisma.SortOrderInput | Prisma.SortOrder
   winnerTeamId?: Prisma.SortOrderInput | Prisma.SortOrder
+  team1Score?: Prisma.SortOrderInput | Prisma.SortOrder
+  team2Score?: Prisma.SortOrderInput | Prisma.SortOrder
+  startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  finishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.TournamentMatchCountOrderByAggregateInput
@@ -323,6 +375,10 @@ export type TournamentMatchScalarWhereWithAggregatesInput = {
   team1Id?: Prisma.StringNullableWithAggregatesFilter<"TournamentMatch"> | string | null
   team2Id?: Prisma.StringNullableWithAggregatesFilter<"TournamentMatch"> | string | null
   winnerTeamId?: Prisma.StringNullableWithAggregatesFilter<"TournamentMatch"> | string | null
+  team1Score?: Prisma.IntNullableWithAggregatesFilter<"TournamentMatch"> | number | null
+  team2Score?: Prisma.IntNullableWithAggregatesFilter<"TournamentMatch"> | number | null
+  startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TournamentMatch"> | Date | string | null
+  finishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TournamentMatch"> | Date | string | null
   status?: Prisma.EnumMatchStatusWithAggregatesFilter<"TournamentMatch"> | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TournamentMatch"> | Date | string
 }
@@ -331,6 +387,10 @@ export type TournamentMatchCreateInput = {
   id?: string
   round: number
   slot: number
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
   tournament: Prisma.TournamentCreateNestedOneWithoutMatchesInput
@@ -347,6 +407,10 @@ export type TournamentMatchUncheckedCreateInput = {
   team1Id?: string | null
   team2Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -355,6 +419,10 @@ export type TournamentMatchUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   round?: Prisma.IntFieldUpdateOperationsInput | number
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tournament?: Prisma.TournamentUpdateOneRequiredWithoutMatchesNestedInput
@@ -371,6 +439,10 @@ export type TournamentMatchUncheckedUpdateInput = {
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -383,6 +455,10 @@ export type TournamentMatchCreateManyInput = {
   team1Id?: string | null
   team2Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -391,6 +467,10 @@ export type TournamentMatchUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   round?: Prisma.IntFieldUpdateOperationsInput | number
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -403,6 +483,10 @@ export type TournamentMatchUncheckedUpdateManyInput = {
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -437,6 +521,10 @@ export type TournamentMatchCountOrderByAggregateInput = {
   team1Id?: Prisma.SortOrder
   team2Id?: Prisma.SortOrder
   winnerTeamId?: Prisma.SortOrder
+  team1Score?: Prisma.SortOrder
+  team2Score?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  finishedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -444,6 +532,8 @@ export type TournamentMatchCountOrderByAggregateInput = {
 export type TournamentMatchAvgOrderByAggregateInput = {
   round?: Prisma.SortOrder
   slot?: Prisma.SortOrder
+  team1Score?: Prisma.SortOrder
+  team2Score?: Prisma.SortOrder
 }
 
 export type TournamentMatchMaxOrderByAggregateInput = {
@@ -454,6 +544,10 @@ export type TournamentMatchMaxOrderByAggregateInput = {
   team1Id?: Prisma.SortOrder
   team2Id?: Prisma.SortOrder
   winnerTeamId?: Prisma.SortOrder
+  team1Score?: Prisma.SortOrder
+  team2Score?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  finishedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -466,6 +560,10 @@ export type TournamentMatchMinOrderByAggregateInput = {
   team1Id?: Prisma.SortOrder
   team2Id?: Prisma.SortOrder
   winnerTeamId?: Prisma.SortOrder
+  team1Score?: Prisma.SortOrder
+  team2Score?: Prisma.SortOrder
+  startedAt?: Prisma.SortOrder
+  finishedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -473,6 +571,8 @@ export type TournamentMatchMinOrderByAggregateInput = {
 export type TournamentMatchSumOrderByAggregateInput = {
   round?: Prisma.SortOrder
   slot?: Prisma.SortOrder
+  team1Score?: Prisma.SortOrder
+  team2Score?: Prisma.SortOrder
 }
 
 export type TournamentMatchCreateNestedManyWithoutTournamentInput = {
@@ -651,6 +751,10 @@ export type TournamentMatchCreateWithoutTournamentInput = {
   id?: string
   round: number
   slot: number
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
   team1?: Prisma.TournamentTeamCreateNestedOneWithoutMatchesAsTeam1Input
@@ -665,6 +769,10 @@ export type TournamentMatchUncheckedCreateWithoutTournamentInput = {
   team1Id?: string | null
   team2Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -706,6 +814,10 @@ export type TournamentMatchScalarWhereInput = {
   team1Id?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
   team2Id?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
   winnerTeamId?: Prisma.StringNullableFilter<"TournamentMatch"> | string | null
+  team1Score?: Prisma.IntNullableFilter<"TournamentMatch"> | number | null
+  team2Score?: Prisma.IntNullableFilter<"TournamentMatch"> | number | null
+  startedAt?: Prisma.DateTimeNullableFilter<"TournamentMatch"> | Date | string | null
+  finishedAt?: Prisma.DateTimeNullableFilter<"TournamentMatch"> | Date | string | null
   status?: Prisma.EnumMatchStatusFilter<"TournamentMatch"> | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFilter<"TournamentMatch"> | Date | string
 }
@@ -714,6 +826,10 @@ export type TournamentMatchCreateWithoutTeam1Input = {
   id?: string
   round: number
   slot: number
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
   tournament: Prisma.TournamentCreateNestedOneWithoutMatchesInput
@@ -728,6 +844,10 @@ export type TournamentMatchUncheckedCreateWithoutTeam1Input = {
   slot: number
   team2Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -746,6 +866,10 @@ export type TournamentMatchCreateWithoutTeam2Input = {
   id?: string
   round: number
   slot: number
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
   tournament: Prisma.TournamentCreateNestedOneWithoutMatchesInput
@@ -760,6 +884,10 @@ export type TournamentMatchUncheckedCreateWithoutTeam2Input = {
   slot: number
   team1Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -778,6 +906,10 @@ export type TournamentMatchCreateWithoutWinnerTeamInput = {
   id?: string
   round: number
   slot: number
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
   tournament: Prisma.TournamentCreateNestedOneWithoutMatchesInput
@@ -792,6 +924,10 @@ export type TournamentMatchUncheckedCreateWithoutWinnerTeamInput = {
   slot: number
   team1Id?: string | null
   team2Id?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -861,6 +997,10 @@ export type TournamentMatchCreateManyTournamentInput = {
   team1Id?: string | null
   team2Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -869,6 +1009,10 @@ export type TournamentMatchUpdateWithoutTournamentInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   round?: Prisma.IntFieldUpdateOperationsInput | number
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   team1?: Prisma.TournamentTeamUpdateOneWithoutMatchesAsTeam1NestedInput
@@ -883,6 +1027,10 @@ export type TournamentMatchUncheckedUpdateWithoutTournamentInput = {
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -894,6 +1042,10 @@ export type TournamentMatchUncheckedUpdateManyWithoutTournamentInput = {
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -905,6 +1057,10 @@ export type TournamentMatchCreateManyTeam1Input = {
   slot: number
   team2Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -916,6 +1072,10 @@ export type TournamentMatchCreateManyTeam2Input = {
   slot: number
   team1Id?: string | null
   winnerTeamId?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -927,6 +1087,10 @@ export type TournamentMatchCreateManyWinnerTeamInput = {
   slot: number
   team1Id?: string | null
   team2Id?: string | null
+  team1Score?: number | null
+  team2Score?: number | null
+  startedAt?: Date | string | null
+  finishedAt?: Date | string | null
   status?: $Enums.MatchStatus
   createdAt?: Date | string
 }
@@ -935,6 +1099,10 @@ export type TournamentMatchUpdateWithoutTeam1Input = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   round?: Prisma.IntFieldUpdateOperationsInput | number
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tournament?: Prisma.TournamentUpdateOneRequiredWithoutMatchesNestedInput
@@ -949,6 +1117,10 @@ export type TournamentMatchUncheckedUpdateWithoutTeam1Input = {
   slot?: Prisma.IntFieldUpdateOperationsInput | number
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -960,6 +1132,10 @@ export type TournamentMatchUncheckedUpdateManyWithoutTeam1Input = {
   slot?: Prisma.IntFieldUpdateOperationsInput | number
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -968,6 +1144,10 @@ export type TournamentMatchUpdateWithoutTeam2Input = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   round?: Prisma.IntFieldUpdateOperationsInput | number
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tournament?: Prisma.TournamentUpdateOneRequiredWithoutMatchesNestedInput
@@ -982,6 +1162,10 @@ export type TournamentMatchUncheckedUpdateWithoutTeam2Input = {
   slot?: Prisma.IntFieldUpdateOperationsInput | number
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -993,6 +1177,10 @@ export type TournamentMatchUncheckedUpdateManyWithoutTeam2Input = {
   slot?: Prisma.IntFieldUpdateOperationsInput | number
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   winnerTeamId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1001,6 +1189,10 @@ export type TournamentMatchUpdateWithoutWinnerTeamInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   round?: Prisma.IntFieldUpdateOperationsInput | number
   slot?: Prisma.IntFieldUpdateOperationsInput | number
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tournament?: Prisma.TournamentUpdateOneRequiredWithoutMatchesNestedInput
@@ -1015,6 +1207,10 @@ export type TournamentMatchUncheckedUpdateWithoutWinnerTeamInput = {
   slot?: Prisma.IntFieldUpdateOperationsInput | number
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1026,6 +1222,10 @@ export type TournamentMatchUncheckedUpdateManyWithoutWinnerTeamInput = {
   slot?: Prisma.IntFieldUpdateOperationsInput | number
   team1Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   team2Id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  team1Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  team2Score?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  finishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.EnumMatchStatusFieldUpdateOperationsInput | $Enums.MatchStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1040,6 +1240,10 @@ export type TournamentMatchSelect<ExtArgs extends runtime.Types.Extensions.Inter
   team1Id?: boolean
   team2Id?: boolean
   winnerTeamId?: boolean
+  team1Score?: boolean
+  team2Score?: boolean
+  startedAt?: boolean
+  finishedAt?: boolean
   status?: boolean
   createdAt?: boolean
   tournament?: boolean | Prisma.TournamentDefaultArgs<ExtArgs>
@@ -1058,11 +1262,15 @@ export type TournamentMatchSelectScalar = {
   team1Id?: boolean
   team2Id?: boolean
   winnerTeamId?: boolean
+  team1Score?: boolean
+  team2Score?: boolean
+  startedAt?: boolean
+  finishedAt?: boolean
   status?: boolean
   createdAt?: boolean
 }
 
-export type TournamentMatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "round" | "slot" | "team1Id" | "team2Id" | "winnerTeamId" | "status" | "createdAt", ExtArgs["result"]["tournamentMatch"]>
+export type TournamentMatchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "round" | "slot" | "team1Id" | "team2Id" | "winnerTeamId" | "team1Score" | "team2Score" | "startedAt" | "finishedAt" | "status" | "createdAt", ExtArgs["result"]["tournamentMatch"]>
 export type TournamentMatchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tournament?: boolean | Prisma.TournamentDefaultArgs<ExtArgs>
   team1?: boolean | Prisma.TournamentMatch$team1Args<ExtArgs>
@@ -1086,6 +1294,10 @@ export type $TournamentMatchPayload<ExtArgs extends runtime.Types.Extensions.Int
     team1Id: string | null
     team2Id: string | null
     winnerTeamId: string | null
+    team1Score: number | null
+    team2Score: number | null
+    startedAt: Date | null
+    finishedAt: Date | null
     status: $Enums.MatchStatus
     createdAt: Date
   }, ExtArgs["result"]["tournamentMatch"]>
@@ -1468,6 +1680,10 @@ export interface TournamentMatchFieldRefs {
   readonly team1Id: Prisma.FieldRef<"TournamentMatch", 'String'>
   readonly team2Id: Prisma.FieldRef<"TournamentMatch", 'String'>
   readonly winnerTeamId: Prisma.FieldRef<"TournamentMatch", 'String'>
+  readonly team1Score: Prisma.FieldRef<"TournamentMatch", 'Int'>
+  readonly team2Score: Prisma.FieldRef<"TournamentMatch", 'Int'>
+  readonly startedAt: Prisma.FieldRef<"TournamentMatch", 'DateTime'>
+  readonly finishedAt: Prisma.FieldRef<"TournamentMatch", 'DateTime'>
   readonly status: Prisma.FieldRef<"TournamentMatch", 'MatchStatus'>
   readonly createdAt: Prisma.FieldRef<"TournamentMatch", 'DateTime'>
 }

@@ -8,12 +8,11 @@ alwaysApply: false
 
 **Запрещено** использовать нативный `<select>` для выбора из списка.
 
-**Обязательно** использовать `SearchableSelect` из `@/components/ui/searchable-select`.
+**Обязательно** использовать `SearchableSelect` из `@/components/ui/searchable-select` или `AdminFilterSelect` в панели фильтров админки.
 
-## Когда применять
+## Панель фильтров таблиц админки
 
-- страна, город, клуб, игрок, турнир, формат
-- любой dropdown с 3+ вариантами или длинными списками
+Эталон — см. правило **admin-table-filters**: `AdminTableToolbar`, `AdminTableSearchField`, `AdminFilterSelect`.
 
 ## Пример
 

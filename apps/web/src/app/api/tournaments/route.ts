@@ -11,7 +11,7 @@ export async function GET() {
   try {
     const tournaments = await prisma.tournament.findMany({
       include: {
-        club: true,
+        club: { include: { city: { include: { country: true } } } },
         registrations: { include: { player: true } },
         teams: {
           include: {

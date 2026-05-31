@@ -387,14 +387,18 @@ export const ModelName = {
   Country: 'Country',
   City: 'City',
   Club: 'Club',
+  ClubNews: 'ClubNews',
   Player: 'Player',
+  ClubPlayerRating: 'ClubPlayerRating',
   LoginChallenge: 'LoginChallenge',
   Tournament: 'Tournament',
   TournamentTeam: 'TournamentTeam',
   TournamentMatch: 'TournamentMatch',
   TournamentRegistration: 'TournamentRegistration',
   RatingChange: 'RatingChange',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  Idea: 'Idea',
+  IdeaVote: 'IdeaVote'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -410,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "player" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog"
+    modelProps: "country" | "city" | "club" | "clubNews" | "player" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -612,6 +616,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ClubNews: {
+      payload: Prisma.$ClubNewsPayload<ExtArgs>
+      fields: Prisma.ClubNewsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClubNewsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClubNewsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload>
+        }
+        findFirst: {
+          args: Prisma.ClubNewsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClubNewsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload>
+        }
+        findMany: {
+          args: Prisma.ClubNewsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload>[]
+        }
+        create: {
+          args: Prisma.ClubNewsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload>
+        }
+        createMany: {
+          args: Prisma.ClubNewsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.ClubNewsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload>
+        }
+        update: {
+          args: Prisma.ClubNewsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload>
+        }
+        deleteMany: {
+          args: Prisma.ClubNewsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClubNewsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.ClubNewsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubNewsPayload>
+        }
+        aggregate: {
+          args: Prisma.ClubNewsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClubNews>
+        }
+        groupBy: {
+          args: Prisma.ClubNewsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubNewsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClubNewsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubNewsCountAggregateOutputType> | number
+        }
+      }
+    }
     Player: {
       payload: Prisma.$PlayerPayload<ExtArgs>
       fields: Prisma.PlayerFieldRefs
@@ -675,6 +745,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PlayerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PlayerCountAggregateOutputType> | number
+        }
+      }
+    }
+    ClubPlayerRating: {
+      payload: Prisma.$ClubPlayerRatingPayload<ExtArgs>
+      fields: Prisma.ClubPlayerRatingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClubPlayerRatingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClubPlayerRatingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload>
+        }
+        findFirst: {
+          args: Prisma.ClubPlayerRatingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClubPlayerRatingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload>
+        }
+        findMany: {
+          args: Prisma.ClubPlayerRatingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload>[]
+        }
+        create: {
+          args: Prisma.ClubPlayerRatingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload>
+        }
+        createMany: {
+          args: Prisma.ClubPlayerRatingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.ClubPlayerRatingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload>
+        }
+        update: {
+          args: Prisma.ClubPlayerRatingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload>
+        }
+        deleteMany: {
+          args: Prisma.ClubPlayerRatingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClubPlayerRatingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.ClubPlayerRatingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubPlayerRatingPayload>
+        }
+        aggregate: {
+          args: Prisma.ClubPlayerRatingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClubPlayerRating>
+        }
+        groupBy: {
+          args: Prisma.ClubPlayerRatingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubPlayerRatingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClubPlayerRatingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubPlayerRatingCountAggregateOutputType> | number
         }
       }
     }
@@ -1140,6 +1276,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Idea: {
+      payload: Prisma.$IdeaPayload<ExtArgs>
+      fields: Prisma.IdeaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IdeaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IdeaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload>
+        }
+        findFirst: {
+          args: Prisma.IdeaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IdeaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload>
+        }
+        findMany: {
+          args: Prisma.IdeaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload>[]
+        }
+        create: {
+          args: Prisma.IdeaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload>
+        }
+        createMany: {
+          args: Prisma.IdeaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.IdeaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload>
+        }
+        update: {
+          args: Prisma.IdeaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload>
+        }
+        deleteMany: {
+          args: Prisma.IdeaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IdeaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.IdeaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaPayload>
+        }
+        aggregate: {
+          args: Prisma.IdeaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIdea>
+        }
+        groupBy: {
+          args: Prisma.IdeaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IdeaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IdeaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IdeaCountAggregateOutputType> | number
+        }
+      }
+    }
+    IdeaVote: {
+      payload: Prisma.$IdeaVotePayload<ExtArgs>
+      fields: Prisma.IdeaVoteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.IdeaVoteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.IdeaVoteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload>
+        }
+        findFirst: {
+          args: Prisma.IdeaVoteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.IdeaVoteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload>
+        }
+        findMany: {
+          args: Prisma.IdeaVoteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload>[]
+        }
+        create: {
+          args: Prisma.IdeaVoteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload>
+        }
+        createMany: {
+          args: Prisma.IdeaVoteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.IdeaVoteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload>
+        }
+        update: {
+          args: Prisma.IdeaVoteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload>
+        }
+        deleteMany: {
+          args: Prisma.IdeaVoteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.IdeaVoteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.IdeaVoteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$IdeaVotePayload>
+        }
+        aggregate: {
+          args: Prisma.IdeaVoteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateIdeaVote>
+        }
+        groupBy: {
+          args: Prisma.IdeaVoteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IdeaVoteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.IdeaVoteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.IdeaVoteCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1204,6 +1472,13 @@ export const ClubScalarFieldEnum = {
   cityId: 'cityId',
   phone: 'phone',
   email: 'email',
+  photoUrl: 'photoUrl',
+  description: 'description',
+  address: 'address',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  workingHours: 'workingHours',
+  tableCount: 'tableCount',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   isVerified: 'isVerified',
@@ -1213,6 +1488,18 @@ export const ClubScalarFieldEnum = {
 } as const
 
 export type ClubScalarFieldEnum = (typeof ClubScalarFieldEnum)[keyof typeof ClubScalarFieldEnum]
+
+
+export const ClubNewsScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type ClubNewsScalarFieldEnum = (typeof ClubNewsScalarFieldEnum)[keyof typeof ClubNewsScalarFieldEnum]
 
 
 export const PlayerScalarFieldEnum = {
@@ -1236,6 +1523,18 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const ClubPlayerRatingScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  rating: 'rating',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClubPlayerRatingScalarFieldEnum = (typeof ClubPlayerRatingScalarFieldEnum)[keyof typeof ClubPlayerRatingScalarFieldEnum]
 
 
 export const LoginChallengeScalarFieldEnum = {
@@ -1294,6 +1593,10 @@ export const TournamentMatchScalarFieldEnum = {
   team1Id: 'team1Id',
   team2Id: 'team2Id',
   winnerTeamId: 'winnerTeamId',
+  team1Score: 'team1Score',
+  team2Score: 'team2Score',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
   status: 'status',
   createdAt: 'createdAt'
 } as const
@@ -1344,6 +1647,36 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+export const IdeaScalarFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  moderationToken: 'moderationToken',
+  likesCount: 'likesCount',
+  dislikesCount: 'dislikesCount',
+  moderatedAt: 'moderatedAt',
+  moderatedById: 'moderatedById',
+  rejectReason: 'rejectReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IdeaScalarFieldEnum = (typeof IdeaScalarFieldEnum)[keyof typeof IdeaScalarFieldEnum]
+
+
+export const IdeaVoteScalarFieldEnum = {
+  id: 'id',
+  ideaId: 'ideaId',
+  playerId: 'playerId',
+  value: 'value',
+  createdAt: 'createdAt'
+} as const
+
+export type IdeaVoteScalarFieldEnum = (typeof IdeaVoteScalarFieldEnum)[keyof typeof IdeaVoteScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1391,12 +1724,26 @@ export const ClubOrderByRelevanceFieldEnum = {
   cityId: 'cityId',
   phone: 'phone',
   email: 'email',
+  photoUrl: 'photoUrl',
+  description: 'description',
+  address: 'address',
+  workingHours: 'workingHours',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   confirmToken: 'confirmToken'
 } as const
 
 export type ClubOrderByRelevanceFieldEnum = (typeof ClubOrderByRelevanceFieldEnum)[keyof typeof ClubOrderByRelevanceFieldEnum]
+
+
+export const ClubNewsOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body'
+} as const
+
+export type ClubNewsOrderByRelevanceFieldEnum = (typeof ClubNewsOrderByRelevanceFieldEnum)[keyof typeof ClubNewsOrderByRelevanceFieldEnum]
 
 
 export const PlayerOrderByRelevanceFieldEnum = {
@@ -1414,6 +1761,15 @@ export const PlayerOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
+
+
+export const ClubPlayerRatingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId'
+} as const
+
+export type ClubPlayerRatingOrderByRelevanceFieldEnum = (typeof ClubPlayerRatingOrderByRelevanceFieldEnum)[keyof typeof ClubPlayerRatingOrderByRelevanceFieldEnum]
 
 
 export const LoginChallengeOrderByRelevanceFieldEnum = {
@@ -1509,6 +1865,28 @@ export const AuditLogOrderByRelevanceFieldEnum = {
 export type AuditLogOrderByRelevanceFieldEnum = (typeof AuditLogOrderByRelevanceFieldEnum)[keyof typeof AuditLogOrderByRelevanceFieldEnum]
 
 
+export const IdeaOrderByRelevanceFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  title: 'title',
+  body: 'body',
+  moderationToken: 'moderationToken',
+  moderatedById: 'moderatedById',
+  rejectReason: 'rejectReason'
+} as const
+
+export type IdeaOrderByRelevanceFieldEnum = (typeof IdeaOrderByRelevanceFieldEnum)[keyof typeof IdeaOrderByRelevanceFieldEnum]
+
+
+export const IdeaVoteOrderByRelevanceFieldEnum = {
+  id: 'id',
+  ideaId: 'ideaId',
+  playerId: 'playerId'
+} as const
+
+export type IdeaVoteOrderByRelevanceFieldEnum = (typeof IdeaVoteOrderByRelevanceFieldEnum)[keyof typeof IdeaVoteOrderByRelevanceFieldEnum]
+
+
 
 /**
  * Field references
@@ -1526,6 +1904,13 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Int'
+ */
+export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
     
 
 
@@ -1586,13 +1971,6 @@ export type EnumRegistrationStatusFieldRefInput<$PrismaModel> = FieldRefInputTyp
 
 
 /**
- * Reference to a field of type 'Int'
- */
-export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-/**
  * Reference to a field of type 'MatchStatus'
  */
 export type EnumMatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchStatus'>
@@ -1610,6 +1988,20 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
  * Reference to a field of type 'QueryMode'
  */
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'IdeaStatus'
+ */
+export type EnumIdeaStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IdeaStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'IdeaVoteValue'
+ */
+export type EnumIdeaVoteValueFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IdeaVoteValue'>
     
 
 /**
@@ -1725,7 +2117,9 @@ export type GlobalOmitConfig = {
   country?: Prisma.CountryOmit
   city?: Prisma.CityOmit
   club?: Prisma.ClubOmit
+  clubNews?: Prisma.ClubNewsOmit
   player?: Prisma.PlayerOmit
+  clubPlayerRating?: Prisma.ClubPlayerRatingOmit
   loginChallenge?: Prisma.LoginChallengeOmit
   tournament?: Prisma.TournamentOmit
   tournamentTeam?: Prisma.TournamentTeamOmit
@@ -1733,6 +2127,8 @@ export type GlobalOmitConfig = {
   tournamentRegistration?: Prisma.TournamentRegistrationOmit
   ratingChange?: Prisma.RatingChangeOmit
   auditLog?: Prisma.AuditLogOmit
+  idea?: Prisma.IdeaOmit
+  ideaVote?: Prisma.IdeaVoteOmit
 }
 
 /* Types for Logging */

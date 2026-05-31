@@ -1,0 +1,39 @@
+---
+description: Эталонная панель фильтров и сортировки таблиц админки
+globs: apps/web/src/components/admin/**/*.tsx,apps/web/src/app/admin/**/*.tsx
+alwaysApply: false
+---
+
+# Таблицы админки — эталон `/admin/players`
+
+Эталон: `PlayersAdminTable` + общие компоненты в `@/components/admin/admin-table-toolbar` и `admin-sort-header`.
+
+## Панель фильтров (обязательна над таблицей)
+
+```tsx
+<AdminTableToolbar count={{ shown: rows.length, total: items.length }}>
+  <AdminTableSearchField value={search} onChange={setSearch} placeholder="…" />
+  <AdminFilterSelect label="Статус" options={[...VERIFIED_STATUS_FILTER_OPTIONS]} ... />
+  <AdminFilterSelect label="Город" options={cityFilterOptions} ... />
+</AdminTableToolbar>
+```
+
+- **Поиск** — текстовое поле с `flex-1`, placeholder по полям сущности
+- **Селекты** — только `AdminFilterSelect` / `SearchableSelect` (клик → сразу ввод, список с поиском)
+- **Счётчик** — `{shown} из {total}` справа в toolbar
+- Статус подтверждения — `VERIFIED_STATUS_FILTER_OPTIONS` + `matchesVerifiedFilter()`
+
+## Таблица
+
+- **Сортировка по всем колонкам с данными** — `AdminSortHeader`, клик по заголовку ↑/↓
+- **Дата регистрации** — колонка «Регистрация», поле `createdAt`, `formatAdminDate()`
+- По умолчанию сортировка: `createdAt desc`
+
+## Запрещено
+
+- Нативный `<select>` в фильтрах и формах админки
+- Таблица без панели фильтров (кроме простых списков без данных)
+
+## Новые страницы
+
+При добавлении admin-таблицы — скопировать паттерн с `/admin/players` или `/admin/clubs`, не изобретать разметку заново.
