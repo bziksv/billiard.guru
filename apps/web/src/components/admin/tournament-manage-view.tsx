@@ -12,6 +12,7 @@ import { OlympicBracketView } from "@/components/bracket/olympic-bracket-view";
 import { SwissBracketView } from "@/components/bracket/swiss-bracket-view";
 import type { TeamPlayer } from "@/lib/pair-tournament";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { AsyncTextButton } from "@/components/ui/async-text-button";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap } from "@/lib/handicap";
 import { formatRating } from "@/lib/rating";
@@ -71,11 +72,11 @@ export function TournamentManageView({
   playerOptions: { value: string; label: string }[];
   bracketLoading: boolean;
   embedded?: boolean;
-  onConfirmRegistration: (id: string) => void;
-  onRejectRegistration: (id: string) => void;
-  onCancelRegistration: (id: string) => void;
-  onConfirmTeam: (id: string) => void;
-  onGenerateBracket: () => void;
+  onConfirmRegistration: (id: string) => void | Promise<void>;
+  onRejectRegistration: (id: string) => void | Promise<void>;
+  onCancelRegistration: (id: string) => void | Promise<void>;
+  onConfirmTeam: (id: string) => void | Promise<void>;
+  onGenerateBracket: () => void | Promise<void>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
   onUpdated: () => void;
@@ -405,10 +406,10 @@ function ParticipantsTab({
   playerOptions: { value: string; label: string }[];
   bracketLocked: boolean;
   canModifyRegistrations: boolean;
-  onConfirmRegistration: (id: string) => void;
-  onRejectRegistration: (id: string) => void;
-  onCancelRegistration: (id: string) => void;
-  onConfirmTeam: (id: string) => void;
+  onConfirmRegistration: (id: string) => void | Promise<void>;
+  onRejectRegistration: (id: string) => void | Promise<void>;
+  onCancelRegistration: (id: string) => void | Promise<void>;
+  onConfirmTeam: (id: string) => void | Promise<void>;
   onUpdated: () => void;
 }) {
   return (
@@ -455,20 +456,20 @@ function ParticipantsTab({
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
-                    type="button"
+                  <AsyncTextButton
+                    variant="emerald"
+                    loadingLabel="…"
                     onClick={() => onConfirmRegistration(r.id)}
-                    className="text-xs text-emerald-400 hover:underline"
                   >
                     Подтвердить
-                  </button>
-                  <button
-                    type="button"
+                  </AsyncTextButton>
+                  <AsyncTextButton
+                    variant="red"
+                    loadingLabel="…"
                     onClick={() => onRejectRegistration(r.id)}
-                    className="text-xs text-red-400 hover:underline"
                   >
                     Отклонить
-                  </button>
+                  </AsyncTextButton>
                 </div>
               </li>
             ))}
@@ -502,13 +503,13 @@ function ParticipantsTab({
                     label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
                   />
                   {canModifyRegistrations && (
-                    <button
-                      type="button"
+                    <AsyncTextButton
+                      variant="red"
+                      loadingLabel="…"
                       onClick={() => onCancelRegistration(r.id)}
-                      className="text-xs text-red-400 hover:underline"
                     >
                       Снять
-                    </button>
+                    </AsyncTextButton>
                   )}
                 </div>
               </li>
@@ -574,7 +575,7 @@ function BracketTab({
   currentRoundOpen: boolean;
   bracketLoading: boolean;
   bracketMatches: BracketMatchView[];
-  onGenerateBracket: () => void;
+  onGenerateBracket: () => void | Promise<void>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
 }) {
@@ -648,7 +649,7 @@ function BracketTab({
           disabled={generateDisabled}
           className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm hover:bg-emerald-600 disabled:opacity-50"
         >
-          {generateLabel}
+          {bracketLoading ? "Формирование…" : generateLabel}
         </button>
         <span className="text-xs text-zinc-500">
           Подтверждённых: {confirmedCount}
@@ -849,14 +850,15 @@ function PairTeamRow({
   team: Team;
   playerOptions: { value: string; label: string }[];
   bracketLocked: boolean;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   onUpdated: () => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [player1Id, setPlayer1Id] = useState(team.player1.id);
-  const [player2Id, setPlayer2Id] = useState(team.player2.id);
+  const [player2Id, setPlayer2Id] = useState(team.player2?.id ?? "");
   const [teamNameEdit, setTeamNameEdit] = useState(team.name ?? "");
   const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function saveTeam() {
@@ -884,17 +886,22 @@ function PairTeamRow({
 
   async function removeTeam() {
     if (!confirm(`Убрать пару ${teamLabel(team)} из турнира?`)) return;
-    const res = await fetch("/api/tournaments/teams", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: team.id, status: "CANCELLED" }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error ?? "Не удалось удалить");
-      return;
+    setRemoving(true);
+    try {
+      const res = await fetch("/api/tournaments/teams", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: team.id, status: "CANCELLED" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error ?? "Не удалось удалить");
+        return;
+      }
+      await onUpdated();
+    } finally {
+      setRemoving(false);
     }
-    await onUpdated();
   }
 
   if (editing && !bracketLocked) {
@@ -935,7 +942,7 @@ function PairTeamRow({
             onClick={() => {
               setEditing(false);
               setPlayer1Id(team.player1.id);
-              setPlayer2Id(team.player2.id);
+              setPlayer2Id(team.player2?.id ?? "");
               setTeamNameEdit(team.name ?? "");
               setError(null);
             }}
@@ -983,13 +990,9 @@ function PairTeamRow({
           label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
         />
         {team.status === "PENDING" && (
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="text-xs text-emerald-400 hover:underline"
-          >
+          <AsyncTextButton variant="emerald" loadingLabel="…" onClick={onConfirm}>
             Подтвердить
-          </button>
+          </AsyncTextButton>
         )}
         {!bracketLocked && team.status !== "CANCELLED" && (
           <>
@@ -1003,9 +1006,13 @@ function PairTeamRow({
             <button
               type="button"
               onClick={removeTeam}
-              className="text-xs text-red-400 hover:underline"
+              disabled={removing}
+              className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Убрать
+              {removing && (
+                <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              )}
+              {removing ? "…" : "Убрать"}
             </button>
           </>
         )}

@@ -17,6 +17,7 @@ import {
 } from "@/components/admin/admin-sort-header";
 import { CitySelect } from "@/components/admin/city-select";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { AsyncTextButton } from "@/components/ui/async-text-button";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { formatRating } from "@/lib/rating";
@@ -213,7 +214,7 @@ export function PlayersAdminTable() {
           label="Статус"
           options={[...VERIFIED_STATUS_FILTER_OPTIONS]}
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={(v) => setStatusFilter(v as VerifiedStatusFilter)}
         />
         <AdminFilterSelect
           label="Город"
@@ -348,13 +349,13 @@ export function PlayersAdminTable() {
                         >
                           {editingId === player.id ? "Закрыть" : "Изменить"}
                         </button>
-                        <button
-                          type="button"
+                        <AsyncTextButton
+                          variant="red"
+                          loadingLabel="…"
                           onClick={() => deletePlayer(player)}
-                          className="text-xs text-red-400 hover:underline"
                         >
                           Удалить
-                        </button>
+                        </AsyncTextButton>
                       </div>
                     </td>
                   </tr>

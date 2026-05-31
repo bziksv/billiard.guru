@@ -57,8 +57,8 @@ export function TournamentCard({
         {participants > 0 && ` · ${participants} участников`}
       </p>
       <p className="mt-1 text-xs text-emerald-700/80">{location}</p>
-      {!compact && t.description && (
-        <p className="mt-3 line-clamp-3 text-sm text-zinc-300">{t.description}</p>
+        {!compact && t.description && (
+        <p className="home-card-body mt-3 line-clamp-3 text-sm">{t.description}</p>
       )}
     </SiteCard>
   );

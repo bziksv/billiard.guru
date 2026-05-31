@@ -17,6 +17,7 @@ export function UserMenu({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const initial = firstName[0]?.toUpperCase() ?? "?";
 
@@ -32,9 +33,14 @@ export function UserMenu({
 
   async function logout() {
     setOpen(false);
-    await fetch("/api/auth/me", { method: "DELETE" });
-    router.push("/");
-    router.refresh();
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/me", { method: "DELETE" });
+      router.push("/");
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   return (
@@ -75,8 +81,16 @@ export function UserMenu({
               {t("nav.admin")}
             </Link>
           )}
-          <button type="button" onClick={logout} className="site-popover-item">
-            {t("nav.logout")}
+          <button
+            type="button"
+            onClick={logout}
+            disabled={loggingOut}
+            className="site-popover-item inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loggingOut && (
+              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            )}
+            {loggingOut ? "Выход…" : t("nav.logout")}
           </button>
         </div>
       )}

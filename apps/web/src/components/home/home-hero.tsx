@@ -50,7 +50,7 @@ export function HomeHero({
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[94vh] overflow-hidden border-b border-zinc-800/60"
+      className="relative min-h-[94vh] overflow-hidden border-b border-[var(--border-subtle)]"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(16,185,129,0.12),transparent)]" />
 

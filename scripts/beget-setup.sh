@@ -137,10 +137,21 @@ PassengerAppRoot $APP_ROOT
 PassengerAppType node
 PassengerStartupFile passenger-start.js
 EOF
+chmod 644 "$SITE_ROOT/.htaccess"
 
 echo "→ public_html → static…"
-rm -rf "$SITE_ROOT/public_html"
+mkdir -p "$APP_ROOT/public"
+if [ ! -d "$APP_ROOT/public" ]; then
+  echo "Ошибка: нет каталога $APP_ROOT/public после сборки"
+  exit 1
+fi
+# Не удаляем public_html до проверки standalone — иначе при падении сборки сайт отдаёт 403.
+if [ -e "$SITE_ROOT/public_html" ] && [ ! -L "$SITE_ROOT/public_html" ]; then
+  echo "  public_html — каталог, не symlink. Переименуем в public_html.bak"
+  mv "$SITE_ROOT/public_html" "$SITE_ROOT/public_html.bak.$(date +%s)"
+fi
 ln -sfn "$APP_ROOT/public" "$SITE_ROOT/public_html"
+chmod -R a+rx "$APP_ROOT" "$SITE_ROOT/.node" 2>/dev/null || true
 
 mkdir -p "$APP_ROOT/tmp"
 touch "$APP_ROOT/tmp/restart.txt"

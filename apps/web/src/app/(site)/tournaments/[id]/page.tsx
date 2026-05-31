@@ -153,7 +153,8 @@ export default async function TournamentPage({
                     <span className="font-medium">{teamLabel(team)}</span>
                     <span className="text-zinc-500">
                       {" "}
-                      — {playerName(team.player1)}, {playerName(team.player2)}
+                      — {playerName(team.player1)}
+                      {team.player2 ? `, ${playerName(team.player2)}` : ""}
                     </span>
                   </li>
                 ))}
@@ -237,7 +238,7 @@ export default async function TournamentPage({
                   </p>
                 </div>
               ) : pair ? (
-                <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-zinc-300">
+                <div className="home-content-card rounded-xl px-4 py-3 home-card-body">
                   <p>
                     Запись на парный турнир — через клуб-организатор. Попросите
                     администратора клуба зарегистрировать вашу пару.

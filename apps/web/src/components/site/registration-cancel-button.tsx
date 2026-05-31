@@ -55,8 +55,11 @@ export function RegistrationCancelButton({
         type="button"
         onClick={cancel}
         disabled={loading}
-        className="text-sm text-red-400 hover:underline disabled:opacity-50"
+        className="inline-flex items-center gap-1.5 text-sm text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
       >
+        {loading && (
+          <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        )}
         {loading ? "…" : cancelRegistrationLabel(registrationStatus)}
       </button>
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}

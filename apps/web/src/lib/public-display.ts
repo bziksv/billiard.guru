@@ -26,10 +26,11 @@ export function playerName(p: {
 export function teamLabel(team: {
   name?: string | null;
   player1: { lastName: string; firstName: string };
-  player2: { lastName: string; firstName: string };
+  player2?: { lastName: string; firstName: string } | null;
 }) {
-  return (
-    team.name?.trim() ||
-    `${team.player1.lastName} / ${team.player2.lastName}`
-  );
+  if (team.name?.trim()) return team.name.trim();
+  if (!team.player2) {
+    return `${team.player1.lastName} ${team.player1.firstName}`;
+  }
+  return `${team.player1.lastName} / ${team.player2.lastName}`;
 }

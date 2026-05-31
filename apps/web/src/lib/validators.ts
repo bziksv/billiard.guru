@@ -73,7 +73,7 @@ export const playerUpdateSchema = z.object({
     .optional()
     .nullable()
     .refine(
-      (v) => v === null || v === "" || /^\d{4}-\d{2}-\d{2}$/.test(v),
+      (v) => v == null || v === "" || /^\d{4}-\d{2}-\d{2}$/.test(v),
       "Некорректная дата",
     ),
   rating: z.coerce.number().min(0).multipleOf(0.5).optional(),

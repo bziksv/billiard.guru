@@ -645,6 +645,41 @@ html.light .hover\:shadow-emerald-950\/20:hover {
   --tw-shadow-color: rgb(16 185 129 / 0.12);
 }
 
+.site-page-subtitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.site-data-table {
+  width: 100%;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.site-data-table thead {
+  background-color: var(--bg-muted);
+  color: var(--text-secondary);
+}
+
+.site-data-table th {
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+
+.site-data-table tbody tr {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.site-data-table td {
+  padding: 0.75rem 1rem;
+}
+
+.site-skeleton {
+  border-radius: 1rem;
+  background-color: var(--bg-muted);
+}
+
 html.light .site-header-shell {
   border-color: var(--border-subtle);
   background-color: var(--header-bg);

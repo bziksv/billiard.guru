@@ -46,6 +46,7 @@ export default function AdminTournamentManagePage() {
   const [regError, setRegError] = useState<string | null>(null);
   const [regMessage, setRegMessage] = useState<string | null>(null);
   const [regLoading, setRegLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const reload = useCallback(async () => {
     const res = await fetch(`/api/tournaments/${id}`);
@@ -147,13 +148,18 @@ export default function AdminTournamentManagePage() {
     ) {
       return;
     }
-    const res = await fetch(`/api/tournaments/${tournament.id}`, { method: "DELETE" });
-    if (!res.ok) {
-      const data = await res.json();
-      alert(data.error ?? "Не удалось удалить");
-      return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/tournaments/${tournament.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error ?? "Не удалось удалить");
+        return;
+      }
+      router.push("/admin/tournaments");
+    } finally {
+      setDeleting(false);
     }
-    router.push("/admin/tournaments");
   }
 
   async function registerParticipant() {
@@ -367,10 +373,14 @@ export default function AdminTournamentManagePage() {
             </Link>
             <button
               type="button"
+              disabled={deleting}
               onClick={deleteTournament}
-              className="rounded-lg px-4 py-2 text-sm text-red-400 hover:underline"
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Удалить
+              {deleting && (
+                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              )}
+              {deleting ? "Удаление…" : "Удалить"}
             </button>
           </div>
         </div>

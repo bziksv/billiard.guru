@@ -11,16 +11,22 @@ export default function HandicapPage() {
     handicapBalls: number;
     strongerPlayer: string;
   } | null>(null);
+  const [loading, setLoading] = useState(false);
 
   async function calculate() {
-    const params = new URLSearchParams({
-      ratingA: String(ratingA),
-      ratingB: String(ratingB),
-      game: String(game),
-    });
-    const res = await fetch(`/api/handicap?${params}`);
-    const data = await res.json();
-    setResult(data);
+    setLoading(true);
+    try {
+      const params = new URLSearchParams({
+        ratingA: String(ratingA),
+        ratingB: String(ratingB),
+        game: String(game),
+      });
+      const res = await fetch(`/api/handicap?${params}`);
+      const data = await res.json();
+      setResult(data);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -70,10 +76,15 @@ export default function HandicapPage() {
           />
         </div>
         <button
+          type="button"
           onClick={calculate}
-          className="w-full rounded-lg bg-emerald-600 py-2 text-sm font-medium hover:bg-emerald-500"
+          disabled={loading}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 py-2 text-sm font-medium hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Рассчитать
+          {loading && (
+            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          )}
+          {loading ? "Расчёт…" : "Рассчитать"}
         </button>
         {result && (
           <div className="rounded-lg bg-zinc-900 p-4 text-sm">

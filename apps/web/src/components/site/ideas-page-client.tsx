@@ -103,11 +103,11 @@ export function IdeasPageClient({
   const tabClass = (active: boolean) =>
     active
       ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white"
-      : "rounded-lg px-4 py-2 text-sm text-zinc-400 hover:text-zinc-200";
+      : "home-card-body rounded-lg px-4 py-2 text-sm hover:text-[var(--text-primary)]";
 
   return (
     <div className="space-y-6">
-      <div className="inline-flex flex-wrap gap-1 rounded-xl border border-zinc-800 bg-zinc-950/80 p-1">
+      <div className="home-tab-bar inline-flex flex-wrap gap-1 rounded-xl p-1">
         <button type="button" onClick={() => setTab("ideas")} className={tabClass(tab === "ideas")}>
           Идеи{approved.length > 0 ? ` (${approved.length})` : ""}
         </button>
@@ -146,12 +146,14 @@ export function IdeasPageClient({
                   <VoteButton
                     active={idea.myVote === "LIKE"}
                     disabled={!isLoggedIn || votingId === idea.id}
+                    loading={votingId === idea.id}
                     onClick={() => vote(idea.id, "LIKE")}
                     label={`👍 ${idea.likesCount}`}
                   />
                   <VoteButton
                     active={idea.myVote === "DISLIKE"}
                     disabled={!isLoggedIn || votingId === idea.id}
+                    loading={votingId === idea.id}
                     onClick={() => vote(idea.id, "DISLIKE")}
                     label={`👎 ${idea.dislikesCount}`}
                   />
@@ -246,11 +248,13 @@ export function IdeasPageClient({
 function VoteButton({
   active,
   disabled,
+  loading,
   onClick,
   label,
 }: {
   active: boolean;
   disabled: boolean;
+  loading?: boolean;
   onClick: () => void;
   label: string;
 }) {
@@ -259,12 +263,15 @@ function VoteButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`rounded-lg border px-3 py-1.5 text-sm disabled:opacity-50 ${
+      className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50 ${
         active
           ? "border-emerald-600 bg-emerald-950/40 text-emerald-300"
           : "border-zinc-700 text-zinc-300 hover:border-zinc-500"
       }`}
     >
+      {loading && (
+        <span className="inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" />
+      )}
       {label}
     </button>
   );

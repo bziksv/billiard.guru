@@ -29,30 +29,30 @@ export default async function PlayersPage({
         lead="Рейтинг подтверждённых игроков. Фильтр по региону — для локальных сообществ."
       />
       <PageMain className="space-y-6 pt-0">
-        <Suspense fallback={<div className="h-24 rounded-2xl bg-zinc-900/50" />}>
+        <Suspense fallback={<div className="site-skeleton h-24" />}>
           <GeoFilterBar basePath="/players" />
         </Suspense>
         {players.length === 0 ? (
           <EmptyState title={t("empty.players")} />
         ) : (
           <div className="site-card overflow-hidden">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-zinc-900/80 text-zinc-400">
+            <table className="site-data-table">
+              <thead>
                 <tr>
-                  <th className="w-12 px-4 py-3">#</th>
-                  <th className="px-4 py-3">Игрок</th>
-                  <th className="px-4 py-3">Город</th>
-                  <th className="px-4 py-3 text-right">Рейтинг</th>
+                  <th className="w-12">#</th>
+                  <th>Игрок</th>
+                  <th>Город</th>
+                  <th className="text-right">Рейтинг</th>
                 </tr>
               </thead>
               <tbody>
                 {players.map((player, index) => (
-                  <tr key={player.id} className="border-t border-zinc-800/80">
-                    <td className="px-4 py-3 text-zinc-500">{index + 1}</td>
-                    <td className="px-4 py-3">
+                  <tr key={player.id}>
+                    <td className="home-card-muted">{index + 1}</td>
+                    <td>
                       <Link
                         href={`/players/${player.id}`}
-                        className="flex items-center gap-3 hover:text-emerald-400"
+                        className="flex items-center gap-3 hover:text-emerald-600"
                       >
                         {player.photoUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
@@ -62,17 +62,17 @@ export default async function PlayersPage({
                             className="h-9 w-9 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-800 text-xs">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-muted)] text-xs">
                             {player.firstName[0]}
                           </div>
                         )}
                         <span className="font-medium">{playerName(player)}</span>
                       </Link>
                     </td>
-                    <td className="px-4 py-3 text-zinc-400">
+                    <td className="home-card-body">
                       {player.city.nameRu}, {player.city.country.nameRu}
                     </td>
-                    <td className="px-4 py-3 text-right font-mono text-emerald-400">
+                    <td className="text-right font-mono text-emerald-600">
                       {formatRating(player.rating)}
                     </td>
                   </tr>

@@ -11,6 +11,7 @@ import {
   type SortDir,
 } from "@/components/admin/admin-sort-header";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { AsyncTextButton } from "@/components/ui/async-text-button";
 import { formatRating } from "@/lib/rating";
 
 interface PlayerOption {
@@ -357,17 +358,16 @@ function ClubRatingRow({
             type="button"
             disabled={saving}
             onClick={save}
-            className="text-xs text-emerald-400 hover:underline disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
           >
+            {saving && (
+              <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            )}
             {saving ? "…" : "Сохранить"}
           </button>
-          <button
-            type="button"
-            onClick={onRemove}
-            className="text-xs text-red-400 hover:underline"
-          >
+          <AsyncTextButton variant="red" loadingLabel="…" onClick={onRemove}>
             Убрать
-          </button>
+          </AsyncTextButton>
         </div>
       </td>
     </tr>

@@ -123,3 +123,34 @@ git pull
 ```
 
 Перезапуск без пересборки: `touch ~/billiard.guru/setka/apps/web/.next/standalone/tmp/restart.txt`
+
+## 403 Forbidden (Apache)
+
+Типичная ошибка: **«You don't have permission to access this resource»** — Apache не видит приложение Passenger, а не ошибка Next.js.
+
+**Частые причины:**
+
+1. **Битая ссылка `public_html`** — после неудачной сборки `npm run build` каталог `.next/standalone` исчез, а symlink остался.
+2. **Нет `.htaccess`** в `~/billiard.guru/` или сборка не запускалась после `git pull`.
+3. **Node недоступен для Apache** — не открыт общий доступ к `~/.local` или не скопирован в `~/billiard.guru/.node/`.
+4. **FTP-аккаунт прикреплён к `public_html`** — на Beget это ломает доступ к статике ([инструкция Beget](https://beget.com/ru/kb/how-to/web-apps/node-js)).
+
+**Диагностика на сервере:**
+
+```bash
+ssh bziksv@bziksv.beget.tech
+ssh localhost -p 222
+cd ~/billiard.guru/setka
+chmod +x scripts/beget-diagnose.sh
+./scripts/beget-diagnose.sh
+```
+
+**Исправление (пересборка и пересоздание symlink):**
+
+```bash
+cd ~/billiard.guru/setka
+git pull
+./scripts/beget-setup.sh
+```
+
+Если `beget-setup.sh` падает — сайт останется 403 до успешной сборки. Смотрите вывод скрипта (Node, `npm run build`, DATABASE_URL).

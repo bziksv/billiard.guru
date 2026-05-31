@@ -12,6 +12,7 @@ import {
   type SortDir,
 } from "@/components/admin/admin-sort-header";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { AsyncTextButton } from "@/components/ui/async-text-button";
 import { IDEA_STATUS_LABELS } from "@/lib/validators";
 
 interface IdeaRow {
@@ -131,6 +132,7 @@ export function IdeasAdminTable() {
           placeholder="Заголовок, текст, автор…"
         />
         <AdminFilterSelect
+          label="Статус"
           value={statusFilter}
           onChange={(v) => setStatusFilter(v as StatusFilter)}
           options={[
@@ -209,22 +211,22 @@ export function IdeasAdminTable() {
                   {row.status === "PENDING" && (
                     <div className="flex flex-col items-end gap-2">
                       <div className="flex gap-2">
-                        <button
-                          type="button"
-                          disabled={actingId === row.id}
+                        <AsyncTextButton
+                          variant="emerald"
+                          loadingLabel="…"
+                          disabled={actingId !== null && actingId !== row.id}
                           onClick={() => moderate(row.id, "approve")}
-                          className="text-xs text-emerald-400 hover:underline disabled:opacity-50"
                         >
                           Одобрить
-                        </button>
-                        <button
-                          type="button"
-                          disabled={actingId === row.id}
+                        </AsyncTextButton>
+                        <AsyncTextButton
+                          variant="red"
+                          loadingLabel="…"
+                          disabled={actingId !== null && actingId !== row.id}
                           onClick={() => setRejectId(row.id)}
-                          className="text-xs text-red-400 hover:underline disabled:opacity-50"
                         >
                           Отклонить
-                        </button>
+                        </AsyncTextButton>
                       </div>
                       {rejectId === row.id && (
                         <div className="w-48 space-y-2">
@@ -234,13 +236,13 @@ export function IdeasAdminTable() {
                             placeholder="Причина (необяз.)"
                             className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
                           />
-                          <button
-                            type="button"
+                          <AsyncTextButton
+                            variant="red"
+                            loadingLabel="…"
                             onClick={() => moderate(row.id, "reject", rejectReason)}
-                            className="text-xs text-red-400 hover:underline"
                           >
                             Подтвердить отклонение
-                          </button>
+                          </AsyncTextButton>
                         </div>
                       )}
                     </div>

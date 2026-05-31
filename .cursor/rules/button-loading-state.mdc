@@ -14,9 +14,9 @@ alwaysApply: false
 
 Без этого пользователь не понимает, что процесс идёт, и может отправить действие дважды.
 
-## Эталон
+## Компонент
 
-См. `TournamentRegisterButton`, `ideas-page-client.tsx` (форма идей).
+Для текстовых action-кнопок в админке используйте `AsyncTextButton` из `@/components/ui/async-text-button`. Для обычных — `AsyncButton` из того же файла.
 
 ```tsx
 const [loading, setLoading] = useState(false);

@@ -24,7 +24,9 @@ export function HomeStickyNav() {
   }, []);
 
   useEffect(() => {
-    const sections = LINKS.map((l) => document.querySelector(l.href)).filter(Boolean);
+    const sections = LINKS.map((l) => document.querySelector(l.href)).filter(
+      (el): el is Element => el != null,
+    );
     if (sections.length === 0) return;
 
     const observer = new IntersectionObserver(

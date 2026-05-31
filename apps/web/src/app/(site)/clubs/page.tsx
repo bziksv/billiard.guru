@@ -82,7 +82,7 @@ export default async function ClubsPage({
           lead={`Сначала клубы в вашем городе (${player.city.nameRu}), ниже — в соседних городах в радиусе ${NOTIFY_RADIUS_KM} км.`}
         />
         <PageMain className="space-y-8 pt-0">
-          <Suspense fallback={<div className="h-24 rounded-2xl bg-zinc-900/50" />}>
+          <Suspense fallback={<div className="site-skeleton h-24" />}>
             <GeoFilterBar basePath="/clubs" />
           </Suspense>
 
@@ -91,9 +91,9 @@ export default async function ClubsPage({
           ) : (
             <>
               <section className="space-y-4">
-                <h2 className="text-lg font-semibold text-zinc-100">
+                <h2 className="site-page-subtitle">
                   В вашем городе
-                  <span className="ml-2 text-base font-normal text-zinc-500">
+                  <span className="home-card-muted ml-2 text-base font-normal">
                     {player.city.nameRu}
                   </span>
                 </h2>
@@ -108,9 +108,9 @@ export default async function ClubsPage({
 
               {nearbyClubs.length > 0 && (
                 <section className="space-y-4">
-                  <h2 className="text-lg font-semibold text-zinc-100">
+                  <h2 className="site-page-subtitle">
                     Рядом
-                    <span className="ml-2 text-base font-normal text-zinc-500">
+                    <span className="home-card-muted ml-2 text-base font-normal">
                       соседние города
                     </span>
                   </h2>
@@ -142,7 +142,7 @@ export default async function ClubsPage({
         lead="Бильярдные клубы на платформе. Выберите регион — увидите локальные площадки."
       />
       <PageMain className="space-y-6 pt-0">
-        <Suspense fallback={<div className="h-24 rounded-2xl bg-zinc-900/50" />}>
+        <Suspense fallback={<div className="site-skeleton h-24" />}>
           <GeoFilterBar basePath="/clubs" />
         </Suspense>
         {clubs.length === 0 ? (

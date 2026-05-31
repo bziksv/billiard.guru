@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { CitySelect } from "@/components/admin/city-select";
+import { AsyncTextButton } from "@/components/ui/async-text-button";
 
 interface ClubNews {
   id: string;
@@ -288,13 +289,13 @@ export default function AdminClubEditPage({ params }: { params: Promise<{ id: st
                     <p className="font-medium">{item.title}</p>
                     <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-400">{item.body}</p>
                   </div>
-                  <button
-                    type="button"
+                  <AsyncTextButton
+                    variant="red"
+                    loadingLabel="…"
                     onClick={() => deleteNews(item.id)}
-                    className="shrink-0 text-xs text-red-400 hover:underline"
                   >
                     Удалить
-                  </button>
+                  </AsyncTextButton>
                 </div>
               </li>
             ))}
