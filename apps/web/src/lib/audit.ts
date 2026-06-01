@@ -1,3 +1,5 @@
+import { pruneExpiredAuditLogs } from "@/lib/audit-log-query";
+import type { AuditSectionId } from "@/lib/audit-sections";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -7,11 +9,14 @@ interface AuditParams {
   action: string;
   entityType: string;
   entityId?: string;
+  section?: AuditSectionId;
+  clubId?: string;
+  summary?: string;
   payload?: Prisma.InputJsonValue;
 }
 
 export async function writeAuditLog(params: AuditParams) {
-  return prisma.auditLog.create({
+  const row = await prisma.auditLog.create({
     data: {
       appVersion: process.env.APP_VERSION ?? "0.1.0",
       actorType: params.actorType,
@@ -19,7 +24,13 @@ export async function writeAuditLog(params: AuditParams) {
       action: params.action,
       entityType: params.entityType,
       entityId: params.entityId,
+      section: params.section,
+      clubId: params.clubId,
+      summary: params.summary,
       payload: params.payload ?? undefined,
     },
   });
+
+  void pruneExpiredAuditLogs();
+  return row;
 }

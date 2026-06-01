@@ -1,14 +1,20 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { ClubTableCountsFields } from "@/components/admin/club-table-counts-fields";
 import { CitySelect } from "@/components/admin/city-select";
 import { PhoneInput } from "@/components/ui/phone-input";
+import {
+  parseTableCountsForm,
+  type ClubTableCounts,
+} from "@/lib/club-table-formats";
 
 export default function NewClubPage() {
   const [cityId, setCityId] = useState("");
   const [countryName, setCountryName] = useState("Россия");
   const [phone, setPhone] = useState("");
   const [phoneValid, setPhoneValid] = useState(false);
+  const [tableCounts, setTableCounts] = useState<ClubTableCounts>({});
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -31,6 +37,11 @@ export default function NewClubPage() {
         cityId,
         phone,
         email: form.get("email"),
+        address: form.get("address"),
+        description: form.get("description"),
+        workingHours: form.get("workingHours"),
+        tableCounts: parseTableCountsForm(form),
+        gamePrice: form.get("gamePrice"),
       }),
     });
 
@@ -64,6 +75,21 @@ export default function NewClubPage() {
           required
         />
         <Field label="Email (необязательно)" name="email" type="email" />
+        <Field label="Адрес" name="address" placeholder="Улица, дом, этаж" />
+        <ClubTableCountsFields values={tableCounts} onChange={setTableCounts} />
+        <TextArea
+          label="Режим работы"
+          name="workingHours"
+          rows={4}
+          placeholder={"Пн–Чт 12:00–23:00\nПт 12:00–01:00\nСб–Вс 11:00–01:00"}
+        />
+        <TextArea
+          label="Стоимость игры"
+          name="gamePrice"
+          rows={3}
+          placeholder={"Почасовая: от 400 ₽/ч\nАбонемент 10 ч — 3500 ₽"}
+        />
+        <TextArea label="Описание клуба" name="description" rows={4} />
         {error && <p className="text-sm text-red-400">{error}</p>}
         <button
           type="submit"
@@ -107,6 +133,30 @@ function Field({
         name={name}
         type={type}
         required={required}
+        placeholder={placeholder}
+        className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+      />
+    </div>
+  );
+}
+
+function TextArea({
+  label,
+  name,
+  rows = 3,
+  placeholder,
+}: {
+  label: string;
+  name: string;
+  rows?: number;
+  placeholder?: string;
+}) {
+  return (
+    <div>
+      <label className="mb-1 block text-sm text-zinc-400">{label}</label>
+      <textarea
+        name={name}
+        rows={rows}
         placeholder={placeholder}
         className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
       />

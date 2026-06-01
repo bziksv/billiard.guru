@@ -36,6 +36,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       action: "club.player_rating.update",
       entityType: "club_player_rating",
       entityId: row.id,
+      section: "players",
+      clubId,
+      summary: `Рейтинг → ${data.rating}`,
       payload: { rating: data.rating },
     });
 
@@ -67,6 +70,9 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
       action: "club.player_rating.remove",
       entityType: "club_player_rating",
       entityId: existing.id,
+      section: "players",
+      clubId,
+      summary: "Игрок убран из рейтинга клуба",
       payload: { clubId, playerId },
     });
 

@@ -21,6 +21,26 @@
 | `/admin/players/new` | Регистрация игрока |
 | `/admin/tournaments` | Турниры и регистрации (фильтры списка) |
 | `/admin/handicap` | Калькулятор форы |
+| `/manage/clubs/[id]/bookings` | Расписание броней столов (сетка, ручная бронь, блокировки, экспорт) |
+
+## Журнал изменений (логи раздела)
+
+- Кнопка **«Логи раздела»** в шапке раздела (управление клубом и админка).
+- API: `GET /api/audit-logs?section=…&clubId=…&context=manage|admin`
+- Хранение записей: **180 дней** (старые удаляются автоматически).
+
+## Сотрудники клуба
+
+- Вкладка `/manage/clubs/[id]/staff` — владелец добавляет игроков по телефону (должны быть зарегистрированы).
+- Сотрудник получает тот же доступ к `/manage`, что и владелец (брони, турниры, игроки и т.д.), кроме управления списком сотрудников.
+- API: `GET/POST /api/clubs/{id}/staff`, `DELETE /api/clubs/{id}/staff/{staffId}`.
+
+## Брони столов (клуб)
+
+- Календарь: `GET /api/clubs/{id}/bookings?calendar=1&from=YYYY-MM-DD&days=7&includeHistory=1`
+- Ручная бронь / блокировка: `POST /api/clubs/{id}/bookings/manage`
+- Статус и заметка клуба: `PATCH /api/clubs/{id}/bookings/{bookingId}`
+- Поиск игрока по телефону: `GET /api/clubs/{id}/bookings/manage?phone=…`
 
 ## API
 

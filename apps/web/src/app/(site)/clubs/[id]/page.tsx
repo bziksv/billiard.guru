@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { ClubBookingWidget } from "@/components/site/club-booking-widget";
+import { ClubFloorPlanLive } from "@/components/club/club-floor-plan-live";
 import { ClubMap } from "@/components/site/club-map";
+import { ClubInfoPanel } from "@/components/site/club-info-panel";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { TournamentCard } from "@/components/site/tournament-card";
 import { ClubPhotoGallery } from "@/components/site/club-photo-gallery";
 import { LinkifiedText } from "@/components/site/linkified-text";
-import { PhoneLink, TelegramLink } from "@/lib/contact-links";
+import { getCurrentPlayer } from "@/lib/auth";
 import { clubPhotoUrls } from "@/lib/club-photos";
+import { floorPlanHasItems } from "@/lib/club-floor-plan";
 import { PUBLIC_TOURNAMENT_STATUSES } from "@/lib/public-display";
 import {
   tournamentListInclude,
@@ -46,11 +50,13 @@ export default async function ClubPage({
 
   if (!club) notFound();
 
+  const player = await getCurrentPlayer();
   const mapLat = club.latitude ?? club.city.latitude;
   const mapLng = club.longitude ?? club.city.longitude;
   const upcoming = club.tournaments.filter((t) => t.status !== "FINISHED");
   const past = club.tournaments.filter((t) => t.status === "FINISHED");
   const photos = clubPhotoUrls(club);
+  const hasFloorPlan = floorPlanHasItems(club.floorPlan);
 
   return (
     <>
@@ -60,62 +66,62 @@ export default async function ClubPage({
         </Link>
       </PageHeader>
       <PageMain className="space-y-8 pt-0">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <SiteCard className="overflow-hidden p-0">
             <ClubPhotoGallery photos={photos} alt={club.name} />
             <div className="p-6">
               <div className="flex flex-wrap items-center gap-2">
-                  <StatusBadge
-                    status={club.isVerified ? "CONFIRMED" : "PENDING"}
-                    label={club.isVerified ? "Подтверждён" : "Ожидает Telegram"}
-                  />
-                  {club.tableCount != null && club.tableCount > 0 && (
-                    <span className="site-meta-chip">{club.tableCount} столов</span>
-                  )}
-                </div>
-                <p className="home-card-body mt-3 text-sm">
-                  {club.city.nameRu}, {club.city.country.nameRu}
+                <StatusBadge
+                  status={club.isVerified ? "CONFIRMED" : "PENDING"}
+                  label={club.isVerified ? "Подтверждён" : "Ожидает Telegram"}
+                />
+              </div>
+              <p className="home-card-body mt-3 text-sm">
+                {club.city.nameRu}, {club.city.country.nameRu}
+              </p>
+              {club.address && (
+                <p className="home-card-muted mt-1 text-sm">{club.address}</p>
+              )}
+              {club.email && (
+                <p className="mt-3 text-sm">
+                  <a
+                    href={`mailto:${club.email}`}
+                    className="text-emerald-600 hover:underline dark:text-emerald-400"
+                  >
+                    {club.email}
+                  </a>
                 </p>
-                {club.address && (
-                  <p className="home-card-muted mt-1 text-sm">{club.address}</p>
-                )}
-                {club.phone && (
-                  <p className="mt-2 text-sm">
-                    <PhoneLink phone={club.phone} />
-                  </p>
-                )}
-                {club.email && (
-                  <p className="mt-2 text-sm">
-                    <a href={`mailto:${club.email}`} className="text-emerald-600 hover:underline dark:text-emerald-400">
-                      {club.email}
-                    </a>
-                  </p>
-                )}
-                {club.telegramUsername && (
-                  <p className="mt-1 text-sm">
-                    <TelegramLink username={club.telegramUsername} />
-                  </p>
-                )}
-                {club.description && (
-                  <p className="home-card-body mt-4 whitespace-pre-wrap text-sm leading-relaxed">
-                    <LinkifiedText text={club.description} />
-                  </p>
-                )}
+              )}
+              {club.description && (
+                <p className="home-card-body mt-4 whitespace-pre-wrap text-sm leading-relaxed">
+                  <LinkifiedText text={club.description} />
+                </p>
+              )}
+              {hasFloorPlan && (
+                <div id="club-floor" className="mt-6 scroll-mt-28">
+                  <h2 className="site-section-title mb-3 text-lg">План зала</h2>
+                  <ClubFloorPlanLive
+                    clubId={club.id}
+                    floorPlan={club.floorPlan}
+                    priceTiers={club.priceTiers}
+                  />
+                </div>
+              )}
             </div>
           </SiteCard>
 
-          <SiteCard>
-            <h2 className="home-card-muted mb-3 text-sm font-semibold uppercase tracking-wider">
-              Режим работы
-            </h2>
-            {club.workingHours ? (
-              <p className="home-card-body whitespace-pre-wrap text-sm leading-relaxed">
-                <LinkifiedText text={club.workingHours} />
-              </p>
-            ) : (
-              <p className="home-card-muted text-sm">График уточняйте у клуба.</p>
-            )}
-          </SiteCard>
+          <ClubInfoPanel
+            phone={club.displayPhone ?? ""}
+            phoneCountryName={club.city.country.nameRu}
+            telegramUsername={club.telegramUsername}
+            workingHours={club.workingHours}
+            weeklyHours={club.weeklyHours}
+            gamePrice={club.gamePrice}
+            priceTiers={club.priceTiers}
+            tableCount={club.tableCount}
+            tableCounts={club.tableCounts}
+            bookingEnabled={club.bookingEnabled}
+          />
         </div>
 
         <section>
@@ -127,12 +133,31 @@ export default async function ClubPage({
               latitude={mapLat}
               longitude={mapLng}
               cityName={club.city.nameRu}
+              countryName={club.city.country.nameRu}
             />
           </SiteCard>
         </section>
 
+        {club.bookingEnabled && (
+          <section id="club-booking" className="scroll-mt-28">
+            <h2 className="site-section-title mb-4">Бронирование стола</h2>
+            <SiteCard>
+              <ClubBookingWidget
+                clubId={club.id}
+                clubName={club.name}
+                bookingEnabled={club.bookingEnabled}
+                bookingAdvanceDays={club.bookingAdvanceDays}
+                tableCounts={club.tableCounts}
+                floorPlan={club.floorPlan}
+                priceTiers={club.priceTiers}
+                isLoggedIn={Boolean(player)}
+              />
+            </SiteCard>
+          </section>
+        )}
+
         {club.news.length > 0 && (
-          <section>
+          <section id="club-news">
             <h2 className="site-section-title mb-4">Новости клуба</h2>
             <ul className="space-y-4">
               {club.news.map((item) => (

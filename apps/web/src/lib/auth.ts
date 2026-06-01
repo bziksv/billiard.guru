@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { UserRole } from "@/generated/prisma/client";
+import { getImpersonationState } from "@/lib/impersonate";
 import { prisma } from "@/lib/prisma";
 import { SESSION_COOKIE, verifySessionToken, type SessionPayload } from "@/lib/session";
 
@@ -21,10 +22,29 @@ export async function getSession(): Promise<SessionPayload | null> {
   return verifySessionToken(token);
 }
 
+export async function getImpersonation() {
+  const session = await getSession();
+  if (!session) return null;
+  return getImpersonationState(session.role);
+}
+
 export async function getCurrentPlayer() {
   const session = await getSession();
   if (!session) return null;
 
+  const impersonation = await getImpersonationState(session.role);
+  const playerId = impersonation?.playerId ?? session.playerId;
+
+  return prisma.player.findUnique({
+    where: { id: playerId },
+    include: { city: { include: { country: true } } },
+  });
+}
+
+/** Реальный игрок из сессии (без режима просмотра). */
+export async function getRealPlayer() {
+  const session = await getSession();
+  if (!session) return null;
   return prisma.player.findUnique({
     where: { id: session.playerId },
     include: { city: { include: { country: true } } },

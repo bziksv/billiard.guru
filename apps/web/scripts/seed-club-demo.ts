@@ -28,7 +28,8 @@ async function main() {
     where: { id: CLUB_ID },
     data: {
       email: "demo@billiard.guru",
-      phone: "+7 (473) 123-45-67",
+      phone: "+79507775325",
+      displayPhone: "+74731234567",
       photoUrl: "/demo/club-test.jpg",
       galleryUrls: [
         "/demo/club-test.jpg",
@@ -45,13 +46,72 @@ async function main() {
       address: "г. Воронеж, ул. Московский проспект, 129, ТЦ «Галерея Чиж», 3 этаж",
       latitude: lat,
       longitude: lng,
-      workingHours: `Пн–Чт: 12:00 – 23:00
-Пт: 12:00 – 01:00
-Сб–Вс: 11:00 – 01:00
-
-Последний заход за стол — за 30 минут до закрытия.
-Бронь стола: +7 (473) 123-45-67 или Telegram @KlubTestDemo`,
+      workingHours: "Последний заход за стол — за 30 минут до закрытия.",
+      weeklyHours: [
+        { days: ["mon", "tue", "wed", "thu"], open: "12:00", close: "23:00" },
+        { days: ["fri"], open: "12:00", close: "01:00", closesAfterMidnight: true },
+        { days: ["sat", "sun"], open: "11:00", close: "01:00", closesAfterMidnight: true },
+      ],
       tableCount: 8,
+      tableCounts: { PYRAMID: 5, POOL: 3 },
+      floorPlan: {
+        version: 1,
+        items: [
+          { id: "demo-entrance", kind: "entrance", x: 50, y: 7 },
+          { id: "demo-bar", kind: "bar", x: 10, y: 24 },
+          { id: "demo-reception", kind: "reception", x: 22, y: 14 },
+          { id: "demo-toilet", kind: "toilet", x: 92, y: 16 },
+          { id: "demo-wardrobe", kind: "wardrobe", x: 92, y: 30 },
+          { id: "demo-lounge", kind: "lounge", x: 90, y: 78 },
+          { id: "demo-smoke", kind: "custom", x: 90, y: 58, label: "Курилка" },
+          { id: "demo-p1", kind: "table", tableFormat: "PYRAMID", tableIndex: 1, x: 28, y: 38 },
+          { id: "demo-p2", kind: "table", tableFormat: "PYRAMID", tableIndex: 2, x: 44, y: 38 },
+          { id: "demo-p3", kind: "table", tableFormat: "PYRAMID", tableIndex: 3, x: 60, y: 38 },
+          { id: "demo-p4", kind: "table", tableFormat: "PYRAMID", tableIndex: 4, x: 36, y: 58 },
+          { id: "demo-p5", kind: "table", tableFormat: "PYRAMID", tableIndex: 5, x: 52, y: 58 },
+          { id: "demo-pool1", kind: "table", tableFormat: "POOL", tableIndex: 1, x: 28, y: 78 },
+          { id: "demo-pool2", kind: "table", tableFormat: "POOL", tableIndex: 2, x: 44, y: 78 },
+          { id: "demo-pool3", kind: "table", tableFormat: "POOL", tableIndex: 3, x: 60, y: 78 },
+        ],
+      },
+      priceTiers: [
+        {
+          label: "День",
+          days: "weekdays",
+          timeFrom: "12:00",
+          timeTo: "17:00",
+          price: "400 ₽/ч",
+          note: "скидка 20%",
+        },
+        {
+          label: "Вечер",
+          days: "weekdays",
+          timeFrom: "17:00",
+          timeTo: "23:00",
+          price: "500 ₽/ч",
+        },
+        {
+          label: "Пятница",
+          days: ["fri"],
+          timeFrom: "12:00",
+          timeTo: "01:00",
+          closesAfterMidnight: true,
+          price: "550 ₽/ч",
+        },
+        {
+          label: "Выходные",
+          days: "weekend",
+          timeFrom: "11:00",
+          timeTo: "01:00",
+          closesAfterMidnight: true,
+          price: "550 ₽/ч",
+        },
+        { label: "Абонемент", days: "all", price: "3 500 ₽", note: "10 часов" },
+      ],
+      gamePrice: null,
+      bookingEnabled: true,
+      bookingSlotMinutes: 30,
+      bookingAdvanceDays: 14,
       telegramUsername: "KlubTestDemo",
       isVerified: true,
     },

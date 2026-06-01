@@ -11,6 +11,8 @@
 export type * from './models/Country'
 export type * from './models/City'
 export type * from './models/Club'
+export type * from './models/ClubStaff'
+export type * from './models/TableBooking'
 export type * from './models/ClubNews'
 export type * from './models/Player'
 export type * from './models/ClubPlayerRating'

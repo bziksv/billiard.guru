@@ -92,7 +92,8 @@ model Club {
   name             String
   cityId           String   @map("city_id")
   city             City     @relation(fields: [cityId], references: [id])
-  phone            String   @unique
+  phone            String
+  displayPhone     String?  @map("display_phone")
   email            String?
   photoUrl         String?  @map("photo_url")
   galleryUrls      Json?    @map("gallery_urls")
@@ -101,8 +102,16 @@ model Club {
   latitude         Float?   @map("latitude")
   longitude        Float?   @map("longitude")
   workingHours     String?  @map("working_hours") @db.Text
+  weeklyHours      Json?    @map("weekly_hours")
   tableCount       Int?     @map("table_count")
-  telegramId       String?  @unique @map("telegram_id")
+  tableCounts      Json?    @map("table_counts")
+  floorPlan          Json?    @map("floor_plan")
+  gamePrice        String?  @map("game_price") @db.Text
+  priceTiers       Json?    @map("price_tiers")
+  bookingEnabled   Boolean  @default(true) @map("booking_enabled")
+  bookingSlotMinutes Int    @default(60) @map("booking_slot_minutes")
+  bookingAdvanceDays Int    @default(14) @map("booking_advance_days")
+  telegramId       String?  @map("telegram_id")
   telegramUsername String?  @map("telegram_username")
   isVerified       Boolean  @default(false) @map("is_verified")
   confirmToken     String?  @unique @map("confirm_token")
@@ -114,8 +123,57 @@ model Club {
   teams          TournamentTeam[]
   playerRatings  ClubPlayerRating[]
   news           ClubNews[]
+  tableBookings  TableBooking[]
+  ideas          Idea[]
+  staff          ClubStaff[]
 
+  @@index([phone])
+  @@index([telegramId])
   @@map("clubs")
+}
+
+/// Сотрудник клуба: доступ к /manage как у владельца (по приглашению владельца).
+model ClubStaff {
+  id        String   @id @default(cuid())
+  clubId    String   @map("club_id")
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  playerId  String   @map("player_id")
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([clubId, playerId])
+  @@index([playerId])
+  @@map("club_staff")
+}
+
+enum TableBookingKind {
+  PLAYER
+  CLUB
+  BLOCK
+}
+
+model TableBooking {
+  id          String             @id @default(cuid())
+  clubId      String             @map("club_id")
+  club        Club               @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  playerId    String?            @map("player_id")
+  player      Player?            @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  kind        TableBookingKind   @default(PLAYER)
+  tableFormat String             @map("table_format")
+  floorItemId String?            @map("floor_item_id")
+  startsAt    DateTime           @map("starts_at")
+  endsAt      DateTime           @map("ends_at")
+  status      RegistrationStatus @default(PENDING)
+  playerNote  String?            @map("player_note") @db.Text
+  clubNote    String?            @map("club_note") @db.Text
+  guestName   String?            @map("guest_name")
+  guestPhone  String?            @map("guest_phone")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+
+  @@index([clubId, startsAt])
+  @@index([playerId, startsAt])
+  @@map("table_bookings")
 }
 
 model ClubNews {
@@ -159,6 +217,8 @@ model Player {
   loginChallenges LoginChallenge[]
   ideas           Idea[]
   ideaVotes       IdeaVote[]
+  tableBookings   TableBooking[]
+  clubStaff       ClubStaff[]
 
   @@map("players")
 }
@@ -299,9 +359,15 @@ model AuditLog {
   action     String
   entityType String   @map("entity_type")
   entityId   String?  @map("entity_id")
+  section    String?  @map("section")
+  clubId     String?  @map("club_id")
+  summary    String?  @db.Text @map("summary")
   payload    Json?
   createdAt  DateTime @default(now()) @map("created_at")
 
+  @@index([clubId, section, createdAt])
+  @@index([section, createdAt])
+  @@index([createdAt])
   @@map("audit_logs")
 }
 
@@ -309,6 +375,8 @@ model Idea {
   id              String     @id @default(cuid())
   authorId        String     @map("author_id")
   author          Player     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  clubId          String?    @map("club_id")
+  club            Club?      @relation(fields: [clubId], references: [id], onDelete: SetNull)
   title           String
   body            String     @db.Text
   status          IdeaStatus @default(PENDING)

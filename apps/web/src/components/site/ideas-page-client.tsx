@@ -10,6 +10,8 @@ interface IdeaView {
   title: string;
   body: string;
   status: string;
+  clubId?: string | null;
+  clubName?: string | null;
   likesCount: number;
   dislikesCount: number;
   rejectReason: string | null;
@@ -140,7 +142,17 @@ export function IdeasPageClient({
                 <h2 className="text-lg font-semibold text-zinc-100">{idea.title}</h2>
                 <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-300">{idea.body}</p>
                 <p className="mt-3 text-xs text-zinc-500">
-                  {idea.author.lastName} {idea.author.firstName}
+                  {idea.clubName ? (
+                    <>
+                      <span className="text-amber-400/90">Клуб «{idea.clubName}»</span>
+                      {" · "}
+                      {idea.author.lastName} {idea.author.firstName}
+                    </>
+                  ) : (
+                    <>
+                      {idea.author.lastName} {idea.author.firstName}
+                    </>
+                  )}
                 </p>
                 <div className="mt-4 flex flex-wrap items-center gap-3">
                   <VoteButton

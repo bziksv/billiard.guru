@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import { isPairFormat } from "@/lib/pair-tournament";
 import { prisma } from "@/lib/prisma";
 import { tournamentAdminInclude } from "@/lib/tournament-admin";
+import {
+  requireTournamentManageAccess,
+  tournamentManageActorType,
+} from "@/lib/tournament-manage";
 import { tournamentUpdateSchema } from "@/lib/validators";
 
 export async function GET(
@@ -11,8 +15,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireSuperAdmin();
     const { id } = await params;
+    await requireTournamentManageAccess(id);
 
     const tournament = await prisma.tournament.findUnique({
       where: { id },
@@ -35,8 +39,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await requireSuperAdmin();
     const { id } = await params;
+    const { session } = await requireTournamentManageAccess(id);
     const body = await request.json();
     const data = tournamentUpdateSchema.parse(body);
 
@@ -86,7 +90,7 @@ export async function PATCH(
     });
 
     await writeAuditLog({
-      actorType: "admin",
+      actorType: tournamentManageActorType(session),
       actorId: session.playerId,
       action:
         data.status === "ACTIVE"
@@ -112,8 +116,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await requireSuperAdmin();
     const { id } = await params;
+    const { session } = await requireTournamentManageAccess(id);
 
     const tournament = await prisma.tournament.findUnique({
       where: { id },
@@ -126,7 +130,7 @@ export async function DELETE(
     await prisma.tournament.delete({ where: { id } });
 
     await writeAuditLog({
-      actorType: "admin",
+      actorType: tournamentManageActorType(session),
       actorId: session.playerId,
       action: "tournament.delete",
       entityType: "tournament",

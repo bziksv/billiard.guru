@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, getSession } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
+import { requireClubManageAccess } from "@/lib/club-manage";
 import { prisma } from "@/lib/prisma";
 import { clubNewsSchema } from "@/lib/validators";
 
@@ -26,8 +27,9 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await requireSuperAdmin();
     const { id } = await params;
+    await requireClubManageAccess(id);
+    const session = await getSession();
     const club = await prisma.club.findUnique({ where: { id }, select: { id: true } });
     if (!club) {
       return NextResponse.json({ error: "Клуб не найден" }, { status: 404 });
@@ -44,11 +46,14 @@ export async function POST(
     });
 
     await writeAuditLog({
-      actorType: "admin",
-      actorId: session.playerId,
+      actorType: session?.role === "SUPERADMIN" ? "admin" : "club",
+      actorId: session!.playerId,
       action: "club.news.create",
       entityType: "club_news",
       entityId: item.id,
+      section: "news",
+      clubId: id,
+      summary: `Новость: ${item.title}`,
     });
 
     return NextResponse.json(item, { status: 201 });

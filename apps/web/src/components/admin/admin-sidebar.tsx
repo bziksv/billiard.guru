@@ -32,6 +32,7 @@ const NAV: {
   { href: "/admin/tournaments", label: "Турниры", icon: IconTournaments },
   { href: "/admin/ideas", label: "Идеи", icon: IconIdeas },
   { href: "/admin/handicap", label: "Калькулятор форы", icon: IconHandicap },
+  { href: "/admin/preview", label: "Просмотр как…", icon: IconCabinet },
 ];
 
 function isActive(href: string, pathname: string) {

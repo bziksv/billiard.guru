@@ -34,9 +34,13 @@ type SortKey = "name" | "systemRating" | "clubRating";
 export function ClubPlayerRatingsPanel({
   clubId,
   clubName,
+  variant = "admin",
+  onLoaded,
 }: {
   clubId: string;
   clubName: string;
+  variant?: "admin" | "manage";
+  onLoaded?: () => void;
 }) {
   const [rows, setRows] = useState<ClubPlayerRatingRow[]>([]);
   const [allPlayers, setAllPlayers] = useState<PlayerOption[]>([]);
@@ -56,14 +60,20 @@ export function ClubPlayerRatingsPanel({
   }
 
   useEffect(() => {
+    let active = true;
     Promise.all([
       fetch(`/api/clubs/${clubId}/player-ratings`).then((r) => r.json()),
       fetch("/api/players").then((r) => r.json()),
     ]).then(([ratings, players]) => {
+      if (!active) return;
       setRows(Array.isArray(ratings) ? ratings : []);
       setAllPlayers(Array.isArray(players) ? players : []);
       setLoading(false);
+      onLoaded?.();
     });
+    return () => {
+      active = false;
+    };
   }, [clubId]);
 
   const indexedPlayerIds = useMemo(
@@ -184,27 +194,63 @@ export function ClubPlayerRatingsPanel({
     await reload();
   }
 
+  const header = variant === "admin" ? (
+    <div>
+      <Link href="/admin/clubs" className="text-sm text-emerald-400 hover:underline">
+        ← Клубы
+      </Link>
+      <h1 className="mt-3 text-2xl font-bold">Рейтинг игроков</h1>
+      <p className="mt-1 text-sm text-zinc-400">{clubName}</p>
+      <p className="mt-2 max-w-2xl text-sm text-zinc-500">
+        Общий рейтинг — по системе billiard.guru, пересчитывается автоматически после
+        матчей. Рейтинг в клубе задаётся вами для турниров и форы именно в этом клубе.
+      </p>
+    </div>
+  ) : (
+    <div>
+      <h1 className="text-2xl font-bold">Игроки</h1>
+      <p className="mt-1 text-sm text-zinc-400">{clubName}</p>
+      <p className="mt-2 max-w-2xl text-sm text-zinc-500">
+        Общий рейтинг пересчитывается после матчей. Рейтинг в клубе задаётся вами для
+        турниров и форы в этом клубе.
+      </p>
+    </div>
+  );
+
   if (loading) {
-    return <p className="text-sm text-zinc-500">Загрузка…</p>;
+    return (
+      <div className="space-y-8">
+        {header}
+        <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+          <div className="h-6 w-40 animate-pulse rounded bg-zinc-800" />
+          <div className="mt-4 grid max-w-2xl gap-3 sm:grid-cols-[1fr_140px_auto]">
+            <div className="h-10 animate-pulse rounded-lg bg-zinc-800" />
+            <div className="h-10 animate-pulse rounded-lg bg-zinc-800" />
+            <div className="h-10 animate-pulse rounded-lg bg-zinc-800" />
+          </div>
+        </section>
+        <section className="overflow-hidden rounded-xl border border-zinc-800">
+          <div className="border-b border-zinc-800 bg-zinc-950 px-4 py-3">
+            <div className="h-9 max-w-xs animate-pulse rounded-lg bg-zinc-800" />
+          </div>
+          <div className="space-y-0 divide-y divide-zinc-800">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex gap-4 px-4 py-4">
+                <div className="h-5 w-36 animate-pulse rounded bg-zinc-800" />
+                <div className="h-5 w-20 animate-pulse rounded bg-zinc-800" />
+                <div className="h-5 w-12 animate-pulse rounded bg-zinc-800" />
+                <div className="h-5 w-16 animate-pulse rounded bg-zinc-800" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-8">
-      <div>
-        <Link
-          href="/admin/clubs"
-          className="text-sm text-emerald-400 hover:underline"
-        >
-          ← Клубы
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold">Рейтинг игроков</h1>
-        <p className="mt-1 text-sm text-zinc-400">{clubName}</p>
-        <p className="mt-2 max-w-2xl text-sm text-zinc-500">
-          Общий рейтинг — по системе billiard.guru, пересчитывается автоматически
-          после матчей. Рейтинг в клубе задаётся вами для турниров и форы именно
-          в этом клубе.
-        </p>
-      </div>
+      {header}
 
       <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
         <h2 className="mb-4 font-semibold">Добавить игрока</h2>

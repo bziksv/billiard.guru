@@ -92,3 +92,12 @@ export const IdeaVoteValue = {
 } as const
 
 export type IdeaVoteValue = (typeof IdeaVoteValue)[keyof typeof IdeaVoteValue]
+
+
+export const TableBookingKind = {
+  PLAYER: 'PLAYER',
+  CLUB: 'CLUB',
+  BLOCK: 'BLOCK'
+} as const
+
+export type TableBookingKind = (typeof TableBookingKind)[keyof typeof TableBookingKind]

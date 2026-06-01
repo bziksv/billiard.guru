@@ -57,6 +57,16 @@ export type City = Prisma.CityModel
  */
 export type Club = Prisma.ClubModel
 /**
+ * Model ClubStaff
+ * Сотрудник клуба: доступ к /manage как у владельца (по приглашению владельца).
+ */
+export type ClubStaff = Prisma.ClubStaffModel
+/**
+ * Model TableBooking
+ * 
+ */
+export type TableBooking = Prisma.TableBookingModel
+/**
  * Model ClubNews
  * 
  */

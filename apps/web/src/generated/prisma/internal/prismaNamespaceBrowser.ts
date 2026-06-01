@@ -54,6 +54,8 @@ export const ModelName = {
   Country: 'Country',
   City: 'City',
   Club: 'Club',
+  ClubStaff: 'ClubStaff',
+  TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
   Player: 'Player',
   ClubPlayerRating: 'ClubPlayerRating',
@@ -108,6 +110,7 @@ export const ClubScalarFieldEnum = {
   name: 'name',
   cityId: 'cityId',
   phone: 'phone',
+  displayPhone: 'displayPhone',
   email: 'email',
   photoUrl: 'photoUrl',
   galleryUrls: 'galleryUrls',
@@ -116,7 +119,15 @@ export const ClubScalarFieldEnum = {
   latitude: 'latitude',
   longitude: 'longitude',
   workingHours: 'workingHours',
+  weeklyHours: 'weeklyHours',
   tableCount: 'tableCount',
+  tableCounts: 'tableCounts',
+  floorPlan: 'floorPlan',
+  gamePrice: 'gamePrice',
+  priceTiers: 'priceTiers',
+  bookingEnabled: 'bookingEnabled',
+  bookingSlotMinutes: 'bookingSlotMinutes',
+  bookingAdvanceDays: 'bookingAdvanceDays',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   isVerified: 'isVerified',
@@ -126,6 +137,37 @@ export const ClubScalarFieldEnum = {
 } as const
 
 export type ClubScalarFieldEnum = (typeof ClubScalarFieldEnum)[keyof typeof ClubScalarFieldEnum]
+
+
+export const ClubStaffScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  createdAt: 'createdAt'
+} as const
+
+export type ClubStaffScalarFieldEnum = (typeof ClubStaffScalarFieldEnum)[keyof typeof ClubStaffScalarFieldEnum]
+
+
+export const TableBookingScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  kind: 'kind',
+  tableFormat: 'tableFormat',
+  floorItemId: 'floorItemId',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  status: 'status',
+  playerNote: 'playerNote',
+  clubNote: 'clubNote',
+  guestName: 'guestName',
+  guestPhone: 'guestPhone',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TableBookingScalarFieldEnum = (typeof TableBookingScalarFieldEnum)[keyof typeof TableBookingScalarFieldEnum]
 
 
 export const ClubNewsScalarFieldEnum = {
@@ -278,6 +320,9 @@ export const AuditLogScalarFieldEnum = {
   action: 'action',
   entityType: 'entityType',
   entityId: 'entityId',
+  section: 'section',
+  clubId: 'clubId',
+  summary: 'summary',
   payload: 'payload',
   createdAt: 'createdAt'
 } as const
@@ -288,6 +333,7 @@ export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typ
 export const IdeaScalarFieldEnum = {
   id: 'id',
   authorId: 'authorId',
+  clubId: 'clubId',
   title: 'title',
   body: 'body',
   status: 'status',
@@ -378,17 +424,43 @@ export const ClubOrderByRelevanceFieldEnum = {
   name: 'name',
   cityId: 'cityId',
   phone: 'phone',
+  displayPhone: 'displayPhone',
   email: 'email',
   photoUrl: 'photoUrl',
   description: 'description',
   address: 'address',
   workingHours: 'workingHours',
+  gamePrice: 'gamePrice',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   confirmToken: 'confirmToken'
 } as const
 
 export type ClubOrderByRelevanceFieldEnum = (typeof ClubOrderByRelevanceFieldEnum)[keyof typeof ClubOrderByRelevanceFieldEnum]
+
+
+export const ClubStaffOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId'
+} as const
+
+export type ClubStaffOrderByRelevanceFieldEnum = (typeof ClubStaffOrderByRelevanceFieldEnum)[keyof typeof ClubStaffOrderByRelevanceFieldEnum]
+
+
+export const TableBookingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  tableFormat: 'tableFormat',
+  floorItemId: 'floorItemId',
+  playerNote: 'playerNote',
+  clubNote: 'clubNote',
+  guestName: 'guestName',
+  guestPhone: 'guestPhone'
+} as const
+
+export type TableBookingOrderByRelevanceFieldEnum = (typeof TableBookingOrderByRelevanceFieldEnum)[keyof typeof TableBookingOrderByRelevanceFieldEnum]
 
 
 export const ClubNewsOrderByRelevanceFieldEnum = {
@@ -497,7 +569,10 @@ export const AuditLogOrderByRelevanceFieldEnum = {
   actorId: 'actorId',
   action: 'action',
   entityType: 'entityType',
-  entityId: 'entityId'
+  entityId: 'entityId',
+  section: 'section',
+  clubId: 'clubId',
+  summary: 'summary'
 } as const
 
 export type AuditLogOrderByRelevanceFieldEnum = (typeof AuditLogOrderByRelevanceFieldEnum)[keyof typeof AuditLogOrderByRelevanceFieldEnum]
@@ -506,6 +581,7 @@ export type AuditLogOrderByRelevanceFieldEnum = (typeof AuditLogOrderByRelevance
 export const IdeaOrderByRelevanceFieldEnum = {
   id: 'id',
   authorId: 'authorId',
+  clubId: 'clubId',
   title: 'title',
   body: 'body',
   moderationToken: 'moderationToken',

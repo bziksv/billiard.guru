@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { BookingCancelButton } from "@/components/site/booking-cancel-button";
 import { RegistrationCancelButton } from "@/components/site/registration-cancel-button";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { getCurrentPlayer, isSuperAdmin } from "@/lib/auth";
 import { formatRating } from "@/lib/rating";
+import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
 import { prisma } from "@/lib/prisma";
 import {
   REGISTRATION_STATUS_LABELS,
@@ -30,6 +32,16 @@ export default async function CabinetPage() {
       tournament: { include: { club: true } },
     },
     orderBy: { createdAt: "desc" },
+  });
+
+  const tableBookings = await prisma.tableBooking.findMany({
+    where: {
+      playerId: player.id,
+      status: { notIn: ["CANCELLED", "REJECTED"] },
+      endsAt: { gte: new Date() },
+    },
+    include: { club: { select: { id: true, name: true } } },
+    orderBy: { startsAt: "asc" },
   });
 
   const teams = await prisma.tournamentTeam.findMany({
@@ -93,6 +105,44 @@ export default async function CabinetPage() {
             )}
           </div>
         </SiteCard>
+
+        <section>
+          <h2 className="site-section-title mb-3">Мои брони столов</h2>
+          {tableBookings.length === 0 ? (
+            <p className="text-sm text-zinc-500">
+              Нет предстоящих броней.{" "}
+              <Link href="/clubs" className="text-emerald-400 hover:underline">
+                Выбрать клуб
+              </Link>
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {tableBookings.map((b) => (
+                <li key={b.id} className="site-card px-4 py-3 text-sm">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link href={`/clubs/${b.club.id}`} className="font-medium hover:text-emerald-400">
+                      {b.club.name}
+                    </Link>
+                    <StatusBadge
+                      status={b.status}
+                      label={REGISTRATION_STATUS_LABELS[b.status] ?? b.status}
+                    />
+                  </div>
+                  <p className="mt-1 text-zinc-400">
+                    {bookingFormatLabel(b.tableFormat)} ·{" "}
+                    {formatBookingRange(b.startsAt, b.endsAt)}
+                  </p>
+                  <BookingCancelButton
+                    clubId={b.clubId}
+                    bookingId={b.id}
+                    startsAt={b.startsAt.toISOString()}
+                    className="mt-2"
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
         <section>
           <h2 className="site-section-title mb-3">Мои регистрации</h2>

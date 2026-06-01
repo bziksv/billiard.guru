@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { AuthError, authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { requireClubManageAccess } from "@/lib/club-manage";
 import { createIdea } from "@/lib/idea-moderation";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
@@ -12,12 +13,14 @@ function serializeIdea(
     title: string;
     body: string;
     status: string;
+    clubId: string | null;
     likesCount: number;
     dislikesCount: number;
     rejectReason: string | null;
     createdAt: Date;
     moderatedAt: Date | null;
     author: { id: string; firstName: string; lastName: string };
+    club?: { id: string; name: string } | null;
   },
   myVote?: "LIKE" | "DISLIKE" | null,
 ) {
@@ -25,6 +28,8 @@ function serializeIdea(
     id: idea.id,
     title: idea.title,
     body: idea.body,
+    clubId: idea.clubId,
+    clubName: idea.club?.name ?? null,
     status: idea.status,
     likesCount: idea.likesCount,
     dislikesCount: idea.dislikesCount,
@@ -46,7 +51,10 @@ export async function GET() {
 
     const approved = await prisma.idea.findMany({
       where: { status: "APPROVED" },
-      include: { author: { select: { id: true, firstName: true, lastName: true } } },
+      include: {
+        author: { select: { id: true, firstName: true, lastName: true } },
+        club: { select: { id: true, name: true } },
+      },
       orderBy: [{ likesCount: "desc" }, { createdAt: "desc" }],
     });
 
@@ -64,7 +72,10 @@ export async function GET() {
     const mine = player
       ? await prisma.idea.findMany({
           where: { authorId: player.id },
-          include: { author: { select: { id: true, firstName: true, lastName: true } } },
+          include: {
+        author: { select: { id: true, firstName: true, lastName: true } },
+        club: { select: { id: true, name: true } },
+      },
           orderBy: { createdAt: "desc" },
         })
       : [];
@@ -93,7 +104,17 @@ export async function POST(request: NextRequest) {
     }
 
     const data = ideaCreateSchema.parse(await request.json());
-    const idea = await createIdea(player.id, data.title, data.body);
+    if (data.clubId) {
+      try {
+        await requireClubManageAccess(data.clubId);
+      } catch (error) {
+        if (error instanceof AuthError) {
+          return NextResponse.json({ error: error.message }, { status: error.status });
+        }
+        throw error;
+      }
+    }
+    const idea = await createIdea(player.id, data.title, data.body, data.clubId);
 
     return NextResponse.json(serializeIdea(idea), { status: 201 });
   } catch (error) {

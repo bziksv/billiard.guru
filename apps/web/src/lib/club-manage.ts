@@ -1,10 +1,10 @@
-import { AuthError, getCurrentPlayer } from "@/lib/auth";
-import { clubOwnedByPlayer } from "@/lib/club-access";
+import { AuthError, getCurrentPlayer, getImpersonation, getSession } from "@/lib/auth";
+import { playerCanManageClub } from "@/lib/club-staff";
 import { prisma } from "@/lib/prisma";
 
 export async function requireClubManageAccess(clubId: string) {
-  const player = await getCurrentPlayer();
-  if (!player) {
+  const session = await getSession();
+  if (!session) {
     throw new AuthError("Требуется вход", 401);
   }
 
@@ -16,7 +16,21 @@ export async function requireClubManageAccess(clubId: string) {
     throw new AuthError("Клуб не найден", 404);
   }
 
-  if (player.role !== "SUPERADMIN" && !clubOwnedByPlayer(club, player)) {
+  const impersonation = await getImpersonation();
+  if (session.role === "SUPERADMIN" && !impersonation) {
+    return { player: await getCurrentPlayer(), club };
+  }
+
+  const player = await getCurrentPlayer();
+  if (!player) {
+    throw new AuthError("Требуется вход", 401);
+  }
+
+  if (session.role === "SUPERADMIN" && impersonation?.clubId === clubId) {
+    return { player, club };
+  }
+
+  if (!(await playerCanManageClub(club, player))) {
     throw new AuthError("Недостаточно прав", 403);
   }
 

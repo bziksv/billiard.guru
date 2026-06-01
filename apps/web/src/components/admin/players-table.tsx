@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Fragment, useEffect, useMemo, useState } from "react";
+import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import {
   AdminFilterSelect,
   AdminTableSearchField,
@@ -196,12 +197,15 @@ export function PlayersAdminTable() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="admin-page-title">Игроки</h1>
-        <Link
-          href="/admin/players/new"
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500"
-        >
-          + Новый игрок
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <SectionLogsButton section="admin_players" context="admin" />
+          <Link
+            href="/admin/players/new"
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500"
+          >
+            + Новый игрок
+          </Link>
+        </div>
       </div>
 
       <AdminTableToolbar count={{ shown: sorted.length, total: players.length }}>

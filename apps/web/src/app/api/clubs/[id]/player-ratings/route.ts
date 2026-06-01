@@ -67,6 +67,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       action: "club.player_rating.set",
       entityType: "club_player_rating",
       entityId: row.id,
+      section: "players",
+      clubId,
+      summary: `Рейтинг ${data.rating}`,
       payload: { clubId, playerId: data.playerId, rating: data.rating },
     });
 

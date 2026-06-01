@@ -42,6 +42,7 @@ async function loadIdea(ideaId: string) {
     where: { id: ideaId },
     include: {
       author: { include: { city: true } },
+      club: { select: { id: true, name: true } },
     },
   });
 }
@@ -53,13 +54,17 @@ async function notifyAdminsAboutNewIdea(ideaId: string) {
   const adminIds = await getSuperadminTelegramIds();
   const link = appUrl("/admin/ideas");
 
+  const authorLine = idea.club
+    ? `От клуба «${idea.club.name}» (${idea.author.lastName} ${idea.author.firstName})`
+    : `Автор: ${idea.author.lastName} ${idea.author.firstName}, ${idea.author.city.nameRu}`;
+
   for (const telegramId of adminIds) {
     await sendTelegramMessage(
       telegramId,
       `💡 <b>Новая идея на модерации</b>\n\n` +
         `<b>${idea.title}</b>\n\n` +
         `${truncate(idea.body, 400)}\n\n` +
-        `Автор: ${idea.author.lastName} ${idea.author.firstName}, ${idea.author.city.nameRu}\n\n` +
+        `${authorLine}\n\n` +
         `Модерация: ${link}`,
       { replyMarkup: ideaModerationKeyboard(idea.moderationToken!) },
     );
@@ -68,7 +73,12 @@ async function notifyAdminsAboutNewIdea(ideaId: string) {
   logger.info({ ideaId, admins: adminIds.length }, "Idea moderation requested");
 }
 
-export async function createIdea(authorId: string, title: string, body: string) {
+export async function createIdea(
+  authorId: string,
+  title: string,
+  body: string,
+  clubId?: string,
+) {
   const player = await prisma.player.findUnique({ where: { id: authorId } });
   if (!player?.isVerified) {
     throw new Error("Предлагать идеи могут только подтверждённые игроки");
@@ -78,6 +88,7 @@ export async function createIdea(authorId: string, title: string, body: string) 
   const idea = await prisma.idea.create({
     data: {
       authorId,
+      clubId: clubId ?? null,
       title: title.trim(),
       body: body.trim(),
       status: "PENDING",

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { normalizePhone } from "@/lib/phone";
-import { prisma } from "@/lib/prisma";
-import { createLoginChallenge } from "@/lib/login-challenge";
+import { resolveAuthByPhone } from "@/lib/auth-phone-flow";
 
+/** @deprecated Prefer POST /api/auth/start — kept for compatibility. */
 export async function POST(request: NextRequest) {
   try {
     const { phone } = await request.json();
@@ -10,41 +9,35 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Укажите телефон" }, { status: 400 });
     }
 
-    const normalized = normalizePhone(String(phone), "Россия");
-    if (!normalized.valid) {
-      return NextResponse.json(
-        { error: normalized.error ?? "Некорректный телефон" },
-        { status: 400 },
-      );
+    const { error, result } = await resolveAuthByPhone(String(phone));
+    if (error) {
+      return NextResponse.json({ error }, { status: 400 });
     }
 
-    const player = await prisma.player.findFirst({
-      where: {
-        phone: normalized.e164,
-        isVerified: true,
-        telegramId: { not: null },
-      },
-    });
-
-    if (!player?.telegramId) {
-      return NextResponse.json(
-        {
-          error:
-            "Игрок не найден или Telegram не привязан. Сначала зарегистрируйтесь и подтвердите профиль в боте.",
-        },
-        { status: 404 },
-      );
+    if (!result) {
+      return NextResponse.json({ error: "Не удалось обработать запрос" }, { status: 500 });
     }
 
-    const { token, expiresAt } = await createLoginChallenge(
-      player.id,
-      player.telegramId,
-    );
+    if (result.mode === "login") {
+      return NextResponse.json({
+        challengeToken: result.challengeToken,
+        expiresAt: result.expiresAt,
+        message: result.message,
+      });
+    }
+
+    if (result.mode === "confirm") {
+      return NextResponse.json({
+        mode: "confirm",
+        confirmLink: result.confirmLink,
+        message: result.message,
+      });
+    }
 
     return NextResponse.json({
-      challengeToken: token,
-      expiresAt: expiresAt.toISOString(),
-      message: "Подтвердите вход в Telegram",
+      mode: "register",
+      phone: result.phone,
+      message: result.message,
     });
   } catch {
     return NextResponse.json({ error: "Не удалось начать вход" }, { status: 500 });

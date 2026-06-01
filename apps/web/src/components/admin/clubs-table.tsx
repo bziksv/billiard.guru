@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import {
   AdminFilterSelect,
   AdminTableSearchField,
@@ -106,12 +107,15 @@ export function ClubsAdminTable() {
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="admin-page-title">Клубы</h1>
-        <Link
-          href="/admin/clubs/new"
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500"
-        >
-          + Новый клуб
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <SectionLogsButton section="admin_clubs" context="admin" />
+          <Link
+            href="/admin/clubs/new"
+            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500"
+          >
+            + Новый клуб
+          </Link>
+        </div>
       </div>
 
       <AdminTableToolbar count={{ shown: rows.length, total: clubs.length }}>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, getSession } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
+import { requireClubManageAccess } from "@/lib/club-manage";
 import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
@@ -8,8 +9,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; newsId: string }> },
 ) {
   try {
-    const session = await requireSuperAdmin();
     const { id, newsId } = await params;
+    await requireClubManageAccess(id);
+    const session = await getSession();
 
     const item = await prisma.clubNews.findFirst({
       where: { id: newsId, clubId: id },
@@ -21,11 +23,14 @@ export async function DELETE(
     await prisma.clubNews.delete({ where: { id: newsId } });
 
     await writeAuditLog({
-      actorType: "admin",
-      actorId: session.playerId,
+      actorType: session?.role === "SUPERADMIN" ? "admin" : "club",
+      actorId: session!.playerId,
       action: "club.news.delete",
       entityType: "club_news",
       entityId: newsId,
+      section: "news",
+      clubId: id,
+      summary: "Новость удалена",
     });
 
     return NextResponse.json({ ok: true });

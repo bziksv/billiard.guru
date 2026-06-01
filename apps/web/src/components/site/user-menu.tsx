@@ -10,10 +10,12 @@ export function UserMenu({
   firstName,
   lastName,
   isAdmin,
+  manageHref,
 }: {
   firstName: string;
   lastName: string;
   isAdmin: boolean;
+  manageHref?: string | null;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -72,6 +74,15 @@ export function UserMenu({
           >
             {t("nav.cabinet")}
           </Link>
+          {manageHref && (
+            <Link
+              href={manageHref}
+              onClick={() => setOpen(false)}
+              className="site-popover-item site-popover-item-active"
+            >
+              Управление клубом
+            </Link>
+          )}
           {isAdmin && (
             <Link
               href="/admin"

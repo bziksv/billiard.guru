@@ -1,5 +1,13 @@
 import { z } from "zod";
 import { normalizePhone } from "@/lib/phone";
+import { CLUB_TABLE_FORMATS } from "@/lib/club-table-formats";
+
+const tableFormatIds = CLUB_TABLE_FORMATS.map((f) => f.id) as [string, ...string[]];
+
+const tableCountsSchema = z
+  .record(z.enum(tableFormatIds), z.coerce.number().int().min(0).max(500))
+  .optional()
+  .nullable();
 
 export const phoneSchema = z
   .string()
@@ -18,11 +26,27 @@ export async function validatePhoneForCity(
   return { phone: result.e164 };
 }
 
+export const clubOwnerCreateSchema = z.object({
+  name: z.string().min(2, "Минимум 2 символа"),
+  cityId: z.string().min(1, "Выберите город"),
+  address: z.string().max(500).optional().or(z.literal("")),
+  displayPhone: z.string().optional().or(z.literal("")),
+});
+
 export const clubRegisterSchema = z.object({
   name: z.string().min(2, "Минимум 2 символа"),
   cityId: z.string().min(1, "Выберите город"),
   phone: phoneSchema,
   email: z.string().email("Некорректный email").optional().or(z.literal("")),
+  address: z.string().max(500).optional().or(z.literal("")),
+  description: z.string().max(5000).optional().or(z.literal("")),
+  workingHours: z.string().max(2000).optional().or(z.literal("")),
+  weeklyHours: z.unknown().optional(),
+  tableCount: z.coerce.number().int().min(0).max(500).optional(),
+  tableCounts: tableCountsSchema,
+  gamePrice: z.string().max(2000).optional().or(z.literal("")),
+  priceTiers: z.unknown().optional(),
+  displayPhone: z.string().optional().or(z.literal("")),
 });
 
 export const clubUpdateSchema = z.object({
@@ -32,9 +56,45 @@ export const clubUpdateSchema = z.object({
   description: z.string().max(5000).optional().nullable(),
   address: z.string().max(500).optional().nullable(),
   workingHours: z.string().max(2000).optional().nullable(),
+  weeklyHours: z.unknown().optional().nullable(),
   tableCount: z.coerce.number().int().min(0).max(500).optional().nullable(),
-  latitude: z.coerce.number().min(-90).max(90).optional().nullable(),
-  longitude: z.coerce.number().min(-180).max(180).optional().nullable(),
+  tableCounts: tableCountsSchema,
+  gamePrice: z.string().max(2000).optional().nullable(),
+  priceTiers: z.unknown().optional().nullable(),
+  bookingEnabled: z.coerce.boolean().optional(),
+  bookingSlotMinutes: z.coerce.number().int().min(30).max(240).optional(),
+  bookingAdvanceDays: z.coerce.number().int().min(1).max(90).optional(),
+  displayPhone: z.string().optional().nullable().or(z.literal("")),
+  floorPlan: z.unknown().optional().nullable(),
+});
+
+export const bookingCreateSchema = z.object({
+  tableFormat: z.enum(tableFormatIds),
+  startsAt: z.string().datetime({ offset: true }),
+  endsAt: z.string().datetime({ offset: true }).optional(),
+  playerNote: z.string().max(500).optional().or(z.literal("")),
+  floorItemId: z.string().min(1).optional().nullable(),
+});
+
+export const bookingStatusSchema = z.object({
+  status: z.enum(["CONFIRMED", "REJECTED", "CANCELLED"]),
+});
+
+export const clubStaffAddSchema = z.object({
+  phone: z.string().min(5, "Укажите телефон"),
+});
+
+export const bookingManageCreateSchema = z.object({
+  kind: z.enum(["CLUB", "BLOCK"]),
+  tableFormat: z.enum(tableFormatIds),
+  startsAt: z.string().datetime({ offset: true }),
+  endsAt: z.string().datetime({ offset: true }),
+  floorItemId: z.string().min(1).nullish(),
+  playerId: z.string().min(1).nullish(),
+  guestName: z.string().max(120).nullish(),
+  guestPhone: z.string().max(20).nullish(),
+  playerNote: z.string().max(500).nullish(),
+  clubNote: z.string().max(500).nullish(),
 });
 
 export const clubNewsSchema = z.object({
@@ -190,6 +250,7 @@ export const matchResultSchema = z.object({
 export const ideaCreateSchema = z.object({
   title: z.string().min(3, "Минимум 3 символа").max(120),
   body: z.string().min(10, "Минимум 10 символов").max(2000),
+  clubId: z.string().min(1).optional(),
 });
 
 export const ideaModerateSchema = z.object({

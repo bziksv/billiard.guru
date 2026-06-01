@@ -32,6 +32,17 @@ export function IconPlayers({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function IconStaff({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
 export function IconTournaments({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
@@ -51,6 +62,57 @@ export function IconIdeas({ className = "h-5 w-5" }: IconProps) {
       <path d="M9 18h6" />
       <path d="M10 22h4" />
       <path d="M12 2a6 6 0 0 0-3 11.5V16h6v-2.5A6 6 0 0 0 12 2z" />
+    </svg>
+  );
+}
+
+export function IconBookings({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4" />
+      <path d="M8 2v4" />
+      <path d="M3 10h18" />
+      <path d="M8 14h.01" />
+      <path d="M12 14h.01" />
+      <path d="M16 14h.01" />
+      <path d="M8 18h.01" />
+      <path d="M12 18h.01" />
+    </svg>
+  );
+}
+
+export function IconFloorPlan({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <rect x="7" y="7" width="5" height="3" rx="0.5" />
+      <rect x="14" y="7" width="3" height="3" rx="0.5" />
+      <rect x="7" y="13" width="3" height="3" rx="0.5" />
+      <rect x="12" y="13" width="5" height="3" rx="0.5" />
+      <circle cx="17" cy="16" r="1.25" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function IconNews({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <path d="M4 5h16v14H4z" />
+      <path d="M8 9h8" />
+      <path d="M8 13h8" />
+      <path d="M8 17h5" />
+    </svg>
+  );
+}
+
+export function IconTariffs({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 8v8" />
+      <path d="M9.5 10.5c.5-.8 1.3-1.2 2.5-1.2s2 .4 2.5 1.2" />
+      <path d="M9.5 13.5c.5.8 1.3 1.2 2.5 1.2s2-.4 2.5-1.2" />
     </svg>
   );
 }

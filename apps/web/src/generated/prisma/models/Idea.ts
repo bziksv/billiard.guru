@@ -39,6 +39,7 @@ export type IdeaSumAggregateOutputType = {
 export type IdeaMinAggregateOutputType = {
   id: string | null
   authorId: string | null
+  clubId: string | null
   title: string | null
   body: string | null
   status: $Enums.IdeaStatus | null
@@ -55,6 +56,7 @@ export type IdeaMinAggregateOutputType = {
 export type IdeaMaxAggregateOutputType = {
   id: string | null
   authorId: string | null
+  clubId: string | null
   title: string | null
   body: string | null
   status: $Enums.IdeaStatus | null
@@ -71,6 +73,7 @@ export type IdeaMaxAggregateOutputType = {
 export type IdeaCountAggregateOutputType = {
   id: number
   authorId: number
+  clubId: number
   title: number
   body: number
   status: number
@@ -99,6 +102,7 @@ export type IdeaSumAggregateInputType = {
 export type IdeaMinAggregateInputType = {
   id?: true
   authorId?: true
+  clubId?: true
   title?: true
   body?: true
   status?: true
@@ -115,6 +119,7 @@ export type IdeaMinAggregateInputType = {
 export type IdeaMaxAggregateInputType = {
   id?: true
   authorId?: true
+  clubId?: true
   title?: true
   body?: true
   status?: true
@@ -131,6 +136,7 @@ export type IdeaMaxAggregateInputType = {
 export type IdeaCountAggregateInputType = {
   id?: true
   authorId?: true
+  clubId?: true
   title?: true
   body?: true
   status?: true
@@ -234,6 +240,7 @@ export type IdeaGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type IdeaGroupByOutputType = {
   id: string
   authorId: string
+  clubId: string | null
   title: string
   body: string
   status: $Enums.IdeaStatus
@@ -273,6 +280,7 @@ export type IdeaWhereInput = {
   NOT?: Prisma.IdeaWhereInput | Prisma.IdeaWhereInput[]
   id?: Prisma.StringFilter<"Idea"> | string
   authorId?: Prisma.StringFilter<"Idea"> | string
+  clubId?: Prisma.StringNullableFilter<"Idea"> | string | null
   title?: Prisma.StringFilter<"Idea"> | string
   body?: Prisma.StringFilter<"Idea"> | string
   status?: Prisma.EnumIdeaStatusFilter<"Idea"> | $Enums.IdeaStatus
@@ -285,12 +293,14 @@ export type IdeaWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   author?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
+  club?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
   votes?: Prisma.IdeaVoteListRelationFilter
 }
 
 export type IdeaOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  clubId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -303,6 +313,7 @@ export type IdeaOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   author?: Prisma.PlayerOrderByWithRelationInput
+  club?: Prisma.ClubOrderByWithRelationInput
   votes?: Prisma.IdeaVoteOrderByRelationAggregateInput
   _relevance?: Prisma.IdeaOrderByRelevanceInput
 }
@@ -314,6 +325,7 @@ export type IdeaWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.IdeaWhereInput[]
   NOT?: Prisma.IdeaWhereInput | Prisma.IdeaWhereInput[]
   authorId?: Prisma.StringFilter<"Idea"> | string
+  clubId?: Prisma.StringNullableFilter<"Idea"> | string | null
   title?: Prisma.StringFilter<"Idea"> | string
   body?: Prisma.StringFilter<"Idea"> | string
   status?: Prisma.EnumIdeaStatusFilter<"Idea"> | $Enums.IdeaStatus
@@ -325,12 +337,14 @@ export type IdeaWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   author?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
+  club?: Prisma.XOR<Prisma.ClubNullableScalarRelationFilter, Prisma.ClubWhereInput> | null
   votes?: Prisma.IdeaVoteListRelationFilter
 }, "id" | "moderationToken">
 
 export type IdeaOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  clubId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -355,6 +369,7 @@ export type IdeaScalarWhereWithAggregatesInput = {
   NOT?: Prisma.IdeaScalarWhereWithAggregatesInput | Prisma.IdeaScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Idea"> | string
   authorId?: Prisma.StringWithAggregatesFilter<"Idea"> | string
+  clubId?: Prisma.StringNullableWithAggregatesFilter<"Idea"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"Idea"> | string
   body?: Prisma.StringWithAggregatesFilter<"Idea"> | string
   status?: Prisma.EnumIdeaStatusWithAggregatesFilter<"Idea"> | $Enums.IdeaStatus
@@ -382,12 +397,14 @@ export type IdeaCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.PlayerCreateNestedOneWithoutIdeasInput
+  club?: Prisma.ClubCreateNestedOneWithoutIdeasInput
   votes?: Prisma.IdeaVoteCreateNestedManyWithoutIdeaInput
 }
 
 export type IdeaUncheckedCreateInput = {
   id?: string
   authorId: string
+  clubId?: string | null
   title: string
   body: string
   status?: $Enums.IdeaStatus
@@ -416,12 +433,14 @@ export type IdeaUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.PlayerUpdateOneRequiredWithoutIdeasNestedInput
+  club?: Prisma.ClubUpdateOneWithoutIdeasNestedInput
   votes?: Prisma.IdeaVoteUpdateManyWithoutIdeaNestedInput
 }
 
 export type IdeaUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
@@ -439,6 +458,7 @@ export type IdeaUncheckedUpdateInput = {
 export type IdeaCreateManyInput = {
   id?: string
   authorId: string
+  clubId?: string | null
   title: string
   body: string
   status?: $Enums.IdeaStatus
@@ -470,6 +490,7 @@ export type IdeaUpdateManyMutationInput = {
 export type IdeaUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
@@ -502,6 +523,7 @@ export type IdeaOrderByRelevanceInput = {
 export type IdeaCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  clubId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -523,6 +545,7 @@ export type IdeaAvgOrderByAggregateInput = {
 export type IdeaMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  clubId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -539,6 +562,7 @@ export type IdeaMaxOrderByAggregateInput = {
 export type IdeaMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
+  clubId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
   status?: Prisma.SortOrder
@@ -560,6 +584,48 @@ export type IdeaSumOrderByAggregateInput = {
 export type IdeaScalarRelationFilter = {
   is?: Prisma.IdeaWhereInput
   isNot?: Prisma.IdeaWhereInput
+}
+
+export type IdeaCreateNestedManyWithoutClubInput = {
+  create?: Prisma.XOR<Prisma.IdeaCreateWithoutClubInput, Prisma.IdeaUncheckedCreateWithoutClubInput> | Prisma.IdeaCreateWithoutClubInput[] | Prisma.IdeaUncheckedCreateWithoutClubInput[]
+  connectOrCreate?: Prisma.IdeaCreateOrConnectWithoutClubInput | Prisma.IdeaCreateOrConnectWithoutClubInput[]
+  createMany?: Prisma.IdeaCreateManyClubInputEnvelope
+  connect?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+}
+
+export type IdeaUncheckedCreateNestedManyWithoutClubInput = {
+  create?: Prisma.XOR<Prisma.IdeaCreateWithoutClubInput, Prisma.IdeaUncheckedCreateWithoutClubInput> | Prisma.IdeaCreateWithoutClubInput[] | Prisma.IdeaUncheckedCreateWithoutClubInput[]
+  connectOrCreate?: Prisma.IdeaCreateOrConnectWithoutClubInput | Prisma.IdeaCreateOrConnectWithoutClubInput[]
+  createMany?: Prisma.IdeaCreateManyClubInputEnvelope
+  connect?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+}
+
+export type IdeaUpdateManyWithoutClubNestedInput = {
+  create?: Prisma.XOR<Prisma.IdeaCreateWithoutClubInput, Prisma.IdeaUncheckedCreateWithoutClubInput> | Prisma.IdeaCreateWithoutClubInput[] | Prisma.IdeaUncheckedCreateWithoutClubInput[]
+  connectOrCreate?: Prisma.IdeaCreateOrConnectWithoutClubInput | Prisma.IdeaCreateOrConnectWithoutClubInput[]
+  upsert?: Prisma.IdeaUpsertWithWhereUniqueWithoutClubInput | Prisma.IdeaUpsertWithWhereUniqueWithoutClubInput[]
+  createMany?: Prisma.IdeaCreateManyClubInputEnvelope
+  set?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  disconnect?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  delete?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  connect?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  update?: Prisma.IdeaUpdateWithWhereUniqueWithoutClubInput | Prisma.IdeaUpdateWithWhereUniqueWithoutClubInput[]
+  updateMany?: Prisma.IdeaUpdateManyWithWhereWithoutClubInput | Prisma.IdeaUpdateManyWithWhereWithoutClubInput[]
+  deleteMany?: Prisma.IdeaScalarWhereInput | Prisma.IdeaScalarWhereInput[]
+}
+
+export type IdeaUncheckedUpdateManyWithoutClubNestedInput = {
+  create?: Prisma.XOR<Prisma.IdeaCreateWithoutClubInput, Prisma.IdeaUncheckedCreateWithoutClubInput> | Prisma.IdeaCreateWithoutClubInput[] | Prisma.IdeaUncheckedCreateWithoutClubInput[]
+  connectOrCreate?: Prisma.IdeaCreateOrConnectWithoutClubInput | Prisma.IdeaCreateOrConnectWithoutClubInput[]
+  upsert?: Prisma.IdeaUpsertWithWhereUniqueWithoutClubInput | Prisma.IdeaUpsertWithWhereUniqueWithoutClubInput[]
+  createMany?: Prisma.IdeaCreateManyClubInputEnvelope
+  set?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  disconnect?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  delete?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  connect?: Prisma.IdeaWhereUniqueInput | Prisma.IdeaWhereUniqueInput[]
+  update?: Prisma.IdeaUpdateWithWhereUniqueWithoutClubInput | Prisma.IdeaUpdateWithWhereUniqueWithoutClubInput[]
+  updateMany?: Prisma.IdeaUpdateManyWithWhereWithoutClubInput | Prisma.IdeaUpdateManyWithWhereWithoutClubInput[]
+  deleteMany?: Prisma.IdeaScalarWhereInput | Prisma.IdeaScalarWhereInput[]
 }
 
 export type IdeaCreateNestedManyWithoutAuthorInput = {
@@ -622,6 +688,86 @@ export type IdeaUpdateOneRequiredWithoutVotesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.IdeaUpdateToOneWithWhereWithoutVotesInput, Prisma.IdeaUpdateWithoutVotesInput>, Prisma.IdeaUncheckedUpdateWithoutVotesInput>
 }
 
+export type IdeaCreateWithoutClubInput = {
+  id?: string
+  title: string
+  body: string
+  status?: $Enums.IdeaStatus
+  moderationToken?: string | null
+  likesCount?: number
+  dislikesCount?: number
+  moderatedAt?: Date | string | null
+  moderatedById?: string | null
+  rejectReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  author: Prisma.PlayerCreateNestedOneWithoutIdeasInput
+  votes?: Prisma.IdeaVoteCreateNestedManyWithoutIdeaInput
+}
+
+export type IdeaUncheckedCreateWithoutClubInput = {
+  id?: string
+  authorId: string
+  title: string
+  body: string
+  status?: $Enums.IdeaStatus
+  moderationToken?: string | null
+  likesCount?: number
+  dislikesCount?: number
+  moderatedAt?: Date | string | null
+  moderatedById?: string | null
+  rejectReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  votes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutIdeaInput
+}
+
+export type IdeaCreateOrConnectWithoutClubInput = {
+  where: Prisma.IdeaWhereUniqueInput
+  create: Prisma.XOR<Prisma.IdeaCreateWithoutClubInput, Prisma.IdeaUncheckedCreateWithoutClubInput>
+}
+
+export type IdeaCreateManyClubInputEnvelope = {
+  data: Prisma.IdeaCreateManyClubInput | Prisma.IdeaCreateManyClubInput[]
+  skipDuplicates?: boolean
+}
+
+export type IdeaUpsertWithWhereUniqueWithoutClubInput = {
+  where: Prisma.IdeaWhereUniqueInput
+  update: Prisma.XOR<Prisma.IdeaUpdateWithoutClubInput, Prisma.IdeaUncheckedUpdateWithoutClubInput>
+  create: Prisma.XOR<Prisma.IdeaCreateWithoutClubInput, Prisma.IdeaUncheckedCreateWithoutClubInput>
+}
+
+export type IdeaUpdateWithWhereUniqueWithoutClubInput = {
+  where: Prisma.IdeaWhereUniqueInput
+  data: Prisma.XOR<Prisma.IdeaUpdateWithoutClubInput, Prisma.IdeaUncheckedUpdateWithoutClubInput>
+}
+
+export type IdeaUpdateManyWithWhereWithoutClubInput = {
+  where: Prisma.IdeaScalarWhereInput
+  data: Prisma.XOR<Prisma.IdeaUpdateManyMutationInput, Prisma.IdeaUncheckedUpdateManyWithoutClubInput>
+}
+
+export type IdeaScalarWhereInput = {
+  AND?: Prisma.IdeaScalarWhereInput | Prisma.IdeaScalarWhereInput[]
+  OR?: Prisma.IdeaScalarWhereInput[]
+  NOT?: Prisma.IdeaScalarWhereInput | Prisma.IdeaScalarWhereInput[]
+  id?: Prisma.StringFilter<"Idea"> | string
+  authorId?: Prisma.StringFilter<"Idea"> | string
+  clubId?: Prisma.StringNullableFilter<"Idea"> | string | null
+  title?: Prisma.StringFilter<"Idea"> | string
+  body?: Prisma.StringFilter<"Idea"> | string
+  status?: Prisma.EnumIdeaStatusFilter<"Idea"> | $Enums.IdeaStatus
+  moderationToken?: Prisma.StringNullableFilter<"Idea"> | string | null
+  likesCount?: Prisma.IntFilter<"Idea"> | number
+  dislikesCount?: Prisma.IntFilter<"Idea"> | number
+  moderatedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
+  moderatedById?: Prisma.StringNullableFilter<"Idea"> | string | null
+  rejectReason?: Prisma.StringNullableFilter<"Idea"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
+}
+
 export type IdeaCreateWithoutAuthorInput = {
   id?: string
   title: string
@@ -635,11 +781,13 @@ export type IdeaCreateWithoutAuthorInput = {
   rejectReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  club?: Prisma.ClubCreateNestedOneWithoutIdeasInput
   votes?: Prisma.IdeaVoteCreateNestedManyWithoutIdeaInput
 }
 
 export type IdeaUncheckedCreateWithoutAuthorInput = {
   id?: string
+  clubId?: string | null
   title: string
   body: string
   status?: $Enums.IdeaStatus
@@ -680,25 +828,6 @@ export type IdeaUpdateManyWithWhereWithoutAuthorInput = {
   data: Prisma.XOR<Prisma.IdeaUpdateManyMutationInput, Prisma.IdeaUncheckedUpdateManyWithoutAuthorInput>
 }
 
-export type IdeaScalarWhereInput = {
-  AND?: Prisma.IdeaScalarWhereInput | Prisma.IdeaScalarWhereInput[]
-  OR?: Prisma.IdeaScalarWhereInput[]
-  NOT?: Prisma.IdeaScalarWhereInput | Prisma.IdeaScalarWhereInput[]
-  id?: Prisma.StringFilter<"Idea"> | string
-  authorId?: Prisma.StringFilter<"Idea"> | string
-  title?: Prisma.StringFilter<"Idea"> | string
-  body?: Prisma.StringFilter<"Idea"> | string
-  status?: Prisma.EnumIdeaStatusFilter<"Idea"> | $Enums.IdeaStatus
-  moderationToken?: Prisma.StringNullableFilter<"Idea"> | string | null
-  likesCount?: Prisma.IntFilter<"Idea"> | number
-  dislikesCount?: Prisma.IntFilter<"Idea"> | number
-  moderatedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
-  moderatedById?: Prisma.StringNullableFilter<"Idea"> | string | null
-  rejectReason?: Prisma.StringNullableFilter<"Idea"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
-}
-
 export type IdeaCreateWithoutVotesInput = {
   id?: string
   title: string
@@ -713,11 +842,13 @@ export type IdeaCreateWithoutVotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.PlayerCreateNestedOneWithoutIdeasInput
+  club?: Prisma.ClubCreateNestedOneWithoutIdeasInput
 }
 
 export type IdeaUncheckedCreateWithoutVotesInput = {
   id?: string
   authorId: string
+  clubId?: string | null
   title: string
   body: string
   status?: $Enums.IdeaStatus
@@ -761,9 +892,77 @@ export type IdeaUpdateWithoutVotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.PlayerUpdateOneRequiredWithoutIdeasNestedInput
+  club?: Prisma.ClubUpdateOneWithoutIdeasNestedInput
 }
 
 export type IdeaUncheckedUpdateWithoutVotesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
+  moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  likesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dislikesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type IdeaCreateManyClubInput = {
+  id?: string
+  authorId: string
+  title: string
+  body: string
+  status?: $Enums.IdeaStatus
+  moderationToken?: string | null
+  likesCount?: number
+  dislikesCount?: number
+  moderatedAt?: Date | string | null
+  moderatedById?: string | null
+  rejectReason?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type IdeaUpdateWithoutClubInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
+  moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  likesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dislikesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  author?: Prisma.PlayerUpdateOneRequiredWithoutIdeasNestedInput
+  votes?: Prisma.IdeaVoteUpdateManyWithoutIdeaNestedInput
+}
+
+export type IdeaUncheckedUpdateWithoutClubInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
+  moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  likesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  dislikesCount?: Prisma.IntFieldUpdateOperationsInput | number
+  moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  votes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutIdeaNestedInput
+}
+
+export type IdeaUncheckedUpdateManyWithoutClubInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   authorId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
@@ -781,6 +980,7 @@ export type IdeaUncheckedUpdateWithoutVotesInput = {
 
 export type IdeaCreateManyAuthorInput = {
   id?: string
+  clubId?: string | null
   title: string
   body: string
   status?: $Enums.IdeaStatus
@@ -807,11 +1007,13 @@ export type IdeaUpdateWithoutAuthorInput = {
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  club?: Prisma.ClubUpdateOneWithoutIdeasNestedInput
   votes?: Prisma.IdeaVoteUpdateManyWithoutIdeaNestedInput
 }
 
 export type IdeaUncheckedUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
@@ -828,6 +1030,7 @@ export type IdeaUncheckedUpdateWithoutAuthorInput = {
 
 export type IdeaUncheckedUpdateManyWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
@@ -875,6 +1078,7 @@ export type IdeaCountOutputTypeCountVotesArgs<ExtArgs extends runtime.Types.Exte
 export type IdeaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   authorId?: boolean
+  clubId?: boolean
   title?: boolean
   body?: boolean
   status?: boolean
@@ -887,6 +1091,7 @@ export type IdeaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   author?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Idea$clubArgs<ExtArgs>
   votes?: boolean | Prisma.Idea$votesArgs<ExtArgs>
   _count?: boolean | Prisma.IdeaCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["idea"]>
@@ -896,6 +1101,7 @@ export type IdeaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type IdeaSelectScalar = {
   id?: boolean
   authorId?: boolean
+  clubId?: boolean
   title?: boolean
   body?: boolean
   status?: boolean
@@ -909,9 +1115,10 @@ export type IdeaSelectScalar = {
   updatedAt?: boolean
 }
 
-export type IdeaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "title" | "body" | "status" | "moderationToken" | "likesCount" | "dislikesCount" | "moderatedAt" | "moderatedById" | "rejectReason" | "createdAt" | "updatedAt", ExtArgs["result"]["idea"]>
+export type IdeaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "clubId" | "title" | "body" | "status" | "moderationToken" | "likesCount" | "dislikesCount" | "moderatedAt" | "moderatedById" | "rejectReason" | "createdAt" | "updatedAt", ExtArgs["result"]["idea"]>
 export type IdeaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
+  club?: boolean | Prisma.Idea$clubArgs<ExtArgs>
   votes?: boolean | Prisma.Idea$votesArgs<ExtArgs>
   _count?: boolean | Prisma.IdeaCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -920,11 +1127,13 @@ export type $IdeaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name: "Idea"
   objects: {
     author: Prisma.$PlayerPayload<ExtArgs>
+    club: Prisma.$ClubPayload<ExtArgs> | null
     votes: Prisma.$IdeaVotePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     authorId: string
+    clubId: string | null
     title: string
     body: string
     status: $Enums.IdeaStatus
@@ -1277,6 +1486,7 @@ readonly fields: IdeaFieldRefs;
 export interface Prisma__IdeaClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   author<T extends Prisma.PlayerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlayerDefaultArgs<ExtArgs>>): Prisma.Prisma__PlayerClient<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  club<T extends Prisma.Idea$clubArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Idea$clubArgs<ExtArgs>>): Prisma.Prisma__ClubClient<runtime.Types.Result.GetResult<Prisma.$ClubPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   votes<T extends Prisma.Idea$votesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Idea$votesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1309,6 +1519,7 @@ export interface Prisma__IdeaClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface IdeaFieldRefs {
   readonly id: Prisma.FieldRef<"Idea", 'String'>
   readonly authorId: Prisma.FieldRef<"Idea", 'String'>
+  readonly clubId: Prisma.FieldRef<"Idea", 'String'>
   readonly title: Prisma.FieldRef<"Idea", 'String'>
   readonly body: Prisma.FieldRef<"Idea", 'String'>
   readonly status: Prisma.FieldRef<"Idea", 'IdeaStatus'>
@@ -1665,6 +1876,25 @@ export type IdeaDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Ideas to delete.
    */
   limit?: number
+}
+
+/**
+ * Idea.club
+ */
+export type Idea$clubArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Club
+   */
+  select?: Prisma.ClubSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Club
+   */
+  omit?: Prisma.ClubOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClubInclude<ExtArgs> | null
+  where?: Prisma.ClubWhereInput
 }
 
 /**

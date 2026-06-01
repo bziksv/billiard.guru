@@ -132,7 +132,12 @@ async function confirmClub(
 
   await prisma.club.update({
     where: { id: club.id },
-    data: { telegramId, telegramUsername: username, isVerified: true },
+    data: {
+      telegramId,
+      telegramUsername: username,
+      isVerified: true,
+      confirmToken: null,
+    },
   });
 
   await writeAuditLog({
@@ -145,7 +150,7 @@ async function confirmClub(
 
   await sendTelegramMessage(
     telegramId,
-    `✅ Клуб «<b>${club.name}</b>» подтверждён!\nTelegram привязан к ${club.phone}.`,
+    `✅ Клуб «<b>${club.name}</b>» подтверждён!\nУправление: billiard.guru/manage`,
     { replyMarkup: removeKeyboard() },
   );
   logger.info({ clubId: club.id, telegramId }, "Club confirmed");
@@ -261,7 +266,7 @@ export async function processTelegramUpdate(
 
       await sendTelegramMessage(
         telegramId,
-        "⚠️ Ссылка недействительна или уже использована.\nЗарегистрируйтесь на billiard.guru",
+        "⚠️ Ссылка недействительна или уже использована.\nПовторите на billiard.guru/login",
       );
     } catch (err) {
       logger.error({ err }, "DB error on confirm token");
@@ -334,7 +339,7 @@ export async function processTelegramUpdate(
 
     await sendTelegramMessage(
       telegramId,
-      "❌ Регистрация с этим номером не найдена.\nСначала зарегистрируйтесь на billiard.guru",
+      "❌ Регистрация с этим номером не найдена.\nВойдите и зарегистрируйтесь на billiard.guru/login",
       { replyMarkup: removeKeyboard() },
     );
     return;

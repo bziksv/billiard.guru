@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { requireClubManageAccess } from "@/lib/club-manage";
 import { writeAuditLog } from "@/lib/audit";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
@@ -46,9 +47,26 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const log = createRequestLogger(randomUUID());
   try {
-    const session = await requireSuperAdmin();
     const body = await request.json();
     const data = tournamentSchema.parse(body);
+
+    let actorType: "admin" | "player" = "player";
+    let actorId: string;
+
+    try {
+      const session = await requireSuperAdmin();
+      actorType = "admin";
+      actorId = session.playerId;
+    } catch (adminError) {
+      const adminAuth = authErrorResponse(adminError);
+      if (adminAuth?.status === 401) return adminAuth;
+      const { player } = await requireClubManageAccess(data.clubId);
+      if (!player) {
+        return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
+      }
+      actorType = "player";
+      actorId = player.id;
+    }
 
     const club = await prisma.club.findUnique({ where: { id: data.clubId } });
     if (!club?.isVerified || !club.telegramId) {
@@ -81,11 +99,14 @@ export async function POST(request: NextRequest) {
     });
 
     await writeAuditLog({
-      actorType: "admin",
-      actorId: session.playerId,
+      actorType,
+      actorId,
       action: "tournament.create",
       entityType: "tournament",
       entityId: tournament.id,
+      section: "tournaments",
+      clubId: data.clubId,
+      summary: `Турнир «${data.name}»`,
       payload: { format: data.format, approvalSent: true },
     });
 
@@ -93,7 +114,9 @@ export async function POST(request: NextRequest) {
       {
         ...updated,
         message:
-          "Турнир создан. Владельцу клуба отправлен запрос на публикацию в Telegram.",
+          actorType === "admin"
+            ? "Турнир создан. Владельцу клуба отправлен запрос на публикацию в Telegram."
+            : "Турнир создан. Подтвердите публикацию в Telegram, если пришёл запрос.",
       },
       { status: 201 },
     );

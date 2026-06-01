@@ -1,9 +1,10 @@
-type ClubOwnerFields = {
+export type ClubOwnerFields = {
   phone: string;
   telegramId: string | null;
 };
 
-type PlayerOwnerFields = {
+export type PlayerOwnerFields = {
+  id?: string;
   phone: string;
   telegramId: string | null;
   role?: string;

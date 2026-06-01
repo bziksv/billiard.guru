@@ -387,6 +387,8 @@ export const ModelName = {
   Country: 'Country',
   City: 'City',
   Club: 'Club',
+  ClubStaff: 'ClubStaff',
+  TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
   Player: 'Player',
   ClubPlayerRating: 'ClubPlayerRating',
@@ -414,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubNews" | "player" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -613,6 +615,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ClubCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ClubCountAggregateOutputType> | number
+        }
+      }
+    }
+    ClubStaff: {
+      payload: Prisma.$ClubStaffPayload<ExtArgs>
+      fields: Prisma.ClubStaffFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ClubStaffFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ClubStaffFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload>
+        }
+        findFirst: {
+          args: Prisma.ClubStaffFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ClubStaffFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload>
+        }
+        findMany: {
+          args: Prisma.ClubStaffFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload>[]
+        }
+        create: {
+          args: Prisma.ClubStaffCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload>
+        }
+        createMany: {
+          args: Prisma.ClubStaffCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.ClubStaffDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload>
+        }
+        update: {
+          args: Prisma.ClubStaffUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload>
+        }
+        deleteMany: {
+          args: Prisma.ClubStaffDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ClubStaffUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.ClubStaffUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ClubStaffPayload>
+        }
+        aggregate: {
+          args: Prisma.ClubStaffAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateClubStaff>
+        }
+        groupBy: {
+          args: Prisma.ClubStaffGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubStaffGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ClubStaffCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ClubStaffCountAggregateOutputType> | number
+        }
+      }
+    }
+    TableBooking: {
+      payload: Prisma.$TableBookingPayload<ExtArgs>
+      fields: Prisma.TableBookingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TableBookingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TableBookingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload>
+        }
+        findFirst: {
+          args: Prisma.TableBookingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TableBookingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload>
+        }
+        findMany: {
+          args: Prisma.TableBookingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload>[]
+        }
+        create: {
+          args: Prisma.TableBookingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload>
+        }
+        createMany: {
+          args: Prisma.TableBookingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.TableBookingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload>
+        }
+        update: {
+          args: Prisma.TableBookingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload>
+        }
+        deleteMany: {
+          args: Prisma.TableBookingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TableBookingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.TableBookingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TableBookingPayload>
+        }
+        aggregate: {
+          args: Prisma.TableBookingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTableBooking>
+        }
+        groupBy: {
+          args: Prisma.TableBookingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TableBookingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TableBookingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TableBookingCountAggregateOutputType> | number
         }
       }
     }
@@ -1471,6 +1605,7 @@ export const ClubScalarFieldEnum = {
   name: 'name',
   cityId: 'cityId',
   phone: 'phone',
+  displayPhone: 'displayPhone',
   email: 'email',
   photoUrl: 'photoUrl',
   galleryUrls: 'galleryUrls',
@@ -1479,7 +1614,15 @@ export const ClubScalarFieldEnum = {
   latitude: 'latitude',
   longitude: 'longitude',
   workingHours: 'workingHours',
+  weeklyHours: 'weeklyHours',
   tableCount: 'tableCount',
+  tableCounts: 'tableCounts',
+  floorPlan: 'floorPlan',
+  gamePrice: 'gamePrice',
+  priceTiers: 'priceTiers',
+  bookingEnabled: 'bookingEnabled',
+  bookingSlotMinutes: 'bookingSlotMinutes',
+  bookingAdvanceDays: 'bookingAdvanceDays',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   isVerified: 'isVerified',
@@ -1489,6 +1632,37 @@ export const ClubScalarFieldEnum = {
 } as const
 
 export type ClubScalarFieldEnum = (typeof ClubScalarFieldEnum)[keyof typeof ClubScalarFieldEnum]
+
+
+export const ClubStaffScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  createdAt: 'createdAt'
+} as const
+
+export type ClubStaffScalarFieldEnum = (typeof ClubStaffScalarFieldEnum)[keyof typeof ClubStaffScalarFieldEnum]
+
+
+export const TableBookingScalarFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  kind: 'kind',
+  tableFormat: 'tableFormat',
+  floorItemId: 'floorItemId',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  status: 'status',
+  playerNote: 'playerNote',
+  clubNote: 'clubNote',
+  guestName: 'guestName',
+  guestPhone: 'guestPhone',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TableBookingScalarFieldEnum = (typeof TableBookingScalarFieldEnum)[keyof typeof TableBookingScalarFieldEnum]
 
 
 export const ClubNewsScalarFieldEnum = {
@@ -1641,6 +1815,9 @@ export const AuditLogScalarFieldEnum = {
   action: 'action',
   entityType: 'entityType',
   entityId: 'entityId',
+  section: 'section',
+  clubId: 'clubId',
+  summary: 'summary',
   payload: 'payload',
   createdAt: 'createdAt'
 } as const
@@ -1651,6 +1828,7 @@ export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typ
 export const IdeaScalarFieldEnum = {
   id: 'id',
   authorId: 'authorId',
+  clubId: 'clubId',
   title: 'title',
   body: 'body',
   status: 'status',
@@ -1741,17 +1919,43 @@ export const ClubOrderByRelevanceFieldEnum = {
   name: 'name',
   cityId: 'cityId',
   phone: 'phone',
+  displayPhone: 'displayPhone',
   email: 'email',
   photoUrl: 'photoUrl',
   description: 'description',
   address: 'address',
   workingHours: 'workingHours',
+  gamePrice: 'gamePrice',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   confirmToken: 'confirmToken'
 } as const
 
 export type ClubOrderByRelevanceFieldEnum = (typeof ClubOrderByRelevanceFieldEnum)[keyof typeof ClubOrderByRelevanceFieldEnum]
+
+
+export const ClubStaffOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId'
+} as const
+
+export type ClubStaffOrderByRelevanceFieldEnum = (typeof ClubStaffOrderByRelevanceFieldEnum)[keyof typeof ClubStaffOrderByRelevanceFieldEnum]
+
+
+export const TableBookingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  clubId: 'clubId',
+  playerId: 'playerId',
+  tableFormat: 'tableFormat',
+  floorItemId: 'floorItemId',
+  playerNote: 'playerNote',
+  clubNote: 'clubNote',
+  guestName: 'guestName',
+  guestPhone: 'guestPhone'
+} as const
+
+export type TableBookingOrderByRelevanceFieldEnum = (typeof TableBookingOrderByRelevanceFieldEnum)[keyof typeof TableBookingOrderByRelevanceFieldEnum]
 
 
 export const ClubNewsOrderByRelevanceFieldEnum = {
@@ -1860,7 +2064,10 @@ export const AuditLogOrderByRelevanceFieldEnum = {
   actorId: 'actorId',
   action: 'action',
   entityType: 'entityType',
-  entityId: 'entityId'
+  entityId: 'entityId',
+  section: 'section',
+  clubId: 'clubId',
+  summary: 'summary'
 } as const
 
 export type AuditLogOrderByRelevanceFieldEnum = (typeof AuditLogOrderByRelevanceFieldEnum)[keyof typeof AuditLogOrderByRelevanceFieldEnum]
@@ -1869,6 +2076,7 @@ export type AuditLogOrderByRelevanceFieldEnum = (typeof AuditLogOrderByRelevance
 export const IdeaOrderByRelevanceFieldEnum = {
   id: 'id',
   authorId: 'authorId',
+  clubId: 'clubId',
   title: 'title',
   body: 'body',
   moderationToken: 'moderationToken',
@@ -1944,6 +2152,20 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
 
 
 /**
+ * Reference to a field of type 'TableBookingKind'
+ */
+export type EnumTableBookingKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TableBookingKind'>
+    
+
+
+/**
+ * Reference to a field of type 'RegistrationStatus'
+ */
+export type EnumRegistrationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegistrationStatus'>
+    
+
+
+/**
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
@@ -1975,13 +2197,6 @@ export type EnumTournamentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<
  * Reference to a field of type 'RegistrationSource'
  */
 export type EnumRegistrationSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegistrationSource'>
-    
-
-
-/**
- * Reference to a field of type 'RegistrationStatus'
- */
-export type EnumRegistrationStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RegistrationStatus'>
     
 
 
@@ -2118,6 +2333,8 @@ export type GlobalOmitConfig = {
   country?: Prisma.CountryOmit
   city?: Prisma.CityOmit
   club?: Prisma.ClubOmit
+  clubStaff?: Prisma.ClubStaffOmit
+  tableBooking?: Prisma.TableBookingOmit
   clubNews?: Prisma.ClubNewsOmit
   player?: Prisma.PlayerOmit
   clubPlayerRating?: Prisma.ClubPlayerRatingOmit

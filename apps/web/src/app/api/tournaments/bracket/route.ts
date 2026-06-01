@@ -1,10 +1,15 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import { generateTournamentPairing, cancelMatchResult, saveMatchResult } from "@/lib/bracket-service";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import {
+  requireMatchManageAccess,
+  requireTournamentManageAccess,
+  tournamentManageActorType,
+} from "@/lib/tournament-manage";
 import { matchCancelSchema, matchResultSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
@@ -15,10 +20,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Укажите турнир" }, { status: 400 });
     }
 
+    const { session } = await requireTournamentManageAccess(tournamentId);
+
     await generateTournamentPairing(prisma, tournamentId);
 
     await writeAuditLog({
-      actorType: "club",
+      actorType: tournamentManageActorType(session),
+      actorId: session.playerId,
       action: "tournament.bracket.generate",
       entityType: "tournament",
       entityId: tournamentId,
@@ -38,6 +46,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ matches });
   } catch (error) {
     log.error({ error }, "Bracket generation failed");
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     const message =
       error instanceof Error ? error.message : "Не удалось сформировать сетку";
     return NextResponse.json({ error: message }, { status: 400 });
@@ -47,12 +57,13 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const log = createRequestLogger(randomUUID());
   try {
-    await requireSuperAdmin();
     const data = matchResultSchema.parse(await request.json());
+    const { session } = await requireMatchManageAccess(data.matchId);
     const match = await saveMatchResult(prisma, data);
 
     await writeAuditLog({
-      actorType: "club",
+      actorType: tournamentManageActorType(session),
+      actorId: session.playerId,
       action: "tournament.match.result",
       entityType: "tournament_match",
       entityId: data.matchId,
@@ -77,12 +88,13 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const log = createRequestLogger(randomUUID());
   try {
-    await requireSuperAdmin();
     const data = matchCancelSchema.parse(await request.json());
+    const { session } = await requireMatchManageAccess(data.matchId);
     const match = await cancelMatchResult(prisma, data.matchId);
 
     await writeAuditLog({
-      actorType: "club",
+      actorType: tournamentManageActorType(session),
+      actorId: session.playerId,
       action: "tournament.match.cancel",
       entityType: "tournament_match",
       entityId: data.matchId,

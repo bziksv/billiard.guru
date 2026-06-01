@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, getCurrentPlayer, requireSuperAdmin } from "@/lib/auth";
+import { playerCanManageClub } from "@/lib/club-staff";
 import { writeAuditLog } from "@/lib/audit";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
@@ -9,6 +10,10 @@ import {
   normalizePlayerPair,
   teamLabel,
 } from "@/lib/pair-tournament";
+import {
+  requireTournamentManageAccess,
+  tournamentManageActorType,
+} from "@/lib/tournament-manage";
 import { tournamentTeamSchema, tournamentTeamUpdateSchema } from "@/lib/validators";
 
 async function findPlayerTeamConflict(
@@ -32,6 +37,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const data = tournamentTeamSchema.parse(body);
+    const { session } = await requireTournamentManageAccess(data.tournamentId);
 
     const tournament = await prisma.tournament.findUnique({
       where: { id: data.tournamentId },
@@ -99,8 +105,8 @@ export async function POST(request: NextRequest) {
     });
 
     await writeAuditLog({
-      actorType: data.source === "CLUB" ? "club" : "player",
-      actorId: data.clubId ?? player1Id,
+      actorType: data.source === "CLUB" ? "club" : tournamentManageActorType(session),
+      actorId: data.clubId ?? session.playerId,
       action: "tournament.team.register",
       entityType: "tournament_team",
       entityId: team.id,
@@ -111,6 +117,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(team, { status: 201 });
   } catch (error) {
     log.error({ error }, "Team registration failed");
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Ошибка валидации" }, { status: 400 });
     }
@@ -125,7 +133,7 @@ export async function PATCH(request: NextRequest) {
 
     const existing = await prisma.tournamentTeam.findUnique({
       where: { id: data.id },
-      include: { tournament: true },
+      include: { tournament: { include: { club: true } } },
     });
     if (!existing) {
       return NextResponse.json({ error: "Команда не найдена" }, { status: 404 });
@@ -207,8 +215,18 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (data.status) {
+      const player = await getCurrentPlayer();
+      if (!player) {
+        return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
+      }
+      const isOrganizer =
+        player.role === "SUPERADMIN" ||
+        (await playerCanManageClub(existing.tournament.club, player));
+      if (!isOrganizer) {
+        return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
+      }
+
       if (data.status === "CANCELLED") {
-        await requireSuperAdmin();
         if (matchCount > 0) {
           const inMatch = await prisma.tournamentMatch.findFirst({
             where: {
@@ -238,8 +256,8 @@ export async function PATCH(request: NextRequest) {
       });
 
       await writeAuditLog({
-        actorType: "club",
-        actorId: team.clubId ?? team.player1Id,
+        actorType: isOrganizer && player.role !== "SUPERADMIN" ? "club" : "admin",
+        actorId: player.id,
         action: `tournament.team.${data.status.toLowerCase()}`,
         entityType: "tournament_team",
         entityId: team.id,

@@ -738,18 +738,6 @@ export type EnumRegistrationSourceFieldUpdateOperationsInput = {
   set?: $Enums.RegistrationSource
 }
 
-export type EnumRegistrationStatusFieldUpdateOperationsInput = {
-  set?: $Enums.RegistrationStatus
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type TournamentTeamCreateNestedOneWithoutMatchesAsTeam1Input = {
   create?: Prisma.XOR<Prisma.TournamentTeamCreateWithoutMatchesAsTeam1Input, Prisma.TournamentTeamUncheckedCreateWithoutMatchesAsTeam1Input>
   connectOrCreate?: Prisma.TournamentTeamCreateOrConnectWithoutMatchesAsTeam1Input

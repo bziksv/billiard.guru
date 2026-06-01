@@ -3,19 +3,20 @@ import { writeAuditLog } from "@/lib/audit";
 import {
   authErrorResponse,
   getCurrentPlayer,
-  requireSuperAdmin,
 } from "@/lib/auth";
-import { clubOwnedByPlayer } from "@/lib/club-access";
+import { playerCanManageClub } from "@/lib/club-staff";
 import { prisma } from "@/lib/prisma";
 import { buildConfirmLink } from "@/lib/telegram";
+import { requireTournamentManageAccess, tournamentManageActorType } from "@/lib/tournament-manage";
 import { canCancelRegistration } from "@/lib/tournament-registration";
 import { tournamentRegistrationSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
   try {
-    await requireSuperAdmin();
     const body = await request.json();
     const data = tournamentRegistrationSchema.parse(body);
+
+    const { session } = await requireTournamentManageAccess(data.tournamentId);
 
     const tournament = await prisma.tournament.findUnique({
       where: { id: data.tournamentId },
@@ -56,8 +57,8 @@ export async function POST(request: NextRequest) {
           },
         });
         await writeAuditLog({
-          actorType: "admin",
-          actorId: data.playerId,
+          actorType: tournamentManageActorType(session),
+          actorId: session.playerId,
           action: "tournament.register",
           entityType: "tournament_registration",
           entityId: registration.id,
@@ -85,8 +86,8 @@ export async function POST(request: NextRequest) {
     });
 
     await writeAuditLog({
-      actorType: data.source === "CLUB" ? "club" : "player",
-      actorId: data.clubId ?? data.playerId,
+      actorType: data.source === "CLUB" ? "club" : tournamentManageActorType(session),
+      actorId: data.clubId ?? session.playerId,
       action: "tournament.register",
       entityType: "tournament_registration",
       entityId: registration.id,
@@ -133,7 +134,7 @@ export async function PATCH(request: NextRequest) {
     const isOwner = existing.playerId === player.id;
     const isOrganizer =
       player.role === "SUPERADMIN" ||
-      clubOwnedByPlayer(existing.tournament.club, player);
+      (await playerCanManageClub(existing.tournament.club, player));
 
     if (status === "CANCELLED") {
       if (isOwner) {

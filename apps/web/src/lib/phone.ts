@@ -183,6 +183,41 @@ export function formatPhoneDisplay(e164: string, countryName: string): string {
   return `+${rule.dial} ${formatNationalDigits(local, rule)}`;
 }
 
+function resolveCountryFromE164(e164: string): string {
+  const digits = digitsOnly(e164);
+  const entries = Object.entries(COUNTRY_PHONE_RULES).sort(
+    (a, b) => b[1].dial.length - a[1].dial.length,
+  );
+  for (const [country, rule] of entries) {
+    if (digits.startsWith(rule.dial)) {
+      return country;
+    }
+  }
+  return DEFAULT_COUNTRY;
+}
+
+/** E.164 (+7473…) → «+7 (473) 123-45-67» для отображения на сайте */
+export function formatE164Display(e164: string, countryName?: string): string {
+  const trimmed = e164.trim();
+  if (!trimmed) return "";
+
+  const digits = digitsOnly(trimmed);
+  if (!digits) return trimmed;
+
+  const normalized = trimmed.startsWith("+") ? trimmed : `+${digits}`;
+  const country = countryName ?? resolveCountryFromE164(normalized);
+  const formatted = formatPhoneDisplay(normalized, country);
+
+  if (formatted === normalized || formatted === trimmed) {
+    if (digits.length === 11 && (digits.startsWith("7") || digits.startsWith("8"))) {
+      const ru = digits.startsWith("8") ? `+7${digits.slice(1)}` : `+${digits}`;
+      return formatPhoneDisplay(ru, "Россия");
+    }
+  }
+
+  return formatted;
+}
+
 /** Форматирование при вводе — принимает сырой ввод, возвращает display + e164 */
 export function formatPhoneInput(
   raw: string,

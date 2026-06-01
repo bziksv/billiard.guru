@@ -30,12 +30,16 @@ export type ClubAvgAggregateOutputType = {
   latitude: number | null
   longitude: number | null
   tableCount: number | null
+  bookingSlotMinutes: number | null
+  bookingAdvanceDays: number | null
 }
 
 export type ClubSumAggregateOutputType = {
   latitude: number | null
   longitude: number | null
   tableCount: number | null
+  bookingSlotMinutes: number | null
+  bookingAdvanceDays: number | null
 }
 
 export type ClubMinAggregateOutputType = {
@@ -43,6 +47,7 @@ export type ClubMinAggregateOutputType = {
   name: string | null
   cityId: string | null
   phone: string | null
+  displayPhone: string | null
   email: string | null
   photoUrl: string | null
   description: string | null
@@ -51,6 +56,10 @@ export type ClubMinAggregateOutputType = {
   longitude: number | null
   workingHours: string | null
   tableCount: number | null
+  gamePrice: string | null
+  bookingEnabled: boolean | null
+  bookingSlotMinutes: number | null
+  bookingAdvanceDays: number | null
   telegramId: string | null
   telegramUsername: string | null
   isVerified: boolean | null
@@ -64,6 +73,7 @@ export type ClubMaxAggregateOutputType = {
   name: string | null
   cityId: string | null
   phone: string | null
+  displayPhone: string | null
   email: string | null
   photoUrl: string | null
   description: string | null
@@ -72,6 +82,10 @@ export type ClubMaxAggregateOutputType = {
   longitude: number | null
   workingHours: string | null
   tableCount: number | null
+  gamePrice: string | null
+  bookingEnabled: boolean | null
+  bookingSlotMinutes: number | null
+  bookingAdvanceDays: number | null
   telegramId: string | null
   telegramUsername: string | null
   isVerified: boolean | null
@@ -85,6 +99,7 @@ export type ClubCountAggregateOutputType = {
   name: number
   cityId: number
   phone: number
+  displayPhone: number
   email: number
   photoUrl: number
   galleryUrls: number
@@ -93,7 +108,15 @@ export type ClubCountAggregateOutputType = {
   latitude: number
   longitude: number
   workingHours: number
+  weeklyHours: number
   tableCount: number
+  tableCounts: number
+  floorPlan: number
+  gamePrice: number
+  priceTiers: number
+  bookingEnabled: number
+  bookingSlotMinutes: number
+  bookingAdvanceDays: number
   telegramId: number
   telegramUsername: number
   isVerified: number
@@ -108,12 +131,16 @@ export type ClubAvgAggregateInputType = {
   latitude?: true
   longitude?: true
   tableCount?: true
+  bookingSlotMinutes?: true
+  bookingAdvanceDays?: true
 }
 
 export type ClubSumAggregateInputType = {
   latitude?: true
   longitude?: true
   tableCount?: true
+  bookingSlotMinutes?: true
+  bookingAdvanceDays?: true
 }
 
 export type ClubMinAggregateInputType = {
@@ -121,6 +148,7 @@ export type ClubMinAggregateInputType = {
   name?: true
   cityId?: true
   phone?: true
+  displayPhone?: true
   email?: true
   photoUrl?: true
   description?: true
@@ -129,6 +157,10 @@ export type ClubMinAggregateInputType = {
   longitude?: true
   workingHours?: true
   tableCount?: true
+  gamePrice?: true
+  bookingEnabled?: true
+  bookingSlotMinutes?: true
+  bookingAdvanceDays?: true
   telegramId?: true
   telegramUsername?: true
   isVerified?: true
@@ -142,6 +174,7 @@ export type ClubMaxAggregateInputType = {
   name?: true
   cityId?: true
   phone?: true
+  displayPhone?: true
   email?: true
   photoUrl?: true
   description?: true
@@ -150,6 +183,10 @@ export type ClubMaxAggregateInputType = {
   longitude?: true
   workingHours?: true
   tableCount?: true
+  gamePrice?: true
+  bookingEnabled?: true
+  bookingSlotMinutes?: true
+  bookingAdvanceDays?: true
   telegramId?: true
   telegramUsername?: true
   isVerified?: true
@@ -163,6 +200,7 @@ export type ClubCountAggregateInputType = {
   name?: true
   cityId?: true
   phone?: true
+  displayPhone?: true
   email?: true
   photoUrl?: true
   galleryUrls?: true
@@ -171,7 +209,15 @@ export type ClubCountAggregateInputType = {
   latitude?: true
   longitude?: true
   workingHours?: true
+  weeklyHours?: true
   tableCount?: true
+  tableCounts?: true
+  floorPlan?: true
+  gamePrice?: true
+  priceTiers?: true
+  bookingEnabled?: true
+  bookingSlotMinutes?: true
+  bookingAdvanceDays?: true
   telegramId?: true
   telegramUsername?: true
   isVerified?: true
@@ -272,6 +318,7 @@ export type ClubGroupByOutputType = {
   name: string
   cityId: string
   phone: string
+  displayPhone: string | null
   email: string | null
   photoUrl: string | null
   galleryUrls: runtime.JsonValue | null
@@ -280,7 +327,15 @@ export type ClubGroupByOutputType = {
   latitude: number | null
   longitude: number | null
   workingHours: string | null
+  weeklyHours: runtime.JsonValue | null
   tableCount: number | null
+  tableCounts: runtime.JsonValue | null
+  floorPlan: runtime.JsonValue | null
+  gamePrice: string | null
+  priceTiers: runtime.JsonValue | null
+  bookingEnabled: boolean
+  bookingSlotMinutes: number
+  bookingAdvanceDays: number
   telegramId: string | null
   telegramUsername: string | null
   isVerified: boolean
@@ -317,6 +372,7 @@ export type ClubWhereInput = {
   name?: Prisma.StringFilter<"Club"> | string
   cityId?: Prisma.StringFilter<"Club"> | string
   phone?: Prisma.StringFilter<"Club"> | string
+  displayPhone?: Prisma.StringNullableFilter<"Club"> | string | null
   email?: Prisma.StringNullableFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableFilter<"Club">
@@ -325,7 +381,15 @@ export type ClubWhereInput = {
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableFilter<"Club"> | string | null
+  weeklyHours?: Prisma.JsonNullableFilter<"Club">
   tableCount?: Prisma.IntNullableFilter<"Club"> | number | null
+  tableCounts?: Prisma.JsonNullableFilter<"Club">
+  floorPlan?: Prisma.JsonNullableFilter<"Club">
+  gamePrice?: Prisma.StringNullableFilter<"Club"> | string | null
+  priceTiers?: Prisma.JsonNullableFilter<"Club">
+  bookingEnabled?: Prisma.BoolFilter<"Club"> | boolean
+  bookingSlotMinutes?: Prisma.IntFilter<"Club"> | number
+  bookingAdvanceDays?: Prisma.IntFilter<"Club"> | number
   telegramId?: Prisma.StringNullableFilter<"Club"> | string | null
   telegramUsername?: Prisma.StringNullableFilter<"Club"> | string | null
   isVerified?: Prisma.BoolFilter<"Club"> | boolean
@@ -338,6 +402,9 @@ export type ClubWhereInput = {
   teams?: Prisma.TournamentTeamListRelationFilter
   playerRatings?: Prisma.ClubPlayerRatingListRelationFilter
   news?: Prisma.ClubNewsListRelationFilter
+  tableBookings?: Prisma.TableBookingListRelationFilter
+  ideas?: Prisma.IdeaListRelationFilter
+  staff?: Prisma.ClubStaffListRelationFilter
 }
 
 export type ClubOrderByWithRelationInput = {
@@ -345,6 +412,7 @@ export type ClubOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  displayPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   galleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -353,7 +421,15 @@ export type ClubOrderByWithRelationInput = {
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   workingHours?: Prisma.SortOrderInput | Prisma.SortOrder
+  weeklyHours?: Prisma.SortOrderInput | Prisma.SortOrder
   tableCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  tableCounts?: Prisma.SortOrderInput | Prisma.SortOrder
+  floorPlan?: Prisma.SortOrderInput | Prisma.SortOrder
+  gamePrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  priceTiers?: Prisma.SortOrderInput | Prisma.SortOrder
+  bookingEnabled?: Prisma.SortOrder
+  bookingSlotMinutes?: Prisma.SortOrder
+  bookingAdvanceDays?: Prisma.SortOrder
   telegramId?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -366,19 +442,22 @@ export type ClubOrderByWithRelationInput = {
   teams?: Prisma.TournamentTeamOrderByRelationAggregateInput
   playerRatings?: Prisma.ClubPlayerRatingOrderByRelationAggregateInput
   news?: Prisma.ClubNewsOrderByRelationAggregateInput
+  tableBookings?: Prisma.TableBookingOrderByRelationAggregateInput
+  ideas?: Prisma.IdeaOrderByRelationAggregateInput
+  staff?: Prisma.ClubStaffOrderByRelationAggregateInput
   _relevance?: Prisma.ClubOrderByRelevanceInput
 }
 
 export type ClubWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  phone?: string
-  telegramId?: string
   confirmToken?: string
   AND?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   OR?: Prisma.ClubWhereInput[]
   NOT?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   name?: Prisma.StringFilter<"Club"> | string
   cityId?: Prisma.StringFilter<"Club"> | string
+  phone?: Prisma.StringFilter<"Club"> | string
+  displayPhone?: Prisma.StringNullableFilter<"Club"> | string | null
   email?: Prisma.StringNullableFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableFilter<"Club">
@@ -387,7 +466,16 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableFilter<"Club"> | string | null
+  weeklyHours?: Prisma.JsonNullableFilter<"Club">
   tableCount?: Prisma.IntNullableFilter<"Club"> | number | null
+  tableCounts?: Prisma.JsonNullableFilter<"Club">
+  floorPlan?: Prisma.JsonNullableFilter<"Club">
+  gamePrice?: Prisma.StringNullableFilter<"Club"> | string | null
+  priceTiers?: Prisma.JsonNullableFilter<"Club">
+  bookingEnabled?: Prisma.BoolFilter<"Club"> | boolean
+  bookingSlotMinutes?: Prisma.IntFilter<"Club"> | number
+  bookingAdvanceDays?: Prisma.IntFilter<"Club"> | number
+  telegramId?: Prisma.StringNullableFilter<"Club"> | string | null
   telegramUsername?: Prisma.StringNullableFilter<"Club"> | string | null
   isVerified?: Prisma.BoolFilter<"Club"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Club"> | Date | string
@@ -398,13 +486,17 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   teams?: Prisma.TournamentTeamListRelationFilter
   playerRatings?: Prisma.ClubPlayerRatingListRelationFilter
   news?: Prisma.ClubNewsListRelationFilter
-}, "id" | "phone" | "telegramId" | "confirmToken">
+  tableBookings?: Prisma.TableBookingListRelationFilter
+  ideas?: Prisma.IdeaListRelationFilter
+  staff?: Prisma.ClubStaffListRelationFilter
+}, "id" | "confirmToken">
 
 export type ClubOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  displayPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   galleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -413,7 +505,15 @@ export type ClubOrderByWithAggregationInput = {
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   workingHours?: Prisma.SortOrderInput | Prisma.SortOrder
+  weeklyHours?: Prisma.SortOrderInput | Prisma.SortOrder
   tableCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  tableCounts?: Prisma.SortOrderInput | Prisma.SortOrder
+  floorPlan?: Prisma.SortOrderInput | Prisma.SortOrder
+  gamePrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  priceTiers?: Prisma.SortOrderInput | Prisma.SortOrder
+  bookingEnabled?: Prisma.SortOrder
+  bookingSlotMinutes?: Prisma.SortOrder
+  bookingAdvanceDays?: Prisma.SortOrder
   telegramId?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -435,6 +535,7 @@ export type ClubScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Club"> | string
   cityId?: Prisma.StringWithAggregatesFilter<"Club"> | string
   phone?: Prisma.StringWithAggregatesFilter<"Club"> | string
+  displayPhone?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   email?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableWithAggregatesFilter<"Club">
@@ -443,7 +544,15 @@ export type ClubScalarWhereWithAggregatesInput = {
   latitude?: Prisma.FloatNullableWithAggregatesFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableWithAggregatesFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
+  weeklyHours?: Prisma.JsonNullableWithAggregatesFilter<"Club">
   tableCount?: Prisma.IntNullableWithAggregatesFilter<"Club"> | number | null
+  tableCounts?: Prisma.JsonNullableWithAggregatesFilter<"Club">
+  floorPlan?: Prisma.JsonNullableWithAggregatesFilter<"Club">
+  gamePrice?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
+  priceTiers?: Prisma.JsonNullableWithAggregatesFilter<"Club">
+  bookingEnabled?: Prisma.BoolWithAggregatesFilter<"Club"> | boolean
+  bookingSlotMinutes?: Prisma.IntWithAggregatesFilter<"Club"> | number
+  bookingAdvanceDays?: Prisma.IntWithAggregatesFilter<"Club"> | number
   telegramId?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   telegramUsername?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   isVerified?: Prisma.BoolWithAggregatesFilter<"Club"> | boolean
@@ -456,6 +565,7 @@ export type ClubCreateInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -464,7 +574,15 @@ export type ClubCreateInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -477,6 +595,9 @@ export type ClubCreateInput = {
   teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
 export type ClubUncheckedCreateInput = {
@@ -484,6 +605,7 @@ export type ClubUncheckedCreateInput = {
   name: string
   cityId: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -492,7 +614,15 @@ export type ClubUncheckedCreateInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -504,12 +634,16 @@ export type ClubUncheckedCreateInput = {
   teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -518,7 +652,15 @@ export type ClubUpdateInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -531,6 +673,9 @@ export type ClubUpdateInput = {
   teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateInput = {
@@ -538,6 +683,7 @@ export type ClubUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -546,7 +692,15 @@ export type ClubUncheckedUpdateInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -558,6 +712,9 @@ export type ClubUncheckedUpdateInput = {
   teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
 export type ClubCreateManyInput = {
@@ -565,6 +722,7 @@ export type ClubCreateManyInput = {
   name: string
   cityId: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -573,7 +731,15 @@ export type ClubCreateManyInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -586,6 +752,7 @@ export type ClubUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -594,7 +761,15 @@ export type ClubUpdateManyMutationInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -608,6 +783,7 @@ export type ClubUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -616,7 +792,15 @@ export type ClubUncheckedUpdateManyInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -646,6 +830,7 @@ export type ClubCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  displayPhone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   galleryUrls?: Prisma.SortOrder
@@ -654,7 +839,15 @@ export type ClubCountOrderByAggregateInput = {
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   workingHours?: Prisma.SortOrder
+  weeklyHours?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
+  tableCounts?: Prisma.SortOrder
+  floorPlan?: Prisma.SortOrder
+  gamePrice?: Prisma.SortOrder
+  priceTiers?: Prisma.SortOrder
+  bookingEnabled?: Prisma.SortOrder
+  bookingSlotMinutes?: Prisma.SortOrder
+  bookingAdvanceDays?: Prisma.SortOrder
   telegramId?: Prisma.SortOrder
   telegramUsername?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -667,6 +860,8 @@ export type ClubAvgOrderByAggregateInput = {
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
+  bookingSlotMinutes?: Prisma.SortOrder
+  bookingAdvanceDays?: Prisma.SortOrder
 }
 
 export type ClubMaxOrderByAggregateInput = {
@@ -674,6 +869,7 @@ export type ClubMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  displayPhone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -682,6 +878,10 @@ export type ClubMaxOrderByAggregateInput = {
   longitude?: Prisma.SortOrder
   workingHours?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
+  gamePrice?: Prisma.SortOrder
+  bookingEnabled?: Prisma.SortOrder
+  bookingSlotMinutes?: Prisma.SortOrder
+  bookingAdvanceDays?: Prisma.SortOrder
   telegramId?: Prisma.SortOrder
   telegramUsername?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -695,6 +895,7 @@ export type ClubMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
+  displayPhone?: Prisma.SortOrder
   email?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -703,6 +904,10 @@ export type ClubMinOrderByAggregateInput = {
   longitude?: Prisma.SortOrder
   workingHours?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
+  gamePrice?: Prisma.SortOrder
+  bookingEnabled?: Prisma.SortOrder
+  bookingSlotMinutes?: Prisma.SortOrder
+  bookingAdvanceDays?: Prisma.SortOrder
   telegramId?: Prisma.SortOrder
   telegramUsername?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
@@ -715,6 +920,8 @@ export type ClubSumOrderByAggregateInput = {
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
+  bookingSlotMinutes?: Prisma.SortOrder
+  bookingAdvanceDays?: Prisma.SortOrder
 }
 
 export type ClubScalarRelationFilter = {
@@ -785,8 +992,44 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type ClubCreateNestedOneWithoutStaffInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutStaffInput, Prisma.ClubUncheckedCreateWithoutStaffInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutStaffInput
+  connect?: Prisma.ClubWhereUniqueInput
+}
+
+export type ClubUpdateOneRequiredWithoutStaffNestedInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutStaffInput, Prisma.ClubUncheckedCreateWithoutStaffInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutStaffInput
+  upsert?: Prisma.ClubUpsertWithoutStaffInput
+  connect?: Prisma.ClubWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClubUpdateToOneWithWhereWithoutStaffInput, Prisma.ClubUpdateWithoutStaffInput>, Prisma.ClubUncheckedUpdateWithoutStaffInput>
+}
+
+export type ClubCreateNestedOneWithoutTableBookingsInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutTableBookingsInput, Prisma.ClubUncheckedCreateWithoutTableBookingsInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutTableBookingsInput
+  connect?: Prisma.ClubWhereUniqueInput
+}
+
+export type ClubUpdateOneRequiredWithoutTableBookingsNestedInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutTableBookingsInput, Prisma.ClubUncheckedCreateWithoutTableBookingsInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutTableBookingsInput
+  upsert?: Prisma.ClubUpsertWithoutTableBookingsInput
+  connect?: Prisma.ClubWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClubUpdateToOneWithWhereWithoutTableBookingsInput, Prisma.ClubUpdateWithoutTableBookingsInput>, Prisma.ClubUncheckedUpdateWithoutTableBookingsInput>
 }
 
 export type ClubCreateNestedOneWithoutNewsInput = {
@@ -863,10 +1106,27 @@ export type ClubUpdateOneWithoutRegistrationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClubUpdateToOneWithWhereWithoutRegistrationsInput, Prisma.ClubUpdateWithoutRegistrationsInput>, Prisma.ClubUncheckedUpdateWithoutRegistrationsInput>
 }
 
+export type ClubCreateNestedOneWithoutIdeasInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutIdeasInput, Prisma.ClubUncheckedCreateWithoutIdeasInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutIdeasInput
+  connect?: Prisma.ClubWhereUniqueInput
+}
+
+export type ClubUpdateOneWithoutIdeasNestedInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutIdeasInput, Prisma.ClubUncheckedCreateWithoutIdeasInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutIdeasInput
+  upsert?: Prisma.ClubUpsertWithoutIdeasInput
+  disconnect?: Prisma.ClubWhereInput | boolean
+  delete?: Prisma.ClubWhereInput | boolean
+  connect?: Prisma.ClubWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClubUpdateToOneWithWhereWithoutIdeasInput, Prisma.ClubUpdateWithoutIdeasInput>, Prisma.ClubUncheckedUpdateWithoutIdeasInput>
+}
+
 export type ClubCreateWithoutCityInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -875,7 +1135,15 @@ export type ClubCreateWithoutCityInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -887,12 +1155,16 @@ export type ClubCreateWithoutCityInput = {
   teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
 export type ClubUncheckedCreateWithoutCityInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -901,7 +1173,15 @@ export type ClubUncheckedCreateWithoutCityInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -913,6 +1193,9 @@ export type ClubUncheckedCreateWithoutCityInput = {
   teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubCreateOrConnectWithoutCityInput = {
@@ -949,6 +1232,7 @@ export type ClubScalarWhereInput = {
   name?: Prisma.StringFilter<"Club"> | string
   cityId?: Prisma.StringFilter<"Club"> | string
   phone?: Prisma.StringFilter<"Club"> | string
+  displayPhone?: Prisma.StringNullableFilter<"Club"> | string | null
   email?: Prisma.StringNullableFilter<"Club"> | string | null
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableFilter<"Club">
@@ -957,7 +1241,15 @@ export type ClubScalarWhereInput = {
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableFilter<"Club"> | string | null
+  weeklyHours?: Prisma.JsonNullableFilter<"Club">
   tableCount?: Prisma.IntNullableFilter<"Club"> | number | null
+  tableCounts?: Prisma.JsonNullableFilter<"Club">
+  floorPlan?: Prisma.JsonNullableFilter<"Club">
+  gamePrice?: Prisma.StringNullableFilter<"Club"> | string | null
+  priceTiers?: Prisma.JsonNullableFilter<"Club">
+  bookingEnabled?: Prisma.BoolFilter<"Club"> | boolean
+  bookingSlotMinutes?: Prisma.IntFilter<"Club"> | number
+  bookingAdvanceDays?: Prisma.IntFilter<"Club"> | number
   telegramId?: Prisma.StringNullableFilter<"Club"> | string | null
   telegramUsername?: Prisma.StringNullableFilter<"Club"> | string | null
   isVerified?: Prisma.BoolFilter<"Club"> | boolean
@@ -966,10 +1258,11 @@ export type ClubScalarWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Club"> | Date | string
 }
 
-export type ClubCreateWithoutNewsInput = {
+export type ClubCreateWithoutStaffInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -978,7 +1271,15 @@ export type ClubCreateWithoutNewsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -990,13 +1291,17 @@ export type ClubCreateWithoutNewsInput = {
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutClubInput
   teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
 }
 
-export type ClubUncheckedCreateWithoutNewsInput = {
+export type ClubUncheckedCreateWithoutStaffInput = {
   id?: string
   name: string
   cityId: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1005,7 +1310,15 @@ export type ClubUncheckedCreateWithoutNewsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1016,6 +1329,345 @@ export type ClubUncheckedCreateWithoutNewsInput = {
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutClubInput
   teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+}
+
+export type ClubCreateOrConnectWithoutStaffInput = {
+  where: Prisma.ClubWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClubCreateWithoutStaffInput, Prisma.ClubUncheckedCreateWithoutStaffInput>
+}
+
+export type ClubUpsertWithoutStaffInput = {
+  update: Prisma.XOR<Prisma.ClubUpdateWithoutStaffInput, Prisma.ClubUncheckedUpdateWithoutStaffInput>
+  create: Prisma.XOR<Prisma.ClubCreateWithoutStaffInput, Prisma.ClubUncheckedCreateWithoutStaffInput>
+  where?: Prisma.ClubWhereInput
+}
+
+export type ClubUpdateToOneWithWhereWithoutStaffInput = {
+  where?: Prisma.ClubWhereInput
+  data: Prisma.XOR<Prisma.ClubUpdateWithoutStaffInput, Prisma.ClubUncheckedUpdateWithoutStaffInput>
+}
+
+export type ClubUpdateWithoutStaffInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutClubsNestedInput
+  tournaments?: Prisma.TournamentUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+}
+
+export type ClubUncheckedUpdateWithoutStaffInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tournaments?: Prisma.TournamentUncheckedUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+}
+
+export type ClubCreateWithoutTableBookingsInput = {
+  id?: string
+  name: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutClubsInput
+  tournaments?: Prisma.TournamentCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
+}
+
+export type ClubUncheckedCreateWithoutTableBookingsInput = {
+  id?: string
+  name: string
+  cityId: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tournaments?: Prisma.TournamentUncheckedCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
+}
+
+export type ClubCreateOrConnectWithoutTableBookingsInput = {
+  where: Prisma.ClubWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClubCreateWithoutTableBookingsInput, Prisma.ClubUncheckedCreateWithoutTableBookingsInput>
+}
+
+export type ClubUpsertWithoutTableBookingsInput = {
+  update: Prisma.XOR<Prisma.ClubUpdateWithoutTableBookingsInput, Prisma.ClubUncheckedUpdateWithoutTableBookingsInput>
+  create: Prisma.XOR<Prisma.ClubCreateWithoutTableBookingsInput, Prisma.ClubUncheckedCreateWithoutTableBookingsInput>
+  where?: Prisma.ClubWhereInput
+}
+
+export type ClubUpdateToOneWithWhereWithoutTableBookingsInput = {
+  where?: Prisma.ClubWhereInput
+  data: Prisma.XOR<Prisma.ClubUpdateWithoutTableBookingsInput, Prisma.ClubUncheckedUpdateWithoutTableBookingsInput>
+}
+
+export type ClubUpdateWithoutTableBookingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutClubsNestedInput
+  tournaments?: Prisma.TournamentUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
+}
+
+export type ClubUncheckedUpdateWithoutTableBookingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tournaments?: Prisma.TournamentUncheckedUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
+}
+
+export type ClubCreateWithoutNewsInput = {
+  id?: string
+  name: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutClubsInput
+  tournaments?: Prisma.TournamentCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
+}
+
+export type ClubUncheckedCreateWithoutNewsInput = {
+  id?: string
+  name: string
+  cityId: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tournaments?: Prisma.TournamentUncheckedCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubCreateOrConnectWithoutNewsInput = {
@@ -1038,6 +1690,7 @@ export type ClubUpdateWithoutNewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1046,7 +1699,15 @@ export type ClubUpdateWithoutNewsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1058,6 +1719,9 @@ export type ClubUpdateWithoutNewsInput = {
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutClubNestedInput
   teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateWithoutNewsInput = {
@@ -1065,6 +1729,7 @@ export type ClubUncheckedUpdateWithoutNewsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1073,7 +1738,15 @@ export type ClubUncheckedUpdateWithoutNewsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1084,12 +1757,16 @@ export type ClubUncheckedUpdateWithoutNewsInput = {
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutClubNestedInput
   teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
 export type ClubCreateWithoutPlayerRatingsInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1098,7 +1775,15 @@ export type ClubCreateWithoutPlayerRatingsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1110,6 +1795,9 @@ export type ClubCreateWithoutPlayerRatingsInput = {
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutClubInput
   teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
 export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
@@ -1117,6 +1805,7 @@ export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
   name: string
   cityId: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1125,7 +1814,15 @@ export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1136,6 +1833,9 @@ export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutClubInput
   teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubCreateOrConnectWithoutPlayerRatingsInput = {
@@ -1158,6 +1858,7 @@ export type ClubUpdateWithoutPlayerRatingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1166,7 +1867,15 @@ export type ClubUpdateWithoutPlayerRatingsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1178,6 +1887,9 @@ export type ClubUpdateWithoutPlayerRatingsInput = {
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutClubNestedInput
   teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
@@ -1185,6 +1897,7 @@ export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1193,7 +1906,15 @@ export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1204,12 +1925,16 @@ export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutClubNestedInput
   teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
 export type ClubCreateWithoutTournamentsInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1218,7 +1943,15 @@ export type ClubCreateWithoutTournamentsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1230,6 +1963,9 @@ export type ClubCreateWithoutTournamentsInput = {
   teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
 export type ClubUncheckedCreateWithoutTournamentsInput = {
@@ -1237,6 +1973,7 @@ export type ClubUncheckedCreateWithoutTournamentsInput = {
   name: string
   cityId: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1245,7 +1982,15 @@ export type ClubUncheckedCreateWithoutTournamentsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1256,6 +2001,9 @@ export type ClubUncheckedCreateWithoutTournamentsInput = {
   teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubCreateOrConnectWithoutTournamentsInput = {
@@ -1278,6 +2026,7 @@ export type ClubUpdateWithoutTournamentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1286,7 +2035,15 @@ export type ClubUpdateWithoutTournamentsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1298,6 +2055,9 @@ export type ClubUpdateWithoutTournamentsInput = {
   teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateWithoutTournamentsInput = {
@@ -1305,6 +2065,7 @@ export type ClubUncheckedUpdateWithoutTournamentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1313,7 +2074,15 @@ export type ClubUncheckedUpdateWithoutTournamentsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1324,12 +2093,16 @@ export type ClubUncheckedUpdateWithoutTournamentsInput = {
   teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
 export type ClubCreateWithoutTeamsInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1338,7 +2111,15 @@ export type ClubCreateWithoutTeamsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1350,6 +2131,9 @@ export type ClubCreateWithoutTeamsInput = {
   registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
 export type ClubUncheckedCreateWithoutTeamsInput = {
@@ -1357,6 +2141,7 @@ export type ClubUncheckedCreateWithoutTeamsInput = {
   name: string
   cityId: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1365,7 +2150,15 @@ export type ClubUncheckedCreateWithoutTeamsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1376,6 +2169,9 @@ export type ClubUncheckedCreateWithoutTeamsInput = {
   registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubCreateOrConnectWithoutTeamsInput = {
@@ -1398,6 +2194,7 @@ export type ClubUpdateWithoutTeamsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1406,7 +2203,15 @@ export type ClubUpdateWithoutTeamsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1418,6 +2223,9 @@ export type ClubUpdateWithoutTeamsInput = {
   registrations?: Prisma.TournamentRegistrationUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateWithoutTeamsInput = {
@@ -1425,6 +2233,7 @@ export type ClubUncheckedUpdateWithoutTeamsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1433,7 +2242,15 @@ export type ClubUncheckedUpdateWithoutTeamsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1444,12 +2261,16 @@ export type ClubUncheckedUpdateWithoutTeamsInput = {
   registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
 export type ClubCreateWithoutRegistrationsInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1458,7 +2279,15 @@ export type ClubCreateWithoutRegistrationsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1470,6 +2299,9 @@ export type ClubCreateWithoutRegistrationsInput = {
   teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
 export type ClubUncheckedCreateWithoutRegistrationsInput = {
@@ -1477,6 +2309,7 @@ export type ClubUncheckedCreateWithoutRegistrationsInput = {
   name: string
   cityId: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1485,7 +2318,15 @@ export type ClubUncheckedCreateWithoutRegistrationsInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1496,6 +2337,9 @@ export type ClubUncheckedCreateWithoutRegistrationsInput = {
   teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubCreateOrConnectWithoutRegistrationsInput = {
@@ -1518,6 +2362,7 @@ export type ClubUpdateWithoutRegistrationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1526,7 +2371,15 @@ export type ClubUpdateWithoutRegistrationsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1538,6 +2391,9 @@ export type ClubUpdateWithoutRegistrationsInput = {
   teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateWithoutRegistrationsInput = {
@@ -1545,6 +2401,7 @@ export type ClubUncheckedUpdateWithoutRegistrationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1553,7 +2410,15 @@ export type ClubUncheckedUpdateWithoutRegistrationsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1564,12 +2429,16 @@ export type ClubUncheckedUpdateWithoutRegistrationsInput = {
   teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
-export type ClubCreateManyCityInput = {
+export type ClubCreateWithoutIdeasInput = {
   id?: string
   name: string
   phone: string
+  displayPhone?: string | null
   email?: string | null
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1578,7 +2447,183 @@ export type ClubCreateManyCityInput = {
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutClubsInput
+  tournaments?: Prisma.TournamentCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
+}
+
+export type ClubUncheckedCreateWithoutIdeasInput = {
+  id?: string
+  name: string
+  cityId: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tournaments?: Prisma.TournamentUncheckedCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
+}
+
+export type ClubCreateOrConnectWithoutIdeasInput = {
+  where: Prisma.ClubWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClubCreateWithoutIdeasInput, Prisma.ClubUncheckedCreateWithoutIdeasInput>
+}
+
+export type ClubUpsertWithoutIdeasInput = {
+  update: Prisma.XOR<Prisma.ClubUpdateWithoutIdeasInput, Prisma.ClubUncheckedUpdateWithoutIdeasInput>
+  create: Prisma.XOR<Prisma.ClubCreateWithoutIdeasInput, Prisma.ClubUncheckedCreateWithoutIdeasInput>
+  where?: Prisma.ClubWhereInput
+}
+
+export type ClubUpdateToOneWithWhereWithoutIdeasInput = {
+  where?: Prisma.ClubWhereInput
+  data: Prisma.XOR<Prisma.ClubUpdateWithoutIdeasInput, Prisma.ClubUncheckedUpdateWithoutIdeasInput>
+}
+
+export type ClubUpdateWithoutIdeasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutClubsNestedInput
+  tournaments?: Prisma.TournamentUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
+}
+
+export type ClubUncheckedUpdateWithoutIdeasInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tournaments?: Prisma.TournamentUncheckedUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
+}
+
+export type ClubCreateManyCityInput = {
+  id?: string
+  name: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
   telegramId?: string | null
   telegramUsername?: string | null
   isVerified?: boolean
@@ -1591,6 +2636,7 @@ export type ClubUpdateWithoutCityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1599,7 +2645,15 @@ export type ClubUpdateWithoutCityInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1611,12 +2665,16 @@ export type ClubUpdateWithoutCityInput = {
   teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateWithoutCityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1625,7 +2683,15 @@ export type ClubUncheckedUpdateWithoutCityInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1637,12 +2703,16 @@ export type ClubUncheckedUpdateWithoutCityInput = {
   teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateManyWithoutCityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1651,7 +2721,15 @@ export type ClubUncheckedUpdateManyWithoutCityInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1671,6 +2749,9 @@ export type ClubCountOutputType = {
   teams: number
   playerRatings: number
   news: number
+  tableBookings: number
+  ideas: number
+  staff: number
 }
 
 export type ClubCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1679,6 +2760,9 @@ export type ClubCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   teams?: boolean | ClubCountOutputTypeCountTeamsArgs
   playerRatings?: boolean | ClubCountOutputTypeCountPlayerRatingsArgs
   news?: boolean | ClubCountOutputTypeCountNewsArgs
+  tableBookings?: boolean | ClubCountOutputTypeCountTableBookingsArgs
+  ideas?: boolean | ClubCountOutputTypeCountIdeasArgs
+  staff?: boolean | ClubCountOutputTypeCountStaffArgs
 }
 
 /**
@@ -1726,12 +2810,34 @@ export type ClubCountOutputTypeCountNewsArgs<ExtArgs extends runtime.Types.Exten
   where?: Prisma.ClubNewsWhereInput
 }
 
+/**
+ * ClubCountOutputType without action
+ */
+export type ClubCountOutputTypeCountTableBookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TableBookingWhereInput
+}
+
+/**
+ * ClubCountOutputType without action
+ */
+export type ClubCountOutputTypeCountIdeasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IdeaWhereInput
+}
+
+/**
+ * ClubCountOutputType without action
+ */
+export type ClubCountOutputTypeCountStaffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClubStaffWhereInput
+}
+
 
 export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
   cityId?: boolean
   phone?: boolean
+  displayPhone?: boolean
   email?: boolean
   photoUrl?: boolean
   galleryUrls?: boolean
@@ -1740,7 +2846,15 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   latitude?: boolean
   longitude?: boolean
   workingHours?: boolean
+  weeklyHours?: boolean
   tableCount?: boolean
+  tableCounts?: boolean
+  floorPlan?: boolean
+  gamePrice?: boolean
+  priceTiers?: boolean
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: boolean
+  bookingAdvanceDays?: boolean
   telegramId?: boolean
   telegramUsername?: boolean
   isVerified?: boolean
@@ -1753,6 +2867,9 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   teams?: boolean | Prisma.Club$teamsArgs<ExtArgs>
   playerRatings?: boolean | Prisma.Club$playerRatingsArgs<ExtArgs>
   news?: boolean | Prisma.Club$newsArgs<ExtArgs>
+  tableBookings?: boolean | Prisma.Club$tableBookingsArgs<ExtArgs>
+  ideas?: boolean | Prisma.Club$ideasArgs<ExtArgs>
+  staff?: boolean | Prisma.Club$staffArgs<ExtArgs>
   _count?: boolean | Prisma.ClubCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["club"]>
 
@@ -1763,6 +2880,7 @@ export type ClubSelectScalar = {
   name?: boolean
   cityId?: boolean
   phone?: boolean
+  displayPhone?: boolean
   email?: boolean
   photoUrl?: boolean
   galleryUrls?: boolean
@@ -1771,7 +2889,15 @@ export type ClubSelectScalar = {
   latitude?: boolean
   longitude?: boolean
   workingHours?: boolean
+  weeklyHours?: boolean
   tableCount?: boolean
+  tableCounts?: boolean
+  floorPlan?: boolean
+  gamePrice?: boolean
+  priceTiers?: boolean
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: boolean
+  bookingAdvanceDays?: boolean
   telegramId?: boolean
   telegramUsername?: boolean
   isVerified?: boolean
@@ -1780,7 +2906,7 @@ export type ClubSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "cityId" | "phone" | "email" | "photoUrl" | "galleryUrls" | "description" | "address" | "latitude" | "longitude" | "workingHours" | "tableCount" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
+export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "cityId" | "phone" | "displayPhone" | "email" | "photoUrl" | "galleryUrls" | "description" | "address" | "latitude" | "longitude" | "workingHours" | "weeklyHours" | "tableCount" | "tableCounts" | "floorPlan" | "gamePrice" | "priceTiers" | "bookingEnabled" | "bookingSlotMinutes" | "bookingAdvanceDays" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
 export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   tournaments?: boolean | Prisma.Club$tournamentsArgs<ExtArgs>
@@ -1788,6 +2914,9 @@ export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   teams?: boolean | Prisma.Club$teamsArgs<ExtArgs>
   playerRatings?: boolean | Prisma.Club$playerRatingsArgs<ExtArgs>
   news?: boolean | Prisma.Club$newsArgs<ExtArgs>
+  tableBookings?: boolean | Prisma.Club$tableBookingsArgs<ExtArgs>
+  ideas?: boolean | Prisma.Club$ideasArgs<ExtArgs>
+  staff?: boolean | Prisma.Club$staffArgs<ExtArgs>
   _count?: boolean | Prisma.ClubCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -1800,12 +2929,16 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     teams: Prisma.$TournamentTeamPayload<ExtArgs>[]
     playerRatings: Prisma.$ClubPlayerRatingPayload<ExtArgs>[]
     news: Prisma.$ClubNewsPayload<ExtArgs>[]
+    tableBookings: Prisma.$TableBookingPayload<ExtArgs>[]
+    ideas: Prisma.$IdeaPayload<ExtArgs>[]
+    staff: Prisma.$ClubStaffPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
     cityId: string
     phone: string
+    displayPhone: string | null
     email: string | null
     photoUrl: string | null
     galleryUrls: runtime.JsonValue | null
@@ -1814,7 +2947,15 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     latitude: number | null
     longitude: number | null
     workingHours: string | null
+    weeklyHours: runtime.JsonValue | null
     tableCount: number | null
+    tableCounts: runtime.JsonValue | null
+    floorPlan: runtime.JsonValue | null
+    gamePrice: string | null
+    priceTiers: runtime.JsonValue | null
+    bookingEnabled: boolean
+    bookingSlotMinutes: number
+    bookingAdvanceDays: number
     telegramId: string | null
     telegramUsername: string | null
     isVerified: boolean
@@ -2167,6 +3308,9 @@ export interface Prisma__ClubClient<T, Null = never, ExtArgs extends runtime.Typ
   teams<T extends Prisma.Club$teamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$teamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentTeamPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   playerRatings<T extends Prisma.Club$playerRatingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$playerRatingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubPlayerRatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   news<T extends Prisma.Club$newsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$newsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubNewsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tableBookings<T extends Prisma.Club$tableBookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$tableBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TableBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ideas<T extends Prisma.Club$ideasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$ideasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  staff<T extends Prisma.Club$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$staffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2200,6 +3344,7 @@ export interface ClubFieldRefs {
   readonly name: Prisma.FieldRef<"Club", 'String'>
   readonly cityId: Prisma.FieldRef<"Club", 'String'>
   readonly phone: Prisma.FieldRef<"Club", 'String'>
+  readonly displayPhone: Prisma.FieldRef<"Club", 'String'>
   readonly email: Prisma.FieldRef<"Club", 'String'>
   readonly photoUrl: Prisma.FieldRef<"Club", 'String'>
   readonly galleryUrls: Prisma.FieldRef<"Club", 'Json'>
@@ -2208,7 +3353,15 @@ export interface ClubFieldRefs {
   readonly latitude: Prisma.FieldRef<"Club", 'Float'>
   readonly longitude: Prisma.FieldRef<"Club", 'Float'>
   readonly workingHours: Prisma.FieldRef<"Club", 'String'>
+  readonly weeklyHours: Prisma.FieldRef<"Club", 'Json'>
   readonly tableCount: Prisma.FieldRef<"Club", 'Int'>
+  readonly tableCounts: Prisma.FieldRef<"Club", 'Json'>
+  readonly floorPlan: Prisma.FieldRef<"Club", 'Json'>
+  readonly gamePrice: Prisma.FieldRef<"Club", 'String'>
+  readonly priceTiers: Prisma.FieldRef<"Club", 'Json'>
+  readonly bookingEnabled: Prisma.FieldRef<"Club", 'Boolean'>
+  readonly bookingSlotMinutes: Prisma.FieldRef<"Club", 'Int'>
+  readonly bookingAdvanceDays: Prisma.FieldRef<"Club", 'Int'>
   readonly telegramId: Prisma.FieldRef<"Club", 'String'>
   readonly telegramUsername: Prisma.FieldRef<"Club", 'String'>
   readonly isVerified: Prisma.FieldRef<"Club", 'Boolean'>
@@ -2680,6 +3833,78 @@ export type Club$newsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   take?: number
   skip?: number
   distinct?: Prisma.ClubNewsScalarFieldEnum | Prisma.ClubNewsScalarFieldEnum[]
+}
+
+/**
+ * Club.tableBookings
+ */
+export type Club$tableBookingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TableBooking
+   */
+  select?: Prisma.TableBookingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TableBooking
+   */
+  omit?: Prisma.TableBookingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TableBookingInclude<ExtArgs> | null
+  where?: Prisma.TableBookingWhereInput
+  orderBy?: Prisma.TableBookingOrderByWithRelationInput | Prisma.TableBookingOrderByWithRelationInput[]
+  cursor?: Prisma.TableBookingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TableBookingScalarFieldEnum | Prisma.TableBookingScalarFieldEnum[]
+}
+
+/**
+ * Club.ideas
+ */
+export type Club$ideasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Idea
+   */
+  select?: Prisma.IdeaSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Idea
+   */
+  omit?: Prisma.IdeaOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IdeaInclude<ExtArgs> | null
+  where?: Prisma.IdeaWhereInput
+  orderBy?: Prisma.IdeaOrderByWithRelationInput | Prisma.IdeaOrderByWithRelationInput[]
+  cursor?: Prisma.IdeaWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IdeaScalarFieldEnum | Prisma.IdeaScalarFieldEnum[]
+}
+
+/**
+ * Club.staff
+ */
+export type Club$staffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClubStaff
+   */
+  select?: Prisma.ClubStaffSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClubStaff
+   */
+  omit?: Prisma.ClubStaffOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClubStaffInclude<ExtArgs> | null
+  where?: Prisma.ClubStaffWhereInput
+  orderBy?: Prisma.ClubStaffOrderByWithRelationInput | Prisma.ClubStaffOrderByWithRelationInput[]
+  cursor?: Prisma.ClubStaffWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClubStaffScalarFieldEnum | Prisma.ClubStaffScalarFieldEnum[]
 }
 
 /**
