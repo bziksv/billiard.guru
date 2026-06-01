@@ -37,6 +37,13 @@ export async function requireClubManageAccess(clubId: string) {
   return { player, club };
 }
 
+export function auditActorFields(session: { role: string; playerId: string }) {
+  return {
+    actorType: (session.role === "SUPERADMIN" ? "admin" : "club") as "admin" | "club",
+    actorId: session.playerId,
+  };
+}
+
 /** Рейтинг игрока в контексте клуба: клубный индекс или общий системный. */
 export async function getPlayerRatingInClub(
   playerId: string,

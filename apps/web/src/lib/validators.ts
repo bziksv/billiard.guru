@@ -1,8 +1,11 @@
 import { z } from "zod";
 import { normalizePhone } from "@/lib/phone";
-import { CLUB_TABLE_FORMATS } from "@/lib/club-table-formats";
+import { CLUB_TABLE_FORMATS, type ClubTableFormatId } from "@/lib/club-table-formats";
 
-const tableFormatIds = CLUB_TABLE_FORMATS.map((f) => f.id) as [string, ...string[]];
+const tableFormatIds = CLUB_TABLE_FORMATS.map((f) => f.id) as [
+  ClubTableFormatId,
+  ...ClubTableFormatId[],
+];
 
 const tableCountsSchema = z
   .record(z.enum(tableFormatIds), z.coerce.number().int().min(0).max(500))

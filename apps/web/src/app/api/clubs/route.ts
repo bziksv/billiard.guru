@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
 import { resolveClubCoordinates } from "@/lib/club-geocode";
 import { createRequestLogger } from "@/lib/logger";
+import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
 import { buildConfirmLink, sendTelegramMessage } from "@/lib/telegram";
 import { normalizePhoneForCity } from "@/lib/phone-server";
@@ -78,11 +79,11 @@ export async function POST(request: NextRequest) {
         address: data.address || null,
         description: data.description || null,
         workingHours: data.workingHours || null,
-        weeklyHours: weeklyHoursJson,
+        weeklyHours: jsonUpdateValue(weeklyHoursJson),
         tableCount: tableCountTotal,
-        tableCounts: tableCountsJson,
+        tableCounts: jsonUpdateValue(tableCountsJson),
         gamePrice: data.gamePrice || null,
-        priceTiers: priceTiersJson,
+        priceTiers: jsonUpdateValue(priceTiersJson),
         latitude: coords.latitude,
         longitude: coords.longitude,
         confirmToken,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
-import { authErrorResponse } from "@/lib/auth";
-import { requireClubManageAccess } from "@/lib/club-manage";
+import { authErrorResponse, getSession } from "@/lib/auth";
+import { auditActorFields, requireClubManageAccess } from "@/lib/club-manage";
 import { prisma } from "@/lib/prisma";
 import { clubPlayerRatingSchema } from "@/lib/validators";
 
@@ -33,7 +33,11 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id: clubId } = await params;
-    const { player: actor } = await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId);
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
+    }
     const body = await request.json();
     const data = clubPlayerRatingSchema.parse(body);
 
@@ -62,8 +66,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     });
 
     await writeAuditLog({
-      actorType: actor.role === "SUPERADMIN" ? "admin" : "club",
-      actorId: actor.id,
+      ...auditActorFields(session),
       action: "club.player_rating.set",
       entityType: "club_player_rating",
       entityId: row.id,

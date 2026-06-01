@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
-import { authErrorResponse } from "@/lib/auth";
-import { requireClubManageAccess } from "@/lib/club-manage";
+import { authErrorResponse, getSession } from "@/lib/auth";
+import { auditActorFields, requireClubManageAccess } from "@/lib/club-manage";
 import { prisma } from "@/lib/prisma";
 import { clubPlayerRatingUpdateSchema } from "@/lib/validators";
 
@@ -10,7 +10,11 @@ type RouteParams = { params: Promise<{ id: string; playerId: string }> };
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const { id: clubId, playerId } = await params;
-    const { player: actor } = await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId);
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
+    }
     const data = clubPlayerRatingUpdateSchema.parse(await request.json());
 
     const existing = await prisma.clubPlayerRating.findUnique({
@@ -31,8 +35,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     });
 
     await writeAuditLog({
-      actorType: actor.role === "SUPERADMIN" ? "admin" : "club",
-      actorId: actor.id,
+      ...auditActorFields(session),
       action: "club.player_rating.update",
       entityType: "club_player_rating",
       entityId: row.id,
@@ -53,7 +56,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id: clubId, playerId } = await params;
-    const { player: actor } = await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId);
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
+    }
 
     const existing = await prisma.clubPlayerRating.findUnique({
       where: { clubId_playerId: { clubId, playerId } },
@@ -65,8 +72,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     await prisma.clubPlayerRating.delete({ where: { id: existing.id } });
 
     await writeAuditLog({
-      actorType: actor.role === "SUPERADMIN" ? "admin" : "club",
-      actorId: actor.id,
+      ...auditActorFields(session),
       action: "club.player_rating.remove",
       entityType: "club_player_rating",
       entityId: existing.id,

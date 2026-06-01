@@ -20,7 +20,9 @@ import {
   priceTiersToJson,
   weeklyHoursToJson,
 } from "@/lib/club-schedule";
+import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { normalizePhoneForCity } from "@/lib/phone-server";
 import { clubUpdateSchema } from "@/lib/validators";
 
@@ -59,7 +61,7 @@ async function logClubPatchAudit(
     section,
     clubId,
     summary,
-    payload: { changes },
+    payload: { changes: JSON.parse(JSON.stringify(changes)) as Prisma.InputJsonValue },
   });
 }
 
@@ -203,9 +205,9 @@ export async function PATCH(
           ...(data.address !== undefined && { address: data.address }),
           ...(data.workingHours !== undefined && { workingHours: data.workingHours }),
           tableCount: tables.tableCount,
-          tableCounts: tables.tableCounts,
-          weeklyHours: weeklyHoursToJson(weeklyHoursParsed),
-          priceTiers: priceTiersToJson(priceTiersParsed),
+          tableCounts: jsonUpdateValue(tables.tableCounts),
+          weeklyHours: jsonUpdateValue(weeklyHoursToJson(weeklyHoursParsed)),
+          priceTiers: jsonUpdateValue(priceTiersToJson(priceTiersParsed)),
           ...(data.gamePrice !== undefined && { gamePrice: data.gamePrice }),
           ...(data.bookingEnabled !== undefined && { bookingEnabled: data.bookingEnabled }),
           ...(data.bookingSlotMinutes !== undefined && {
@@ -220,7 +222,7 @@ export async function PATCH(
             longitude: coords.longitude,
           }),
           photoUrl,
-          galleryUrls: galleryJson,
+          galleryUrls: jsonUpdateValue(galleryJson),
         },
         include: { city: { include: { country: true } } },
       });
@@ -301,9 +303,7 @@ export async function PATCH(
         ? syncClubPhotoFields(parseClubGalleryUrls(body.galleryUrls))
         : null;
 
-    const club = await prisma.club.update({
-      where: { id },
-      data: {
+    const updateData: Prisma.ClubUpdateInput = {
         ...(data.name !== undefined && { name: data.name }),
         ...(data.cityId !== undefined && { cityId: data.cityId }),
         ...(data.email !== undefined && { email: data.email }),
@@ -311,16 +311,16 @@ export async function PATCH(
         ...(data.address !== undefined && { address: data.address }),
         ...(data.workingHours !== undefined && { workingHours: data.workingHours }),
         ...(body.tableCounts !== undefined && {
-          tableCounts: tableCountsJson,
+          tableCounts: jsonUpdateValue(tableCountsJson),
           tableCount: tableCountsJson ? clubTableCountsTotal(parsedCounts) : null,
         }),
         ...(body.weeklyHours !== undefined && {
-          weeklyHours: weeklyHoursToJson(weeklyHoursParsed),
+          weeklyHours: jsonUpdateValue(weeklyHoursToJson(weeklyHoursParsed)),
         }),
         ...(body.priceTiers !== undefined && {
-          priceTiers: priceTiersToJson(priceTiersParsed),
+          priceTiers: jsonUpdateValue(priceTiersToJson(priceTiersParsed)),
         }),
-        ...(floorPlanJson !== undefined && { floorPlan: floorPlanJson }),
+        ...(floorPlanJson !== undefined && { floorPlan: jsonUpdateValue(floorPlanJson) }),
         ...(data.gamePrice !== undefined && { gamePrice: data.gamePrice }),
         ...(displayPhone !== undefined && { displayPhone }),
         ...(coords !== undefined && {
@@ -328,10 +328,14 @@ export async function PATCH(
           longitude: coords.longitude,
         }),
         ...(syncedFromBody && {
-          galleryUrls: syncedFromBody.galleryUrls,
+          galleryUrls: jsonUpdateValue(syncedFromBody.galleryUrls),
           photoUrl: syncedFromBody.photoUrl,
         }),
-      },
+    };
+
+    const club = await prisma.club.update({
+      where: { id },
+      data: updateData,
       include: { city: { include: { country: true } } },
     });
 

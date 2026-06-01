@@ -342,7 +342,7 @@ export function ClubBookingWidget({
               <ClubFloorPlanCanvas
                 items={planItemsForBooking}
                 booking
-                bookingTableFormat={format}
+                bookingTableFormat={format || undefined}
                 selectedId={selectedTableId}
                 tableStates={tableStates}
                 priceTiers={priceTiers}

@@ -167,14 +167,14 @@ export function ClubOwnerSidebar({
       </div>
 
       <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2">
-        {nav.map(({ href, label, icon: Icon, exact }) => (
+        {nav.map((item) => (
           <NavLink
-            key={href}
-            href={href}
-            label={label}
-            icon={Icon}
+            key={item.href}
+            href={item.href}
+            label={item.label}
+            icon={item.icon}
             collapsed={collapsed}
-            active={isActive(href, pathname, exact)}
+            active={isActive(item.href, pathname, "exact" in item ? item.exact : undefined)}
           />
         ))}
       </nav>
