@@ -391,6 +391,7 @@ export const ModelName = {
   TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
   Player: 'Player',
+  CoachRating: 'CoachRating',
   ClubPlayerRating: 'ClubPlayerRating',
   LoginChallenge: 'LoginChallenge',
   Tournament: 'Tournament',
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -879,6 +880,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PlayerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PlayerCountAggregateOutputType> | number
+        }
+      }
+    }
+    CoachRating: {
+      payload: Prisma.$CoachRatingPayload<ExtArgs>
+      fields: Prisma.CoachRatingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CoachRatingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CoachRatingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload>
+        }
+        findFirst: {
+          args: Prisma.CoachRatingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CoachRatingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload>
+        }
+        findMany: {
+          args: Prisma.CoachRatingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload>[]
+        }
+        create: {
+          args: Prisma.CoachRatingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload>
+        }
+        createMany: {
+          args: Prisma.CoachRatingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.CoachRatingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload>
+        }
+        update: {
+          args: Prisma.CoachRatingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload>
+        }
+        deleteMany: {
+          args: Prisma.CoachRatingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CoachRatingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.CoachRatingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CoachRatingPayload>
+        }
+        aggregate: {
+          args: Prisma.CoachRatingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCoachRating>
+        }
+        groupBy: {
+          args: Prisma.CoachRatingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CoachRatingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CoachRatingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CoachRatingCountAggregateOutputType> | number
         }
       }
     }
@@ -1694,6 +1761,8 @@ export const PlayerScalarFieldEnum = {
   isCoach: 'isCoach',
   coachBio: 'coachBio',
   coachGalleryUrls: 'coachGalleryUrls',
+  coachReviewAvg: 'coachReviewAvg',
+  coachReviewCount: 'coachReviewCount',
   role: 'role',
   isVerified: 'isVerified',
   confirmToken: 'confirmToken',
@@ -1702,6 +1771,19 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const CoachRatingScalarFieldEnum = {
+  id: 'id',
+  coachId: 'coachId',
+  raterId: 'raterId',
+  score: 'score',
+  comment: 'comment',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CoachRatingScalarFieldEnum = (typeof CoachRatingScalarFieldEnum)[keyof typeof CoachRatingScalarFieldEnum]
 
 
 export const ClubPlayerRatingScalarFieldEnum = {
@@ -1989,6 +2071,16 @@ export const PlayerOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
+
+
+export const CoachRatingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  coachId: 'coachId',
+  raterId: 'raterId',
+  comment: 'comment'
+} as const
+
+export type CoachRatingOrderByRelevanceFieldEnum = (typeof CoachRatingOrderByRelevanceFieldEnum)[keyof typeof CoachRatingOrderByRelevanceFieldEnum]
 
 
 export const ClubPlayerRatingOrderByRelevanceFieldEnum = {
@@ -2343,6 +2435,7 @@ export type GlobalOmitConfig = {
   tableBooking?: Prisma.TableBookingOmit
   clubNews?: Prisma.ClubNewsOmit
   player?: Prisma.PlayerOmit
+  coachRating?: Prisma.CoachRatingOmit
   clubPlayerRating?: Prisma.ClubPlayerRatingOmit
   loginChallenge?: Prisma.LoginChallengeOmit
   tournament?: Prisma.TournamentOmit

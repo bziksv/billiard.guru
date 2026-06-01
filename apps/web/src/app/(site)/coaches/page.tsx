@@ -24,7 +24,7 @@ export default async function CoachesPage({
     <>
       <PageHeader
         title={t("nav.coaches")}
-        lead="Тренеры с подтверждённым профилем: рейтинг, город и описание. Подробности — на странице каждого тренера."
+        lead="Тренеры с подтверждённым профилем. Оценка на карточке — от игроков, которые оценили человека как тренера (1–5)."
       />
       <PageMain className="space-y-6 pt-0">
         <Suspense fallback={<div className="site-skeleton h-24" />}>

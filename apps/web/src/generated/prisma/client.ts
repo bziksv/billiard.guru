@@ -77,6 +77,11 @@ export type ClubNews = Prisma.ClubNewsModel
  */
 export type Player = Prisma.PlayerModel
 /**
+ * Model CoachRating
+ * Оценка игрока тренера (1–5), не путать с турнирным рейтингом Player.rating.
+ */
+export type CoachRating = Prisma.CoachRatingModel
+/**
  * Model ClubPlayerRating
  * 
  */

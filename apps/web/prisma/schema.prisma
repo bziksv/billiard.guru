@@ -207,6 +207,8 @@ model Player {
   isCoach          Boolean  @default(false) @map("is_coach")
   coachBio         String?  @map("coach_bio") @db.Text
   coachGalleryUrls Json?    @map("coach_gallery_urls")
+  coachReviewAvg   Float?   @map("coach_review_avg")
+  coachReviewCount Int      @default(0) @map("coach_review_count")
   role             UserRole @default(PLAYER)
   isVerified       Boolean  @default(false) @map("is_verified")
   confirmToken     String?  @unique @map("confirm_token")
@@ -222,9 +224,28 @@ model Player {
   ideas           Idea[]
   ideaVotes       IdeaVote[]
   tableBookings   TableBooking[]
-  clubStaff       ClubStaff[]
+  clubStaff            ClubStaff[]
+  coachReviewsReceived CoachRating[] @relation("CoachReviewsReceived")
+  coachReviewsGiven    CoachRating[] @relation("CoachReviewsGiven")
 
   @@map("players")
+}
+
+/// Оценка игрока тренера (1–5), не путать с турнирным рейтингом Player.rating.
+model CoachRating {
+  id        String   @id @default(cuid())
+  coachId   String   @map("coach_id")
+  coach     Player   @relation("CoachReviewsReceived", fields: [coachId], references: [id], onDelete: Cascade)
+  raterId   String   @map("rater_id")
+  rater     Player   @relation("CoachReviewsGiven", fields: [raterId], references: [id], onDelete: Cascade)
+  score     Int
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([coachId, raterId])
+  @@index([coachId, createdAt])
+  @@map("coach_ratings")
 }
 
 model ClubPlayerRating {

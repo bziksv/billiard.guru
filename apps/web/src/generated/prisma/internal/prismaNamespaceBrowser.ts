@@ -58,6 +58,7 @@ export const ModelName = {
   TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
   Player: 'Player',
+  CoachRating: 'CoachRating',
   ClubPlayerRating: 'ClubPlayerRating',
   LoginChallenge: 'LoginChallenge',
   Tournament: 'Tournament',
@@ -199,6 +200,8 @@ export const PlayerScalarFieldEnum = {
   isCoach: 'isCoach',
   coachBio: 'coachBio',
   coachGalleryUrls: 'coachGalleryUrls',
+  coachReviewAvg: 'coachReviewAvg',
+  coachReviewCount: 'coachReviewCount',
   role: 'role',
   isVerified: 'isVerified',
   confirmToken: 'confirmToken',
@@ -207,6 +210,19 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const CoachRatingScalarFieldEnum = {
+  id: 'id',
+  coachId: 'coachId',
+  raterId: 'raterId',
+  score: 'score',
+  comment: 'comment',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CoachRatingScalarFieldEnum = (typeof CoachRatingScalarFieldEnum)[keyof typeof CoachRatingScalarFieldEnum]
 
 
 export const ClubPlayerRatingScalarFieldEnum = {
@@ -494,6 +510,16 @@ export const PlayerOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
+
+
+export const CoachRatingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  coachId: 'coachId',
+  raterId: 'raterId',
+  comment: 'comment'
+} as const
+
+export type CoachRatingOrderByRelevanceFieldEnum = (typeof CoachRatingOrderByRelevanceFieldEnum)[keyof typeof CoachRatingOrderByRelevanceFieldEnum]
 
 
 export const ClubPlayerRatingOrderByRelevanceFieldEnum = {

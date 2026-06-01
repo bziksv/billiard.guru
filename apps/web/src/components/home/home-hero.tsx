@@ -61,7 +61,7 @@ export function HomeHero({
       {/* затемнение под текстом — справа оставляем графику ярче */}
       <div className="home-hero-scrim pointer-events-none absolute inset-0" />
 
-      <div className="relative z-10 mx-auto flex min-h-[min(94vh,820px)] max-w-6xl flex-col justify-center px-4 pb-16 pt-24 sm:min-h-[94vh] sm:px-6 sm:pb-20 sm:pt-28">
+      <div className="relative z-10 mx-auto flex min-h-[min(94vh,820px)] max-w-6xl flex-col justify-center px-4 pb-16 pt-20 sm:min-h-[94vh] sm:px-6 sm:pb-20 sm:pt-28">
         <p className="home-animate-fade-up guide-format-badge inline-flex w-fit items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] backdrop-blur-sm">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
           пирамида · снукер · пул
@@ -71,7 +71,7 @@ export function HomeHero({
           <span className="mx-2 text-emerald-600/70">—</span>
           <span className="italic text-emerald-600/80">точность, ставшая искусством</span>
         </p>
-        <h1 className="home-animate-fade-up-delay-1 home-hero-title mt-5 max-w-3xl text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl md:text-[3.25rem]">
+        <h1 className="home-animate-fade-up-delay-1 home-hero-title mt-4 max-w-3xl text-[1.75rem] font-bold leading-[1.12] tracking-tight sm:mt-5 sm:text-5xl md:text-[3.25rem]">
           Турниры, новости и{" "}
           <span className="home-shimmer-text">бильярдное сообщество</span>
         </h1>
@@ -80,17 +80,23 @@ export function HomeHero({
           Скоро — спарринг-партнёр через Telegram-бота.
         </p>
 
-        <div className="home-animate-fade-up-delay-3 mt-10 flex flex-wrap gap-3">
+        <div className="home-animate-fade-up-delay-3 mt-8 flex w-full max-w-md flex-col gap-2.5 sm:mt-10 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-3">
           <Link
             href="/tournaments"
-            className="site-btn-primary home-btn-glow px-7 py-3.5 text-base shadow-lg shadow-emerald-900/30"
+            className="site-btn-primary home-btn-glow w-full px-6 py-3 text-center text-base shadow-lg shadow-emerald-900/30 sm:w-auto sm:px-7 sm:py-3.5"
           >
             Смотреть турниры
           </Link>
-          <Link href="/login" className="site-btn-secondary px-7 py-3.5 text-base backdrop-blur-sm">
+          <Link
+            href="/login"
+            className="site-btn-secondary w-full px-6 py-3 text-center text-base backdrop-blur-sm sm:w-auto sm:px-7 sm:py-3.5"
+          >
             Войти и публиковать
           </Link>
-          <a href="#news" className="site-btn-ghost home-hero-tagline px-4 py-3.5 text-base">
+          <a
+            href="#news"
+            className="site-btn-ghost home-hero-tagline w-full px-4 py-2.5 text-center text-sm sm:w-auto sm:py-3.5 sm:text-base"
+          >
             Новости ↓
           </a>
         </div>

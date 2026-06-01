@@ -28,10 +28,14 @@ export type AggregatePlayer = {
 
 export type PlayerAvgAggregateOutputType = {
   rating: number | null
+  coachReviewAvg: number | null
+  coachReviewCount: number | null
 }
 
 export type PlayerSumAggregateOutputType = {
   rating: number | null
+  coachReviewAvg: number | null
+  coachReviewCount: number | null
 }
 
 export type PlayerMinAggregateOutputType = {
@@ -50,6 +54,8 @@ export type PlayerMinAggregateOutputType = {
   about: string | null
   isCoach: boolean | null
   coachBio: string | null
+  coachReviewAvg: number | null
+  coachReviewCount: number | null
   role: $Enums.UserRole | null
   isVerified: boolean | null
   confirmToken: string | null
@@ -73,6 +79,8 @@ export type PlayerMaxAggregateOutputType = {
   about: string | null
   isCoach: boolean | null
   coachBio: string | null
+  coachReviewAvg: number | null
+  coachReviewCount: number | null
   role: $Enums.UserRole | null
   isVerified: boolean | null
   confirmToken: string | null
@@ -97,6 +105,8 @@ export type PlayerCountAggregateOutputType = {
   isCoach: number
   coachBio: number
   coachGalleryUrls: number
+  coachReviewAvg: number
+  coachReviewCount: number
   role: number
   isVerified: number
   confirmToken: number
@@ -108,10 +118,14 @@ export type PlayerCountAggregateOutputType = {
 
 export type PlayerAvgAggregateInputType = {
   rating?: true
+  coachReviewAvg?: true
+  coachReviewCount?: true
 }
 
 export type PlayerSumAggregateInputType = {
   rating?: true
+  coachReviewAvg?: true
+  coachReviewCount?: true
 }
 
 export type PlayerMinAggregateInputType = {
@@ -130,6 +144,8 @@ export type PlayerMinAggregateInputType = {
   about?: true
   isCoach?: true
   coachBio?: true
+  coachReviewAvg?: true
+  coachReviewCount?: true
   role?: true
   isVerified?: true
   confirmToken?: true
@@ -153,6 +169,8 @@ export type PlayerMaxAggregateInputType = {
   about?: true
   isCoach?: true
   coachBio?: true
+  coachReviewAvg?: true
+  coachReviewCount?: true
   role?: true
   isVerified?: true
   confirmToken?: true
@@ -177,6 +195,8 @@ export type PlayerCountAggregateInputType = {
   isCoach?: true
   coachBio?: true
   coachGalleryUrls?: true
+  coachReviewAvg?: true
+  coachReviewCount?: true
   role?: true
   isVerified?: true
   confirmToken?: true
@@ -288,6 +308,8 @@ export type PlayerGroupByOutputType = {
   isCoach: boolean
   coachBio: string | null
   coachGalleryUrls: runtime.JsonValue | null
+  coachReviewAvg: number | null
+  coachReviewCount: number
   role: $Enums.UserRole
   isVerified: boolean
   confirmToken: string | null
@@ -335,6 +357,8 @@ export type PlayerWhereInput = {
   isCoach?: Prisma.BoolFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
+  coachReviewAvg?: Prisma.FloatNullableFilter<"Player"> | number | null
+  coachReviewCount?: Prisma.IntFilter<"Player"> | number
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -351,6 +375,8 @@ export type PlayerWhereInput = {
   ideaVotes?: Prisma.IdeaVoteListRelationFilter
   tableBookings?: Prisma.TableBookingListRelationFilter
   clubStaff?: Prisma.ClubStaffListRelationFilter
+  coachReviewsReceived?: Prisma.CoachRatingListRelationFilter
+  coachReviewsGiven?: Prisma.CoachRatingListRelationFilter
 }
 
 export type PlayerOrderByWithRelationInput = {
@@ -370,6 +396,8 @@ export type PlayerOrderByWithRelationInput = {
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrderInput | Prisma.SortOrder
   coachGalleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachReviewAvg?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -386,6 +414,8 @@ export type PlayerOrderByWithRelationInput = {
   ideaVotes?: Prisma.IdeaVoteOrderByRelationAggregateInput
   tableBookings?: Prisma.TableBookingOrderByRelationAggregateInput
   clubStaff?: Prisma.ClubStaffOrderByRelationAggregateInput
+  coachReviewsReceived?: Prisma.CoachRatingOrderByRelationAggregateInput
+  coachReviewsGiven?: Prisma.CoachRatingOrderByRelationAggregateInput
   _relevance?: Prisma.PlayerOrderByRelevanceInput
 }
 
@@ -410,6 +440,8 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   isCoach?: Prisma.BoolFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
+  coachReviewAvg?: Prisma.FloatNullableFilter<"Player"> | number | null
+  coachReviewCount?: Prisma.IntFilter<"Player"> | number
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
@@ -425,6 +457,8 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   ideaVotes?: Prisma.IdeaVoteListRelationFilter
   tableBookings?: Prisma.TableBookingListRelationFilter
   clubStaff?: Prisma.ClubStaffListRelationFilter
+  coachReviewsReceived?: Prisma.CoachRatingListRelationFilter
+  coachReviewsGiven?: Prisma.CoachRatingListRelationFilter
 }, "id" | "phone" | "telegramId" | "confirmToken">
 
 export type PlayerOrderByWithAggregationInput = {
@@ -444,6 +478,8 @@ export type PlayerOrderByWithAggregationInput = {
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrderInput | Prisma.SortOrder
   coachGalleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachReviewAvg?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -476,6 +512,8 @@ export type PlayerScalarWhereWithAggregatesInput = {
   isCoach?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableWithAggregatesFilter<"Player">
+  coachReviewAvg?: Prisma.FloatNullableWithAggregatesFilter<"Player"> | number | null
+  coachReviewCount?: Prisma.IntWithAggregatesFilter<"Player"> | number
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
@@ -499,6 +537,8 @@ export type PlayerCreateInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -515,6 +555,8 @@ export type PlayerCreateInput = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateInput = {
@@ -534,6 +576,8 @@ export type PlayerUncheckedCreateInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -549,6 +593,8 @@ export type PlayerUncheckedCreateInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUpdateInput = {
@@ -567,6 +613,8 @@ export type PlayerUpdateInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -583,6 +631,8 @@ export type PlayerUpdateInput = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateInput = {
@@ -602,6 +652,8 @@ export type PlayerUncheckedUpdateInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -617,6 +669,8 @@ export type PlayerUncheckedUpdateInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateManyInput = {
@@ -636,6 +690,8 @@ export type PlayerCreateManyInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -659,6 +715,8 @@ export type PlayerUpdateManyMutationInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -683,6 +741,8 @@ export type PlayerUncheckedUpdateManyInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -733,6 +793,8 @@ export type PlayerCountOrderByAggregateInput = {
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrder
   coachGalleryUrls?: Prisma.SortOrder
+  coachReviewAvg?: Prisma.SortOrder
+  coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
@@ -742,6 +804,8 @@ export type PlayerCountOrderByAggregateInput = {
 
 export type PlayerAvgOrderByAggregateInput = {
   rating?: Prisma.SortOrder
+  coachReviewAvg?: Prisma.SortOrder
+  coachReviewCount?: Prisma.SortOrder
 }
 
 export type PlayerMaxOrderByAggregateInput = {
@@ -760,6 +824,8 @@ export type PlayerMaxOrderByAggregateInput = {
   about?: Prisma.SortOrder
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrder
+  coachReviewAvg?: Prisma.SortOrder
+  coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
@@ -783,6 +849,8 @@ export type PlayerMinOrderByAggregateInput = {
   about?: Prisma.SortOrder
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrder
+  coachReviewAvg?: Prisma.SortOrder
+  coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
@@ -792,6 +860,8 @@ export type PlayerMinOrderByAggregateInput = {
 
 export type PlayerSumOrderByAggregateInput = {
   rating?: Prisma.SortOrder
+  coachReviewAvg?: Prisma.SortOrder
+  coachReviewCount?: Prisma.SortOrder
 }
 
 export type PlayerCreateNestedManyWithoutCityInput = {
@@ -880,6 +950,34 @@ export type FloatFieldUpdateOperationsInput = {
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
+}
+
+export type PlayerCreateNestedOneWithoutCoachReviewsReceivedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsReceivedInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsReceivedInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutCoachReviewsReceivedInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerCreateNestedOneWithoutCoachReviewsGivenInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsGivenInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsGivenInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutCoachReviewsGivenInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutCoachReviewsReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsReceivedInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsReceivedInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutCoachReviewsReceivedInput
+  upsert?: Prisma.PlayerUpsertWithoutCoachReviewsReceivedInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutCoachReviewsReceivedInput, Prisma.PlayerUpdateWithoutCoachReviewsReceivedInput>, Prisma.PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput>
+}
+
+export type PlayerUpdateOneRequiredWithoutCoachReviewsGivenNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsGivenInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsGivenInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutCoachReviewsGivenInput
+  upsert?: Prisma.PlayerUpsertWithoutCoachReviewsGivenInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutCoachReviewsGivenInput, Prisma.PlayerUpdateWithoutCoachReviewsGivenInput>, Prisma.PlayerUncheckedUpdateWithoutCoachReviewsGivenInput>
 }
 
 export type PlayerCreateNestedOneWithoutClubRatingsInput = {
@@ -1012,6 +1110,8 @@ export type PlayerCreateWithoutCityInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1027,6 +1127,8 @@ export type PlayerCreateWithoutCityInput = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutCityInput = {
@@ -1045,6 +1147,8 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1060,6 +1164,8 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutCityInput = {
@@ -1108,6 +1214,8 @@ export type PlayerScalarWhereInput = {
   isCoach?: Prisma.BoolFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
+  coachReviewAvg?: Prisma.FloatNullableFilter<"Player"> | number | null
+  coachReviewCount?: Prisma.IntFilter<"Player"> | number
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -1131,6 +1239,8 @@ export type PlayerCreateWithoutClubStaffInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1146,6 +1256,8 @@ export type PlayerCreateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutClubStaffInput = {
@@ -1165,6 +1277,8 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1179,6 +1293,8 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutClubStaffInput = {
@@ -1213,6 +1329,8 @@ export type PlayerUpdateWithoutClubStaffInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1228,6 +1346,8 @@ export type PlayerUpdateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubStaffInput = {
@@ -1247,6 +1367,8 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1261,6 +1383,8 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateWithoutTableBookingsInput = {
@@ -1279,6 +1403,8 @@ export type PlayerCreateWithoutTableBookingsInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1294,6 +1420,8 @@ export type PlayerCreateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutTableBookingsInput = {
@@ -1313,6 +1441,8 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1327,6 +1457,8 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutTableBookingsInput = {
@@ -1361,6 +1493,8 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1376,6 +1510,8 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
@@ -1395,6 +1531,8 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1409,6 +1547,336 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
+}
+
+export type PlayerCreateWithoutCoachReviewsReceivedInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
+}
+
+export type PlayerUncheckedCreateWithoutCoachReviewsReceivedInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
+}
+
+export type PlayerCreateOrConnectWithoutCoachReviewsReceivedInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsReceivedInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsReceivedInput>
+}
+
+export type PlayerCreateWithoutCoachReviewsGivenInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+}
+
+export type PlayerUncheckedCreateWithoutCoachReviewsGivenInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+}
+
+export type PlayerCreateOrConnectWithoutCoachReviewsGivenInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsGivenInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsGivenInput>
+}
+
+export type PlayerUpsertWithoutCoachReviewsReceivedInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutCoachReviewsReceivedInput, Prisma.PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsReceivedInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsReceivedInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutCoachReviewsReceivedInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutCoachReviewsReceivedInput, Prisma.PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput>
+}
+
+export type PlayerUpdateWithoutCoachReviewsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
+}
+
+export type PlayerUpsertWithoutCoachReviewsGivenInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutCoachReviewsGivenInput, Prisma.PlayerUncheckedUpdateWithoutCoachReviewsGivenInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutCoachReviewsGivenInput, Prisma.PlayerUncheckedCreateWithoutCoachReviewsGivenInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutCoachReviewsGivenInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutCoachReviewsGivenInput, Prisma.PlayerUncheckedUpdateWithoutCoachReviewsGivenInput>
+}
+
+export type PlayerUpdateWithoutCoachReviewsGivenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutCoachReviewsGivenInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
 }
 
 export type PlayerCreateWithoutClubRatingsInput = {
@@ -1427,6 +1895,8 @@ export type PlayerCreateWithoutClubRatingsInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1442,6 +1912,8 @@ export type PlayerCreateWithoutClubRatingsInput = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutClubRatingsInput = {
@@ -1461,6 +1933,8 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1475,6 +1949,8 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutClubRatingsInput = {
@@ -1509,6 +1985,8 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1524,6 +2002,8 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
@@ -1543,6 +2023,8 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1557,6 +2039,8 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateWithoutLoginChallengesInput = {
@@ -1575,6 +2059,8 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1590,6 +2076,8 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
@@ -1609,6 +2097,8 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1623,6 +2113,8 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutLoginChallengesInput = {
@@ -1657,6 +2149,8 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1672,6 +2166,8 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
@@ -1691,6 +2187,8 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1705,6 +2203,8 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateWithoutTeamsAsPlayer1Input = {
@@ -1723,6 +2223,8 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1738,6 +2240,8 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
@@ -1757,6 +2261,8 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1771,6 +2277,8 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutTeamsAsPlayer1Input = {
@@ -1794,6 +2302,8 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1809,6 +2319,8 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
@@ -1828,6 +2340,8 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1842,6 +2356,8 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutTeamsAsPlayer2Input = {
@@ -1876,6 +2392,8 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1891,6 +2409,8 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
@@ -1910,6 +2430,8 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1924,6 +2446,8 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUpsertWithoutTeamsAsPlayer2Input = {
@@ -1953,6 +2477,8 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1968,6 +2494,8 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
@@ -1987,6 +2515,8 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2001,6 +2531,8 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateWithoutRegistrationsInput = {
@@ -2019,6 +2551,8 @@ export type PlayerCreateWithoutRegistrationsInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2034,6 +2568,8 @@ export type PlayerCreateWithoutRegistrationsInput = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutRegistrationsInput = {
@@ -2053,6 +2589,8 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2067,6 +2605,8 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutRegistrationsInput = {
@@ -2101,6 +2641,8 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2116,6 +2658,8 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
@@ -2135,6 +2679,8 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2149,6 +2695,8 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateWithoutRatingHistoryInput = {
@@ -2167,6 +2715,8 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2182,6 +2732,8 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
@@ -2201,6 +2753,8 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2215,6 +2769,8 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutRatingHistoryInput = {
@@ -2249,6 +2805,8 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2264,6 +2822,8 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
@@ -2283,6 +2843,8 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2297,6 +2859,8 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateWithoutIdeasInput = {
@@ -2315,6 +2879,8 @@ export type PlayerCreateWithoutIdeasInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2330,6 +2896,8 @@ export type PlayerCreateWithoutIdeasInput = {
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutIdeasInput = {
@@ -2349,6 +2917,8 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2363,6 +2933,8 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutIdeasInput = {
@@ -2397,6 +2969,8 @@ export type PlayerUpdateWithoutIdeasInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2412,6 +2986,8 @@ export type PlayerUpdateWithoutIdeasInput = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutIdeasInput = {
@@ -2431,6 +3007,8 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2445,6 +3023,8 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateWithoutIdeaVotesInput = {
@@ -2463,6 +3043,8 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2478,6 +3060,8 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
@@ -2497,6 +3081,8 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2511,6 +3097,8 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
 }
 
 export type PlayerCreateOrConnectWithoutIdeaVotesInput = {
@@ -2545,6 +3133,8 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2560,6 +3150,8 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
@@ -2579,6 +3171,8 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2593,6 +3187,8 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerCreateManyCityInput = {
@@ -2611,6 +3207,8 @@ export type PlayerCreateManyCityInput = {
   isCoach?: boolean
   coachBio?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2634,6 +3232,8 @@ export type PlayerUpdateWithoutCityInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2649,6 +3249,8 @@ export type PlayerUpdateWithoutCityInput = {
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutCityInput = {
@@ -2667,6 +3269,8 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2682,6 +3286,8 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
 }
 
 export type PlayerUncheckedUpdateManyWithoutCityInput = {
@@ -2700,6 +3306,8 @@ export type PlayerUncheckedUpdateManyWithoutCityInput = {
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2723,6 +3331,8 @@ export type PlayerCountOutputType = {
   ideaVotes: number
   tableBookings: number
   clubStaff: number
+  coachReviewsReceived: number
+  coachReviewsGiven: number
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2736,6 +3346,8 @@ export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   ideaVotes?: boolean | PlayerCountOutputTypeCountIdeaVotesArgs
   tableBookings?: boolean | PlayerCountOutputTypeCountTableBookingsArgs
   clubStaff?: boolean | PlayerCountOutputTypeCountClubStaffArgs
+  coachReviewsReceived?: boolean | PlayerCountOutputTypeCountCoachReviewsReceivedArgs
+  coachReviewsGiven?: boolean | PlayerCountOutputTypeCountCoachReviewsGivenArgs
 }
 
 /**
@@ -2818,6 +3430,20 @@ export type PlayerCountOutputTypeCountClubStaffArgs<ExtArgs extends runtime.Type
   where?: Prisma.ClubStaffWhereInput
 }
 
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountCoachReviewsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CoachRatingWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountCoachReviewsGivenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CoachRatingWhereInput
+}
+
 
 export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2836,6 +3462,8 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   isCoach?: boolean
   coachBio?: boolean
   coachGalleryUrls?: boolean
+  coachReviewAvg?: boolean
+  coachReviewCount?: boolean
   role?: boolean
   isVerified?: boolean
   confirmToken?: boolean
@@ -2852,6 +3480,8 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   ideaVotes?: boolean | Prisma.Player$ideaVotesArgs<ExtArgs>
   tableBookings?: boolean | Prisma.Player$tableBookingsArgs<ExtArgs>
   clubStaff?: boolean | Prisma.Player$clubStaffArgs<ExtArgs>
+  coachReviewsReceived?: boolean | Prisma.Player$coachReviewsReceivedArgs<ExtArgs>
+  coachReviewsGiven?: boolean | Prisma.Player$coachReviewsGivenArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
@@ -2874,6 +3504,8 @@ export type PlayerSelectScalar = {
   isCoach?: boolean
   coachBio?: boolean
   coachGalleryUrls?: boolean
+  coachReviewAvg?: boolean
+  coachReviewCount?: boolean
   role?: boolean
   isVerified?: boolean
   confirmToken?: boolean
@@ -2881,7 +3513,7 @@ export type PlayerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "isCoach" | "coachBio" | "coachGalleryUrls" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "isCoach" | "coachBio" | "coachGalleryUrls" | "coachReviewAvg" | "coachReviewCount" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Player$registrationsArgs<ExtArgs>
@@ -2894,6 +3526,8 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   ideaVotes?: boolean | Prisma.Player$ideaVotesArgs<ExtArgs>
   tableBookings?: boolean | Prisma.Player$tableBookingsArgs<ExtArgs>
   clubStaff?: boolean | Prisma.Player$clubStaffArgs<ExtArgs>
+  coachReviewsReceived?: boolean | Prisma.Player$coachReviewsReceivedArgs<ExtArgs>
+  coachReviewsGiven?: boolean | Prisma.Player$coachReviewsGivenArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -2911,6 +3545,8 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     ideaVotes: Prisma.$IdeaVotePayload<ExtArgs>[]
     tableBookings: Prisma.$TableBookingPayload<ExtArgs>[]
     clubStaff: Prisma.$ClubStaffPayload<ExtArgs>[]
+    coachReviewsReceived: Prisma.$CoachRatingPayload<ExtArgs>[]
+    coachReviewsGiven: Prisma.$CoachRatingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2929,6 +3565,8 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     isCoach: boolean
     coachBio: string | null
     coachGalleryUrls: runtime.JsonValue | null
+    coachReviewAvg: number | null
+    coachReviewCount: number
     role: $Enums.UserRole
     isVerified: boolean
     confirmToken: string | null
@@ -3285,6 +3923,8 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   ideaVotes<T extends Prisma.Player$ideaVotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$ideaVotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tableBookings<T extends Prisma.Player$tableBookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$tableBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TableBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clubStaff<T extends Prisma.Player$clubStaffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$clubStaffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coachReviewsReceived<T extends Prisma.Player$coachReviewsReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$coachReviewsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoachRatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  coachReviewsGiven<T extends Prisma.Player$coachReviewsGivenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$coachReviewsGivenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoachRatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3330,6 +3970,8 @@ export interface PlayerFieldRefs {
   readonly isCoach: Prisma.FieldRef<"Player", 'Boolean'>
   readonly coachBio: Prisma.FieldRef<"Player", 'String'>
   readonly coachGalleryUrls: Prisma.FieldRef<"Player", 'Json'>
+  readonly coachReviewAvg: Prisma.FieldRef<"Player", 'Float'>
+  readonly coachReviewCount: Prisma.FieldRef<"Player", 'Int'>
   readonly role: Prisma.FieldRef<"Player", 'UserRole'>
   readonly isVerified: Prisma.FieldRef<"Player", 'Boolean'>
   readonly confirmToken: Prisma.FieldRef<"Player", 'String'>
@@ -3920,6 +4562,54 @@ export type Player$clubStaffArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.ClubStaffScalarFieldEnum | Prisma.ClubStaffScalarFieldEnum[]
+}
+
+/**
+ * Player.coachReviewsReceived
+ */
+export type Player$coachReviewsReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CoachRating
+   */
+  select?: Prisma.CoachRatingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CoachRating
+   */
+  omit?: Prisma.CoachRatingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CoachRatingInclude<ExtArgs> | null
+  where?: Prisma.CoachRatingWhereInput
+  orderBy?: Prisma.CoachRatingOrderByWithRelationInput | Prisma.CoachRatingOrderByWithRelationInput[]
+  cursor?: Prisma.CoachRatingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CoachRatingScalarFieldEnum | Prisma.CoachRatingScalarFieldEnum[]
+}
+
+/**
+ * Player.coachReviewsGiven
+ */
+export type Player$coachReviewsGivenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CoachRating
+   */
+  select?: Prisma.CoachRatingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CoachRating
+   */
+  omit?: Prisma.CoachRatingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CoachRatingInclude<ExtArgs> | null
+  where?: Prisma.CoachRatingWhereInput
+  orderBy?: Prisma.CoachRatingOrderByWithRelationInput | Prisma.CoachRatingOrderByWithRelationInput[]
+  cursor?: Prisma.CoachRatingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CoachRatingScalarFieldEnum | Prisma.CoachRatingScalarFieldEnum[]
 }
 
 /**

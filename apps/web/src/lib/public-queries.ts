@@ -74,7 +74,8 @@ export const coachListInclude = {
 } satisfies Prisma.PlayerInclude;
 
 export const coachListOrderBy = [
-  { rating: "desc" as const },
+  { coachReviewCount: "desc" as const },
+  { coachReviewAvg: "desc" as const },
   { lastName: "asc" as const },
 ] as const;
 

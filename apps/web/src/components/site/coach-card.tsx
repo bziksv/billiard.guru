@@ -1,6 +1,7 @@
 import { SiteCard } from "@/components/site/site-card";
 import { coachCoverPhoto, coachTeaser } from "@/lib/coach-profile";
-import { formatRating } from "@/lib/rating";
+import { formatCoachReviewAvg } from "@/lib/coach-review-display";
+import { CoachReviewStars } from "@/components/site/coach-review-stars";
 import { playerName } from "@/lib/public-display";
 
 export type CoachListItem = {
@@ -8,7 +9,8 @@ export type CoachListItem = {
   firstName: string;
   lastName: string;
   middleName: string | null;
-  rating: number;
+  coachReviewAvg: number | null;
+  coachReviewCount: number;
   photoUrl: string | null;
   coachBio: string | null;
   coachGalleryUrls?: unknown;
@@ -30,9 +32,14 @@ export function CoachCard({ coach, href }: { coach: CoachListItem; href: string 
             🎓
           </div>
         )}
-        <span className="coach-card-rating absolute right-3 top-3 rounded-lg bg-black/55 px-2 py-1 font-mono text-sm font-semibold text-emerald-300 backdrop-blur-sm">
-          {formatRating(coach.rating)}
-        </span>
+        {coach.coachReviewCount > 0 && coach.coachReviewAvg != null && (
+          <div className="coach-card-rating absolute right-3 top-3 flex flex-col items-end gap-0.5 rounded-lg bg-black/60 px-2 py-1.5 backdrop-blur-sm">
+            <CoachReviewStars score={coach.coachReviewAvg} size="sm" />
+            <span className="font-mono text-xs font-semibold text-emerald-300">
+              {formatCoachReviewAvg(coach.coachReviewAvg, coach.coachReviewCount)}
+            </span>
+          </div>
+        )}
       </div>
       <div className="p-4">
         <h3 className="home-card-title font-semibold">{playerName(coach)}</h3>

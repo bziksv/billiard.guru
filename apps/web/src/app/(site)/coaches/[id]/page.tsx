@@ -5,7 +5,11 @@ import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { TelegramLink } from "@/lib/contact-links";
 import { parseCoachGalleryUrls } from "@/lib/coach-profile";
+import { CoachReviewsSection } from "@/components/site/coach-reviews-section";
+import { CoachReviewStars } from "@/components/site/coach-review-stars";
+import { coachReviewLabel, formatCoachReviewAvg } from "@/lib/coach-review-display";
 import { formatRating } from "@/lib/rating";
+import { getCurrentPlayer, getSession } from "@/lib/auth";
 import { playerName } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
 
@@ -22,6 +26,10 @@ export default async function CoachDetailPage({
   });
 
   if (!coach) notFound();
+
+  const session = await getSession();
+  const viewer = await getCurrentPlayer();
+  const isSelf = viewer?.id === coach.id;
 
   const gallery = parseCoachGalleryUrls(coach.coachGalleryUrls);
   const photos =
@@ -49,10 +57,26 @@ export default async function CoachDetailPage({
                 </dd>
               </div>
               <div>
-                <dt className="text-zinc-500">Рейтинг</dt>
-                <dd className="mt-1 font-mono text-lg text-emerald-400">
-                  {formatRating(coach.rating)}
+                <dt className="text-zinc-500">Оценка как тренер</dt>
+                <dd className="mt-1">
+                  {coach.coachReviewCount > 0 && coach.coachReviewAvg != null ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <CoachReviewStars score={coach.coachReviewAvg} />
+                      <span className="font-mono text-lg text-emerald-400">
+                        {formatCoachReviewAvg(coach.coachReviewAvg, coach.coachReviewCount)}
+                      </span>
+                      <span className="text-xs text-zinc-500">
+                        {coachReviewLabel(coach.coachReviewCount)}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-sm text-zinc-500">Пока нет оценок</span>
+                  )}
                 </dd>
+              </div>
+              <div>
+                <dt className="text-zinc-500">Игровой рейтинг</dt>
+                <dd className="mt-1 font-mono text-sm text-zinc-400">{formatRating(coach.rating)}</dd>
               </div>
               {coach.telegramUsername && (
                 <div className="sm:col-span-2">
@@ -83,6 +107,8 @@ export default async function CoachDetailPage({
             )}
           </SiteCard>
         </section>
+
+        <CoachReviewsSection coachId={coach.id} loggedIn={Boolean(session)} isSelf={isSelf} />
       </PageMain>
     </>
   );

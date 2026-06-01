@@ -47,11 +47,12 @@ export function HomeStickyNav() {
 
   return (
     <nav
-      className={`sticky top-[7.25rem] z-30 border-b transition-all duration-300 sm:top-32 lg:top-16 ${
+      className={`sticky top-[6.5rem] z-30 hidden border-b transition-all duration-300 sm:top-[7.75rem] lg:top-16 lg:block ${
         stuck ? "home-sticky-nav-stuck" : "border-transparent bg-transparent"
       }`}
+      aria-label="Навигация по разделам главной"
     >
-      <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-6 py-2.5 scrollbar-none">
+      <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 py-2.5 scrollbar-none sm:px-6">
         {LINKS.map((link) => (
           <a
             key={link.href}

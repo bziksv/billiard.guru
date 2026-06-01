@@ -153,6 +153,11 @@ export const playerAboutUpdateSchema = z.object({
   about: z.string().max(4000).optional().nullable().or(z.literal("")),
 });
 
+export const coachReviewSchema = z.object({
+  score: z.coerce.number().int().min(1).max(5),
+  comment: z.string().max(2000).optional().nullable().or(z.literal("")),
+});
+
 export const coachProfileUpdateSchema = z.object({
   isCoach: z.boolean(),
   coachBio: z.string().max(8000).optional().nullable().or(z.literal("")),
