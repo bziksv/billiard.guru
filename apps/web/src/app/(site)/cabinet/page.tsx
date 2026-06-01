@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { BookingCancelButton } from "@/components/site/booking-cancel-button";
 import { RegistrationCancelButton } from "@/components/site/registration-cancel-button";
+import { CoachProfileEditor } from "@/components/cabinet/coach-profile-editor";
+import { PlayerAboutEditor } from "@/components/cabinet/player-about-editor";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { getCurrentPlayer, isSuperAdmin } from "@/lib/auth";
@@ -105,6 +107,10 @@ export default async function CabinetPage() {
             )}
           </div>
         </SiteCard>
+
+        <PlayerAboutEditor playerId={player.id} />
+
+        <CoachProfileEditor playerId={player.id} />
 
         <section>
           <h2 className="site-section-title mb-3">Мои брони столов</h2>

@@ -149,6 +149,27 @@ export const clubPlayerRatingSchema = z.object({
   rating: z.coerce.number().min(0).multipleOf(0.5),
 });
 
+export const playerAboutUpdateSchema = z.object({
+  about: z.string().max(4000).optional().nullable().or(z.literal("")),
+});
+
+export const coachProfileUpdateSchema = z.object({
+  isCoach: z.boolean(),
+  coachBio: z.string().max(8000).optional().nullable().or(z.literal("")),
+  coachGalleryUrls: z
+    .array(
+      z
+        .string()
+        .min(1)
+        .max(500)
+        .refine((u) => u.startsWith("http://") || u.startsWith("https://") || u.startsWith("/uploads/"), {
+          message: "Некорректный URL фото",
+        }),
+    )
+    .max(12)
+    .optional(),
+});
+
 export const clubPlayerRatingUpdateSchema = z.object({
   rating: z.coerce.number().min(0).multipleOf(0.5),
 });

@@ -61,7 +61,25 @@ export default async function PlayerPage({
               </div>
             )}
           </dl>
+          {player.isCoach && (
+            <div className="mt-4">
+              <Link href={`/coaches/${player.id}`} className="site-btn-primary text-sm">
+                Профиль тренера
+              </Link>
+            </div>
+          )}
         </SiteCard>
+
+        {player.about?.trim() && (
+          <section>
+            <h2 className="site-section-title mb-3">О себе</h2>
+            <SiteCard>
+              <div className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-secondary)]">
+                {player.about.trim()}
+              </div>
+            </SiteCard>
+          </section>
+        )}
 
         <section>
           <h2 className="site-section-title mb-3">Турниры</h2>

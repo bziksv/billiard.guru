@@ -47,6 +47,9 @@ export type PlayerMinAggregateOutputType = {
   telegramId: string | null
   telegramUsername: string | null
   rating: number | null
+  about: string | null
+  isCoach: boolean | null
+  coachBio: string | null
   role: $Enums.UserRole | null
   isVerified: boolean | null
   confirmToken: string | null
@@ -67,6 +70,9 @@ export type PlayerMaxAggregateOutputType = {
   telegramId: string | null
   telegramUsername: string | null
   rating: number | null
+  about: string | null
+  isCoach: boolean | null
+  coachBio: string | null
   role: $Enums.UserRole | null
   isVerified: boolean | null
   confirmToken: string | null
@@ -87,6 +93,10 @@ export type PlayerCountAggregateOutputType = {
   telegramId: number
   telegramUsername: number
   rating: number
+  about: number
+  isCoach: number
+  coachBio: number
+  coachGalleryUrls: number
   role: number
   isVerified: number
   confirmToken: number
@@ -117,6 +127,9 @@ export type PlayerMinAggregateInputType = {
   telegramId?: true
   telegramUsername?: true
   rating?: true
+  about?: true
+  isCoach?: true
+  coachBio?: true
   role?: true
   isVerified?: true
   confirmToken?: true
@@ -137,6 +150,9 @@ export type PlayerMaxAggregateInputType = {
   telegramId?: true
   telegramUsername?: true
   rating?: true
+  about?: true
+  isCoach?: true
+  coachBio?: true
   role?: true
   isVerified?: true
   confirmToken?: true
@@ -157,6 +173,10 @@ export type PlayerCountAggregateInputType = {
   telegramId?: true
   telegramUsername?: true
   rating?: true
+  about?: true
+  isCoach?: true
+  coachBio?: true
+  coachGalleryUrls?: true
   role?: true
   isVerified?: true
   confirmToken?: true
@@ -264,6 +284,10 @@ export type PlayerGroupByOutputType = {
   telegramId: string | null
   telegramUsername: string | null
   rating: number
+  about: string | null
+  isCoach: boolean
+  coachBio: string | null
+  coachGalleryUrls: runtime.JsonValue | null
   role: $Enums.UserRole
   isVerified: boolean
   confirmToken: string | null
@@ -307,6 +331,10 @@ export type PlayerWhereInput = {
   telegramId?: Prisma.StringNullableFilter<"Player"> | string | null
   telegramUsername?: Prisma.StringNullableFilter<"Player"> | string | null
   rating?: Prisma.FloatFilter<"Player"> | number
+  about?: Prisma.StringNullableFilter<"Player"> | string | null
+  isCoach?: Prisma.BoolFilter<"Player"> | boolean
+  coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
+  coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -338,6 +366,10 @@ export type PlayerOrderByWithRelationInput = {
   telegramId?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrder
+  about?: Prisma.SortOrderInput | Prisma.SortOrder
+  isCoach?: Prisma.SortOrder
+  coachBio?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachGalleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -374,6 +406,10 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   photoUrl?: Prisma.StringNullableFilter<"Player"> | string | null
   telegramUsername?: Prisma.StringNullableFilter<"Player"> | string | null
   rating?: Prisma.FloatFilter<"Player"> | number
+  about?: Prisma.StringNullableFilter<"Player"> | string | null
+  isCoach?: Prisma.BoolFilter<"Player"> | boolean
+  coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
+  coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
@@ -404,6 +440,10 @@ export type PlayerOrderByWithAggregationInput = {
   telegramId?: Prisma.SortOrderInput | Prisma.SortOrder
   telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrder
+  about?: Prisma.SortOrderInput | Prisma.SortOrder
+  isCoach?: Prisma.SortOrder
+  coachBio?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachGalleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -432,6 +472,10 @@ export type PlayerScalarWhereWithAggregatesInput = {
   telegramId?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   telegramUsername?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   rating?: Prisma.FloatWithAggregatesFilter<"Player"> | number
+  about?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
+  isCoach?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
+  coachBio?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
+  coachGalleryUrls?: Prisma.JsonNullableWithAggregatesFilter<"Player">
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
@@ -451,6 +495,10 @@ export type PlayerCreateInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -482,6 +530,10 @@ export type PlayerUncheckedCreateInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -511,6 +563,10 @@ export type PlayerUpdateInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -542,6 +598,10 @@ export type PlayerUncheckedUpdateInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -572,6 +632,10 @@ export type PlayerCreateManyInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -591,6 +655,10 @@ export type PlayerUpdateManyMutationInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -611,6 +679,10 @@ export type PlayerUncheckedUpdateManyInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -657,6 +729,10 @@ export type PlayerCountOrderByAggregateInput = {
   telegramId?: Prisma.SortOrder
   telegramUsername?: Prisma.SortOrder
   rating?: Prisma.SortOrder
+  about?: Prisma.SortOrder
+  isCoach?: Prisma.SortOrder
+  coachBio?: Prisma.SortOrder
+  coachGalleryUrls?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
@@ -681,6 +757,9 @@ export type PlayerMaxOrderByAggregateInput = {
   telegramId?: Prisma.SortOrder
   telegramUsername?: Prisma.SortOrder
   rating?: Prisma.SortOrder
+  about?: Prisma.SortOrder
+  isCoach?: Prisma.SortOrder
+  coachBio?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
@@ -701,6 +780,9 @@ export type PlayerMinOrderByAggregateInput = {
   telegramId?: Prisma.SortOrder
   telegramUsername?: Prisma.SortOrder
   rating?: Prisma.SortOrder
+  about?: Prisma.SortOrder
+  isCoach?: Prisma.SortOrder
+  coachBio?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
@@ -926,6 +1008,10 @@ export type PlayerCreateWithoutCityInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -955,6 +1041,10 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1014,6 +1104,10 @@ export type PlayerScalarWhereInput = {
   telegramId?: Prisma.StringNullableFilter<"Player"> | string | null
   telegramUsername?: Prisma.StringNullableFilter<"Player"> | string | null
   rating?: Prisma.FloatFilter<"Player"> | number
+  about?: Prisma.StringNullableFilter<"Player"> | string | null
+  isCoach?: Prisma.BoolFilter<"Player"> | boolean
+  coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
+  coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -1033,6 +1127,10 @@ export type PlayerCreateWithoutClubStaffInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1063,6 +1161,10 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1107,6 +1209,10 @@ export type PlayerUpdateWithoutClubStaffInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1137,6 +1243,10 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1165,6 +1275,10 @@ export type PlayerCreateWithoutTableBookingsInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1195,6 +1309,10 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1239,6 +1357,10 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1269,6 +1391,10 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1297,6 +1423,10 @@ export type PlayerCreateWithoutClubRatingsInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1327,6 +1457,10 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1371,6 +1505,10 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1401,6 +1539,10 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1429,6 +1571,10 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1459,6 +1605,10 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1503,6 +1653,10 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1533,6 +1687,10 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1561,6 +1719,10 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1591,6 +1753,10 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1624,6 +1790,10 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1654,6 +1824,10 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1698,6 +1872,10 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1728,6 +1906,10 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1767,6 +1949,10 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1797,6 +1983,10 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1825,6 +2015,10 @@ export type PlayerCreateWithoutRegistrationsInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1855,6 +2049,10 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1899,6 +2097,10 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1929,6 +2131,10 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1957,6 +2163,10 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -1987,6 +2197,10 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2031,6 +2245,10 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2061,6 +2279,10 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2089,6 +2311,10 @@ export type PlayerCreateWithoutIdeasInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2119,6 +2345,10 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2163,6 +2393,10 @@ export type PlayerUpdateWithoutIdeasInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2193,6 +2427,10 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2221,6 +2459,10 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2251,6 +2493,10 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2295,6 +2541,10 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2325,6 +2575,10 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2353,6 +2607,10 @@ export type PlayerCreateManyCityInput = {
   telegramId?: string | null
   telegramUsername?: string | null
   rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: $Enums.UserRole
   isVerified?: boolean
   confirmToken?: string | null
@@ -2372,6 +2630,10 @@ export type PlayerUpdateWithoutCityInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2401,6 +2663,10 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2430,6 +2696,10 @@ export type PlayerUncheckedUpdateManyWithoutCityInput = {
   telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2562,6 +2832,10 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   telegramId?: boolean
   telegramUsername?: boolean
   rating?: boolean
+  about?: boolean
+  isCoach?: boolean
+  coachBio?: boolean
+  coachGalleryUrls?: boolean
   role?: boolean
   isVerified?: boolean
   confirmToken?: boolean
@@ -2596,6 +2870,10 @@ export type PlayerSelectScalar = {
   telegramId?: boolean
   telegramUsername?: boolean
   rating?: boolean
+  about?: boolean
+  isCoach?: boolean
+  coachBio?: boolean
+  coachGalleryUrls?: boolean
   role?: boolean
   isVerified?: boolean
   confirmToken?: boolean
@@ -2603,7 +2881,7 @@ export type PlayerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "isCoach" | "coachBio" | "coachGalleryUrls" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Player$registrationsArgs<ExtArgs>
@@ -2647,6 +2925,10 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     telegramId: string | null
     telegramUsername: string | null
     rating: number
+    about: string | null
+    isCoach: boolean
+    coachBio: string | null
+    coachGalleryUrls: runtime.JsonValue | null
     role: $Enums.UserRole
     isVerified: boolean
     confirmToken: string | null
@@ -3044,6 +3326,10 @@ export interface PlayerFieldRefs {
   readonly telegramId: Prisma.FieldRef<"Player", 'String'>
   readonly telegramUsername: Prisma.FieldRef<"Player", 'String'>
   readonly rating: Prisma.FieldRef<"Player", 'Float'>
+  readonly about: Prisma.FieldRef<"Player", 'String'>
+  readonly isCoach: Prisma.FieldRef<"Player", 'Boolean'>
+  readonly coachBio: Prisma.FieldRef<"Player", 'String'>
+  readonly coachGalleryUrls: Prisma.FieldRef<"Player", 'Json'>
   readonly role: Prisma.FieldRef<"Player", 'UserRole'>
   readonly isVerified: Prisma.FieldRef<"Player", 'Boolean'>
   readonly confirmToken: Prisma.FieldRef<"Player", 'String'>

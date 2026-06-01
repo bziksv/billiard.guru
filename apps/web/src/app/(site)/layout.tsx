@@ -11,12 +11,12 @@ export default function SiteLayout({
 }) {
   return (
     <div className="site-main flex min-h-screen flex-col">
-      <div className="sticky top-0 z-40">
+      <div className="site-top-shell sticky top-0 z-40">
         <SiteDevBanner />
         <PreviewBannerSlot />
         <SiteHeader />
       </div>
-      <div className="flex-1 bg-transparent">{children}</div>
+      <div className="site-content-shell flex-1 bg-transparent">{children}</div>
       <SiteFooter />
     </div>
   );

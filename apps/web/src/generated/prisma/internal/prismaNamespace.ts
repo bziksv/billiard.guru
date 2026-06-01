@@ -1690,6 +1690,10 @@ export const PlayerScalarFieldEnum = {
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   rating: 'rating',
+  about: 'about',
+  isCoach: 'isCoach',
+  coachBio: 'coachBio',
+  coachGalleryUrls: 'coachGalleryUrls',
   role: 'role',
   isVerified: 'isVerified',
   confirmToken: 'confirmToken',
@@ -1979,6 +1983,8 @@ export const PlayerOrderByRelevanceFieldEnum = {
   photoUrl: 'photoUrl',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
+  about: 'about',
+  coachBio: 'coachBio',
   confirmToken: 'confirmToken'
 } as const
 

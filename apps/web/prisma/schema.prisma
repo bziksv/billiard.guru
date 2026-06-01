@@ -203,6 +203,10 @@ model Player {
   telegramId       String?  @unique @map("telegram_id")
   telegramUsername String?  @map("telegram_username")
   rating           Float    @default(0)
+  about            String?  @db.Text
+  isCoach          Boolean  @default(false) @map("is_coach")
+  coachBio         String?  @map("coach_bio") @db.Text
+  coachGalleryUrls Json?    @map("coach_gallery_urls")
   role             UserRole @default(PLAYER)
   isVerified       Boolean  @default(false) @map("is_verified")
   confirmToken     String?  @unique @map("confirm_token")

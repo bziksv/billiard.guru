@@ -22,8 +22,8 @@ export async function SiteHeader() {
       : null;
 
   return (
-    <header className="site-header-shell border-b backdrop-blur-xl backdrop-saturate-150">
-      <SiteContainer className="flex h-14 items-center gap-3 py-0 sm:gap-4 lg:h-16">
+    <header className="site-header-shell overflow-visible border-b backdrop-blur-xl backdrop-saturate-150">
+      <SiteContainer className="relative flex h-14 items-center gap-2 py-0 sm:gap-3 lg:h-16 lg:gap-4">
         <Link
           href="/"
           className="shrink-0 text-base font-bold tracking-tight text-emerald-400 lg:text-lg"
@@ -31,11 +31,8 @@ export async function SiteHeader() {
           {APP_NAME}
         </Link>
 
-        <div className="min-w-0 flex-1 overflow-visible">
+        <div className="ml-auto flex min-w-0 items-center gap-1.5 sm:gap-2 lg:ml-0 lg:flex-1">
           <SiteHeaderNav />
-        </div>
-
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <ThemeToggle variant="site" />
           {player ? (
             <UserMenu

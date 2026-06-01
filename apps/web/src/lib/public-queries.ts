@@ -62,6 +62,22 @@ export function playerGeoWhere(params: GeoSearchParams): Prisma.PlayerWhereInput
   };
 }
 
+export function coachGeoWhere(params: GeoSearchParams): Prisma.PlayerWhereInput {
+  return {
+    ...playerGeoWhere(params),
+    isCoach: true,
+  };
+}
+
+export const coachListInclude = {
+  city: { include: { country: true } },
+} satisfies Prisma.PlayerInclude;
+
+export const coachListOrderBy = [
+  { rating: "desc" as const },
+  { lastName: "asc" as const },
+] as const;
+
 export const tournamentListInclude = {
   club: { include: { city: { include: { country: true } } } },
   _count: {

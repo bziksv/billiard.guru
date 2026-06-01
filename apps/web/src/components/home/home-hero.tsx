@@ -50,7 +50,7 @@ export function HomeHero({
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[94vh] overflow-hidden border-b border-[var(--border-subtle)]"
+      className="relative min-h-[min(94vh,820px)] overflow-hidden border-b border-[var(--border-subtle)] sm:min-h-[94vh]"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(16,185,129,0.12),transparent)]" />
 
@@ -61,7 +61,7 @@ export function HomeHero({
       {/* затемнение под текстом — справа оставляем графику ярче */}
       <div className="home-hero-scrim pointer-events-none absolute inset-0" />
 
-      <div className="relative z-10 mx-auto flex min-h-[94vh] max-w-6xl flex-col justify-center px-6 pb-20 pt-28">
+      <div className="relative z-10 mx-auto flex min-h-[min(94vh,820px)] max-w-6xl flex-col justify-center px-4 pb-16 pt-24 sm:min-h-[94vh] sm:px-6 sm:pb-20 sm:pt-28">
         <p className="home-animate-fade-up guide-format-badge inline-flex w-fit items-center gap-2 px-3 py-1 text-xs font-medium uppercase tracking-[0.2em] backdrop-blur-sm">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
           пирамида · снукер · пул

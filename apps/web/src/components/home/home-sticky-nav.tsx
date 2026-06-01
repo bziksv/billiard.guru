@@ -47,7 +47,7 @@ export function HomeStickyNav() {
 
   return (
     <nav
-      className={`sticky top-14 z-30 border-b transition-all duration-300 lg:top-16 ${
+      className={`sticky top-[7.25rem] z-30 border-b transition-all duration-300 sm:top-32 lg:top-16 ${
         stuck ? "home-sticky-nav-stuck" : "border-transparent bg-transparent"
       }`}
     >

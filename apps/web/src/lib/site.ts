@@ -4,6 +4,7 @@ export const SITE_NAV_MAIN = [
   { href: "/tournaments", labelKey: "nav.tournaments" as const },
   { href: "/clubs", labelKey: "nav.clubs" as const },
   { href: "/players", labelKey: "nav.players" as const },
+  { href: "/coaches", labelKey: "nav.coaches" as const },
   { href: "/ideas", labelKey: "nav.ideas" as const },
 ] as const;
 
@@ -34,7 +35,8 @@ export type SiteLabelKey =
   | "home.explore"
   | "empty.tournaments"
   | "empty.clubs"
-  | "empty.players";
+  | "empty.players"
+  | "empty.coaches";
 
 /** Тексты UI — сейчас RU, позже locale → dictionary. */
 export const SITE_COPY: Record<SiteLabelKey, string> = {
@@ -42,6 +44,7 @@ export const SITE_COPY: Record<SiteLabelKey, string> = {
   "nav.tournaments": "Турниры",
   "nav.clubs": "Клубы",
   "nav.players": "Игроки",
+  "nav.coaches": "Тренеры",
   "nav.rules": "Правила",
   "nav.brackets": "Сетки",
   "nav.ideas": "Идеи",
@@ -64,6 +67,7 @@ export const SITE_COPY: Record<SiteLabelKey, string> = {
   "empty.tournaments": "В этом регионе пока нет опубликованных турниров.",
   "empty.clubs": "В этом регионе пока нет клубов.",
   "empty.players": "Игроков пока нет.",
+  "empty.coaches": "Тренеров в этом регионе пока нет.",
 };
 
 export function t(key: SiteLabelKey): string {

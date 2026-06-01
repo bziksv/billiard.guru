@@ -281,6 +281,14 @@ body {
   color: var(--text-primary);
 }
 
+.site-top-shell {
+  overflow: visible;
+}
+
+.site-content-shell {
+  overflow-x: clip;
+}
+
 /* ── Landing / home ── */
 @keyframes home-float {
   0%,
@@ -1895,6 +1903,73 @@ html.light .home-player-card:hover {
 .site-nav-link-active:hover {
   background-color: var(--nav-active-bg);
   color: var(--nav-active-text);
+}
+
+.site-mobile-menu-btn {
+  flex-shrink: 0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-subtle);
+  background-color: var(--user-trigger-bg);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.site-mobile-menu-btn:hover {
+  border-color: var(--text-muted);
+  background-color: var(--bg-muted);
+}
+
+.site-mobile-nav {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+.site-mobile-nav-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgb(0 0 0 / 0.45);
+  cursor: pointer;
+}
+
+.site-mobile-nav-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  max-height: 100%;
+  width: min(18rem, 100vw);
+  flex-direction: column;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-subtle);
+  background-color: var(--popover-bg);
+  padding: 1rem 1rem 1.5rem;
+  padding-top: max(1rem, env(safe-area-inset-top));
+  box-shadow: -8px 0 32px rgb(0 0 0 / 0.15);
+}
+
+.site-mobile-nav-title {
+  margin-bottom: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.site-mobile-nav-link {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-size: 1rem;
+}
+
+.site-user-popover {
+  margin-top: 0;
 }
 
 .site-popover {
