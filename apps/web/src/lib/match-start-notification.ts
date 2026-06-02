@@ -22,7 +22,7 @@ function escapeHtml(text: string): string {
 
 type NotifyPlayer = {
   id: string;
-  telegramId: string;
+  telegramId: string | null;
   firstName: string;
   lastName: string;
 };
@@ -54,14 +54,14 @@ export async function notifyMatchStartScheduled(
       tournament: { include: { club: true } },
       team1: {
         include: {
-          player1: { select: { id: true, telegramId: true, firstName: true, lastName: true } },
-          player2: { select: { id: true, telegramId: true, firstName: true, lastName: true } },
+          player1: { select: { id: true, telegramId: true, firstName: true, lastName: true, rating: true } },
+          player2: { select: { id: true, telegramId: true, firstName: true, lastName: true, rating: true } },
         },
       },
       team2: {
         include: {
-          player1: { select: { id: true, telegramId: true, firstName: true, lastName: true } },
-          player2: { select: { id: true, telegramId: true, firstName: true, lastName: true } },
+          player1: { select: { id: true, telegramId: true, firstName: true, lastName: true, rating: true } },
+          player2: { select: { id: true, telegramId: true, firstName: true, lastName: true, rating: true } },
         },
       },
     },
@@ -117,6 +117,7 @@ export async function notifyMatchStartScheduled(
 
   let sent = 0;
   for (const { player, opponent } of recipients.values()) {
+    if (!player.telegramId) continue;
     const opponentHtml = escapeHtml(opponent);
     const matchLine =
       matchNo !== undefined ? `Встреча <b>#${matchNo}</b>\n` : "";

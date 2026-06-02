@@ -9,6 +9,7 @@ type DeliveryEntry = {
   id: string;
   atLabel: string;
   notificationId: string | null;
+  context: string;
   status: string;
   statusLabel: string;
   playerLabel: string | null;

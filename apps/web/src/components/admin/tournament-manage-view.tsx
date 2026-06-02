@@ -82,6 +82,7 @@ export function TournamentManageView({
   playerOptions,
   bracketLoading,
   embedded = false,
+  initialTab = "participants",
   onConfirmRegistration,
   onRejectRegistration,
   onCancelRegistration,
@@ -99,6 +100,7 @@ export function TournamentManageView({
   playerOptions: { value: string; label: string }[];
   bracketLoading: boolean;
   embedded?: boolean;
+  initialTab?: ManageTab;
   onConfirmRegistration: (id: string) => void | Promise<void>;
   onRejectRegistration: (id: string) => void | Promise<void>;
   onCancelRegistration: (id: string) => void | Promise<void>;
@@ -111,7 +113,7 @@ export function TournamentManageView({
   onUpdated: () => void;
   onDelete: () => void;
 }) {
-  const [tab, setTab] = useState<ManageTab>("participants");
+  const [tab, setTab] = useState<ManageTab>(initialTab);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editName, setEditName] = useState(t.name);

@@ -147,7 +147,7 @@ export default function AdminBracketTournamentPage() {
           playerOptions={[]}
           bracketLoading={bracketLoading}
           embedded
-          viewMode="bracket"
+          initialTab="bracket"
           onConfirmRegistration={noop}
           onRejectRegistration={noop}
           onCancelRegistration={noop}

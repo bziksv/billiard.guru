@@ -213,7 +213,7 @@ export async function notifyTournamentTeamRegisteredByClub(teamId: string): Prom
 
     let sent = 0;
     for (const p of [team.player1, team.player2]) {
-      if (!p.telegramId) continue;
+      if (!p?.telegramId) continue;
       if (
         await sendToPlayer(
           "tournament-registration-by-club",
@@ -242,17 +242,15 @@ export async function notifyTournamentTeamRegistrationConfirmed(teamId: string):
     const team = await loadTeamContext(teamId);
     if (!team) return;
 
-    const ids = new Set<string>();
-    for (const p of [team.player1, team.player2]) {
-      if (p.telegramId) ids.add(p.telegramId);
-    }
     let sent = 0;
-    for (const telegramId of ids) {
+    for (const p of [team.player1, team.player2]) {
+      if (!p?.telegramId) continue;
       if (
         await sendToPlayer(
           "tournament-registration-confirmed",
           "tournament.registration.notify.confirmed",
-          telegramId,
+          p.id,
+          p.telegramId,
           team.id,
           team.tournament,
           "tournament_team",
@@ -277,7 +275,7 @@ export async function notifyTournamentTeamRegistrationRejected(teamId: string): 
 
     let sent = 0;
     for (const p of [team.player1, team.player2]) {
-      if (!p.telegramId) continue;
+      if (!p?.telegramId) continue;
       if (
         await sendToPlayer(
           "tournament-registration-rejected",
