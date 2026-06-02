@@ -3999,8 +3999,6 @@ html.light {
 
 .bracket-match-row--loser {
   color: var(--bracket-row-loser-text);
-  text-decoration: line-through;
-  text-decoration-color: var(--bracket-row-loser-decoration);
 }
 
 .bracket-match-row--empty {
