@@ -45,6 +45,7 @@ export function ClubOwnerTournamentManagePage({
   const [regMessage, setRegMessage] = useState<string | null>(null);
   const [regLoading, setRegLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
   const reload = useCallback(async () => {
     const res = await fetch(`/api/tournaments/${tournamentId}`);
@@ -108,6 +109,25 @@ export function ClubOwnerTournamentManagePage({
     () => playerOptions.filter((p) => !registeredPlayerIds.has(p.value)),
     [playerOptions, registeredPlayerIds],
   );
+
+  async function publishTournament() {
+    if (!tournament) return;
+    setPublishing(true);
+    setRegError(null);
+    setRegMessage(null);
+    try {
+      const res = await fetch(`/api/tournaments/${tournament.id}/publish`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setRegError(data.error ?? "Не удалось опубликовать турнир");
+        return;
+      }
+      setRegMessage(data.message ?? "Турнир опубликован");
+      await reload();
+    } finally {
+      setPublishing(false);
+    }
+  }
 
   async function startTournament() {
     if (!tournament) return;
@@ -369,8 +389,29 @@ export function ClubOwnerTournamentManagePage({
             <p className="mt-2 text-sm text-zinc-400">
               {TOURNAMENT_FORMAT_LABELS[tournament.format]} · {clubName} · {confirmed} подтверждённых
             </p>
+            {tournament.status === "PENDING_CLUB_APPROVAL" && (
+              <p className="mt-2 text-sm text-amber-400/90">
+                Ждёт публикации. Если кнопка в Telegram не сработала — нажмите «Опубликовать турнир».
+              </p>
+            )}
           </div>
           <div className="flex flex-wrap gap-2">
+            {tournament.status === "PENDING_CLUB_APPROVAL" && (
+              <button
+                type="button"
+                disabled={publishing}
+                onClick={publishTournament}
+                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {publishing && (
+                  <span
+                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                    aria-hidden
+                  />
+                )}
+                {publishing ? "Публикация…" : "Опубликовать турнир"}
+              </button>
+            )}
             {canStart && (
               <button
                 type="button"

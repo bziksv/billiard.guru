@@ -12,9 +12,10 @@ export async function POST(request: NextRequest) {
   }
 
   const update = await request.json();
-  // Telegram ждёт быстрый ответ; тяжёлую работу — после 200 OK
-  void processTelegramUpdate(update).catch((err) => {
+  try {
+    await processTelegramUpdate(update);
+  } catch (err) {
     logger.error({ err }, "Telegram webhook processing failed");
-  });
+  }
   return NextResponse.json({ ok: true });
 }

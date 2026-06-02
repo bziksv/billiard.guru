@@ -33,7 +33,14 @@ function createPrismaClient() {
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
 function isPrismaClientStale(client: PrismaClient): boolean {
-  return typeof (client as PrismaClient & { idea?: { findMany?: unknown } }).idea?.findMany !== "function";
+  const c = client as PrismaClient & {
+    idea?: { findMany?: unknown };
+    bracketFormatConfig?: { findMany?: unknown };
+  };
+  return (
+    typeof c.idea?.findMany !== "function" ||
+    typeof c.bracketFormatConfig?.findMany !== "function"
+  );
 }
 
 function getPrismaClient(): PrismaClient {

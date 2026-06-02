@@ -1,0 +1,20 @@
+---
+description: Типы турнирных сеток — реестр BRACKET_FORMAT_CATALOG
+globs: apps/web/src/lib/bracket-formats/**,apps/web/src/lib/fixed-swiss*.ts,apps/web/src/lib/bracket-service.ts
+alwaysApply: false
+---
+
+# Типы сеток
+
+Реестр: `apps/web/src/lib/bracket-formats/catalog.ts`
+
+Новый формат турнира (Prisma `TournamentFormat` + UI):
+
+1. Enum в `prisma/schema.prisma`
+2. Запись в `BRACKET_FORMAT_CATALOG` (adminLabel, layout, implementation, guideSectionId)
+3. Логика в `bracket-service.ts` / layout-модули
+4. Секция в `tournament-brackets-guide.ts` при необходимости
+
+`FORMAT_OPTIONS` для форм берётся из каталога. Настройки типов — `/admin/brackets` (`BracketFormatConfig`: `enabled`, `maintenanceMode`). API `/api/bracket-formats/options`: все `enabled`, на техобслуживании — `disabled` в селекте (видны, не выбираются).
+
+Эталон FIXED_SWISS — не ломать без явного запроса (см. bracket-reference-16-8.mdc).

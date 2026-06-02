@@ -77,6 +77,11 @@ export type ClubNews = Prisma.ClubNewsModel
  */
 export type Player = Prisma.PlayerModel
 /**
+ * Model PlayerNotificationPreference
+ * Подписка игрока на типы Telegram-уведомлений (нет строки = включено).
+ */
+export type PlayerNotificationPreference = Prisma.PlayerNotificationPreferenceModel
+/**
  * Model CoachRating
  * Оценка игрока тренера (1–5), не путать с турнирным рейтингом Player.rating.
  */
@@ -141,3 +146,23 @@ export type PlayListing = Prisma.PlayListingModel
  * Отклик на объявление «Покатать».
  */
 export type PlayListingResponse = Prisma.PlayListingResponseModel
+/**
+ * Model NotificationGlobalConfig
+ * Глобальные настройки Telegram-уведомлений (одна строка).
+ */
+export type NotificationGlobalConfig = Prisma.NotificationGlobalConfigModel
+/**
+ * Model NotificationTypeConfig
+ * Настройки по типу уведомления (id из NOTIFICATION_CATALOG).
+ */
+export type NotificationTypeConfig = Prisma.NotificationTypeConfigModel
+/**
+ * Model BracketFormatConfig
+ * Вкл/выкл типа сетки (код = TournamentFormat, реестр BRACKET_FORMAT_CATALOG).
+ */
+export type BracketFormatConfig = Prisma.BracketFormatConfigModel
+/**
+ * Model TelegramDeliveryLog
+ * Журнал отправок Telegram: каждая попытка (успех / ошибка / пропуск с причиной).
+ */
+export type TelegramDeliveryLog = Prisma.TelegramDeliveryLogModel

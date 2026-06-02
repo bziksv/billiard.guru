@@ -58,6 +58,7 @@ export const ModelName = {
   TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
   Player: 'Player',
+  PlayerNotificationPreference: 'PlayerNotificationPreference',
   CoachRating: 'CoachRating',
   ClubPlayerRating: 'ClubPlayerRating',
   LoginChallenge: 'LoginChallenge',
@@ -70,7 +71,11 @@ export const ModelName = {
   Idea: 'Idea',
   IdeaVote: 'IdeaVote',
   PlayListing: 'PlayListing',
-  PlayListingResponse: 'PlayListingResponse'
+  PlayListingResponse: 'PlayListingResponse',
+  NotificationGlobalConfig: 'NotificationGlobalConfig',
+  NotificationTypeConfig: 'NotificationTypeConfig',
+  BracketFormatConfig: 'BracketFormatConfig',
+  TelegramDeliveryLog: 'TelegramDeliveryLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -212,6 +217,16 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const PlayerNotificationPreferenceScalarFieldEnum = {
+  playerId: 'playerId',
+  notificationId: 'notificationId',
+  enabled: 'enabled',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlayerNotificationPreferenceScalarFieldEnum = (typeof PlayerNotificationPreferenceScalarFieldEnum)[keyof typeof PlayerNotificationPreferenceScalarFieldEnum]
 
 
 export const CoachRatingScalarFieldEnum = {
@@ -422,6 +437,55 @@ export const PlayListingResponseScalarFieldEnum = {
 export type PlayListingResponseScalarFieldEnum = (typeof PlayListingResponseScalarFieldEnum)[keyof typeof PlayListingResponseScalarFieldEnum]
 
 
+export const NotificationGlobalConfigScalarFieldEnum = {
+  id: 'id',
+  testModeEnabled: 'testModeEnabled',
+  testPlayerIds: 'testPlayerIds',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationGlobalConfigScalarFieldEnum = (typeof NotificationGlobalConfigScalarFieldEnum)[keyof typeof NotificationGlobalConfigScalarFieldEnum]
+
+
+export const NotificationTypeConfigScalarFieldEnum = {
+  notificationId: 'notificationId',
+  enabled: 'enabled',
+  templateOverride: 'templateOverride',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationTypeConfigScalarFieldEnum = (typeof NotificationTypeConfigScalarFieldEnum)[keyof typeof NotificationTypeConfigScalarFieldEnum]
+
+
+export const BracketFormatConfigScalarFieldEnum = {
+  formatCode: 'formatCode',
+  enabled: 'enabled',
+  maintenanceMode: 'maintenanceMode',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BracketFormatConfigScalarFieldEnum = (typeof BracketFormatConfigScalarFieldEnum)[keyof typeof BracketFormatConfigScalarFieldEnum]
+
+
+export const TelegramDeliveryLogScalarFieldEnum = {
+  id: 'id',
+  notificationId: 'notificationId',
+  context: 'context',
+  status: 'status',
+  chatId: 'chatId',
+  playerId: 'playerId',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  batchId: 'batchId',
+  skipReason: 'skipReason',
+  errorMessage: 'errorMessage',
+  messagePreview: 'messagePreview',
+  createdAt: 'createdAt'
+} as const
+
+export type TelegramDeliveryLogScalarFieldEnum = (typeof TelegramDeliveryLogScalarFieldEnum)[keyof typeof TelegramDeliveryLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -436,6 +500,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const CountryOrderByRelevanceFieldEnum = {
@@ -551,6 +622,14 @@ export const PlayerOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
+
+
+export const PlayerNotificationPreferenceOrderByRelevanceFieldEnum = {
+  playerId: 'playerId',
+  notificationId: 'notificationId'
+} as const
+
+export type PlayerNotificationPreferenceOrderByRelevanceFieldEnum = (typeof PlayerNotificationPreferenceOrderByRelevanceFieldEnum)[keyof typeof PlayerNotificationPreferenceOrderByRelevanceFieldEnum]
 
 
 export const CoachRatingOrderByRelevanceFieldEnum = {
@@ -697,4 +776,44 @@ export const PlayListingResponseOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayListingResponseOrderByRelevanceFieldEnum = (typeof PlayListingResponseOrderByRelevanceFieldEnum)[keyof typeof PlayListingResponseOrderByRelevanceFieldEnum]
+
+
+export const NotificationGlobalConfigOrderByRelevanceFieldEnum = {
+  id: 'id'
+} as const
+
+export type NotificationGlobalConfigOrderByRelevanceFieldEnum = (typeof NotificationGlobalConfigOrderByRelevanceFieldEnum)[keyof typeof NotificationGlobalConfigOrderByRelevanceFieldEnum]
+
+
+export const NotificationTypeConfigOrderByRelevanceFieldEnum = {
+  notificationId: 'notificationId',
+  templateOverride: 'templateOverride'
+} as const
+
+export type NotificationTypeConfigOrderByRelevanceFieldEnum = (typeof NotificationTypeConfigOrderByRelevanceFieldEnum)[keyof typeof NotificationTypeConfigOrderByRelevanceFieldEnum]
+
+
+export const BracketFormatConfigOrderByRelevanceFieldEnum = {
+  formatCode: 'formatCode'
+} as const
+
+export type BracketFormatConfigOrderByRelevanceFieldEnum = (typeof BracketFormatConfigOrderByRelevanceFieldEnum)[keyof typeof BracketFormatConfigOrderByRelevanceFieldEnum]
+
+
+export const TelegramDeliveryLogOrderByRelevanceFieldEnum = {
+  id: 'id',
+  notificationId: 'notificationId',
+  context: 'context',
+  status: 'status',
+  chatId: 'chatId',
+  playerId: 'playerId',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  batchId: 'batchId',
+  skipReason: 'skipReason',
+  errorMessage: 'errorMessage',
+  messagePreview: 'messagePreview'
+} as const
+
+export type TelegramDeliveryLogOrderByRelevanceFieldEnum = (typeof TelegramDeliveryLogOrderByRelevanceFieldEnum)[keyof typeof TelegramDeliveryLogOrderByRelevanceFieldEnum]
 

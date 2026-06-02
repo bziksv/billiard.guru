@@ -9,11 +9,17 @@ datasource db {
 
 enum TournamentFormat {
   OLYMPIC
+  /** Олимпийская до 1 поражения + матч за 3–4 место */
+  OLYMPIC_1L_BRONZE
   SWISS
   FIXED_SWISS
+  /** 16→8 (27+1 встреч): эталон TS + матч за 3–4 (#28) */
+  FIXED_SWISS_16_BRONZE
   PAIR_OLYMPIC
+  PAIR_OLYMPIC_1L_BRONZE
   PAIR_SWISS
   FIXED_PAIR_SWISS
+  FIXED_PAIR_SWISS_16_BRONZE
 }
 
 enum RegistrationStatus {
@@ -259,8 +265,21 @@ model Player {
   clubStaff            ClubStaff[]
   coachReviewsReceived CoachRating[] @relation("CoachReviewsReceived")
   coachReviewsGiven    CoachRating[] @relation("CoachReviewsGiven")
+  notificationPreferences PlayerNotificationPreference[]
 
   @@map("players")
+}
+
+/// Подписка игрока на типы Telegram-уведомлений (нет строки = включено).
+model PlayerNotificationPreference {
+  playerId       String   @map("player_id")
+  player         Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  notificationId String   @map("notification_id")
+  enabled        Boolean  @default(true)
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@id([playerId, notificationId])
+  @@map("player_notification_preferences")
 }
 
 /// Оценка игрока тренера (1–5), не путать с турнирным рейтингом Player.rating.
@@ -515,4 +534,60 @@ model PlayListingResponse {
   @@unique([listingId, playerId])
   @@index([playerId, createdAt])
   @@map("play_listing_responses")
+}
+
+/// Глобальные настройки Telegram-уведомлений (одна строка).
+model NotificationGlobalConfig {
+  id              String   @id @default("default")
+  testModeEnabled Boolean  @default(false) @map("test_mode_enabled")
+  /// JSON: string[] — id игроков для тестовой рассылки
+  testPlayerIds   Json     @default("[]") @map("test_player_ids")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("notification_global_config")
+}
+
+/// Настройки по типу уведомления (id из NOTIFICATION_CATALOG).
+model NotificationTypeConfig {
+  notificationId   String   @id @map("notification_id")
+  enabled            Boolean  @default(true)
+  templateOverride   String?  @db.Text @map("template_override")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("notification_type_config")
+}
+
+/// Вкл/выкл типа сетки (код = TournamentFormat, реестр BRACKET_FORMAT_CATALOG).
+model BracketFormatConfig {
+  formatCode        String   @id @map("format_code")
+  enabled           Boolean  @default(true)
+  /// Техобслуживание: тип виден в админке, но недоступен при создании турнира
+  maintenanceMode   Boolean  @default(false) @map("maintenance_mode")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("bracket_format_config")
+}
+
+/// Журнал отправок Telegram: каждая попытка (успех / ошибка / пропуск с причиной).
+model TelegramDeliveryLog {
+  id               String   @id @default(cuid())
+  notificationId   String?  @map("notification_id")
+  context          String
+  status           String
+  chatId           String?  @map("chat_id")
+  playerId         String?  @map("player_id")
+  entityType       String?  @map("entity_type")
+  entityId         String?  @map("entity_id")
+  batchId          String?  @map("batch_id")
+  skipReason       String?  @map("skip_reason") @db.VarChar(512)
+  errorMessage     String?  @map("error_message") @db.VarChar(512)
+  messagePreview   String?  @map("message_preview") @db.VarChar(500)
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  @@index([notificationId, createdAt])
+  @@index([entityType, entityId, createdAt])
+  @@index([batchId])
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@map("telegram_delivery_logs")
 }

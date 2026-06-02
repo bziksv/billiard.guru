@@ -6,7 +6,11 @@ import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { adminTabClass } from "@/lib/admin-ui";
-import { FORMAT_OPTIONS, type AdminTournament } from "@/lib/tournament-admin";
+import type { AdminTournament } from "@/lib/tournament-admin";
+import {
+  firstSelectableFormat,
+  useBracketFormatOptions,
+} from "@/hooks/use-bracket-format-options";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 const CURRENT_STATUSES = new Set([
@@ -17,10 +21,13 @@ const CURRENT_STATUSES = new Set([
 ]);
 
 export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
+  const { options: formatOptions, loading: formatOptionsLoading } =
+    useBracketFormatOptions();
   const [tournaments, setTournaments] = useState<AdminTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [newFormat, setNewFormat] = useState("OLYMPIC");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
+  const [creating, setCreating] = useState(false);
   const [tab, setTab] = useState<"create" | "current" | "finished">("current");
 
   async function reloadTournaments() {
@@ -31,6 +38,14 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   useEffect(() => {
     reloadTournaments().finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const current = formatOptions.find((o) => o.value === newFormat);
+    if (current?.disabled || !current) {
+      const first = firstSelectableFormat(formatOptions);
+      if (first) setNewFormat(first);
+    }
+  }, [formatOptions, newFormat]);
 
   const clubTournaments = useMemo(
     () => tournaments.filter((t) => t.club.id === clubId),
@@ -52,30 +67,35 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
     const formEl = e.currentTarget;
     const form = new FormData(formEl);
     setCreateMessage(null);
-    const res = await fetch("/api/tournaments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: form.get("name"),
-        description: form.get("description") || undefined,
-        clubId,
-        format: newFormat,
-        startsAt: form.get("startsAt") || undefined,
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setCreateMessage(data.error ?? "Ошибка создания");
-      return;
+    setCreating(true);
+    try {
+      const res = await fetch("/api/tournaments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.get("name"),
+          description: form.get("description") || undefined,
+          clubId,
+          format: newFormat,
+          startsAt: form.get("startsAt") || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setCreateMessage(data.error ?? "Ошибка создания");
+        return;
+      }
+      await reloadTournaments();
+      setNewFormat("OLYMPIC");
+      formEl.reset();
+      setCreateMessage(
+        data.message ??
+          "Турнир создан. Подтвердите публикацию в Telegram, если пришёл запрос.",
+      );
+      setTab("current");
+    } finally {
+      setCreating(false);
     }
-    await reloadTournaments();
-    setNewFormat("OLYMPIC");
-    formEl.reset();
-    setCreateMessage(
-      data.message ??
-        "Турнир создан. Подтвердите публикацию в Telegram, если пришёл запрос.",
-    );
-    setTab("current");
   }
 
   if (loading) {
@@ -131,12 +151,17 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               onChange={(e) => setNewFormat(e.target.value)}
               className="site-input w-full"
               required
+              disabled={formatOptionsLoading || formatOptions.length === 0}
             >
-              {FORMAT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
-                </option>
-              ))}
+              {formatOptionsLoading ? (
+                <option value="">Загрузка форматов…</option>
+              ) : (
+                formatOptions.map((o) => (
+                  <option key={o.value} value={o.value} disabled={o.disabled}>
+                    {o.label}
+                  </option>
+                ))
+              )}
             </select>
             <textarea
               name="description"
@@ -148,9 +173,16 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
             <div className="flex flex-wrap items-center gap-4">
               <button
                 type="submit"
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500"
+                disabled={creating}
+                className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Создать
+                {creating && (
+                  <span
+                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                    aria-hidden
+                  />
+                )}
+                {creating ? "Создание…" : "Создать"}
               </button>
               {createMessage && (
                 <p

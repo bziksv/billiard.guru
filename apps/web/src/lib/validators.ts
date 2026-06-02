@@ -185,11 +185,15 @@ export const tournamentSchema = z.object({
   clubId: z.string().min(1),
   format: z.enum([
     "OLYMPIC",
+    "OLYMPIC_1L_BRONZE",
     "SWISS",
     "FIXED_SWISS",
+    "FIXED_SWISS_16_BRONZE",
     "PAIR_OLYMPIC",
+    "PAIR_OLYMPIC_1L_BRONZE",
     "PAIR_SWISS",
     "FIXED_PAIR_SWISS",
+    "FIXED_PAIR_SWISS_16_BRONZE",
   ]),
   startsAt: z.string().optional(),
   status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
@@ -202,11 +206,15 @@ export const tournamentUpdateSchema = z.object({
   format: z
     .enum([
       "OLYMPIC",
+      "OLYMPIC_1L_BRONZE",
       "SWISS",
       "FIXED_SWISS",
+      "FIXED_SWISS_16_BRONZE",
       "PAIR_OLYMPIC",
+      "PAIR_OLYMPIC_1L_BRONZE",
       "PAIR_SWISS",
       "FIXED_PAIR_SWISS",
+      "FIXED_PAIR_SWISS_16_BRONZE",
     ])
     .optional(),
   startsAt: z.string().optional().nullable(),
@@ -387,13 +395,29 @@ export const playListingResponseUpdateSchema = z.object({
 export const FIXED_SWISS_16_8_FORMAT_LABEL =
   "Сетка на 16 до 2 поражений, олимпийка с 1/4 с двумя 3 местами";
 
+/** 16→8 + отдельный матч проигравших полуфиналистов за 3–4 место (#28). */
+export const FIXED_SWISS_16_BRONZE_FORMAT_LABEL =
+  "Сетка на 16 до 2 поражений, олимпийка с 1/4, с определением 3 и 4 места (доп.игра)";
+
+/** Одиночная олимпийская фикс. сетка (код OLYMPIC в Prisma). */
+export const OLYMPIC_SINGLE_FORMAT_LABEL =
+  "Сетка (олимпийская) до 1 поражения, с двумя 3 местами";
+
+/** Олимпийская с матчем проигравших полуфиналистов за 3–4 место. */
+export const OLYMPIC_1L_BRONZE_FORMAT_LABEL =
+  "Сетка (олимпийская) до 1 поражения, с определением 3 и 4 места (доп.игра)";
+
 export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
-  OLYMPIC: "Олимпийская (фикс. сетка)",
+  OLYMPIC: OLYMPIC_SINGLE_FORMAT_LABEL,
+  OLYMPIC_1L_BRONZE: OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   SWISS: "Швейцарская (по турам)",
   FIXED_SWISS: FIXED_SWISS_16_8_FORMAT_LABEL,
+  FIXED_SWISS_16_BRONZE: FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   PAIR_OLYMPIC: "Парный (фикс. сетка)",
+  PAIR_OLYMPIC_1L_BRONZE: `Парная: ${OLYMPIC_1L_BRONZE_FORMAT_LABEL}`,
   PAIR_SWISS: "Парный швейцарская (по турам)",
   FIXED_PAIR_SWISS: `Парная: ${FIXED_SWISS_16_8_FORMAT_LABEL}`,
+  FIXED_PAIR_SWISS_16_BRONZE: `Парная: ${FIXED_SWISS_16_BRONZE_FORMAT_LABEL}`,
 };
 
 export const REGISTRATION_STATUS_LABELS: Record<string, string> = {

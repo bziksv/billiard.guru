@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { BRACKET_FORMAT_CATALOG } from "@/lib/bracket-formats/catalog";
+import { NOTIFICATION_CATALOG } from "@/lib/notifications/catalog";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +18,12 @@ export default async function AdminDashboard() {
     { label: "Клубы", value: clubs, href: "/admin/clubs" },
     { label: "Игроки", value: players, href: "/admin/players" },
     { label: "Турниры", value: tournaments, href: "/admin/tournaments" },
+    { label: "Типы сеток", value: BRACKET_FORMAT_CATALOG.length, href: "/admin/brackets" },
+    {
+      label: "Уведомления (типов)",
+      value: NOTIFICATION_CATALOG.length,
+      href: "/admin/notifications",
+    },
     { label: "Ожидают подтверждения", value: pending, href: "/admin/tournaments" },
     { label: "Идеи на модерации", value: pendingIdeas, href: "/admin/ideas" },
   ];

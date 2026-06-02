@@ -1,0 +1,21 @@
+---
+description: Админка — стили только через admin-* токены, без text-zinc/bg-zinc
+globs: apps/web/src/components/admin/**,apps/web/src/app/admin/**
+alwaysApply: false
+---
+
+# Светлая тема админки
+
+На страницах `/admin/*` **запрещены** жёсткие классы `text-zinc-*`, `bg-zinc-*`, `border-zinc-*`, `text-emerald-400` без контекста темы.
+
+Использовать:
+
+- Текст: `admin-page-title`, `admin-page-lead`, `admin-text-secondary`, `admin-muted`
+- Карточки: `admin-card`, `admin-divider`, `admin-inset`
+- Поля: `admin-input`, `admin-label`
+- Уведомления / сетки: `admin-notify-*`, `admin-bracket-format-card*`, `admin-code`, `admin-pill--*`, `admin-checkbox`
+- Табы: `adminTabClass()` / `admin-tab-bar`
+
+Переменные темы: `apps/web/src/app/globals.css` блок `.admin-app` (секции `html.light .admin-app`).
+
+После правок UI админки — проверить страницу в **светлой** теме (переключатель в сайдбаре).

@@ -30,11 +30,11 @@ import {
 } from "@/lib/pair-tournament";
 import { isOutdatedFixedSwiss27Bracket } from "@/lib/fixed-swiss-grid";
 import {
-  FORMAT_OPTIONS,
   STATUS_OPTIONS,
   computeTournamentStandings,
   type AdminTournament,
 } from "@/lib/tournament-admin";
+import { useBracketFormatOptions } from "@/hooks/use-bracket-format-options";
 import {
   canCancelRegistration,
 } from "@/lib/tournament-registration";
@@ -118,6 +118,8 @@ export function TournamentManageView({
   const [editDescription, setEditDescription] = useState(t.description ?? "");
   const [editClubId, setEditClubId] = useState(t.clubId);
   const [editFormat, setEditFormat] = useState(t.format);
+  const { options: formatOptions, loading: formatOptionsLoading } =
+    useBracketFormatOptions(editFormat);
   const [editStatus, setEditStatus] = useState(t.status);
   const [editStartsAt, setEditStartsAt] = useState(
     t.startsAt ? t.startsAt.slice(0, 16) : "",
@@ -294,11 +296,16 @@ export function TournamentManageView({
             searchPlaceholder="Поиск клуба…"
           />
           <SearchableSelect
-            options={FORMAT_OPTIONS}
+            options={
+              formatOptionsLoading
+                ? [{ value: editFormat, label: "Загрузка форматов…" }]
+                : formatOptions
+            }
             value={editFormat}
             onChange={setEditFormat}
             placeholder="Формат"
             searchPlaceholder="Формат…"
+            disabled={formatOptionsLoading}
           />
           <SearchableSelect
             options={STATUS_OPTIONS}

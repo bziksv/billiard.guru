@@ -1,4 +1,9 @@
 import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
+import {
+  pruneTelegramDeliveryLogs,
+  writeTelegramDeliveryLog,
+  type TelegramDeliveryLogInput,
+} from "@/lib/notifications/delivery-log";
 
 export function buildConfirmLink(token: string): string {
   return `https://t.me/${TELEGRAM_BOT_USERNAME}?start=confirm_${token}`;
@@ -68,14 +73,77 @@ interface SendMessageOptions {
   replyMarkup?: object;
 }
 
+export type TelegramLogMeta = Omit<TelegramDeliveryLogInput, "status" | "messagePreview" | "chatId"> & {
+  chatId?: string;
+};
+
+type TelegramApiResult = { ok: true } | { ok: false; error: string };
+
+async function telegramApi(
+  method: string,
+  body: Record<string, unknown>,
+): Promise<TelegramApiResult | null> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return null;
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const json = (await res.json()) as { ok?: boolean; description?: string };
+    if (json.ok) return { ok: true };
+    return { ok: false, error: json.description ?? `HTTP ${res.status}` };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "network_error";
+    return { ok: false, error: message };
+  }
+}
+
+async function logTelegramAttempt(
+  text: string,
+  chatId: string,
+  meta: TelegramLogMeta | undefined,
+  result: TelegramApiResult | null,
+): Promise<void> {
+  if (!meta) return;
+
+  const base = {
+    ...meta,
+    chatId,
+    messagePreview: text,
+  };
+
+  if (!result) {
+    await writeTelegramDeliveryLog({
+      ...base,
+      status: "failed",
+      skipReason: "no_bot_token",
+      errorMessage: "TELEGRAM_BOT_TOKEN не задан",
+    });
+    void pruneTelegramDeliveryLogs();
+    return;
+  }
+
+  if (result.ok) {
+    await writeTelegramDeliveryLog({ ...base, status: "sent" });
+  } else {
+    await writeTelegramDeliveryLog({
+      ...base,
+      status: "failed",
+      skipReason: result.error.includes("fetch") ? "network_error" : undefined,
+      errorMessage: result.error,
+    });
+  }
+  void pruneTelegramDeliveryLogs();
+}
+
 export async function sendTelegramMessage(
   chatId: string,
   text: string,
   options?: SendMessageOptions,
+  logMeta?: TelegramLogMeta,
 ): Promise<boolean> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  if (!token) return false;
-
   const body: Record<string, unknown> = {
     chat_id: chatId,
     text,
@@ -85,15 +153,9 @@ export async function sendTelegramMessage(
     body.reply_markup = options.replyMarkup;
   }
 
-  const res = await fetch(
-    `https://api.telegram.org/bot${token}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    },
-  );
-  return res.ok;
+  const result = await telegramApi("sendMessage", body);
+  await logTelegramAttempt(text, chatId, logMeta, result);
+  return result?.ok ?? false;
 }
 
 export async function answerCallbackQuery(
@@ -101,41 +163,25 @@ export async function answerCallbackQuery(
   text?: string,
   options?: { showAlert?: boolean },
 ): Promise<void> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  if (!token) return;
-
-  await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      callback_query_id: callbackQueryId,
-      text,
-      show_alert: options?.showAlert ?? false,
-    }),
+  await telegramApi("answerCallbackQuery", {
+    callback_query_id: callbackQueryId,
+    text,
+    show_alert: options?.showAlert ?? false,
   });
 }
 
 /** Убирает inline-кнопки после нажатия (чтобы не нажимали повторно). */
 export async function clearInlineKeyboard(chatId: string, messageId: number): Promise<void> {
-  const token = process.env.TELEGRAM_BOT_TOKEN;
-  if (!token) return;
-
-  await fetch(`https://api.telegram.org/bot${token}/editMessageReplyMarkup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      chat_id: chatId,
-      message_id: messageId,
-      reply_markup: { inline_keyboard: [] },
-    }),
+  await telegramApi("editMessageReplyMarkup", {
+    chat_id: chatId,
+    message_id: messageId,
+    reply_markup: { inline_keyboard: [] },
   });
 }
 
 export function contactRequestKeyboard() {
   return {
-    keyboard: [
-      [{ text: "📱 Подтвердить по телефону", request_contact: true }],
-    ],
+    keyboard: [[{ text: "📱 Подтвердить по телефону", request_contact: true }]],
     resize_keyboard: true,
     one_time_keyboard: true,
   };

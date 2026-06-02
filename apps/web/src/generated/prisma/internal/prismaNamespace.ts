@@ -391,6 +391,7 @@ export const ModelName = {
   TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
   Player: 'Player',
+  PlayerNotificationPreference: 'PlayerNotificationPreference',
   CoachRating: 'CoachRating',
   ClubPlayerRating: 'ClubPlayerRating',
   LoginChallenge: 'LoginChallenge',
@@ -403,7 +404,11 @@ export const ModelName = {
   Idea: 'Idea',
   IdeaVote: 'IdeaVote',
   PlayListing: 'PlayListing',
-  PlayListingResponse: 'PlayListingResponse'
+  PlayListingResponse: 'PlayListingResponse',
+  NotificationGlobalConfig: 'NotificationGlobalConfig',
+  NotificationTypeConfig: 'NotificationTypeConfig',
+  BracketFormatConfig: 'BracketFormatConfig',
+  TelegramDeliveryLog: 'TelegramDeliveryLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -419,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "telegramDeliveryLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -882,6 +887,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PlayerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PlayerCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlayerNotificationPreference: {
+      payload: Prisma.$PlayerNotificationPreferencePayload<ExtArgs>
+      fields: Prisma.PlayerNotificationPreferenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayerNotificationPreferenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayerNotificationPreferenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload>
+        }
+        findFirst: {
+          args: Prisma.PlayerNotificationPreferenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayerNotificationPreferenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload>
+        }
+        findMany: {
+          args: Prisma.PlayerNotificationPreferenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload>[]
+        }
+        create: {
+          args: Prisma.PlayerNotificationPreferenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload>
+        }
+        createMany: {
+          args: Prisma.PlayerNotificationPreferenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.PlayerNotificationPreferenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload>
+        }
+        update: {
+          args: Prisma.PlayerNotificationPreferenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayerNotificationPreferenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayerNotificationPreferenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.PlayerNotificationPreferenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerNotificationPreferencePayload>
+        }
+        aggregate: {
+          args: Prisma.PlayerNotificationPreferenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayerNotificationPreference>
+        }
+        groupBy: {
+          args: Prisma.PlayerNotificationPreferenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerNotificationPreferenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayerNotificationPreferenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerNotificationPreferenceCountAggregateOutputType> | number
         }
       }
     }
@@ -1743,6 +1814,270 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    NotificationGlobalConfig: {
+      payload: Prisma.$NotificationGlobalConfigPayload<ExtArgs>
+      fields: Prisma.NotificationGlobalConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NotificationGlobalConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NotificationGlobalConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.NotificationGlobalConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NotificationGlobalConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload>
+        }
+        findMany: {
+          args: Prisma.NotificationGlobalConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload>[]
+        }
+        create: {
+          args: Prisma.NotificationGlobalConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload>
+        }
+        createMany: {
+          args: Prisma.NotificationGlobalConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.NotificationGlobalConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload>
+        }
+        update: {
+          args: Prisma.NotificationGlobalConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.NotificationGlobalConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NotificationGlobalConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.NotificationGlobalConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationGlobalConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationGlobalConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotificationGlobalConfig>
+        }
+        groupBy: {
+          args: Prisma.NotificationGlobalConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationGlobalConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NotificationGlobalConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationGlobalConfigCountAggregateOutputType> | number
+        }
+      }
+    }
+    NotificationTypeConfig: {
+      payload: Prisma.$NotificationTypeConfigPayload<ExtArgs>
+      fields: Prisma.NotificationTypeConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NotificationTypeConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NotificationTypeConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.NotificationTypeConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NotificationTypeConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload>
+        }
+        findMany: {
+          args: Prisma.NotificationTypeConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload>[]
+        }
+        create: {
+          args: Prisma.NotificationTypeConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload>
+        }
+        createMany: {
+          args: Prisma.NotificationTypeConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.NotificationTypeConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload>
+        }
+        update: {
+          args: Prisma.NotificationTypeConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.NotificationTypeConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NotificationTypeConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.NotificationTypeConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationTypeConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationTypeConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotificationTypeConfig>
+        }
+        groupBy: {
+          args: Prisma.NotificationTypeConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationTypeConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NotificationTypeConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationTypeConfigCountAggregateOutputType> | number
+        }
+      }
+    }
+    BracketFormatConfig: {
+      payload: Prisma.$BracketFormatConfigPayload<ExtArgs>
+      fields: Prisma.BracketFormatConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BracketFormatConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BracketFormatConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.BracketFormatConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BracketFormatConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload>
+        }
+        findMany: {
+          args: Prisma.BracketFormatConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload>[]
+        }
+        create: {
+          args: Prisma.BracketFormatConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload>
+        }
+        createMany: {
+          args: Prisma.BracketFormatConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.BracketFormatConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload>
+        }
+        update: {
+          args: Prisma.BracketFormatConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.BracketFormatConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BracketFormatConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.BracketFormatConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BracketFormatConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.BracketFormatConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBracketFormatConfig>
+        }
+        groupBy: {
+          args: Prisma.BracketFormatConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BracketFormatConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BracketFormatConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BracketFormatConfigCountAggregateOutputType> | number
+        }
+      }
+    }
+    TelegramDeliveryLog: {
+      payload: Prisma.$TelegramDeliveryLogPayload<ExtArgs>
+      fields: Prisma.TelegramDeliveryLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TelegramDeliveryLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TelegramDeliveryLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload>
+        }
+        findFirst: {
+          args: Prisma.TelegramDeliveryLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TelegramDeliveryLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload>
+        }
+        findMany: {
+          args: Prisma.TelegramDeliveryLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload>[]
+        }
+        create: {
+          args: Prisma.TelegramDeliveryLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload>
+        }
+        createMany: {
+          args: Prisma.TelegramDeliveryLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.TelegramDeliveryLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload>
+        }
+        update: {
+          args: Prisma.TelegramDeliveryLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.TelegramDeliveryLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TelegramDeliveryLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.TelegramDeliveryLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TelegramDeliveryLogPayload>
+        }
+        aggregate: {
+          args: Prisma.TelegramDeliveryLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTelegramDeliveryLog>
+        }
+        groupBy: {
+          args: Prisma.TelegramDeliveryLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TelegramDeliveryLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TelegramDeliveryLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TelegramDeliveryLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1905,6 +2240,16 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const PlayerNotificationPreferenceScalarFieldEnum = {
+  playerId: 'playerId',
+  notificationId: 'notificationId',
+  enabled: 'enabled',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlayerNotificationPreferenceScalarFieldEnum = (typeof PlayerNotificationPreferenceScalarFieldEnum)[keyof typeof PlayerNotificationPreferenceScalarFieldEnum]
 
 
 export const CoachRatingScalarFieldEnum = {
@@ -2115,6 +2460,55 @@ export const PlayListingResponseScalarFieldEnum = {
 export type PlayListingResponseScalarFieldEnum = (typeof PlayListingResponseScalarFieldEnum)[keyof typeof PlayListingResponseScalarFieldEnum]
 
 
+export const NotificationGlobalConfigScalarFieldEnum = {
+  id: 'id',
+  testModeEnabled: 'testModeEnabled',
+  testPlayerIds: 'testPlayerIds',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationGlobalConfigScalarFieldEnum = (typeof NotificationGlobalConfigScalarFieldEnum)[keyof typeof NotificationGlobalConfigScalarFieldEnum]
+
+
+export const NotificationTypeConfigScalarFieldEnum = {
+  notificationId: 'notificationId',
+  enabled: 'enabled',
+  templateOverride: 'templateOverride',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NotificationTypeConfigScalarFieldEnum = (typeof NotificationTypeConfigScalarFieldEnum)[keyof typeof NotificationTypeConfigScalarFieldEnum]
+
+
+export const BracketFormatConfigScalarFieldEnum = {
+  formatCode: 'formatCode',
+  enabled: 'enabled',
+  maintenanceMode: 'maintenanceMode',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BracketFormatConfigScalarFieldEnum = (typeof BracketFormatConfigScalarFieldEnum)[keyof typeof BracketFormatConfigScalarFieldEnum]
+
+
+export const TelegramDeliveryLogScalarFieldEnum = {
+  id: 'id',
+  notificationId: 'notificationId',
+  context: 'context',
+  status: 'status',
+  chatId: 'chatId',
+  playerId: 'playerId',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  batchId: 'batchId',
+  skipReason: 'skipReason',
+  errorMessage: 'errorMessage',
+  messagePreview: 'messagePreview',
+  createdAt: 'createdAt'
+} as const
+
+export type TelegramDeliveryLogScalarFieldEnum = (typeof TelegramDeliveryLogScalarFieldEnum)[keyof typeof TelegramDeliveryLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2129,6 +2523,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const CountryOrderByRelevanceFieldEnum = {
@@ -2244,6 +2645,14 @@ export const PlayerOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
+
+
+export const PlayerNotificationPreferenceOrderByRelevanceFieldEnum = {
+  playerId: 'playerId',
+  notificationId: 'notificationId'
+} as const
+
+export type PlayerNotificationPreferenceOrderByRelevanceFieldEnum = (typeof PlayerNotificationPreferenceOrderByRelevanceFieldEnum)[keyof typeof PlayerNotificationPreferenceOrderByRelevanceFieldEnum]
 
 
 export const CoachRatingOrderByRelevanceFieldEnum = {
@@ -2390,6 +2799,46 @@ export const PlayListingResponseOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayListingResponseOrderByRelevanceFieldEnum = (typeof PlayListingResponseOrderByRelevanceFieldEnum)[keyof typeof PlayListingResponseOrderByRelevanceFieldEnum]
+
+
+export const NotificationGlobalConfigOrderByRelevanceFieldEnum = {
+  id: 'id'
+} as const
+
+export type NotificationGlobalConfigOrderByRelevanceFieldEnum = (typeof NotificationGlobalConfigOrderByRelevanceFieldEnum)[keyof typeof NotificationGlobalConfigOrderByRelevanceFieldEnum]
+
+
+export const NotificationTypeConfigOrderByRelevanceFieldEnum = {
+  notificationId: 'notificationId',
+  templateOverride: 'templateOverride'
+} as const
+
+export type NotificationTypeConfigOrderByRelevanceFieldEnum = (typeof NotificationTypeConfigOrderByRelevanceFieldEnum)[keyof typeof NotificationTypeConfigOrderByRelevanceFieldEnum]
+
+
+export const BracketFormatConfigOrderByRelevanceFieldEnum = {
+  formatCode: 'formatCode'
+} as const
+
+export type BracketFormatConfigOrderByRelevanceFieldEnum = (typeof BracketFormatConfigOrderByRelevanceFieldEnum)[keyof typeof BracketFormatConfigOrderByRelevanceFieldEnum]
+
+
+export const TelegramDeliveryLogOrderByRelevanceFieldEnum = {
+  id: 'id',
+  notificationId: 'notificationId',
+  context: 'context',
+  status: 'status',
+  chatId: 'chatId',
+  playerId: 'playerId',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  batchId: 'batchId',
+  skipReason: 'skipReason',
+  errorMessage: 'errorMessage',
+  messagePreview: 'messagePreview'
+} as const
+
+export type TelegramDeliveryLogOrderByRelevanceFieldEnum = (typeof TelegramDeliveryLogOrderByRelevanceFieldEnum)[keyof typeof TelegramDeliveryLogOrderByRelevanceFieldEnum]
 
 
 
@@ -2661,6 +3110,7 @@ export type GlobalOmitConfig = {
   tableBooking?: Prisma.TableBookingOmit
   clubNews?: Prisma.ClubNewsOmit
   player?: Prisma.PlayerOmit
+  playerNotificationPreference?: Prisma.PlayerNotificationPreferenceOmit
   coachRating?: Prisma.CoachRatingOmit
   clubPlayerRating?: Prisma.ClubPlayerRatingOmit
   loginChallenge?: Prisma.LoginChallengeOmit
@@ -2674,6 +3124,10 @@ export type GlobalOmitConfig = {
   ideaVote?: Prisma.IdeaVoteOmit
   playListing?: Prisma.PlayListingOmit
   playListingResponse?: Prisma.PlayListingResponseOmit
+  notificationGlobalConfig?: Prisma.NotificationGlobalConfigOmit
+  notificationTypeConfig?: Prisma.NotificationTypeConfigOmit
+  bracketFormatConfig?: Prisma.BracketFormatConfigOmit
+  telegramDeliveryLog?: Prisma.TelegramDeliveryLogOmit
 }
 
 /* Types for Logging */

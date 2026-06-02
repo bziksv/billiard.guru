@@ -1,0 +1,24 @@
+---
+description: Новые Telegram-уведомления — только через реестр и dispatchNotification
+globs: apps/web/src/lib/**/*.ts,apps/web/src/app/api/**/*.ts
+alwaysApply: false
+---
+
+# Уведомления (Telegram)
+
+Единый реестр: `apps/web/src/lib/notifications/catalog.ts`
+
+## Добавление
+
+1. Запись в `NOTIFICATION_CATALOG` (уникальный `id`, `trigger`, `recipient`, `examplePreview`).
+2. Отправка: `dispatchNotification(id, chatId, text, options)` — **не** прямой `sendTelegramMessage` для продуктовых исходящих.
+3. Цепочки: `triggeredBy` / `chainsTo`; при необходимости шаг в `NOTIFICATION_FLOWS`.
+4. Массовая рассылка: `writeAuditLog` + `auditAction` в каталоге.
+
+Страница `/admin/notifications`: каталог + настройки в БД (`notification_type_config`, `notification_global_config`).
+
+Массовые (`massBroadcast: true`) в тестовом режиме — только `testPlayerIds` или суперадмины.
+
+## Ответы бота
+
+Сообщения из `telegram-handler.ts` тоже описываются в каталоге (`kind: bot_reply`). По возможности используйте `dispatchNotification` с соответствующим `id`.

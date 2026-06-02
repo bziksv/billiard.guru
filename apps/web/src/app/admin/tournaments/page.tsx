@@ -13,7 +13,12 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { FORMAT_OPTIONS, type AdminTournament } from "@/lib/tournament-admin";
+import type { AdminTournament } from "@/lib/tournament-admin";
+import {
+  firstSelectableFormat,
+  useBracketFormatOptions,
+} from "@/hooks/use-bracket-format-options";
+import { FORMAT_OPTIONS } from "@/lib/bracket-formats/catalog";
 import { adminTabClass } from "@/lib/admin-ui";
 
 interface Club {
@@ -88,6 +93,8 @@ function matchesSearch(tournament: Tournament, query: string): boolean {
 
 export default function TournamentsPage() {
   const router = useRouter();
+  const { options: formatOptions, loading: formatOptionsLoading } =
+    useBracketFormatOptions();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [newClubId, setNewClubId] = useState("");
@@ -105,6 +112,14 @@ export default function TournamentsPage() {
   const [finishedSearch, setFinishedSearch] = useState("");
   const [filtersReady, setFiltersReady] = useState(false);
   const [tab, setTab] = useState<"create" | "current" | "finished">("current");
+
+  useEffect(() => {
+    const current = formatOptions.find((o) => o.value === newFormat);
+    if (current?.disabled || !current) {
+      const first = firstSelectableFormat(formatOptions);
+      if (first) setNewFormat(first);
+    }
+  }, [formatOptions, newFormat]);
 
   async function reloadTournaments() {
     const t = await fetch("/api/tournaments").then((r) => r.json());
@@ -357,12 +372,17 @@ export default function TournamentsPage() {
             required
           />
           <SearchableSelect
-            options={FORMAT_OPTIONS}
+            options={
+              formatOptionsLoading
+                ? [{ value: newFormat, label: "Загрузка форматов…" }]
+                : formatOptions
+            }
             value={newFormat}
             onChange={setNewFormat}
             placeholder="Формат турнира"
             searchPlaceholder="Поиск формата…"
             required
+            disabled={formatOptionsLoading || formatOptions.length === 0}
           />
           <textarea
             name="description"
