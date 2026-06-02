@@ -1,0 +1,43 @@
+---
+description: Эталон сетки 16→8 (Fixed Swiss) — ориентир для всех турнирных сеток; не ломать без явного запроса
+globs: apps/web/src/lib/fixed-swiss*.ts,apps/web/src/lib/swiss-bracket-layout.ts,apps/web/src/lib/bracket-service.ts,apps/web/src/lib/bracket-view.ts,apps/web/src/components/bracket/**,apps/web/scripts/test-fixed-swiss-layout.ts,docs/BRACKET_REFERENCE_16_8.md,docs/FIXED_SWISS_BRACKET_LINES.md
+alwaysApply: false
+---
+
+# Эталон: Fixed Swiss 16→8
+
+**Полный регламент:** `docs/BRACKET_REFERENCE_16_8.md`  
+**Линии SVG:** `docs/FIXED_SWISS_BRACKET_LINES.md`
+
+Эта сетка (**27 встреч, 7 колонок, формат `FIXED_SWISS`**) — **эталон** для UI, layout, links, подвалов карточек и модалки результата. Новые форматы копируют **паттерны**, не изобретают параллельные карточки/линии.
+
+## Не менять без явного запроса
+
+- `buildFixedSwissTsTemplate()` и links в `fixed-swiss-grid.ts`
+- `buildTsPositions27`, `shouldDrawFixedSwissWinEdge`, размеры `FIXED_SWISS_CARD_H` / `FIXED_SWISS_BRACKET_UNIT`
+- Подписи мест по #13–#27 (`fixedSwissTs27PlacementByMatchNo`, `matchNumber` в placement)
+- Whitelist SVG (см. FIXED_SWISS_BRACKET_LINES.md)
+
+## Паттерны для других сеток
+
+| Эталон | Куда переносить |
+|--------|------------------|
+| `links[]` win/loss | свой `build*Template()` |
+| `buildTsPositions27` | своя функция Y по слотам |
+| `LlbBracketMatch` | общая карточка, свои labels |
+| `shouldDraw*Edge` whitelist | явный список пар, без bus между колонками |
+| `test-fixed-swiss-layout.ts` | аналогичный скрипт под формат |
+
+## UI карточки
+
+- Шапка: только `#N`
+- Подвал: место / проигравший / победитель (до 3 строк)
+- Заголовки колонок — **этапы**, не диапазоны мест
+
+## Проверка
+
+```bash
+cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts
+```
+
+После смены links — пересоздать сетку в админке.

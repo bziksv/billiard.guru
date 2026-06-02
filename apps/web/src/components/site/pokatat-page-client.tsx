@@ -1,0 +1,509 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { CitySelect } from "@/components/admin/city-select";
+import { EmptyState, SiteCard } from "@/components/site/site-card";
+import { PlayListingCard } from "@/components/site/play-listing-card";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { CLUB_TABLE_FORMATS } from "@/lib/club-table-formats";
+import {
+  PLAY_LISTING_KIND_LABELS,
+  WEEKDAY_LABELS,
+} from "@/lib/play-listing-display";
+import type { SerializedPlayListing } from "@/lib/play-listing-server";
+
+type Tab = "browse" | "create" | "mine";
+
+const KIND_OPTIONS = Object.entries(PLAY_LISTING_KIND_LABELS).map(([value, label]) => ({
+  value,
+  label,
+}));
+
+const FORMAT_OPTIONS = CLUB_TABLE_FORMATS.map((f) => ({ value: f.id, label: f.label }));
+
+export function PokatatPageClient({
+  isLoggedIn,
+  isVerified,
+  defaultCityId,
+}: {
+  isLoggedIn: boolean;
+  isVerified: boolean;
+  defaultCityId?: string;
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTab = (searchParams.get("tab") as Tab) || "browse";
+
+  const [tab, setTab] = useState<Tab>(
+    initialTab === "create" || initialTab === "mine" ? initialTab : "browse",
+  );
+  const [listings, setListings] = useState<SerializedPlayListing[]>([]);
+  const [mine, setMine] = useState<SerializedPlayListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filterKind, setFilterKind] = useState("");
+  const [filterSchedule, setFilterSchedule] = useState("");
+
+  // Form state
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [kind, setKind] = useState("SPARRING");
+  const [scheduleType, setScheduleType] = useState<"ONE_TIME" | "RECURRING">("ONE_TIME");
+  const [cityId, setCityId] = useState(defaultCityId ?? "");
+  const [clubId, setClubId] = useState("");
+  const [clubs, setClubs] = useState<{ id: string; name: string }[]>([]);
+  const [playDate, setPlayDate] = useState("");
+  const [playTime, setPlayTime] = useState("19:00");
+  const [weekdays, setWeekdays] = useState<number[]>([]);
+  const [timeFrom, setTimeFrom] = useState("19:00");
+  const [timeTo, setTimeTo] = useState("22:00");
+  const [gameFormat, setGameFormat] = useState("");
+  const [ratingMin, setRatingMin] = useState("");
+  const [ratingMax, setRatingMax] = useState("");
+  const [playersNeeded, setPlayersNeeded] = useState("1");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const geoQuery = useMemo(() => {
+    const q = new URLSearchParams(searchParams.toString());
+    return q.toString() ? `?${q.toString()}` : "";
+  }, [searchParams]);
+
+  const reloadBrowse = useCallback(async () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (filterKind) params.set("kind", filterKind);
+    else params.delete("kind");
+    if (filterSchedule) params.set("scheduleType", filterSchedule);
+    else params.delete("scheduleType");
+    const res = await fetch(`/api/play-listings?${params.toString()}`);
+    const data = await res.json();
+    setListings(Array.isArray(data.listings) ? data.listings : []);
+  }, [searchParams, filterKind, filterSchedule]);
+
+  const reloadMine = useCallback(async () => {
+    const res = await fetch("/api/play-listings?scope=mine");
+    const data = await res.json();
+    setMine(Array.isArray(data.listings) ? data.listings : []);
+  }, []);
+
+  const reload = useCallback(async () => {
+    setLoading(true);
+    await Promise.all([reloadBrowse(), isLoggedIn ? reloadMine() : Promise.resolve()]);
+    setLoading(false);
+  }, [reloadBrowse, reloadMine, isLoggedIn]);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  useEffect(() => {
+    if (tab === "browse") reloadBrowse();
+  }, [tab, filterKind, filterSchedule, reloadBrowse]);
+
+  useEffect(() => {
+    if (!cityId) {
+      setClubs([]);
+      setClubId("");
+      return;
+    }
+    fetch("/api/clubs")
+      .then((r) => r.json())
+      .then((data) => {
+        const list = Array.isArray(data) ? data : [];
+        setClubs(
+          list
+            .filter((c: { cityId?: string }) => c.cityId === cityId)
+            .map((c: { id: string; name: string }) => ({ id: c.id, name: c.name })),
+        );
+      })
+      .catch(() => setClubs([]));
+  }, [cityId]);
+
+  useEffect(() => {
+    if (defaultCityId && !cityId) setCityId(defaultCityId);
+  }, [defaultCityId, cityId]);
+
+  const clubOptions = useMemo(
+    () => [{ value: "", label: "Любой клуб / не важно" }, ...clubs.map((c) => ({ value: c.id, label: c.name }))],
+    [clubs],
+  );
+
+  function toggleWeekday(day: number) {
+    setWeekdays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort((a, b) => a - b),
+    );
+  }
+
+  async function submitListing() {
+    setSubmitError(null);
+    setSubmitting(true);
+
+    let playAt: string | undefined;
+    if (scheduleType === "ONE_TIME") {
+      if (!playDate) {
+        setSubmitError("Укажите дату");
+        setSubmitting(false);
+        return;
+      }
+      const local = new Date(`${playDate}T${playTime}:00`);
+      playAt = local.toISOString();
+    }
+
+    const payload = {
+      title: title.trim(),
+      body: body.trim(),
+      kind,
+      scheduleType,
+      cityId,
+      clubId: clubId || undefined,
+      playAt,
+      weekdays: scheduleType === "RECURRING" ? weekdays : undefined,
+      timeFrom: scheduleType === "RECURRING" ? timeFrom : playTime,
+      timeTo: scheduleType === "RECURRING" ? timeTo : undefined,
+      gameFormat: gameFormat || undefined,
+      ratingMin: ratingMin ? Number(ratingMin) : undefined,
+      ratingMax: ratingMax ? Number(ratingMax) : undefined,
+      playersNeeded: Number(playersNeeded) || 1,
+    };
+
+    const res = await fetch("/api/play-listings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    setSubmitting(false);
+
+    if (!res.ok) {
+      setSubmitError(data.error ?? "Ошибка публикации");
+      return;
+    }
+
+    setTitle("");
+    setBody("");
+    setTab("mine");
+    router.push("/pokatat?tab=mine");
+    await reload();
+  }
+
+  const tabClass = (active: boolean) =>
+    active
+      ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm shadow-emerald-900/40"
+      : "home-card-body rounded-lg px-4 py-2 text-sm hover:text-[var(--text-primary)]";
+
+  return (
+    <div className="space-y-6">
+      <div className="home-tab-bar inline-flex flex-wrap gap-1 rounded-xl p-1">
+        <button type="button" onClick={() => setTab("browse")} className={tabClass(tab === "browse")}>
+          Объявления{listings.length > 0 ? ` (${listings.length})` : ""}
+        </button>
+        <button type="button" onClick={() => setTab("create")} className={tabClass(tab === "create")}>
+          Опубликовать
+        </button>
+        {isLoggedIn && (
+          <button type="button" onClick={() => setTab("mine")} className={tabClass(tab === "mine")}>
+            Мои{mine.length > 0 ? ` (${mine.length})` : ""}
+          </button>
+        )}
+      </div>
+
+      {tab === "browse" && (
+        <>
+          <div className="flex flex-wrap gap-3">
+            <SearchableSelect
+              options={[{ value: "", label: "Все типы" }, ...KIND_OPTIONS]}
+              value={filterKind}
+              onChange={setFilterKind}
+              placeholder="Тип"
+              className="min-w-[10rem]"
+            />
+            <SearchableSelect
+              options={[
+                { value: "", label: "Разово и на постоянке" },
+                { value: "ONE_TIME", label: "Разово" },
+                { value: "RECURRING", label: "На постоянке" },
+              ]}
+              value={filterSchedule}
+              onChange={setFilterSchedule}
+              placeholder="Расписание"
+              className="min-w-[10rem]"
+            />
+          </div>
+
+          {loading ? (
+            <p className="text-sm text-zinc-500">Загрузка…</p>
+          ) : listings.length === 0 ? (
+            <>
+              <EmptyState
+                title="Пока нет объявлений"
+                description="Станьте первым — опубликуйте, когда и с кем хотите поиграть"
+              />
+              <div className="text-center">
+                {isLoggedIn ? (
+                  <button type="button" onClick={() => setTab("create")} className="site-btn-primary">
+                    Опубликовать
+                  </button>
+                ) : (
+                  <Link href="/login?next=/pokatat?tab=create" className="site-btn-primary inline-flex">
+                    Войти и опубликовать
+                  </Link>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {listings.map((listing) => (
+                <PlayListingCard key={listing.id} listing={listing} />
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === "create" && (
+        <SiteCard>
+          {!isLoggedIn ? (
+            <div className="space-y-3 text-sm text-zinc-400">
+              <p>Публиковать объявления могут зарегистрированные игроки.</p>
+              <Link href="/login?next=/pokatat?tab=create" className="site-btn-primary inline-flex">
+                Войти
+              </Link>
+            </div>
+          ) : !isVerified ? (
+            <p className="text-sm text-amber-400/90">
+              Подтвердите регистрацию в Telegram — после этого можно публиковать объявления.
+            </p>
+          ) : (
+            <form
+              className="space-y-6"
+              onSubmit={(e) => {
+                e.preventDefault();
+                submitListing();
+              }}
+            >
+              <section className="space-y-4">
+                <h3 className="text-sm font-medium text-zinc-300">О чём объявление</h3>
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Например: Спарринг по средам в «Абрилок»"
+                  maxLength={120}
+                  required
+                  className="site-input w-full"
+                />
+                <textarea
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  placeholder="Дополнительно: стиль игры, уровень, пожелания…"
+                  rows={4}
+                  maxLength={2000}
+                  className="site-input w-full resize-y"
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <SearchableSelect
+                    label="Что ищете"
+                    options={KIND_OPTIONS}
+                    value={kind}
+                    onChange={setKind}
+                    required
+                  />
+                  <SearchableSelect
+                    label="Формат стола"
+                    options={[{ value: "", label: "Не важно" }, ...FORMAT_OPTIONS]}
+                    value={gameFormat}
+                    onChange={setGameFormat}
+                  />
+                </div>
+              </section>
+
+              <section className="space-y-4 border-t border-zinc-800 pt-6">
+                <h3 className="text-sm font-medium text-zinc-300">Когда играете</h3>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setScheduleType("ONE_TIME")}
+                    className={
+                      scheduleType === "ONE_TIME"
+                        ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white"
+                        : "rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400"
+                    }
+                  >
+                    Разово
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setScheduleType("RECURRING")}
+                    className={
+                      scheduleType === "RECURRING"
+                        ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white"
+                        : "rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400"
+                    }
+                  >
+                    На постоянке
+                  </button>
+                </div>
+
+                {scheduleType === "ONE_TIME" ? (
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block text-sm">
+                      <span className="mb-1 block text-zinc-500">Дата</span>
+                      <input
+                        type="date"
+                        value={playDate}
+                        onChange={(e) => setPlayDate(e.target.value)}
+                        required
+                        min={new Date().toISOString().slice(0, 10)}
+                        className="site-input w-full"
+                      />
+                    </label>
+                    <label className="block text-sm">
+                      <span className="mb-1 block text-zinc-500">Время</span>
+                      <input
+                        type="time"
+                        value={playTime}
+                        onChange={(e) => setPlayTime(e.target.value)}
+                        required
+                        className="site-input w-full"
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <p className="mb-2 text-xs text-zinc-500">Дни недели</p>
+                      <div className="flex flex-wrap gap-2">
+                        {WEEKDAY_LABELS.map((label, day) => (
+                          <button
+                            key={label}
+                            type="button"
+                            onClick={() => toggleWeekday(day)}
+                            className={
+                              weekdays.includes(day)
+                                ? "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm text-white"
+                                : "rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-400"
+                            }
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <label className="block text-sm">
+                        <span className="mb-1 block text-zinc-500">С</span>
+                        <input
+                          type="time"
+                          value={timeFrom}
+                          onChange={(e) => setTimeFrom(e.target.value)}
+                          required
+                          className="site-input w-full"
+                        />
+                      </label>
+                      <label className="block text-sm">
+                        <span className="mb-1 block text-zinc-500">До</span>
+                        <input
+                          type="time"
+                          value={timeTo}
+                          onChange={(e) => setTimeTo(e.target.value)}
+                          className="site-input w-full"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              <section className="space-y-4 border-t border-zinc-800 pt-6">
+                <h3 className="text-sm font-medium text-zinc-300">Где и с кем</h3>
+                <CitySelect value={cityId} onChange={setCityId} required />
+                <SearchableSelect
+                  label="Клуб (необязательно)"
+                  options={clubOptions}
+                  value={clubId}
+                  onChange={setClubId}
+                  disabled={!cityId}
+                  placeholder={cityId ? "Выберите клуб" : "Сначала выберите город"}
+                />
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <label className="block text-sm">
+                    <span className="mb-1 block text-zinc-500">Рейтинг от</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      max="10"
+                      value={ratingMin}
+                      onChange={(e) => setRatingMin(e.target.value)}
+                      placeholder="—"
+                      className="site-input w-full"
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className="mb-1 block text-zinc-500">Рейтинг до</span>
+                    <input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      max="10"
+                      value={ratingMax}
+                      onChange={(e) => setRatingMax(e.target.value)}
+                      placeholder="—"
+                      className="site-input w-full"
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className="mb-1 block text-zinc-500">Сколько игроков</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={playersNeeded}
+                      onChange={(e) => setPlayersNeeded(e.target.value)}
+                      className="site-input w-full"
+                    />
+                  </label>
+                </div>
+              </section>
+
+              {submitError && <p className="text-sm text-red-400">{submitError}</p>}
+
+              <button
+                type="submit"
+                disabled={submitting || title.trim().length < 3 || !cityId}
+                className="site-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {submitting ? "Публикация…" : "Опубликовать"}
+              </button>
+            </form>
+          )}
+        </SiteCard>
+      )}
+
+      {tab === "mine" && isLoggedIn && (
+        <section className="space-y-4">
+          {mine.length === 0 ? (
+            <>
+              <EmptyState title="У вас пока нет объявлений" />
+              <div className="text-center">
+                <button type="button" onClick={() => setTab("create")} className="site-btn-primary">
+                  Опубликовать первое
+                </button>
+              </div>
+            </>
+          ) : (
+            mine.map((listing) => (
+              <PlayListingCard key={listing.id} listing={listing} showStatus />
+            ))
+          )}
+        </section>
+      )}
+
+      {tab === "browse" && geoQuery && (
+        <p className="text-xs text-zinc-600">
+          Фильтр региона применяется из панели выше{geoQuery ? "" : ""}.
+        </p>
+      )}
+    </div>
+  );
+}

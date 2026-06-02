@@ -1,5 +1,6 @@
 import {
   groupMatchesByRound,
+  matchAutopassBye,
   type BracketMatchView,
 } from "@/lib/bracket-view";
 
@@ -10,6 +11,10 @@ export type SwissBracketEdge = {
   toId: string;
   teamId: string;
   kind: SwissEdgeKind;
+  /** Фикс. швейцарка: строка источника (1 — верх, 2 — низ) */
+  fromTeamSlot?: 1 | 2;
+  /** Фикс. швейцарка: строка назначения */
+  toTeamSlot?: 1 | 2;
 };
 
 export type SwissMatchPosition = {
@@ -28,6 +33,10 @@ export type SwissBracketLayout = {
   totalWidth: number;
   totalHeight: number;
   centerX: number;
+  /** Фикс. швейцарка: ширина колонки/карточки (если отличается от GRID_*). */
+  colWidth?: number;
+  cardWidth?: number;
+  cardHeight?: number;
 };
 
 export const GRID_COL_W = 280;
@@ -35,11 +44,33 @@ export const GRID_CARD_W = 220;
 export const GRID_ROW_H = 28;
 export const GRID_META_H = 24;
 export const GRID_FOOTER_H = 22;
+/** Высота одной строки подвала (место / переходы). */
+export const GRID_FOOTER_LINE_H = 12;
 export const GRID_GAP_Y = 20;
 export const GRID_PAD = 24;
+/** Отступ под заголовки колонок — как OLYMPIC_LABEL_OFFSET в bracket-view */
+export const GRID_LABEL_OFFSET = 18;
 
-export function gridCardHeight(hasHandicap = false) {
-  return GRID_META_H + GRID_ROW_H * 2 + GRID_FOOTER_H + (hasHandicap ? 16 : 0);
+export function gridCardInset() {
+  return (GRID_COL_W - GRID_CARD_W) / 2;
+}
+
+export function gridCardLeft(col: number, minCol: number) {
+  return gridColLeft(col, minCol) + gridCardInset();
+}
+
+export function gridFooterHeight(lines = 2): number {
+  if (lines <= 1) return GRID_FOOTER_H;
+  return lines * GRID_FOOTER_LINE_H + 8;
+}
+
+export function gridCardHeight(hasHandicap = false, footerLines = 2) {
+  return (
+    GRID_META_H +
+    GRID_ROW_H * 2 +
+    gridFooterHeight(footerLines) +
+    (hasHandicap ? 18 : 0)
+  );
 }
 
 function matchTeams(match: BracketMatchView): string[] {
@@ -294,6 +325,18 @@ export function gridTeamRowY(
   return teamRowCenterY(match, teamId, cardTop);
 }
 
+export function teamRowCenterYBySlot(cardTop: number, teamSlot: 1 | 2): number {
+  if (teamSlot === 1) {
+    return cardTop + GRID_META_H + GRID_ROW_H / 2;
+  }
+  return cardTop + GRID_META_H + GRID_ROW_H + GRID_ROW_H / 2;
+}
+
+/** Y горизонтали между двумя строками игроков (эталон для линий fixed Swiss). */
+export function teamDividerY(cardTop: number): number {
+  return cardTop + GRID_META_H + GRID_ROW_H;
+}
+
 export function gridEdgePoints(
   fromMatch: BracketMatchView,
   toMatch: BracketMatchView,
@@ -303,12 +346,12 @@ export function gridEdgePoints(
   _kind: SwissEdgeKind,
   minCol: number,
 ) {
-  const fromTop = fromPos.y + GRID_PAD;
-  const toTop = toPos.y + GRID_PAD;
+  const fromTop = fromPos.y + GRID_PAD + GRID_LABEL_OFFSET;
+  const toTop = toPos.y + GRID_PAD + GRID_LABEL_OFFSET;
   const y = gridTeamRowY(fromMatch, teamId, fromTop);
   const entryY = gridTeamRowY(toMatch, teamId, toTop);
-  const fromLeft = gridColLeft(fromPos.col, minCol);
-  const toLeft = gridColLeft(toPos.col, minCol);
+  const fromLeft = gridCardLeft(fromPos.col, minCol);
+  const toLeft = gridCardLeft(toPos.col, minCol);
 
   return {
     from: { x: fromLeft + GRID_CARD_W, y },
@@ -352,4 +395,22 @@ export function getMatchDestinations(
 
 export function gridColumnLabel(col: number, minRound = 1): string {
   return `Тур ${col + minRound}`;
+}
+
+/** × от bye 1-го тура показывается в матче назначения (слот toTeamSlot), как llb. */
+export function incomingAutopassPhantomSlot(
+  matchId: string,
+  edges: SwissBracketEdge[],
+  matchById: Map<string, BracketMatchView>,
+): 1 | 2 | null {
+  for (const edge of edges) {
+    if (edge.toId !== matchId || edge.kind !== "loss" || !edge.toTeamSlot) {
+      continue;
+    }
+    const from = matchById.get(edge.fromId);
+    if (from && matchAutopassBye(from).isBye) {
+      return edge.toTeamSlot;
+    }
+  }
+  return null;
 }

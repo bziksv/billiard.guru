@@ -2,6 +2,7 @@
 
 import {
   type BracketMatchView,
+  matchAutopassBye,
   type SwissStandingView,
 } from "@/lib/bracket-view";
 import { LlbBracketMatch } from "@/components/bracket/llb-bracket-match";
@@ -10,14 +11,31 @@ import { teamLabel } from "@/lib/pair-tournament";
 import type { TeamPlayer } from "@/lib/pair-tournament";
 import {
   buildFixedSwissBracketLayout,
+  fixedGridCardLeft,
+  fixedGridColLeft,
+  fixedSwissColumnLabel,
+  fixedSwissForkTrunkYByTarget,
   gridFixedColumnLabel,
   gridFixedConnectorPath,
+  gridFixedCrossToQuarterConnectorPath,
+  gridFixedForkConnectorPath,
   gridFixedEdgePoints,
+  isFixedSwissCrossToQuarterEdge,
+  isFixedSwissForkEdge,
+  isFixedSwissR1LowerLossEdge,
+  isFixedSwissR23UpperLossEdge,
+  shouldDrawFixedSwissLossEdge,
+  shouldDrawFixedSwissWinEdge,
 } from "@/lib/fixed-swiss-layout";
+import {
+  isFixedSwiss168MatchCount,
+} from "@/lib/fixed-swiss-grid";
 import {
   buildSwissBracketLayout,
   GRID_COL_W,
+  GRID_LABEL_OFFSET,
   GRID_PAD,
+  gridCardLeft,
   gridColLeft,
   gridColumnLabel,
   gridConnectorPath,
@@ -44,10 +62,61 @@ export function SwissBracketView({
     ? buildFixedSwissBracketLayout(matches)
     : buildSwissBracketLayout(matches);
   const matchById = new Map(matches.map((m) => [m.id, m]));
+  const fixedMaxRound =
+    matches.length > 0 ? Math.max(...matches.map((m) => m.round)) : 0;
+  const useFixed168 = fixedGrid && isFixedSwiss168MatchCount(matches.length);
+
+  const colW = layout.colWidth ?? GRID_COL_W;
+  const colLeft = fixedGrid
+    ? (col: number) => fixedGridColLeft(col, layout.minCol)
+    : (col: number) => gridColLeft(col, layout.minCol);
+  const cardLeft = fixedGrid
+    ? (col: number) => fixedGridCardLeft(col, layout.minCol)
+    : (col: number) => gridCardLeft(col, layout.minCol);
 
   const columns: number[] = [];
   for (let c = layout.minCol; c <= layout.maxCol; c++) {
     columns.push(c);
+  }
+
+  const forkTrunkFromY = (
+    fromId: string,
+    toId: string,
+    fromTeamSlot: 1 | 2,
+    toTeamSlot: 1 | 2,
+    kind: "win" | "loss",
+  ) => {
+    const fp = layout.positions.get(fromId);
+    const tp = layout.positions.get(toId);
+    if (!fp || !tp) return undefined;
+    return gridFixedEdgePoints(
+      fp,
+      tp,
+      fromTeamSlot,
+      toTeamSlot,
+      kind,
+      layout.minCol,
+    ).from.y;
+  };
+
+  const r12TrunkY =
+    fixedGrid && useFixed168
+      ? fixedSwissForkTrunkYByTarget(1, 2, layout.edges, forkTrunkFromY, matchById)
+      : new Map<string, number>();
+  const r34TrunkY =
+    fixedGrid && useFixed168
+      ? fixedSwissForkTrunkYByTarget(3, 4, layout.edges, forkTrunkFromY, matchById)
+      : new Map<string, number>();
+  const r45TrunkY =
+    fixedGrid && useFixed168
+      ? fixedSwissForkTrunkYByTarget(4, 5, layout.edges, forkTrunkFromY, matchById)
+      : new Map<string, number>();
+
+  function fixedSwissTrunkY(fromRound: number, toId: string, fallback: number) {
+    if (fromRound === 1) return r12TrunkY.get(toId) ?? fallback;
+    if (fromRound === 3) return r34TrunkY.get(toId) ?? fallback;
+    if (fromRound === 4) return r45TrunkY.get(toId) ?? fallback;
+    return fallback;
   }
 
   return (
@@ -110,39 +179,47 @@ export function SwissBracketView({
 
       <BracketScrollCenter
         centerX={layout.centerX}
-        className="max-h-[75vh] overflow-x-auto overflow-y-auto rounded-lg border border-zinc-700/60 bg-zinc-900/20 pb-6 pt-2"
+        contentHeight={fixedGrid ? layout.totalHeight : undefined}
+        className={
+          fixedGrid
+            ? "bracket-canvas max-h-[min(90vh,1400px)] overflow-x-auto overflow-y-auto pb-6 pt-2"
+            : "bracket-canvas max-h-[75vh] overflow-x-auto overflow-y-auto pb-6 pt-2"
+        }
       >
         <div
-          className="relative mx-auto min-w-max"
+          className="relative min-w-max"
           style={{
             width: layout.totalWidth,
             height: layout.totalHeight,
-            minWidth: "100%",
           }}
         >
           {columns.map((col) => {
             const label = fixedGrid
-              ? gridFixedColumnLabel(col)
+              ? useFixed168
+                ? fixedSwissColumnLabel(col, matches.length, fixedMaxRound)
+                : gridFixedColumnLabel(col)
               : gridColumnLabel(col, layout.minRound);
             const isStart = fixedGrid ? col === 0 : col === layout.minCol;
             return (
               <div
                 key={`col-${col}`}
-                className="pointer-events-none absolute top-0 z-20 text-center text-[10px] font-medium uppercase tracking-wider text-zinc-600"
+                className="pointer-events-none absolute top-0 z-20"
                 style={{
-                  left: gridColLeft(col, layout.minCol),
-                  width: GRID_COL_W,
+                  left: colLeft(col),
+                  width: colW,
                 }}
               >
-                <span className={isStart ? "text-emerald-600/80" : undefined}>
-                  {label}
-                </span>
+                <div className="bracket-col-header text-center text-[10px] font-medium uppercase tracking-wider">
+                  <span className={isStart ? "text-emerald-700 dark:text-emerald-400" : undefined}>
+                    {label}
+                  </span>
+                </div>
               </div>
             );
           })}
 
           <svg
-            className="pointer-events-none absolute inset-0 z-0"
+            className="pointer-events-none absolute left-0 top-0 z-0 overflow-visible"
             width={layout.totalWidth}
             height={layout.totalHeight}
             aria-hidden
@@ -153,29 +230,144 @@ export function SwissBracketView({
               const fromPos = layout.positions.get(edge.fromId);
               const toPos = layout.positions.get(edge.toId);
               if (!fromMatch || !toMatch || !fromPos || !toPos) return null;
+              if (
+                fixedGrid &&
+                !useFixed168 &&
+                Math.abs(fromPos.col - toPos.col) !== 1
+              ) {
+                return null;
+              }
 
-              const points = fixedGrid
-                ? gridFixedEdgePoints(
-                    fromMatch,
-                    toMatch,
-                    fromPos,
-                    toPos,
-                    edge.teamId,
-                    edge.kind,
-                    layout.minCol,
+              if (
+                fixedGrid &&
+                edge.fromTeamSlot != null &&
+                edge.toTeamSlot != null
+              ) {
+                const isFork = isFixedSwissForkEdge(
+                  fromMatch.round,
+                  toMatch.round,
+                );
+                const isPhantomLoss =
+                  edge.kind === "loss" &&
+                  matchAutopassBye(fromMatch).isBye;
+                if (
+                  edge.kind === "loss" &&
+                  useFixed168 &&
+                  !shouldDrawFixedSwissLossEdge(
+                    fromPos.col,
+                    toPos.col,
+                    isPhantomLoss,
+                    fromMatch.round,
+                    toMatch.round,
                   )
-                : gridEdgePoints(
-                    fromMatch,
-                    toMatch,
-                    fromPos,
-                    toPos,
-                    edge.teamId,
+                ) {
+                  return null;
+                }
+                const points = gridFixedEdgePoints(
+                  fromPos,
+                  toPos,
+                  edge.fromTeamSlot,
+                  edge.toTeamSlot,
+                  edge.kind,
+                  layout.minCol,
+                );
+                if (
+                  useFixed168 &&
+                  (edge.kind === "win" || edge.kind === "bye") &&
+                  !shouldDrawFixedSwissWinEdge(
+                    fromPos.col,
+                    toPos.col,
+                    fromMatch.round,
+                    toMatch.round,
                     edge.kind,
-                    layout.minCol,
+                    fromMatch.slot,
+                    toMatch.slot,
+                  )
+                ) {
+                  return null;
+                }
+                const trunkY = isFork
+                  ? fixedSwissTrunkY(fromMatch.round, edge.toId, points.from.y)
+                  : points.from.y;
+                const crossToQuarter =
+                  useFixed168 &&
+                  isFixedSwissCrossToQuarterEdge(
+                    fromMatch.round,
+                    toMatch.round,
                   );
-              const path = fixedGrid
-                ? gridFixedConnectorPath(points.from, points.to, edge.kind)
-                : gridConnectorPath(points.from, points.to, edge.kind);
+                const path = isFork
+                  ? gridFixedForkConnectorPath(
+                      points.from,
+                      points.to,
+                      fromPos.col,
+                      toPos.col,
+                      layout.minCol,
+                      layout.colWidth,
+                      trunkY,
+                    )
+                  : crossToQuarter
+                    ? gridFixedCrossToQuarterConnectorPath(
+                        points.from,
+                        points.to,
+                        fromPos.col,
+                        toPos.col,
+                        layout.minCol,
+                        layout.colWidth,
+                        edge.fromTeamSlot ?? 0,
+                      )
+                    : gridFixedConnectorPath(
+                        points.from,
+                        points.to,
+                        edge.kind,
+                        fromPos.col,
+                        toPos.col,
+                        layout.minCol,
+                        layout.colWidth,
+                        0,
+                      );
+                const r1LowerFork = isFixedSwissR1LowerLossEdge(
+                  fromPos.col,
+                  toPos.col,
+                  edge.kind,
+                );
+                const forkLoss =
+                  isFork &&
+                  edge.kind === "loss" &&
+                  (r1LowerFork ||
+                    isFixedSwissR23UpperLossEdge(
+                      fromPos.col,
+                      toPos.col,
+                      edge.kind,
+                    ));
+                return (
+                  <path
+                    key={`${edge.fromId}-${edge.kind}-${edge.fromTeamSlot}-${edge.toId}`}
+                    d={path}
+                    fill="none"
+                    stroke={
+                      edge.kind === "loss"
+                        ? forkLoss
+                          ? "var(--bracket-line)"
+                          : "rgb(113 113 122 / 0.55)"
+                        : "var(--bracket-line)"
+                    }
+                    strokeWidth={edge.kind === "loss" ? 1.25 : 1.5}
+                    strokeLinecap="square"
+                    strokeLinejoin="miter"
+                  />
+                );
+              }
+
+              const points = gridEdgePoints(
+                fromMatch,
+                toMatch,
+                fromPos,
+                toPos,
+                edge.teamId,
+                edge.kind,
+                layout.minCol,
+              );
+              const path = gridConnectorPath(points.from, points.to, edge.kind);
 
               return (
                 <path
@@ -199,8 +391,8 @@ export function SwissBracketView({
                 key={match.id}
                 className="absolute z-10"
                 style={{
-                  left: gridColLeft(pos.col, layout.minCol),
-                  top: pos.y + GRID_PAD + 18,
+                  left: cardLeft(pos.col),
+                  top: pos.y + GRID_PAD + GRID_LABEL_OFFSET,
                 }}
               >
                 <LlbBracketMatch
@@ -208,6 +400,7 @@ export function SwissBracketView({
                   matchNumber={matchNumber}
                   edges={layout.edges}
                   matchNumbers={layout.matchNumbers}
+                  matchById={matchById}
                   onMatchClick={onMatchClick}
                   onPlayerClick={onPlayerClick}
                 />

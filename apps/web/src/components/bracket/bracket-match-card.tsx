@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
 import { teamLabel, teamRating, type TeamPlayer } from "@/lib/pair-tournament";
 import type { BracketMatchView } from "@/lib/bracket-view";
+import { isMatchResolved } from "@/lib/match-result";
 import { cn } from "@/lib/cn";
 
 function ScoreSlot({
@@ -124,7 +125,7 @@ export function BracketMatchCard({
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   showMatchScore?: boolean;
 }) {
-  const finished = match.status === "FINISHED" || !!match.winnerTeamId;
+  const finished = isMatchResolved(match.status, match.winnerTeamId);
   const winnerId = match.winnerTeamId;
   const team1Wins = winnerId === match.team1?.id;
   const team2Wins = winnerId === match.team2?.id;

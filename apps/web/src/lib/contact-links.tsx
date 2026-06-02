@@ -1,4 +1,5 @@
 import { Fragment, type ReactNode } from "react";
+import { cn } from "@/lib/cn";
 import { formatE164Display } from "@/lib/phone";
 
 export const SITE_CONTACT_LINK_CLASS = "text-emerald-600 hover:underline dark:text-emerald-400";
@@ -111,10 +112,10 @@ export function TelegramLink({
       href={`https://t.me/${handle}`}
       target="_blank"
       rel="noopener noreferrer"
-      className={className}
+      className={cn(showIcon && "site-telegram-link", className)}
       title={`Telegram @${handle}`}
     >
-      {showIcon && <TelegramIcon className="club-info-telegram-icon" />}
+      {showIcon && <TelegramIcon className="h-5 w-5 shrink-0" />}
       <span>@{handle}</span>
     </a>
   );

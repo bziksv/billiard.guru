@@ -19,10 +19,18 @@ import {
   HOME_DEMO_CLUB_ADS,
   HOME_DEMO_NEWS,
   HOME_DEMO_PLAYER_ADS,
+  type HomeAnnouncement,
 } from "@/lib/home-content";
+import {
+  formatPlayListingSchedule,
+  PLAY_LISTING_KIND_LABELS,
+  PLAY_LISTING_SCHEDULE_LABELS,
+} from "@/lib/play-listing-display";
 import {
   clubGeoWhere,
   clubListInclude,
+  playListingGeoWhere,
+  playListingListInclude,
   playerGeoWhere,
   tournamentGeoWhere,
   tournamentListInclude,
@@ -55,7 +63,7 @@ export default async function HomePage({
     player?.city.countryId,
   );
 
-  const [localTournaments, clubs, topPlayers, stats] = await Promise.all([
+  const [localTournaments, clubs, topPlayers, stats, playListings] = await Promise.all([
     prisma.tournament.findMany({
       where: tournamentGeoWhere(geo),
       include: tournamentListInclude,
@@ -79,12 +87,36 @@ export default async function HomePage({
       prisma.club.count({ where: { isVerified: true } }),
       prisma.player.count({ where: { isVerified: true } }),
     ]),
+    prisma.playListing.findMany({
+      where: playListingGeoWhere(geo),
+      include: playListingListInclude,
+      orderBy: { createdAt: "desc" },
+      take: 4,
+    }),
   ]);
 
   const [tournamentsTotal, clubsTotal, playersTotal] = stats;
   const hasGeo = Boolean(geo.cityId || geo.countryId);
   const featured = localTournaments[0];
   const restTournaments = localTournaments.slice(1);
+
+  const playerAds: HomeAnnouncement[] =
+    playListings.length > 0
+      ? playListings.map((listing) => ({
+          id: listing.id,
+          kind: "player" as const,
+          title: listing.title,
+          body: listing.body ?? formatPlayListingSchedule(listing),
+          meta: [
+            PLAY_LISTING_KIND_LABELS[listing.kind],
+            PLAY_LISTING_SCHEDULE_LABELS[listing.scheduleType],
+            listing.city.nameRu,
+          ]
+            .filter(Boolean)
+            .join(" · "),
+          href: `/pokatat/${listing.id}`,
+        }))
+      : HOME_DEMO_PLAYER_ADS;
 
   return (
     <>
@@ -173,12 +205,14 @@ export default async function HomePage({
         eyebrow="Доска"
         title="Объявления"
         lead="Спарринг, напарники, столы и акции — от игроков и клубов."
+        action={{ href: hrefWithGeo("/pokatat", geo), label: "Покатать" }}
         className="home-section-alt"
       >
         <HomeReveal>
           <HomeAnnouncements
-            playerAds={HOME_DEMO_PLAYER_ADS}
+            playerAds={playerAds}
             clubAds={HOME_DEMO_CLUB_ADS}
+            pokatatHref={hrefWithGeo("/pokatat", geo)}
           />
         </HomeReveal>
       </HomeSection>

@@ -69,6 +69,38 @@ export function coachGeoWhere(params: GeoSearchParams): Prisma.PlayerWhereInput 
   };
 }
 
+export function playListingGeoWhere(params: GeoSearchParams): Prisma.PlayListingWhereInput {
+  return {
+    status: "OPEN",
+    OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    ...(params.cityId
+      ? { cityId: params.cityId }
+      : params.countryId
+        ? { city: { countryId: params.countryId } }
+        : {}),
+  };
+}
+
+export const playListingListInclude = {
+  author: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      rating: true,
+      photoUrl: true,
+      telegramUsername: true,
+    },
+  },
+  city: { include: { country: true } },
+  club: { select: { id: true, name: true } },
+  _count: { select: { responses: true } },
+} satisfies Prisma.PlayListingInclude;
+
+export const playListingListOrderBy = [
+  { createdAt: "desc" as const },
+] as const;
+
 export const coachListInclude = {
   city: { include: { country: true } },
 } satisfies Prisma.PlayerInclude;

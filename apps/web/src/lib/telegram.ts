@@ -99,6 +99,7 @@ export async function sendTelegramMessage(
 export async function answerCallbackQuery(
   callbackQueryId: string,
   text?: string,
+  options?: { showAlert?: boolean },
 ): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) return;
@@ -109,6 +110,23 @@ export async function answerCallbackQuery(
     body: JSON.stringify({
       callback_query_id: callbackQueryId,
       text,
+      show_alert: options?.showAlert ?? false,
+    }),
+  });
+}
+
+/** Убирает inline-кнопки после нажатия (чтобы не нажимали повторно). */
+export async function clearInlineKeyboard(chatId: string, messageId: number): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return;
+
+  await fetch(`https://api.telegram.org/bot${token}/editMessageReplyMarkup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      message_id: messageId,
+      reply_markup: { inline_keyboard: [] },
     }),
   });
 }

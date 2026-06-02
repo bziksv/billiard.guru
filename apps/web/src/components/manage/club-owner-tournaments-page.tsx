@@ -6,17 +6,8 @@ import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { adminTabClass } from "@/lib/admin-ui";
-import type { AdminTournament } from "@/lib/tournament-admin";
+import { FORMAT_OPTIONS, type AdminTournament } from "@/lib/tournament-admin";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
-
-const FORMAT_OPTIONS = [
-  { value: "OLYMPIC", label: "Олимпийская (фикс. сетка, одиночный)" },
-  { value: "SWISS", label: "Швейцарская (по турам, одиночный)" },
-  { value: "FIXED_SWISS", label: "Швейцарская (фикс. сетка, одиночный)" },
-  { value: "PAIR_OLYMPIC", label: "Парный (фикс. сетка)" },
-  { value: "PAIR_SWISS", label: "Парный швейцарская (по турам)" },
-  { value: "FIXED_PAIR_SWISS", label: "Парный швейцарская (фикс. сетка)" },
-];
 
 const CURRENT_STATUSES = new Set([
   "DRAFT",

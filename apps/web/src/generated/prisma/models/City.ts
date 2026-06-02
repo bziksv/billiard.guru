@@ -223,6 +223,7 @@ export type CityWhereInput = {
   country?: Prisma.XOR<Prisma.CountryScalarRelationFilter, Prisma.CountryWhereInput>
   players?: Prisma.PlayerListRelationFilter
   clubs?: Prisma.ClubListRelationFilter
+  playListings?: Prisma.PlayListingListRelationFilter
 }
 
 export type CityOrderByWithRelationInput = {
@@ -234,6 +235,7 @@ export type CityOrderByWithRelationInput = {
   country?: Prisma.CountryOrderByWithRelationInput
   players?: Prisma.PlayerOrderByRelationAggregateInput
   clubs?: Prisma.ClubOrderByRelationAggregateInput
+  playListings?: Prisma.PlayListingOrderByRelationAggregateInput
   _relevance?: Prisma.CityOrderByRelevanceInput
 }
 
@@ -250,6 +252,7 @@ export type CityWhereUniqueInput = Prisma.AtLeast<{
   country?: Prisma.XOR<Prisma.CountryScalarRelationFilter, Prisma.CountryWhereInput>
   players?: Prisma.PlayerListRelationFilter
   clubs?: Prisma.ClubListRelationFilter
+  playListings?: Prisma.PlayListingListRelationFilter
 }, "id" | "countryId_nameRu">
 
 export type CityOrderByWithAggregationInput = {
@@ -284,6 +287,7 @@ export type CityCreateInput = {
   country: Prisma.CountryCreateNestedOneWithoutCitiesInput
   players?: Prisma.PlayerCreateNestedManyWithoutCityInput
   clubs?: Prisma.ClubCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutCityInput
 }
 
 export type CityUncheckedCreateInput = {
@@ -294,6 +298,7 @@ export type CityUncheckedCreateInput = {
   longitude?: number | null
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutCityInput
   clubs?: Prisma.ClubUncheckedCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutCityInput
 }
 
 export type CityUpdateInput = {
@@ -304,6 +309,7 @@ export type CityUpdateInput = {
   country?: Prisma.CountryUpdateOneRequiredWithoutCitiesNestedInput
   players?: Prisma.PlayerUpdateManyWithoutCityNestedInput
   clubs?: Prisma.ClubUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutCityNestedInput
 }
 
 export type CityUncheckedUpdateInput = {
@@ -314,6 +320,7 @@ export type CityUncheckedUpdateInput = {
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   players?: Prisma.PlayerUncheckedUpdateManyWithoutCityNestedInput
   clubs?: Prisma.ClubUncheckedUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutCityNestedInput
 }
 
 export type CityCreateManyInput = {
@@ -477,6 +484,20 @@ export type CityUpdateOneRequiredWithoutPlayersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CityUpdateToOneWithWhereWithoutPlayersInput, Prisma.CityUpdateWithoutPlayersInput>, Prisma.CityUncheckedUpdateWithoutPlayersInput>
 }
 
+export type CityCreateNestedOneWithoutPlayListingsInput = {
+  create?: Prisma.XOR<Prisma.CityCreateWithoutPlayListingsInput, Prisma.CityUncheckedCreateWithoutPlayListingsInput>
+  connectOrCreate?: Prisma.CityCreateOrConnectWithoutPlayListingsInput
+  connect?: Prisma.CityWhereUniqueInput
+}
+
+export type CityUpdateOneRequiredWithoutPlayListingsNestedInput = {
+  create?: Prisma.XOR<Prisma.CityCreateWithoutPlayListingsInput, Prisma.CityUncheckedCreateWithoutPlayListingsInput>
+  connectOrCreate?: Prisma.CityCreateOrConnectWithoutPlayListingsInput
+  upsert?: Prisma.CityUpsertWithoutPlayListingsInput
+  connect?: Prisma.CityWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CityUpdateToOneWithWhereWithoutPlayListingsInput, Prisma.CityUpdateWithoutPlayListingsInput>, Prisma.CityUncheckedUpdateWithoutPlayListingsInput>
+}
+
 export type CityCreateWithoutCountryInput = {
   id?: string
   nameRu: string
@@ -484,6 +505,7 @@ export type CityCreateWithoutCountryInput = {
   longitude?: number | null
   players?: Prisma.PlayerCreateNestedManyWithoutCityInput
   clubs?: Prisma.ClubCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutCityInput
 }
 
 export type CityUncheckedCreateWithoutCountryInput = {
@@ -493,6 +515,7 @@ export type CityUncheckedCreateWithoutCountryInput = {
   longitude?: number | null
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutCityInput
   clubs?: Prisma.ClubUncheckedCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutCityInput
 }
 
 export type CityCreateOrConnectWithoutCountryInput = {
@@ -539,6 +562,7 @@ export type CityCreateWithoutClubsInput = {
   longitude?: number | null
   country: Prisma.CountryCreateNestedOneWithoutCitiesInput
   players?: Prisma.PlayerCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutCityInput
 }
 
 export type CityUncheckedCreateWithoutClubsInput = {
@@ -548,6 +572,7 @@ export type CityUncheckedCreateWithoutClubsInput = {
   latitude?: number | null
   longitude?: number | null
   players?: Prisma.PlayerUncheckedCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutCityInput
 }
 
 export type CityCreateOrConnectWithoutClubsInput = {
@@ -573,6 +598,7 @@ export type CityUpdateWithoutClubsInput = {
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   country?: Prisma.CountryUpdateOneRequiredWithoutCitiesNestedInput
   players?: Prisma.PlayerUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutCityNestedInput
 }
 
 export type CityUncheckedUpdateWithoutClubsInput = {
@@ -582,6 +608,7 @@ export type CityUncheckedUpdateWithoutClubsInput = {
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   players?: Prisma.PlayerUncheckedUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutCityNestedInput
 }
 
 export type CityCreateWithoutPlayersInput = {
@@ -591,6 +618,7 @@ export type CityCreateWithoutPlayersInput = {
   longitude?: number | null
   country: Prisma.CountryCreateNestedOneWithoutCitiesInput
   clubs?: Prisma.ClubCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutCityInput
 }
 
 export type CityUncheckedCreateWithoutPlayersInput = {
@@ -600,6 +628,7 @@ export type CityUncheckedCreateWithoutPlayersInput = {
   latitude?: number | null
   longitude?: number | null
   clubs?: Prisma.ClubUncheckedCreateNestedManyWithoutCityInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutCityInput
 }
 
 export type CityCreateOrConnectWithoutPlayersInput = {
@@ -625,6 +654,7 @@ export type CityUpdateWithoutPlayersInput = {
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   country?: Prisma.CountryUpdateOneRequiredWithoutCitiesNestedInput
   clubs?: Prisma.ClubUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutCityNestedInput
 }
 
 export type CityUncheckedUpdateWithoutPlayersInput = {
@@ -633,6 +663,63 @@ export type CityUncheckedUpdateWithoutPlayersInput = {
   countryId?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  clubs?: Prisma.ClubUncheckedUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutCityNestedInput
+}
+
+export type CityCreateWithoutPlayListingsInput = {
+  id?: string
+  nameRu: string
+  latitude?: number | null
+  longitude?: number | null
+  country: Prisma.CountryCreateNestedOneWithoutCitiesInput
+  players?: Prisma.PlayerCreateNestedManyWithoutCityInput
+  clubs?: Prisma.ClubCreateNestedManyWithoutCityInput
+}
+
+export type CityUncheckedCreateWithoutPlayListingsInput = {
+  id?: string
+  nameRu: string
+  countryId: string
+  latitude?: number | null
+  longitude?: number | null
+  players?: Prisma.PlayerUncheckedCreateNestedManyWithoutCityInput
+  clubs?: Prisma.ClubUncheckedCreateNestedManyWithoutCityInput
+}
+
+export type CityCreateOrConnectWithoutPlayListingsInput = {
+  where: Prisma.CityWhereUniqueInput
+  create: Prisma.XOR<Prisma.CityCreateWithoutPlayListingsInput, Prisma.CityUncheckedCreateWithoutPlayListingsInput>
+}
+
+export type CityUpsertWithoutPlayListingsInput = {
+  update: Prisma.XOR<Prisma.CityUpdateWithoutPlayListingsInput, Prisma.CityUncheckedUpdateWithoutPlayListingsInput>
+  create: Prisma.XOR<Prisma.CityCreateWithoutPlayListingsInput, Prisma.CityUncheckedCreateWithoutPlayListingsInput>
+  where?: Prisma.CityWhereInput
+}
+
+export type CityUpdateToOneWithWhereWithoutPlayListingsInput = {
+  where?: Prisma.CityWhereInput
+  data: Prisma.XOR<Prisma.CityUpdateWithoutPlayListingsInput, Prisma.CityUncheckedUpdateWithoutPlayListingsInput>
+}
+
+export type CityUpdateWithoutPlayListingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  country?: Prisma.CountryUpdateOneRequiredWithoutCitiesNestedInput
+  players?: Prisma.PlayerUpdateManyWithoutCityNestedInput
+  clubs?: Prisma.ClubUpdateManyWithoutCityNestedInput
+}
+
+export type CityUncheckedUpdateWithoutPlayListingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  countryId?: Prisma.StringFieldUpdateOperationsInput | string
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  players?: Prisma.PlayerUncheckedUpdateManyWithoutCityNestedInput
   clubs?: Prisma.ClubUncheckedUpdateManyWithoutCityNestedInput
 }
 
@@ -650,6 +737,7 @@ export type CityUpdateWithoutCountryInput = {
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   players?: Prisma.PlayerUpdateManyWithoutCityNestedInput
   clubs?: Prisma.ClubUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutCityNestedInput
 }
 
 export type CityUncheckedUpdateWithoutCountryInput = {
@@ -659,6 +747,7 @@ export type CityUncheckedUpdateWithoutCountryInput = {
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   players?: Prisma.PlayerUncheckedUpdateManyWithoutCityNestedInput
   clubs?: Prisma.ClubUncheckedUpdateManyWithoutCityNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutCityNestedInput
 }
 
 export type CityUncheckedUpdateManyWithoutCountryInput = {
@@ -676,11 +765,13 @@ export type CityUncheckedUpdateManyWithoutCountryInput = {
 export type CityCountOutputType = {
   players: number
   clubs: number
+  playListings: number
 }
 
 export type CityCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   players?: boolean | CityCountOutputTypeCountPlayersArgs
   clubs?: boolean | CityCountOutputTypeCountClubsArgs
+  playListings?: boolean | CityCountOutputTypeCountPlayListingsArgs
 }
 
 /**
@@ -707,6 +798,13 @@ export type CityCountOutputTypeCountClubsArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.ClubWhereInput
 }
 
+/**
+ * CityCountOutputType without action
+ */
+export type CityCountOutputTypeCountPlayListingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlayListingWhereInput
+}
+
 
 export type CitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -717,6 +815,7 @@ export type CitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   country?: boolean | Prisma.CountryDefaultArgs<ExtArgs>
   players?: boolean | Prisma.City$playersArgs<ExtArgs>
   clubs?: boolean | Prisma.City$clubsArgs<ExtArgs>
+  playListings?: boolean | Prisma.City$playListingsArgs<ExtArgs>
   _count?: boolean | Prisma.CityCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["city"]>
 
@@ -735,6 +834,7 @@ export type CityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   country?: boolean | Prisma.CountryDefaultArgs<ExtArgs>
   players?: boolean | Prisma.City$playersArgs<ExtArgs>
   clubs?: boolean | Prisma.City$clubsArgs<ExtArgs>
+  playListings?: boolean | Prisma.City$playListingsArgs<ExtArgs>
   _count?: boolean | Prisma.CityCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -744,6 +844,7 @@ export type $CityPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     country: Prisma.$CountryPayload<ExtArgs>
     players: Prisma.$PlayerPayload<ExtArgs>[]
     clubs: Prisma.$ClubPayload<ExtArgs>[]
+    playListings: Prisma.$PlayListingPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1094,6 +1195,7 @@ export interface Prisma__CityClient<T, Null = never, ExtArgs extends runtime.Typ
   country<T extends Prisma.CountryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CountryDefaultArgs<ExtArgs>>): Prisma.Prisma__CountryClient<runtime.Types.Result.GetResult<Prisma.$CountryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   players<T extends Prisma.City$playersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.City$playersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clubs<T extends Prisma.City$clubsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.City$clubsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  playListings<T extends Prisma.City$playListingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.City$playListingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1521,6 +1623,30 @@ export type City$clubsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.ClubScalarFieldEnum | Prisma.ClubScalarFieldEnum[]
+}
+
+/**
+ * City.playListings
+ */
+export type City$playListingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlayListing
+   */
+  select?: Prisma.PlayListingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlayListing
+   */
+  omit?: Prisma.PlayListingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlayListingInclude<ExtArgs> | null
+  where?: Prisma.PlayListingWhereInput
+  orderBy?: Prisma.PlayListingOrderByWithRelationInput | Prisma.PlayListingOrderByWithRelationInput[]
+  cursor?: Prisma.PlayListingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlayListingScalarFieldEnum | Prisma.PlayListingScalarFieldEnum[]
 }
 
 /**

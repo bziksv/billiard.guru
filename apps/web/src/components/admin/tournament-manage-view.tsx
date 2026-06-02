@@ -1,18 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, type ReactNode } from "react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { PlayerContactLinks } from "@/components/admin/player-contact-links";
 import {
   MatchResultModal,
   type MatchResultPayload,
 } from "@/components/bracket/match-result-modal";
+import { ConfirmModal } from "@/components/bracket/confirm-modal";
 import { PlayerCardModal } from "@/components/bracket/player-card-modal";
 import { OlympicBracketView } from "@/components/bracket/olympic-bracket-view";
 import { SwissBracketView } from "@/components/bracket/swiss-bracket-view";
 import type { TeamPlayer } from "@/lib/pair-tournament";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { AsyncTextButton } from "@/components/ui/async-text-button";
+import { AsyncButton } from "@/components/ui/async-text-button";
+import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap } from "@/lib/handicap";
 import { formatRating } from "@/lib/rating";
@@ -26,6 +28,7 @@ import {
   teamRating,
   type TeamWithPlayers,
 } from "@/lib/pair-tournament";
+import { isOutdatedFixedSwiss27Bracket } from "@/lib/fixed-swiss-grid";
 import {
   FORMAT_OPTIONS,
   STATUS_OPTIONS,
@@ -46,6 +49,33 @@ type Team = AdminTournament["teams"][number] & TeamWithPlayers;
 type Match = AdminTournament["matches"][number];
 type ManageTab = "participants" | "bracket" | "protocol";
 
+function RegistrationActionButton({
+  variant,
+  onClick,
+  children,
+  loadingLabel = "…",
+}: {
+  variant: "primary" | "danger" | "outline";
+  onClick: () => void | Promise<void>;
+  children: ReactNode;
+  loadingLabel?: string;
+}) {
+  return (
+    <AsyncButton
+      onClick={onClick}
+      loadingLabel={loadingLabel}
+      className={cn(
+        "admin-btn min-h-[2.25rem] min-w-[7.5rem] px-3 py-2 text-xs sm:text-sm",
+        variant === "primary" && "admin-btn--primary",
+        variant === "danger" && "admin-btn--danger",
+        variant === "outline" && "admin-btn--outline",
+      )}
+    >
+      {children}
+    </AsyncButton>
+  );
+}
+
 export function TournamentManageView({
   tournament: t,
   clubOptions,
@@ -57,6 +87,8 @@ export function TournamentManageView({
   onCancelRegistration,
   onConfirmTeam,
   onGenerateBracket,
+  onResetAllMatches,
+  onRegenerateBracket,
   onSaveMatchResult,
   onCancelMatchResult,
   onUpdated,
@@ -72,6 +104,8 @@ export function TournamentManageView({
   onCancelRegistration: (id: string) => void | Promise<void>;
   onConfirmTeam: (id: string) => void | Promise<void>;
   onGenerateBracket: () => void | Promise<void>;
+  onResetAllMatches?: () => void | Promise<void>;
+  onRegenerateBracket?: () => void | Promise<void>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
   onUpdated: () => void;
@@ -358,6 +392,8 @@ export function TournamentManageView({
           bracketLoading={bracketLoading}
           bracketMatches={bracketMatches}
           onGenerateBracket={onGenerateBracket}
+          onResetAllMatches={onResetAllMatches}
+          onRegenerateBracket={onRegenerateBracket}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
         />
@@ -431,40 +467,43 @@ function ParticipantsTab({
 
       {!pair && pendingRegistrations.length > 0 && (
         <div>
-          <p className="mb-2 text-xs uppercase tracking-wide text-amber-400/90">
+          <p className="tournament-section-label tournament-section-label--pending">
             Заявки на участие ({pendingRegistrations.length})
           </p>
           <ul className="space-y-2">
             {pendingRegistrations.map((r) => (
               <li
                 key={r.id}
-                className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-900/40 bg-amber-950/20 px-3 py-2 text-sm"
+                className="tournament-participant-card tournament-participant-card--pending"
               >
                 <div className="min-w-0 flex-1">
-                  <div>
-                    {r.player.lastName} {r.player.firstName} — рейтинг {r.player.rating}
-                    {r.source === "SELF" ? " · самостоятельная заявка" : ""}
+                  <div className="tournament-participant-name">
+                    {r.player.lastName} {r.player.firstName}
+                    <span className="tournament-participant-meta ml-1 font-normal">
+                      · рейтинг {r.player.rating}
+                      {r.source === "SELF" ? " · самостоятельная заявка" : ""}
+                    </span>
                   </div>
                   <PlayerContactLinks
                     phone={r.player.phone}
                     telegramUsername={r.player.telegramUsername}
                   />
                 </div>
-                <div className="flex items-center gap-2">
-                  <AsyncTextButton
-                    variant="emerald"
-                    loadingLabel="…"
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <RegistrationActionButton
+                    variant="primary"
+                    loadingLabel="Подтверждаем…"
                     onClick={() => onConfirmRegistration(r.id)}
                   >
                     Подтвердить
-                  </AsyncTextButton>
-                  <AsyncTextButton
-                    variant="red"
-                    loadingLabel="…"
+                  </RegistrationActionButton>
+                  <RegistrationActionButton
+                    variant="danger"
+                    loadingLabel="Отклоняем…"
                     onClick={() => onRejectRegistration(r.id)}
                   >
                     Отклонить
-                  </AsyncTextButton>
+                  </RegistrationActionButton>
                 </div>
               </li>
             ))}
@@ -474,37 +513,37 @@ function ParticipantsTab({
 
       {!pair && confirmedRegistrations.length > 0 && (
         <div>
-          <p className="mb-2 text-xs uppercase tracking-wide text-zinc-500">
+          <p className="tournament-section-label">
             Подтверждённые участники ({confirmedRegistrations.length})
           </p>
           <ul className="space-y-2">
             {confirmedRegistrations.map((r) => (
-              <li
-                key={r.id}
-                className="flex items-center justify-between gap-3 rounded-lg bg-zinc-900 px-3 py-2 text-sm"
-              >
+              <li key={r.id} className="tournament-participant-card">
                 <div className="min-w-0 flex-1">
-                  <div>
-                    {r.player.lastName} {r.player.firstName} — рейтинг {r.player.rating}
+                  <div className="tournament-participant-name">
+                    {r.player.lastName} {r.player.firstName}
+                    <span className="tournament-participant-meta ml-1 font-normal">
+                      · рейтинг {r.player.rating}
+                    </span>
                   </div>
                   <PlayerContactLinks
                     phone={r.player.phone}
                     telegramUsername={r.player.telegramUsername}
                   />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
                   <StatusBadge
                     status={r.status}
                     label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
                   />
                   {canModifyRegistrations && (
-                    <AsyncTextButton
-                      variant="red"
-                      loadingLabel="…"
+                    <RegistrationActionButton
+                      variant="outline"
+                      loadingLabel="Снимаем…"
                       onClick={() => onCancelRegistration(r.id)}
                     >
                       Снять
-                    </AsyncTextButton>
+                    </RegistrationActionButton>
                   )}
                 </div>
               </li>
@@ -516,13 +555,13 @@ function ParticipantsTab({
       {!pair && otherRegistrations.length > 0 && (
         <ul className="space-y-2">
           {otherRegistrations.map((r) => (
-            <li
-              key={r.id}
-              className="flex items-center justify-between gap-3 rounded-lg bg-zinc-900 px-3 py-2 text-sm"
-            >
+            <li key={r.id} className="tournament-participant-card opacity-80">
               <div className="min-w-0 flex-1">
-                <div>
-                  {r.player.lastName} {r.player.firstName} — рейтинг {r.player.rating}
+                <div className="tournament-participant-name">
+                  {r.player.lastName} {r.player.firstName}
+                  <span className="tournament-participant-meta ml-1 font-normal">
+                    · рейтинг {r.player.rating}
+                  </span>
                 </div>
                 <PlayerContactLinks
                   phone={r.player.phone}
@@ -539,11 +578,11 @@ function ParticipantsTab({
       )}
 
       {!pair && t.registrations.length === 0 && (
-        <p className="text-xs text-zinc-500">Заявок и участников пока нет.</p>
+        <p className="tournament-hint">Заявок и участников пока нет.</p>
       )}
 
       {pair && activeTeams.length === 0 && (
-        <p className="text-xs text-zinc-500">Команд пока нет.</p>
+        <p className="tournament-hint">Команд пока нет.</p>
       )}
     </div>
   );
@@ -559,6 +598,8 @@ function BracketTab({
   bracketLoading,
   bracketMatches,
   onGenerateBracket,
+  onResetAllMatches,
+  onRegenerateBracket,
   onSaveMatchResult,
   onCancelMatchResult,
 }: {
@@ -571,6 +612,8 @@ function BracketTab({
   bracketLoading: boolean;
   bracketMatches: BracketMatchView[];
   onGenerateBracket: () => void | Promise<void>;
+  onResetAllMatches?: () => void | Promise<void>;
+  onRegenerateBracket?: () => void | Promise<void>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
 }) {
@@ -578,6 +621,17 @@ function BracketTab({
   const fixedSwiss = isFixedSwissFormat(format);
   const olympic = isOlympicFormat(format);
   const oneShotGrid = olympic || fixedSwiss;
+  const hasFinishedMatches = bracketMatches.some((m) => {
+    if (!m.winnerTeamId) return false;
+    if (m.team1 && m.team2) return true;
+    return m.team1Score != null || m.team2Score != null;
+  });
+  const [confirmAction, setConfirmAction] = useState<
+    "reset-all" | "regenerate" | null
+  >(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [bracketNotice, setBracketNotice] = useState<string | null>(null);
   const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
   const [matchSaving, setMatchSaving] = useState(false);
   const [playerModal, setPlayerModal] = useState<{
@@ -611,6 +665,45 @@ function BracketTab({
     }
   }
 
+  function closeConfirm() {
+    if (confirmLoading) return;
+    setConfirmAction(null);
+    setConfirmError(null);
+  }
+
+  async function handleBracketConfirm() {
+    if (!confirmAction) return;
+    setConfirmLoading(true);
+    setConfirmError(null);
+    try {
+      if (confirmAction === "reset-all") {
+        if (!onResetAllMatches) return;
+        await onResetAllMatches();
+        setConfirmAction(null);
+        setBracketNotice(
+          "Результаты сброшены. Сетка на месте — автопроходы применены заново.",
+        );
+      } else if (confirmAction === "regenerate") {
+        if (!onRegenerateBracket) return;
+        await onRegenerateBracket();
+        setConfirmAction(null);
+        setBracketNotice(
+          "Сетка пересоздана: 27 встреч, 1/4 (#21–#24), крест → 1/4, полуфинал и финал.",
+        );
+      }
+    } catch (e) {
+      setConfirmError(e instanceof Error ? e.message : "Не удалось выполнить действие");
+    } finally {
+      setConfirmLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!bracketNotice) return;
+    const timer = window.setTimeout(() => setBracketNotice(null), 6000);
+    return () => window.clearTimeout(timer);
+  }, [bracketNotice]);
+
   if (!dynamicSwiss && !fixedSwiss && !olympic) {
     return (
       <div className="rounded-lg border border-dashed border-zinc-700 bg-zinc-900/40 px-4 py-8 text-center text-sm text-zinc-500">
@@ -619,34 +712,76 @@ function BracketTab({
     );
   }
 
-  const generateLabel = bracketLoading
-    ? "Формируем…"
-    : oneShotGrid
-      ? maxRound === 0
-        ? "Сформировать сетку"
-        : "Сетка сформирована"
-      : maxRound === 0
-        ? "Сформировать 1-й тур"
-        : `Сформировать тур ${maxRound + 1}`;
+  const generateLabel = oneShotGrid
+    ? maxRound === 0
+      ? "Сформировать сетку"
+      : "Сетка сформирована"
+    : maxRound === 0
+      ? "Сформировать 1-й тур"
+      : `Сформировать тур ${maxRound + 1}`;
 
   const generateDisabled =
     bracketLoading ||
+    confirmLoading ||
     confirmedCount < 2 ||
     (oneShotGrid && maxRound > 0) ||
     (dynamicSwiss && maxRound > 0 && currentRoundOpen);
 
+  const outdatedFixedSwiss =
+    fixedSwiss &&
+    bracketMatches.length > 0 &&
+    isOutdatedFixedSwiss27Bracket(bracketMatches);
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3">
+      {outdatedFixedSwiss && (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Сетка в базе устарела (2×1/4 вместо 4, крест не ведёт в 1/4). Нажмите{" "}
+          <strong>«Сформировать заново»</strong>, чтобы получить эталон TS: #21–#24,
+          нижняя тур 2 → 1/4, полуфинал #25–#26, финал #27.
+        </p>
+      )}
+      {bracketNotice && (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200">
+          {bracketNotice}
+        </p>
+      )}
+      <div className="tournament-toolbar flex-wrap">
         <button
           type="button"
           onClick={onGenerateBracket}
           disabled={generateDisabled}
-          className="rounded-lg bg-emerald-700 px-3 py-1.5 text-sm hover:bg-emerald-600 disabled:opacity-50"
+          className="admin-btn admin-btn--primary px-4 py-2 text-sm disabled:opacity-50"
         >
           {bracketLoading ? "Формирование…" : generateLabel}
         </button>
-        <span className="text-xs text-zinc-500">
+        {bracketMatches.length > 0 && onResetAllMatches && (
+          <button
+            type="button"
+            onClick={() => {
+              setConfirmError(null);
+              setConfirmAction("reset-all");
+            }}
+            disabled={bracketLoading || !hasFinishedMatches || confirmLoading}
+            className="admin-btn px-4 py-2 text-sm disabled:opacity-50"
+          >
+            Отменить все встречи
+          </button>
+        )}
+        {bracketMatches.length > 0 && oneShotGrid && onRegenerateBracket && (
+          <button
+            type="button"
+            onClick={() => {
+              setConfirmError(null);
+              setConfirmAction("regenerate");
+            }}
+            disabled={bracketLoading || confirmLoading}
+            className="admin-btn admin-btn--danger px-4 py-2 text-sm disabled:opacity-50"
+          >
+            Сформировать заново
+          </button>
+        )}
+        <span className="tournament-hint">
           Подтверждённых: {confirmedCount}
           {confirmedCount < 2 && " (минимум 2)"}
           {dynamicSwiss && maxRound > 0 && currentRoundOpen && " · завершите текущий тур"}
@@ -656,14 +791,14 @@ function BracketTab({
       </div>
 
       {bracketMatches.length === 0 ? (
-        <p className="text-sm text-zinc-500">
+        <p className="tournament-hint text-sm">
           {oneShotGrid
             ? "Сетка ещё не сформирована. Подтвердите участников и нажмите «Сформировать сетку»."
             : "Сетка ещё не сформирована. Подтвердите участников и нажмите «Сформировать 1-й тур»."}
         </p>
       ) : (
         <>
-          <p className="text-xs text-zinc-500">
+          <p className="tournament-hint">
             {olympic
               ? "Имя — профиль игрока · рамка счёта или строка «Фора» — результат встречи."
               : "Зажмите фон сетки и тащите. Имя — карточка игрока, счёт / # / подвал — результат встречи."}
@@ -699,6 +834,28 @@ function BracketTab({
             open={playerModal !== null}
             onClose={() => setPlayerModal(null)}
           />
+          <ConfirmModal
+            open={confirmAction === "reset-all"}
+            title="Отменить все встречи?"
+            description="Результаты всех завершённых встреч будут сброшены. Сетка останется — игроки вернутся к стартовым позициям первого тура. Автопроходы (×) применятся снова автоматически."
+            confirmLabel="Да, отменить все"
+            variant="danger"
+            loading={confirmLoading}
+            error={confirmError}
+            onConfirm={handleBracketConfirm}
+            onClose={closeConfirm}
+          />
+          <ConfirmModal
+            open={confirmAction === "regenerate"}
+            title="Сформировать сетку заново?"
+            description="Текущая сетка будет удалена и создана заново по списку подтверждённых участников. Все результаты и расстановка будут потеряны."
+            confirmLabel="Да, пересоздать"
+            variant="danger"
+            loading={confirmLoading}
+            error={confirmError}
+            onConfirm={handleBracketConfirm}
+            onClose={closeConfirm}
+          />
         </>
       )}
     </div>
@@ -723,7 +880,7 @@ function ProtocolTab({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-400">
+      <div className="tournament-info-panel">
         <p>
           {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
           {t.startsAt
@@ -748,13 +905,13 @@ function ProtocolTab({
       </div>
 
       {rows.length === 0 ? (
-        <p className="text-sm text-zinc-500">
+        <p className="tournament-hint text-sm">
           Нет подтверждённых участников для протокола.
         </p>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-zinc-800">
+        <div className="admin-table-wrap overflow-x-auto">
           <table className="w-full min-w-[480px] text-left text-sm">
-            <thead className="bg-zinc-950 text-zinc-400">
+            <thead className="admin-thead">
               <tr>
                 <th className="px-4 py-3 font-medium">Место</th>
                 <th className="px-4 py-3 font-medium">Участник</th>
@@ -767,14 +924,14 @@ function ProtocolTab({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={`${row.place}-${row.label}`} className="border-t border-zinc-800">
-                  <td className="px-4 py-3 font-mono text-emerald-400">{row.place}</td>
+                <tr key={`${row.place}-${row.label}`} className="admin-table-row border-t border-[var(--admin-border)]">
+                  <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">{row.place}</td>
                   <td className="px-4 py-3 font-medium">{row.label}</td>
-                  <td className="px-4 py-3 font-mono text-zinc-400">{formatRating(row.rating)}</td>
+                  <td className="px-4 py-3 font-mono tournament-participant-meta">{formatRating(row.rating)}</td>
                   {showSwissPoints && (
                     <td className="px-4 py-3 font-mono">{row.points ?? 0}</td>
                   )}
-                  <td className="px-4 py-3 text-xs text-zinc-500">{row.note ?? ""}</td>
+                  <td className="px-4 py-3 text-xs tournament-participant-meta">{row.note ?? ""}</td>
                 </tr>
               ))}
             </tbody>
@@ -987,9 +1144,9 @@ function PairTeamRow({
           label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
         />
         {team.status === "PENDING" && (
-          <AsyncTextButton variant="emerald" loadingLabel="…" onClick={onConfirm}>
+          <RegistrationActionButton variant="primary" loadingLabel="Подтверждаем…" onClick={onConfirm}>
             Подтвердить
-          </AsyncTextButton>
+          </RegistrationActionButton>
         )}
         {!bracketLocked && team.status !== "CANCELLED" && (
           <>

@@ -68,7 +68,9 @@ export const ModelName = {
   RatingChange: 'RatingChange',
   AuditLog: 'AuditLog',
   Idea: 'Idea',
-  IdeaVote: 'IdeaVote'
+  IdeaVote: 'IdeaVote',
+  PlayListing: 'PlayListing',
+  PlayListingResponse: 'PlayListingResponse'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -381,6 +383,45 @@ export const IdeaVoteScalarFieldEnum = {
 export type IdeaVoteScalarFieldEnum = (typeof IdeaVoteScalarFieldEnum)[keyof typeof IdeaVoteScalarFieldEnum]
 
 
+export const PlayListingScalarFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  cityId: 'cityId',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body',
+  kind: 'kind',
+  scheduleType: 'scheduleType',
+  playAt: 'playAt',
+  weekdays: 'weekdays',
+  timeFrom: 'timeFrom',
+  timeTo: 'timeTo',
+  gameFormat: 'gameFormat',
+  ratingMin: 'ratingMin',
+  ratingMax: 'ratingMax',
+  playersNeeded: 'playersNeeded',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlayListingScalarFieldEnum = (typeof PlayListingScalarFieldEnum)[keyof typeof PlayListingScalarFieldEnum]
+
+
+export const PlayListingResponseScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  playerId: 'playerId',
+  message: 'message',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlayListingResponseScalarFieldEnum = (typeof PlayListingResponseScalarFieldEnum)[keyof typeof PlayListingResponseScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -631,4 +672,29 @@ export const IdeaVoteOrderByRelevanceFieldEnum = {
 } as const
 
 export type IdeaVoteOrderByRelevanceFieldEnum = (typeof IdeaVoteOrderByRelevanceFieldEnum)[keyof typeof IdeaVoteOrderByRelevanceFieldEnum]
+
+
+export const PlayListingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  cityId: 'cityId',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body',
+  timeFrom: 'timeFrom',
+  timeTo: 'timeTo',
+  gameFormat: 'gameFormat'
+} as const
+
+export type PlayListingOrderByRelevanceFieldEnum = (typeof PlayListingOrderByRelevanceFieldEnum)[keyof typeof PlayListingOrderByRelevanceFieldEnum]
+
+
+export const PlayListingResponseOrderByRelevanceFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  playerId: 'playerId',
+  message: 'message'
+} as const
+
+export type PlayListingResponseOrderByRelevanceFieldEnum = (typeof PlayListingResponseOrderByRelevanceFieldEnum)[keyof typeof PlayListingResponseOrderByRelevanceFieldEnum]
 

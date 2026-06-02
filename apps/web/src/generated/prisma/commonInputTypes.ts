@@ -477,6 +477,74 @@ export type EnumIdeaVoteValueWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumIdeaVoteValueFilter<$PrismaModel>
 }
 
+export type EnumPlayListingKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingKind | Prisma.EnumPlayListingKindFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingKind[]
+  notIn?: $Enums.PlayListingKind[]
+  not?: Prisma.NestedEnumPlayListingKindFilter<$PrismaModel> | $Enums.PlayListingKind
+}
+
+export type EnumPlayListingScheduleTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingScheduleType | Prisma.EnumPlayListingScheduleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingScheduleType[]
+  notIn?: $Enums.PlayListingScheduleType[]
+  not?: Prisma.NestedEnumPlayListingScheduleTypeFilter<$PrismaModel> | $Enums.PlayListingScheduleType
+}
+
+export type EnumPlayListingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingStatus | Prisma.EnumPlayListingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingStatus[]
+  notIn?: $Enums.PlayListingStatus[]
+  not?: Prisma.NestedEnumPlayListingStatusFilter<$PrismaModel> | $Enums.PlayListingStatus
+}
+
+export type EnumPlayListingKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingKind | Prisma.EnumPlayListingKindFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingKind[]
+  notIn?: $Enums.PlayListingKind[]
+  not?: Prisma.NestedEnumPlayListingKindWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingKindFilter<$PrismaModel>
+}
+
+export type EnumPlayListingScheduleTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingScheduleType | Prisma.EnumPlayListingScheduleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingScheduleType[]
+  notIn?: $Enums.PlayListingScheduleType[]
+  not?: Prisma.NestedEnumPlayListingScheduleTypeWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingScheduleType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingScheduleTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingScheduleTypeFilter<$PrismaModel>
+}
+
+export type EnumPlayListingStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingStatus | Prisma.EnumPlayListingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingStatus[]
+  notIn?: $Enums.PlayListingStatus[]
+  not?: Prisma.NestedEnumPlayListingStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingStatusFilter<$PrismaModel>
+}
+
+export type EnumPlayListingResponseStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingResponseStatus | Prisma.EnumPlayListingResponseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingResponseStatus[]
+  notIn?: $Enums.PlayListingResponseStatus[]
+  not?: Prisma.NestedEnumPlayListingResponseStatusFilter<$PrismaModel> | $Enums.PlayListingResponseStatus
+}
+
+export type EnumPlayListingResponseStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingResponseStatus | Prisma.EnumPlayListingResponseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingResponseStatus[]
+  notIn?: $Enums.PlayListingResponseStatus[]
+  not?: Prisma.NestedEnumPlayListingResponseStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingResponseStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingResponseStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingResponseStatusFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[]
@@ -906,6 +974,74 @@ export type NestedEnumIdeaVoteValueWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumIdeaVoteValueFilter<$PrismaModel>
   _max?: Prisma.NestedEnumIdeaVoteValueFilter<$PrismaModel>
+}
+
+export type NestedEnumPlayListingKindFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingKind | Prisma.EnumPlayListingKindFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingKind[]
+  notIn?: $Enums.PlayListingKind[]
+  not?: Prisma.NestedEnumPlayListingKindFilter<$PrismaModel> | $Enums.PlayListingKind
+}
+
+export type NestedEnumPlayListingScheduleTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingScheduleType | Prisma.EnumPlayListingScheduleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingScheduleType[]
+  notIn?: $Enums.PlayListingScheduleType[]
+  not?: Prisma.NestedEnumPlayListingScheduleTypeFilter<$PrismaModel> | $Enums.PlayListingScheduleType
+}
+
+export type NestedEnumPlayListingStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingStatus | Prisma.EnumPlayListingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingStatus[]
+  notIn?: $Enums.PlayListingStatus[]
+  not?: Prisma.NestedEnumPlayListingStatusFilter<$PrismaModel> | $Enums.PlayListingStatus
+}
+
+export type NestedEnumPlayListingKindWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingKind | Prisma.EnumPlayListingKindFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingKind[]
+  notIn?: $Enums.PlayListingKind[]
+  not?: Prisma.NestedEnumPlayListingKindWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingKind
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingKindFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingKindFilter<$PrismaModel>
+}
+
+export type NestedEnumPlayListingScheduleTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingScheduleType | Prisma.EnumPlayListingScheduleTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingScheduleType[]
+  notIn?: $Enums.PlayListingScheduleType[]
+  not?: Prisma.NestedEnumPlayListingScheduleTypeWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingScheduleType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingScheduleTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingScheduleTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumPlayListingStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingStatus | Prisma.EnumPlayListingStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingStatus[]
+  notIn?: $Enums.PlayListingStatus[]
+  not?: Prisma.NestedEnumPlayListingStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumPlayListingResponseStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingResponseStatus | Prisma.EnumPlayListingResponseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingResponseStatus[]
+  notIn?: $Enums.PlayListingResponseStatus[]
+  not?: Prisma.NestedEnumPlayListingResponseStatusFilter<$PrismaModel> | $Enums.PlayListingResponseStatus
+}
+
+export type NestedEnumPlayListingResponseStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.PlayListingResponseStatus | Prisma.EnumPlayListingResponseStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.PlayListingResponseStatus[]
+  notIn?: $Enums.PlayListingResponseStatus[]
+  not?: Prisma.NestedEnumPlayListingResponseStatusWithAggregatesFilter<$PrismaModel> | $Enums.PlayListingResponseStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumPlayListingResponseStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumPlayListingResponseStatusFilter<$PrismaModel>
 }
 
 

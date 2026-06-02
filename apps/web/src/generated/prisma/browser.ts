@@ -107,3 +107,13 @@ export type Idea = Prisma.IdeaModel
  * 
  */
 export type IdeaVote = Prisma.IdeaVoteModel
+/**
+ * Model PlayListing
+ * Объявление «Покатать» — игрок ищет партнёра/соперника для игры.
+ */
+export type PlayListing = Prisma.PlayListingModel
+/**
+ * Model PlayListingResponse
+ * Отклик на объявление «Покатать».
+ */
+export type PlayListingResponse = Prisma.PlayListingResponseModel

@@ -1,0 +1,44 @@
+---
+description: (устарело как точка входа) см. bracket-reference-16-8.mdc
+globs: apps/web/src/lib/fixed-swiss*.ts
+alwaysApply: false
+---
+
+# Fixed Swiss — линии (кратко)
+
+**Эталон целиком:** `docs/BRACKET_REFERENCE_16_8.md` + правило `bracket-reference-16-8.mdc`  
+**Только SVG:** `docs/FIXED_SWISS_BRACKET_LINES.md` — не ломать без явного запроса.
+
+## Линии SVG
+
+| Переход | win | loss |
+|---------|-----|------|
+| R12 `1→2` | `0→1` | `0→-1` (вкл. bye → #13) |
+| R23 `2→3` | `1→2`, `-1→-2` | нет (`1→-2` loss — текст) |
+| Крест→1/4 `3→3` | `-2→2` | нет |
+
+- Путь: `gridFixedForkConnectorPath` + `fixedSwissForkTrunkYByTarget(fromRound, toRound)`.
+- **Y точки:** `teamDividerY` (разделитель между игроками), не `teamRowCenterYBySlot`.
+- Сторона: win — справа→слева; loss — слева→справа (`gridFixedEdgePoints`).
+
+## UI
+
+- `isFixedSwissForkEdge` → fork + trunk (R12 / R23).
+- Win-фильтр **только** `win`|`bye`.
+- Fork loss: `var(--bracket-line)`. Тур 4+ (кроме крест→1/4) — без SVG.
+
+## Y карточек
+
+- R3 верхняя (#21–#22) = середина пары R2 (5+6, 7+8).
+- R3 крест (#17–#20) = зеркало Y #21/#22 (слоты 1,3→5; 2,4→6).
+- Без `evenColY` на тур 3+.
+
+## Запрещено
+
+- Шина на всю высоту; `gridFixedConnectorPath` для R12/R23; win-фильтр на loss; полосы на чужом Y.
+
+## Проверка
+
+```bash
+cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts
+```

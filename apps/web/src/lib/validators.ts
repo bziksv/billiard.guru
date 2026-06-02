@@ -267,6 +267,15 @@ export const matchCancelSchema = z.object({
   matchId: z.string().min(1),
 });
 
+export const bracketGenerateSchema = z.object({
+  tournamentId: z.string().min(1),
+  regenerate: z.boolean().optional(),
+});
+
+export const bracketResetSchema = z.object({
+  tournamentId: z.string().min(1),
+});
+
 export const matchResultSchema = z.object({
   matchId: z.string().min(1),
   winnerTeamId: z.string().min(1).optional(),
@@ -291,13 +300,100 @@ export const ideaVoteSchema = z.object({
   value: z.enum(["LIKE", "DISLIKE"]),
 });
 
+const ratingStepSchema = z
+  .number()
+  .min(0)
+  .max(10)
+  .refine((v) => Math.abs(v * 2 - Math.round(v * 2)) < 1e-6, "Шаг рейтинга — 0,5");
+
+export const playListingCreateSchema = z
+  .object({
+    title: z.string().min(3, "Минимум 3 символа").max(120),
+    body: z.string().max(2000).optional().or(z.literal("")),
+    kind: z.enum(["SPARRING", "PARTNER", "OPPONENT", "TRAINING", "OTHER"]),
+    scheduleType: z.enum(["ONE_TIME", "RECURRING"]),
+    cityId: z.string().min(1, "Выберите город"),
+    clubId: z.string().min(1).optional().or(z.literal("")),
+    playAt: z.string().datetime({ offset: true }).optional(),
+    weekdays: z.array(z.number().int().min(0).max(6)).optional(),
+    timeFrom: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Формат ЧЧ:ММ")
+      .optional()
+      .or(z.literal("")),
+    timeTo: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Формат ЧЧ:ММ")
+      .optional()
+      .or(z.literal("")),
+    gameFormat: z.enum(tableFormatIds).optional().or(z.literal("")),
+    ratingMin: ratingStepSchema.optional().nullable(),
+    ratingMax: ratingStepSchema.optional().nullable(),
+    playersNeeded: z.coerce.number().int().min(1).max(10).default(1),
+  })
+  .superRefine((data, ctx) => {
+    if (data.scheduleType === "ONE_TIME" && !data.playAt) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Укажите дату и время для разовой игры",
+        path: ["playAt"],
+      });
+    }
+    if (data.scheduleType === "RECURRING") {
+      if (!data.weekdays?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Выберите хотя бы один день недели",
+          path: ["weekdays"],
+        });
+      }
+      if (!data.timeFrom) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Укажите время начала",
+          path: ["timeFrom"],
+        });
+      }
+    }
+    if (
+      data.ratingMin != null &&
+      data.ratingMax != null &&
+      data.ratingMin > data.ratingMax
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Минимальный рейтинг не может быть выше максимального",
+        path: ["ratingMax"],
+      });
+    }
+  });
+
+export const playListingUpdateSchema = z.object({
+  status: z.enum(["OPEN", "MATCHED", "CLOSED"]).optional(),
+});
+
+export const playListingRespondSchema = z.object({
+  message: z.string().max(500).optional().or(z.literal("")),
+});
+
+export const playListingResponseUpdateSchema = z.object({
+  status: z.enum(["ACCEPTED", "DECLINED", "WITHDRAWN"]),
+});
+
+/**
+ * Отображаемое имя эталонного формата (27 встреч, 7 колонок).
+ * Регламент: docs/BRACKET_REFERENCE_16_8.md
+ */
+export const FIXED_SWISS_16_8_FORMAT_LABEL =
+  "Сетка на 16 до 2 поражений, олимпийка с 1/4 с двумя 3 местами";
+
 export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   OLYMPIC: "Олимпийская (фикс. сетка)",
   SWISS: "Швейцарская (по турам)",
-  FIXED_SWISS: "Швейцарская (фикс. сетка)",
+  FIXED_SWISS: FIXED_SWISS_16_8_FORMAT_LABEL,
   PAIR_OLYMPIC: "Парный (фикс. сетка)",
   PAIR_SWISS: "Парный швейцарская (по турам)",
-  FIXED_PAIR_SWISS: "Парный швейцарская (фикс. сетка)",
+  FIXED_PAIR_SWISS: `Парная: ${FIXED_SWISS_16_8_FORMAT_LABEL}`,
 };
 
 export const REGISTRATION_STATUS_LABELS: Record<string, string> = {

@@ -3,15 +3,29 @@
 import { describeHandicap } from "@/lib/handicap";
 import { teamLabel, teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
 import type { BracketMatchView } from "@/lib/bracket-view";
+import { matchAutopassBye } from "@/lib/bracket-view";
+import { isMatchResolved } from "@/lib/match-result";
 import {
   getMatchDestinations,
-  gridCardHeight,
   GRID_CARD_W,
-  GRID_FOOTER_H,
+  gridFooterHeight,
   GRID_META_H,
   GRID_ROW_H,
+  incomingAutopassPhantomSlot,
   type SwissBracketEdge,
 } from "@/lib/swiss-bracket-layout";
+import {
+  FIXED_SWISS_CARD_H,
+  fixedSwissPlacementLabel,
+} from "@/lib/fixed-swiss-layout";
+import {
+  inferFixedSwissGridSize,
+  isFixedSwiss168LegacyMatchCount,
+  isFixedSwiss168MatchCount,
+  isFixedSwissTsLegacy27SixRound,
+  isFixedSwissTsLegacy29MatchCount,
+  isFixedSwissTsMatchCount,
+} from "@/lib/fixed-swiss-grid";
 import { cn } from "@/lib/cn";
 
 function ScoreBox({
@@ -25,9 +39,9 @@ function ScoreBox({
     <span
       className={cn(
         "inline-flex h-[18px] min-w-[18px] items-center justify-center border font-mono text-[11px] leading-none",
-        highlight === "win" && "border-sky-600 bg-sky-950 text-sky-100",
-        highlight === "loss" && "border-zinc-700 bg-zinc-900 text-zinc-500",
-        highlight === "none" && "border-zinc-600 bg-zinc-950 text-zinc-500",
+        highlight === "win" && "border-sky-400 bg-sky-100 text-sky-900 dark:border-sky-600 dark:bg-sky-950 dark:text-sky-100",
+        highlight === "loss" && "border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] text-[var(--bracket-row-loser-text)]",
+        highlight === "none" && "border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] text-[var(--bracket-meta-text)]",
       )}
     >
       {value}
@@ -37,11 +51,11 @@ function ScoreBox({
 
 function playerRowClass(isWinner?: boolean, isLoser?: boolean, empty?: boolean) {
   return cn(
-    "flex w-full items-center gap-1.5 border-b border-zinc-600/80 px-2 last:border-b-0",
-    isWinner && "bg-sky-900/80 text-sky-50",
-    isLoser && "bg-zinc-950 text-zinc-500",
-    empty && "bg-rose-950/30 text-rose-200/70",
-    !isWinner && !isLoser && !empty && "bg-zinc-900 text-zinc-100",
+    "flex w-full items-center gap-1.5 border-b border-[var(--bracket-row-border)] px-2 last:border-b-0",
+    isWinner && "bg-[var(--bracket-row-winner-bg)] text-[var(--bracket-row-winner-text)]",
+    isLoser && "text-[var(--bracket-row-loser-text)]",
+    empty && "bg-rose-50 text-rose-400 dark:bg-rose-950/30 dark:text-rose-200/70",
+    !isWinner && !isLoser && !empty && "bg-[var(--bracket-card-bg)] text-[var(--bracket-row-text)]",
   );
 }
 
@@ -76,20 +90,12 @@ function TeamRow({
             e.stopPropagation();
             onPlayerClick();
           }}
-          className={cn(
-            "min-w-0 flex-1 truncate text-left text-[12px] leading-none hover:text-sky-200",
-            isLoser && "line-through decoration-zinc-600",
-          )}
+          className="min-w-0 flex-1 truncate text-left text-[12px] leading-none hover:text-sky-200"
         >
           {label}
         </button>
       ) : (
-        <span
-          className={cn(
-            "min-w-0 flex-1 truncate text-left text-[12px] leading-none",
-            isLoser && "line-through decoration-zinc-600",
-          )}
-        >
+        <span className="min-w-0 flex-1 truncate text-left text-[12px] leading-none">
           {label}
         </span>
       )}
@@ -153,7 +159,6 @@ function PairTeamRow({
         }}
         className={cn(
           "min-w-0 flex-1 truncate text-left text-[12px] leading-none",
-          isLoser && "line-through decoration-zinc-600",
           onPlayerClick && "hover:text-sky-200",
         )}
       >
@@ -170,7 +175,6 @@ function PairTeamRow({
         }}
         className={cn(
           "min-w-0 flex-1 truncate text-left text-[12px] leading-none",
-          isLoser && "line-through decoration-zinc-600",
           onPlayerClick && team.player2 && "hover:text-sky-200",
         )}
       >
@@ -250,6 +254,7 @@ export function LlbBracketMatch({
   matchNumber,
   edges,
   matchNumbers,
+  matchById,
   onMatchClick,
   onPlayerClick,
 }: {
@@ -257,14 +262,20 @@ export function LlbBracketMatch({
   matchNumber: number;
   edges: SwissBracketEdge[];
   matchNumbers: Map<string, number>;
+  matchById: Map<string, BracketMatchView>;
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamWithPlayers["player1"]) => void;
 }) {
-  const finished = match.status === "FINISHED" || !!match.winnerTeamId;
+  const finished = isMatchResolved(match.status, match.winnerTeamId);
   const winnerId = match.winnerTeamId;
   const team1Wins = winnerId === match.team1?.id;
   const team2Wins = winnerId === match.team2?.id;
-  const bye = Boolean(match.team1 && !match.team2);
+  const { isBye: roundOneBye, phantomRow } = matchAutopassBye(match);
+  const incomingPhantom = incomingAutopassPhantomSlot(
+    match.id,
+    edges,
+    matchById,
+  );
   const { winnerTo, loserTo, winnerKind } = getMatchDestinations(
     match.id,
     edges,
@@ -300,7 +311,43 @@ export function LlbBracketMatch({
         : "—";
 
   const footerParts: string[] = [];
-  if (loserTo !== undefined) footerParts.push(`проигравший на #${loserTo}`);
+  const matchCount = matchNumbers.size;
+  const gridSize = inferFixedSwissGridSize(matchCount);
+  const matchesPerRound = gridSize / 2;
+  const bracketMaxRound =
+    matchById.size > 0
+      ? Math.max(...Array.from(matchById.values()).map((m) => m.round))
+      : 0;
+  const maxRound = isFixedSwissTsLegacy29MatchCount(matchCount)
+    ? bracketMaxRound || 6
+    : matchCount === 27
+      ? bracketMaxRound ||
+        (isFixedSwissTsLegacy27SixRound(matchCount, 6) ? 6 : 5)
+      : isFixedSwiss168LegacyMatchCount(matchCount, bracketMaxRound)
+        ? bracketMaxRound || 5
+        : Math.log2(gridSize) + 1;
+  const isFixedSwissGrid = isFixedSwiss168MatchCount(matchCount);
+  const placement = fixedSwissPlacementLabel(
+    match.round,
+    match.slot,
+    maxRound,
+    matchesPerRound,
+    matchCount,
+    matchNumber,
+  );
+  if (placement) {
+    footerParts.push(placement);
+  }
+  if (match.status === "WALKOVER") {
+    footerParts.push("тех. поражение");
+  }
+  if (loserTo !== undefined) {
+    footerParts.push(
+      roundOneBye && phantomRow
+        ? `× на #${loserTo}`
+        : `проигравший на #${loserTo}`,
+    );
+  }
   if (winnerTo !== undefined) {
     footerParts.push(
       winnerKind === "bye"
@@ -309,28 +356,43 @@ export function LlbBracketMatch({
     );
   }
 
+  const footerHeight = gridFooterHeight(
+    isFixedSwissGrid ? 3 : Math.max(footerParts.length, 1),
+  );
+
   function handlePlayerClick(playerId: string, preview: TeamWithPlayers["player1"]) {
     onPlayerClick?.(playerId, preview);
   }
 
   return (
     <div
-      className="overflow-hidden border border-zinc-500/70 bg-zinc-100/[0.03] shadow-lg shadow-black/30"
+      className="llb-bracket-match overflow-hidden border border-[var(--bracket-card-border)] bg-[var(--bracket-card-bg)] shadow-[var(--bracket-card-shadow)]"
       style={{
         width: GRID_CARD_W,
-        height: gridCardHeight(Boolean(showHandicap)),
+        height: FIXED_SWISS_CARD_H,
       }}
     >
       <MatchArea
         onMatchClick={openMatch}
-        className="flex items-center justify-between border-b border-zinc-600/80 bg-zinc-900/90 px-2 text-[10px] text-zinc-400"
+        className={cn(
+          "flex items-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px] text-[var(--bracket-meta-text)]",
+          isFixedSwissGrid ? "justify-center" : "justify-between",
+        )}
         style={{ height: GRID_META_H }}
       >
-        <span className="tabular-nums">Тур {match.round}</span>
-        <span className="font-semibold tabular-nums text-emerald-300/90">
-          #{matchNumber}
-        </span>
-        <span className="tabular-nums text-zinc-600">сл.{match.slot}</span>
+        {!isFixedSwissGrid ? (
+          <>
+            <span className="tabular-nums">Тур {match.round}</span>
+            <span className="font-semibold tabular-nums text-emerald-300/90">
+              #{matchNumber}
+            </span>
+            <span className="tabular-nums text-zinc-600">сл.{match.slot}</span>
+          </>
+        ) : (
+          <span className="font-semibold tabular-nums text-emerald-300/90">
+            #{matchNumber}
+          </span>
+        )}
       </MatchArea>
 
       {match.team1?.player2 ? (
@@ -354,11 +416,20 @@ export function LlbBracketMatch({
         />
       ) : (
         <TeamRow
-          label={match.team1 ? teamLabel(match.team1) : "—"}
+          label={
+            match.team1
+              ? teamLabel(match.team1)
+              : incomingPhantom === 1
+                ? "×"
+                : roundOneBye && phantomRow === 1
+                  ? "—"
+                  : "ожидание"
+          }
           rating={match.team1 ? teamRating(match.team1) : undefined}
           score={team1ScoreDisplay}
           isWinner={team1Wins}
           isLoser={finished && !!winnerId && !team1Wins && !!match.team1}
+          empty={incomingPhantom === 1}
           onMatchClick={openMatch}
           onPlayerClick={
             match.team1 && onPlayerClick
@@ -403,10 +474,15 @@ export function LlbBracketMatch({
         />
       ) : (
         <TeamRow
-          label={bye ? "×" : "ожидание"}
+          label={
+            incomingPhantom === 2
+              ? "×"
+              : roundOneBye && phantomRow === 2
+                ? "—"
+                : "ожидание"
+          }
           score="—"
-          empty={bye}
-          isWinner={bye && finished && !!winnerId}
+          empty={incomingPhantom === 2}
           onMatchClick={openMatch}
         />
       )}
@@ -414,7 +490,7 @@ export function LlbBracketMatch({
       {showHandicap && (
         <MatchArea
           onMatchClick={openMatch}
-          className="border-t border-zinc-700/60 px-2 py-0.5 text-[9px] leading-tight text-zinc-500"
+          className="border-t border-zinc-700/60 px-2 py-1 text-[9px] leading-snug text-zinc-500"
         >
           фора: {handicap}
         </MatchArea>
@@ -423,8 +499,8 @@ export function LlbBracketMatch({
       {footerParts.length > 0 ? (
         <MatchArea
           onMatchClick={openMatch}
-          className="flex flex-col justify-center border-t border-zinc-700/50 px-2 text-[9px] leading-tight text-zinc-500"
-          style={{ minHeight: GRID_FOOTER_H }}
+          className="flex flex-col justify-center gap-0.5 border-t border-[var(--bracket-row-border)] px-2 py-1 text-[9px] leading-snug text-[var(--bracket-meta-text)]"
+          style={{ minHeight: footerHeight }}
         >
           {footerParts.map((line) => (
             <span key={line}>{line}</span>
@@ -434,8 +510,8 @@ export function LlbBracketMatch({
         openMatch && (
           <MatchArea
             onMatchClick={openMatch}
-            className="flex items-center justify-center border-t border-zinc-700/40 px-2 text-[9px] text-zinc-600"
-            style={{ minHeight: GRID_FOOTER_H }}
+            className="flex items-center justify-center border-t border-zinc-700/40 px-2 py-1 text-[9px] text-zinc-600"
+            style={{ minHeight: footerHeight }}
           >
             результат встречи →
           </MatchArea>

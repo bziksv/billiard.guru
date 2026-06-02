@@ -404,6 +404,7 @@ export type ClubWhereInput = {
   news?: Prisma.ClubNewsListRelationFilter
   tableBookings?: Prisma.TableBookingListRelationFilter
   ideas?: Prisma.IdeaListRelationFilter
+  playListings?: Prisma.PlayListingListRelationFilter
   staff?: Prisma.ClubStaffListRelationFilter
 }
 
@@ -444,6 +445,7 @@ export type ClubOrderByWithRelationInput = {
   news?: Prisma.ClubNewsOrderByRelationAggregateInput
   tableBookings?: Prisma.TableBookingOrderByRelationAggregateInput
   ideas?: Prisma.IdeaOrderByRelationAggregateInput
+  playListings?: Prisma.PlayListingOrderByRelationAggregateInput
   staff?: Prisma.ClubStaffOrderByRelationAggregateInput
   _relevance?: Prisma.ClubOrderByRelevanceInput
 }
@@ -488,6 +490,7 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   news?: Prisma.ClubNewsListRelationFilter
   tableBookings?: Prisma.TableBookingListRelationFilter
   ideas?: Prisma.IdeaListRelationFilter
+  playListings?: Prisma.PlayListingListRelationFilter
   staff?: Prisma.ClubStaffListRelationFilter
 }, "id" | "confirmToken">
 
@@ -597,6 +600,7 @@ export type ClubCreateInput = {
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -636,6 +640,7 @@ export type ClubUncheckedCreateInput = {
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -675,6 +680,7 @@ export type ClubUpdateInput = {
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -714,6 +720,7 @@ export type ClubUncheckedUpdateInput = {
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -1122,6 +1129,22 @@ export type ClubUpdateOneWithoutIdeasNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClubUpdateToOneWithWhereWithoutIdeasInput, Prisma.ClubUpdateWithoutIdeasInput>, Prisma.ClubUncheckedUpdateWithoutIdeasInput>
 }
 
+export type ClubCreateNestedOneWithoutPlayListingsInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutPlayListingsInput, Prisma.ClubUncheckedCreateWithoutPlayListingsInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutPlayListingsInput
+  connect?: Prisma.ClubWhereUniqueInput
+}
+
+export type ClubUpdateOneWithoutPlayListingsNestedInput = {
+  create?: Prisma.XOR<Prisma.ClubCreateWithoutPlayListingsInput, Prisma.ClubUncheckedCreateWithoutPlayListingsInput>
+  connectOrCreate?: Prisma.ClubCreateOrConnectWithoutPlayListingsInput
+  upsert?: Prisma.ClubUpsertWithoutPlayListingsInput
+  disconnect?: Prisma.ClubWhereInput | boolean
+  delete?: Prisma.ClubWhereInput | boolean
+  connect?: Prisma.ClubWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClubUpdateToOneWithWhereWithoutPlayListingsInput, Prisma.ClubUpdateWithoutPlayListingsInput>, Prisma.ClubUncheckedUpdateWithoutPlayListingsInput>
+}
+
 export type ClubCreateWithoutCityInput = {
   id?: string
   name: string
@@ -1157,6 +1180,7 @@ export type ClubCreateWithoutCityInput = {
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -1195,6 +1219,7 @@ export type ClubUncheckedCreateWithoutCityInput = {
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -1294,6 +1319,7 @@ export type ClubCreateWithoutStaffInput = {
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
 }
 
 export type ClubUncheckedCreateWithoutStaffInput = {
@@ -1332,6 +1358,7 @@ export type ClubUncheckedCreateWithoutStaffInput = {
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
 }
 
 export type ClubCreateOrConnectWithoutStaffInput = {
@@ -1386,6 +1413,7 @@ export type ClubUpdateWithoutStaffInput = {
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
 }
 
 export type ClubUncheckedUpdateWithoutStaffInput = {
@@ -1424,6 +1452,7 @@ export type ClubUncheckedUpdateWithoutStaffInput = {
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
 }
 
 export type ClubCreateWithoutTableBookingsInput = {
@@ -1461,6 +1490,7 @@ export type ClubCreateWithoutTableBookingsInput = {
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -1499,6 +1529,7 @@ export type ClubUncheckedCreateWithoutTableBookingsInput = {
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -1553,6 +1584,7 @@ export type ClubUpdateWithoutTableBookingsInput = {
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -1591,6 +1623,7 @@ export type ClubUncheckedUpdateWithoutTableBookingsInput = {
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -1629,6 +1662,7 @@ export type ClubCreateWithoutNewsInput = {
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -1667,6 +1701,7 @@ export type ClubUncheckedCreateWithoutNewsInput = {
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -1721,6 +1756,7 @@ export type ClubUpdateWithoutNewsInput = {
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -1759,6 +1795,7 @@ export type ClubUncheckedUpdateWithoutNewsInput = {
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -1797,6 +1834,7 @@ export type ClubCreateWithoutPlayerRatingsInput = {
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -1835,6 +1873,7 @@ export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -1889,6 +1928,7 @@ export type ClubUpdateWithoutPlayerRatingsInput = {
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -1927,6 +1967,7 @@ export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -1965,6 +2006,7 @@ export type ClubCreateWithoutTournamentsInput = {
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -2003,6 +2045,7 @@ export type ClubUncheckedCreateWithoutTournamentsInput = {
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -2057,6 +2100,7 @@ export type ClubUpdateWithoutTournamentsInput = {
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -2095,6 +2139,7 @@ export type ClubUncheckedUpdateWithoutTournamentsInput = {
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -2133,6 +2178,7 @@ export type ClubCreateWithoutTeamsInput = {
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -2171,6 +2217,7 @@ export type ClubUncheckedCreateWithoutTeamsInput = {
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -2225,6 +2272,7 @@ export type ClubUpdateWithoutTeamsInput = {
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -2263,6 +2311,7 @@ export type ClubUncheckedUpdateWithoutTeamsInput = {
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -2301,6 +2350,7 @@ export type ClubCreateWithoutRegistrationsInput = {
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -2339,6 +2389,7 @@ export type ClubUncheckedCreateWithoutRegistrationsInput = {
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -2393,6 +2444,7 @@ export type ClubUpdateWithoutRegistrationsInput = {
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -2431,6 +2483,7 @@ export type ClubUncheckedUpdateWithoutRegistrationsInput = {
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -2469,6 +2522,7 @@ export type ClubCreateWithoutIdeasInput = {
   playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
 }
 
@@ -2507,6 +2561,7 @@ export type ClubUncheckedCreateWithoutIdeasInput = {
   playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
   news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutClubInput
   staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
 }
 
@@ -2561,6 +2616,7 @@ export type ClubUpdateWithoutIdeasInput = {
   playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -2599,6 +2655,179 @@ export type ClubUncheckedUpdateWithoutIdeasInput = {
   playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
+}
+
+export type ClubCreateWithoutPlayListingsInput = {
+  id?: string
+  name: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutClubsInput
+  tournaments?: Prisma.TournamentCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffCreateNestedManyWithoutClubInput
+}
+
+export type ClubUncheckedCreateWithoutPlayListingsInput = {
+  id?: string
+  name: string
+  cityId: string
+  phone: string
+  displayPhone?: string | null
+  email?: string | null
+  photoUrl?: string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: string | null
+  address?: string | null
+  latitude?: number | null
+  longitude?: number | null
+  workingHours?: string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: boolean
+  bookingSlotMinutes?: number
+  bookingAdvanceDays?: number
+  telegramId?: string | null
+  telegramUsername?: string | null
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tournaments?: Prisma.TournamentUncheckedCreateNestedManyWithoutClubInput
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutClubInput
+  teams?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutClubInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutClubInput
+  news?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutClubInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutClubInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutClubInput
+  staff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutClubInput
+}
+
+export type ClubCreateOrConnectWithoutPlayListingsInput = {
+  where: Prisma.ClubWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClubCreateWithoutPlayListingsInput, Prisma.ClubUncheckedCreateWithoutPlayListingsInput>
+}
+
+export type ClubUpsertWithoutPlayListingsInput = {
+  update: Prisma.XOR<Prisma.ClubUpdateWithoutPlayListingsInput, Prisma.ClubUncheckedUpdateWithoutPlayListingsInput>
+  create: Prisma.XOR<Prisma.ClubCreateWithoutPlayListingsInput, Prisma.ClubUncheckedCreateWithoutPlayListingsInput>
+  where?: Prisma.ClubWhereInput
+}
+
+export type ClubUpdateToOneWithWhereWithoutPlayListingsInput = {
+  where?: Prisma.ClubWhereInput
+  data: Prisma.XOR<Prisma.ClubUpdateWithoutPlayListingsInput, Prisma.ClubUncheckedUpdateWithoutPlayListingsInput>
+}
+
+export type ClubUpdateWithoutPlayListingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutClubsNestedInput
+  tournaments?: Prisma.TournamentUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
+}
+
+export type ClubUncheckedUpdateWithoutPlayListingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tournaments?: Prisma.TournamentUncheckedUpdateManyWithoutClubNestedInput
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutClubNestedInput
+  teams?: Prisma.TournamentTeamUncheckedUpdateManyWithoutClubNestedInput
+  playerRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutClubNestedInput
+  news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -2667,6 +2896,7 @@ export type ClubUpdateWithoutCityInput = {
   news?: Prisma.ClubNewsUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUpdateManyWithoutClubNestedInput
 }
 
@@ -2705,6 +2935,7 @@ export type ClubUncheckedUpdateWithoutCityInput = {
   news?: Prisma.ClubNewsUncheckedUpdateManyWithoutClubNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutClubNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutClubNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutClubNestedInput
   staff?: Prisma.ClubStaffUncheckedUpdateManyWithoutClubNestedInput
 }
 
@@ -2751,6 +2982,7 @@ export type ClubCountOutputType = {
   news: number
   tableBookings: number
   ideas: number
+  playListings: number
   staff: number
 }
 
@@ -2762,6 +2994,7 @@ export type ClubCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   news?: boolean | ClubCountOutputTypeCountNewsArgs
   tableBookings?: boolean | ClubCountOutputTypeCountTableBookingsArgs
   ideas?: boolean | ClubCountOutputTypeCountIdeasArgs
+  playListings?: boolean | ClubCountOutputTypeCountPlayListingsArgs
   staff?: boolean | ClubCountOutputTypeCountStaffArgs
 }
 
@@ -2827,6 +3060,13 @@ export type ClubCountOutputTypeCountIdeasArgs<ExtArgs extends runtime.Types.Exte
 /**
  * ClubCountOutputType without action
  */
+export type ClubCountOutputTypeCountPlayListingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlayListingWhereInput
+}
+
+/**
+ * ClubCountOutputType without action
+ */
 export type ClubCountOutputTypeCountStaffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ClubStaffWhereInput
 }
@@ -2869,6 +3109,7 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   news?: boolean | Prisma.Club$newsArgs<ExtArgs>
   tableBookings?: boolean | Prisma.Club$tableBookingsArgs<ExtArgs>
   ideas?: boolean | Prisma.Club$ideasArgs<ExtArgs>
+  playListings?: boolean | Prisma.Club$playListingsArgs<ExtArgs>
   staff?: boolean | Prisma.Club$staffArgs<ExtArgs>
   _count?: boolean | Prisma.ClubCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["club"]>
@@ -2916,6 +3157,7 @@ export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   news?: boolean | Prisma.Club$newsArgs<ExtArgs>
   tableBookings?: boolean | Prisma.Club$tableBookingsArgs<ExtArgs>
   ideas?: boolean | Prisma.Club$ideasArgs<ExtArgs>
+  playListings?: boolean | Prisma.Club$playListingsArgs<ExtArgs>
   staff?: boolean | Prisma.Club$staffArgs<ExtArgs>
   _count?: boolean | Prisma.ClubCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -2931,6 +3173,7 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     news: Prisma.$ClubNewsPayload<ExtArgs>[]
     tableBookings: Prisma.$TableBookingPayload<ExtArgs>[]
     ideas: Prisma.$IdeaPayload<ExtArgs>[]
+    playListings: Prisma.$PlayListingPayload<ExtArgs>[]
     staff: Prisma.$ClubStaffPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -3310,6 +3553,7 @@ export interface Prisma__ClubClient<T, Null = never, ExtArgs extends runtime.Typ
   news<T extends Prisma.Club$newsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$newsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubNewsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tableBookings<T extends Prisma.Club$tableBookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$tableBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TableBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ideas<T extends Prisma.Club$ideasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$ideasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  playListings<T extends Prisma.Club$playListingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$playListingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   staff<T extends Prisma.Club$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Club$staffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -3881,6 +4125,30 @@ export type Club$ideasArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.IdeaScalarFieldEnum | Prisma.IdeaScalarFieldEnum[]
+}
+
+/**
+ * Club.playListings
+ */
+export type Club$playListingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlayListing
+   */
+  select?: Prisma.PlayListingSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlayListing
+   */
+  omit?: Prisma.PlayListingOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlayListingInclude<ExtArgs> | null
+  where?: Prisma.PlayListingWhereInput
+  orderBy?: Prisma.PlayListingOrderByWithRelationInput | Prisma.PlayListingOrderByWithRelationInput[]
+  cursor?: Prisma.PlayListingWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlayListingScalarFieldEnum | Prisma.PlayListingScalarFieldEnum[]
 }
 
 /**

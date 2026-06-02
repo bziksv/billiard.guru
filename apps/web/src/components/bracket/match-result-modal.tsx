@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from "react";
 import type { BracketMatchView } from "@/lib/bracket-view";
+import {
+  defaultScoreInput,
+  isMatchResolved,
+  parseMatchScoreInputs,
+  validateMatchScoresForFinish,
+  winnerTeamIdFromScores,
+} from "@/lib/match-result";
 import { teamLabel } from "@/lib/pair-tournament";
 import { cn } from "@/lib/cn";
 
@@ -24,6 +31,37 @@ function toDatetimeLocal(iso: string | null | undefined): string {
 
 function nowDatetimeLocal(): string {
   return toDatetimeLocal(new Date().toISOString());
+}
+
+function toIsoFromLocal(value: string): string {
+  return new Date(value).toISOString();
+}
+
+/** Не отправляем null — иначе в БД сотрётся уже сохранённое время. */
+function buildMatchTimePayload(options: {
+  startedAt: string;
+  finishedAt: string;
+  includeStart: boolean;
+  includeFinish: boolean;
+  defaultStartIfEmpty?: boolean;
+  defaultFinishIfEmpty?: boolean;
+}): Pick<MatchResultPayload, "startedAt" | "finishedAt"> {
+  const out: Pick<MatchResultPayload, "startedAt" | "finishedAt"> = {};
+  let start = options.startedAt;
+  let finish = options.finishedAt;
+  if (options.includeStart && !start && options.defaultStartIfEmpty) {
+    start = nowDatetimeLocal();
+  }
+  if (options.includeFinish && !finish && options.defaultFinishIfEmpty) {
+    finish = nowDatetimeLocal();
+  }
+  if (options.includeStart && start) {
+    out.startedAt = toIsoFromLocal(start);
+  }
+  if (options.includeFinish && finish) {
+    out.finishedAt = toIsoFromLocal(finish);
+  }
+  return out;
 }
 
 export function MatchResultModal({
@@ -53,8 +91,8 @@ export function MatchResultModal({
 
   useEffect(() => {
     if (!match || !open) return;
-    setTeam1Score(match.team1Score != null ? String(match.team1Score) : "");
-    setTeam2Score(match.team2Score != null ? String(match.team2Score) : "");
+    setTeam1Score(defaultScoreInput(match.team1Score));
+    setTeam2Score(defaultScoreInput(match.team2Score));
     setStartedAt(toDatetimeLocal(match.startedAt));
     setFinishedAt(toDatetimeLocal(match.finishedAt));
     setWinnerTeamId(match.winnerTeamId ?? "");
@@ -64,7 +102,7 @@ export function MatchResultModal({
 
   if (!open || !match) return null;
 
-  const finished = match.status === "FINISHED" || !!match.winnerTeamId;
+  const finished = isMatchResolved(match.status, match.winnerTeamId);
   const roundOneBye = Boolean(
     match.round === 1 &&
       ((match.team1 && !match.team2) || (!match.team1 && match.team2)),
@@ -74,61 +112,131 @@ export function MatchResultModal({
     ? teamLabel(match.team2)
     : roundOneBye
       ? "× (автопроход)"
-      : "—";
+      : "Ожидание соперника";
 
-  async function savePartial(startOnly = false) {
+  async function saveTimesOnly(options: {
+    startOnly: boolean;
+    startOverride?: string;
+    closeAfter?: boolean;
+  }) {
     setError(null);
+    const times = buildMatchTimePayload({
+      startedAt: options.startOverride ?? startedAt,
+      finishedAt,
+      includeStart: true,
+      includeFinish: !options.startOnly,
+      defaultStartIfEmpty: true,
+      defaultFinishIfEmpty: !options.startOnly,
+    });
+    if (times.startedAt) {
+      setStartedAt(toDatetimeLocal(times.startedAt));
+    }
+    if (times.finishedAt) {
+      setFinishedAt(toDatetimeLocal(times.finishedAt));
+    }
     const payload: MatchResultPayload = {
       matchId: match!.id,
-      team1Score: team1Score === "" ? null : Number(team1Score),
-      team2Score: team2Score === "" ? null : Number(team2Score),
-      startedAt: startedAt ? new Date(startedAt).toISOString() : null,
-      finishedAt: startOnly ? undefined : finishedAt ? new Date(finishedAt).toISOString() : null,
+      ...times,
     };
-    if (Number.isNaN(payload.team1Score as number) || Number.isNaN(payload.team2Score as number)) {
-      setError("Счёт должен быть числом");
-      return;
-    }
     try {
       await onSave(payload);
-      if (startOnly) onClose();
+      if (options.closeAfter) onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Не удалось сохранить");
     }
   }
 
-  async function saveResult() {
+  /** Обновление времени и счёта уже завершённой встречи (без смены победителя). */
+  async function saveFinishedMatchData() {
     setError(null);
-    const s1 = team1Score === "" ? null : Number(team1Score);
-    const s2 = team2Score === "" ? null : Number(team2Score);
-    if ((s1 !== null && Number.isNaN(s1)) || (s2 !== null && Number.isNaN(s2))) {
-      setError("Счёт должен быть числом");
+    const parsed = parseMatchScoreInputs(team1Score, team2Score);
+    if (!parsed.ok) {
+      setError(parsed.error);
       return;
     }
+    const times = buildMatchTimePayload({
+      startedAt,
+      finishedAt,
+      includeStart: true,
+      includeFinish: true,
+      defaultStartIfEmpty: false,
+      defaultFinishIfEmpty: false,
+    });
+    if (times.startedAt) {
+      setStartedAt(toDatetimeLocal(times.startedAt));
+    }
+    if (times.finishedAt) {
+      setFinishedAt(toDatetimeLocal(times.finishedAt));
+    }
+    const payload: MatchResultPayload = {
+      matchId: match!.id,
+      team1Score: parsed.s1,
+      team2Score: parsed.s2,
+      ...times,
+    };
+    try {
+      await onSave(payload);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Не удалось сохранить");
+    }
+  }
+
+  async function stampStartNow() {
+    const now = nowDatetimeLocal();
+    setStartedAt(now);
+    await saveTimesOnly({ startOnly: true, startOverride: now, closeAfter: true });
+  }
+
+  async function stampFinishNow() {
+    const now = nowDatetimeLocal();
+    setFinishedAt(now);
+    if (!startedAt) {
+      setStartedAt(now);
+    }
+    await saveTimesOnly({ startOnly: false, startOverride: startedAt || now });
+  }
+
+  async function saveResult() {
+    setError(null);
+    const parsed = parseMatchScoreInputs(team1Score, team2Score);
+    if (!parsed.ok) {
+      setError(parsed.error);
+      return;
+    }
+    const { s1, s2 } = parsed;
 
     let winner = winnerTeamId || undefined;
     if (roundOneBye && match!.team1) {
       winner = match!.team1.id;
     } else if (match!.team1 && match!.team2) {
-      if (s1 !== null && s2 !== null) {
-        if (s1 > s2) winner = match!.team1.id;
-        else if (s2 > s1) winner = match!.team2.id;
+      const scoreError = validateMatchScoresForFinish(s1, s2);
+      if (scoreError) {
+        setError(scoreError);
+        return;
       }
+      winner =
+        winnerTeamIdFromScores(match!.team1.id, match!.team2.id, s1, s2) ??
+        winner;
       if (!winner) {
         setError("Укажите счёт или выберите победителя");
         return;
       }
     }
 
+    const times = buildMatchTimePayload({
+      startedAt,
+      finishedAt,
+      includeStart: true,
+      includeFinish: true,
+      defaultStartIfEmpty: true,
+      defaultFinishIfEmpty: true,
+    });
     const payload: MatchResultPayload = {
       matchId: match!.id,
       winnerTeamId: winner,
       team1Score: s1,
       team2Score: s2,
-      startedAt: startedAt ? new Date(startedAt).toISOString() : null,
-      finishedAt: finishedAt
-        ? new Date(finishedAt).toISOString()
-        : new Date().toISOString(),
+      ...times,
     };
 
     try {
@@ -151,18 +259,42 @@ export function MatchResultModal({
     }
   }
 
+  function pickWinner(teamId: string) {
+    setWinnerTeamId(teamId);
+    if (!match?.team1 || !match.team2) return;
+    if (teamId === match.team1.id) {
+      setTeam1Score("1");
+      setTeam2Score("0");
+    } else {
+      setTeam1Score("0");
+      setTeam2Score("1");
+    }
+  }
+
+  const parsedScores = parseMatchScoreInputs(team1Score, team2Score);
+  const canFixResult =
+    roundOneBye ||
+    !match.team1 ||
+    !match.team2 ||
+    (parsedScores.ok &&
+      validateMatchScoresForFinish(parsedScores.s1, parsedScores.s2) === null);
+
   return (
     <div
       className="bracket-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
-        className="bracket-modal-panel w-full max-w-lg p-6"
+        className="bracket-modal-panel w-full max-w-lg overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-labelledby="match-modal-title"
       >
-        <div className="mb-5 flex items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold">Встреча #{matchNumber ?? "—"}</h2>
+        <div className="flex items-start justify-between gap-4 border-b border-[var(--bracket-modal-border)] px-5 py-4">
+          <div className="min-w-0">
+            <h2 id="match-modal-title" className="text-lg font-semibold leading-tight">
+              Встреча #{matchNumber ?? "—"}
+            </h2>
             <p className="bracket-modal-muted mt-1 text-sm">
               Тур {match.round} · слот {match.slot}
             </p>
@@ -170,51 +302,67 @@ export function MatchResultModal({
           <button
             type="button"
             onClick={onClose}
-            className="bracket-modal-muted hover:text-[var(--admin-text,var(--text-primary))]"
+            className="bracket-modal-close"
             aria-label="Закрыть"
           >
             ✕
           </button>
         </div>
 
-        <div className="space-y-4">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block text-sm">
-              <span className="bracket-modal-label mb-1 block">{team1Label}</span>
-              <input
-                type="number"
-                min="0"
-                value={team1Score}
-                onChange={(e) => setTeam1Score(e.target.value)}
-                className="bracket-modal-input w-full px-3 py-2 font-mono"
-                placeholder="Счёт"
-              />
-            </label>
-            <label className="block text-sm">
-              <span className="bracket-modal-label mb-1 block">{team2Label}</span>
-              <input
-                type="number"
-                min="0"
-                value={team2Score}
-                onChange={(e) => setTeam2Score(e.target.value)}
-                disabled={roundOneBye}
-                className="bracket-modal-input w-full px-3 py-2 font-mono disabled:opacity-50"
-                placeholder="Счёт"
-              />
-            </label>
+        <div className="space-y-5 px-5 py-5">
+          <div className="bracket-modal-score-box p-4">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-3">
+              <label className="min-w-0 text-center">
+                <span className="admin-label-xs mb-2 block truncate">{team1Label}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={team1Score}
+                  onChange={(e) => setTeam1Score(e.target.value)}
+                  className="admin-input w-full px-2 py-2 text-center font-mono text-lg tabular-nums"
+                  placeholder="0"
+                  aria-label={`Счёт: ${team1Label}`}
+                />
+              </label>
+              <span className="pb-2.5 text-xl font-medium text-zinc-400" aria-hidden>
+                :
+              </span>
+              <label className="min-w-0 text-center">
+                <span
+                  className={cn(
+                    "admin-label-xs mb-2 block truncate",
+                    !match.team2 && !roundOneBye && "text-zinc-400",
+                  )}
+                >
+                  {team2Label}
+                </span>
+                <input
+                  type="number"
+                  min="0"
+                  value={team2Score}
+                  onChange={(e) => setTeam2Score(e.target.value)}
+                  disabled={roundOneBye || !match.team2}
+                  className="admin-input w-full px-2 py-2 text-center font-mono text-lg tabular-nums disabled:opacity-50"
+                  placeholder="0"
+                  aria-label={`Счёт: ${team2Label}`}
+                />
+              </label>
+            </div>
           </div>
 
           {!roundOneBye && match.team1 && match.team2 && !finished && (
             <div className="space-y-2">
-              <p className="bracket-modal-muted text-xs">Победитель (если счёт не указан)</p>
+              <p className="admin-label-xs">
+                Победитель (если счёт не указан) · 1:0 — техническое поражение
+              </p>
               <div className="flex flex-wrap gap-2">
                 {[match.team1, match.team2].map((team) => (
                   <button
                     key={team.id}
                     type="button"
-                    onClick={() => setWinnerTeamId(team.id)}
+                    onClick={() => pickWinner(team.id)}
                     className={cn(
-                      "bracket-modal-choice rounded-lg px-3 py-1.5 text-sm",
+                      "bracket-modal-choice rounded-lg px-3 py-1.5 text-sm transition-colors",
                       winnerTeamId === team.id && "bracket-modal-choice--active",
                     )}
                   >
@@ -225,57 +373,65 @@ export function MatchResultModal({
             </div>
           )}
 
-          <label className="block text-sm">
-            <span className="bracket-modal-label mb-1 block">Начало встречи</span>
-            <div className="flex gap-2">
-              <input
-                type="datetime-local"
-                value={startedAt}
-                onChange={(e) => setStartedAt(e.target.value)}
-                className="bracket-modal-input min-w-0 flex-1 px-3 py-2"
-              />
-              <button
-                type="button"
-                onClick={() => setStartedAt(nowDatetimeLocal())}
-                className="bracket-modal-choice shrink-0 rounded-lg px-3 py-2 text-xs"
-              >
-                Сейчас
-              </button>
-            </div>
-          </label>
+          <div className="space-y-4">
+            <label className="block text-sm">
+              <span className="admin-label-xs mb-1.5 block">Начало</span>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                <input
+                  type="datetime-local"
+                  value={startedAt}
+                  onChange={(e) => setStartedAt(e.target.value)}
+                  className="bracket-modal-datetime admin-input min-w-0 flex-1 px-2 py-2 text-sm tabular-nums"
+                />
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void stampStartNow()}
+                  className="admin-btn admin-btn--outline shrink-0 px-4 py-2 text-xs sm:w-24"
+                >
+                  {saving ? "…" : "Сейчас"}
+                </button>
+              </div>
+            </label>
 
-          <label className="block text-sm">
-            <span className="bracket-modal-label mb-1 block">Завершение встречи</span>
-            <div className="flex gap-2">
-              <input
-                type="datetime-local"
-                value={finishedAt}
-                onChange={(e) => setFinishedAt(e.target.value)}
-                className="bracket-modal-input min-w-0 flex-1 px-3 py-2"
-              />
-              <button
-                type="button"
-                onClick={() => setFinishedAt(nowDatetimeLocal())}
-                className="bracket-modal-choice shrink-0 rounded-lg px-3 py-2 text-xs"
-              >
-                Сейчас
-              </button>
-            </div>
-          </label>
+            <label className="block text-sm">
+              <span className="admin-label-xs mb-1.5 block">Завершение</span>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                <input
+                  type="datetime-local"
+                  value={finishedAt}
+                  onChange={(e) => setFinishedAt(e.target.value)}
+                  className="bracket-modal-datetime admin-input min-w-0 flex-1 px-2 py-2 text-sm tabular-nums"
+                />
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => void stampFinishNow()}
+                  className="admin-btn admin-btn--outline shrink-0 px-4 py-2 text-xs sm:w-24"
+                >
+                  {saving ? "…" : "Сейчас"}
+                </button>
+              </div>
+            </label>
+          </div>
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && (
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+              {error}
+            </p>
+          )}
 
           {finished && onCancel && !confirmCancel && (
             <p className="text-xs leading-relaxed text-zinc-500">
-              Отмена сбросит результат, счёт и уберёт игроков из следующих встреч, если те
-              ещё не сыграны.
+              Отмена сбросит результат и уберёт игроков из следующих встреч, если те ещё
+              не сыграны.
             </p>
           )}
 
           {confirmCancel && (
-            <div className="rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-3 text-sm">
-              <p className="text-red-200">Отменить результат этой встречи?</p>
-              <p className="mt-1 text-xs text-red-200/70">
+            <div className="bracket-modal-danger px-4 py-3 text-sm">
+              <p className="font-medium">Отменить результат этой встречи?</p>
+              <p className="mt-1 text-xs">
                 Счёт будет удалён, победитель снят. Если следующая встреча уже завершена —
                 отмена не пройдёт.
               </p>
@@ -284,7 +440,7 @@ export function MatchResultModal({
                   type="button"
                   disabled={saving}
                   onClick={cancelResult}
-                  className="rounded-lg bg-red-700 px-3 py-1.5 text-xs hover:bg-red-600 disabled:opacity-50"
+                  className="admin-btn admin-btn--danger px-3 py-1.5 text-xs"
                 >
                   {saving ? "Отмена…" : "Да, отменить"}
                 </button>
@@ -292,29 +448,44 @@ export function MatchResultModal({
                   type="button"
                   disabled={saving}
                   onClick={() => setConfirmCancel(false)}
-                  className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs hover:border-zinc-500"
+                  className="admin-btn admin-btn--outline px-3 py-1.5 text-xs"
                 >
                   Нет
                 </button>
               </div>
             </div>
           )}
+        </div>
 
-          <div className="flex flex-wrap gap-2 pt-2">
+        <div className="bracket-modal-footer flex flex-col-reverse gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-h-[2.25rem]">
+            {finished && onCancel && !confirmCancel && (
+              <button
+                type="button"
+                disabled={saving}
+                onClick={() => setConfirmCancel(true)}
+                className="admin-btn admin-btn--outline w-full border-red-200 text-red-600 hover:border-red-300 hover:bg-red-50 sm:w-auto dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/30"
+              >
+                Отменить результат
+              </button>
+            )}
+          </div>
+
+          <div className="flex flex-wrap justify-end gap-2">
             <button
               type="button"
               disabled={saving}
-              onClick={() => savePartial(true)}
-              className="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:border-zinc-500 disabled:opacity-50"
+              onClick={() => saveTimesOnly({ startOnly: true })}
+              className="admin-btn admin-btn--outline px-4 py-2 text-sm"
             >
               Сохранить начало
             </button>
             {!finished && (
               <button
                 type="button"
-                disabled={saving}
+                disabled={saving || !canFixResult}
                 onClick={saveResult}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
+                className="admin-btn admin-btn--primary px-4 py-2 text-sm disabled:opacity-50"
               >
                 {saving ? "Сохранение…" : "Зафиксировать результат"}
               </button>
@@ -323,20 +494,10 @@ export function MatchResultModal({
               <button
                 type="button"
                 disabled={saving}
-                onClick={() => savePartial(false)}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
+                onClick={saveFinishedMatchData}
+                className="admin-btn admin-btn--primary px-4 py-2 text-sm"
               >
                 {saving ? "Сохранение…" : "Обновить данные"}
-              </button>
-            )}
-            {finished && onCancel && !confirmCancel && (
-              <button
-                type="button"
-                disabled={saving}
-                onClick={() => setConfirmCancel(true)}
-                className="rounded-lg border border-red-900/60 px-4 py-2 text-sm text-red-400 hover:border-red-700 hover:bg-red-950/30 disabled:opacity-50"
-              >
-                Отменить результат
               </button>
             )}
           </div>

@@ -17,6 +17,7 @@ export type HomeAnnouncement = {
   title: string;
   body: string;
   meta: string;
+  href?: string;
   preview?: boolean;
 };
 

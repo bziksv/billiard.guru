@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { cn } from "@/lib/cn";
-import { SITE_GUIDE_NAV, SITE_NAV_MAIN, t } from "@/lib/site";
+import { SITE_GUIDE_NAV, SITE_NAV_CTA, SITE_NAV_MAIN, t } from "@/lib/site";
 
 function NavLink({
   href,
@@ -149,6 +149,15 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
               active={item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)}
             />
           ))}
+          <Link
+            href={SITE_NAV_CTA.href}
+            className={cn(
+              "site-nav-cta",
+              pathname.startsWith(SITE_NAV_CTA.href) && "site-nav-cta-active",
+            )}
+          >
+            {t(SITE_NAV_CTA.labelKey)}
+          </Link>
         </nav>
 
         <div ref={guideRef} className="relative shrink-0">
@@ -234,6 +243,16 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
                       className="site-mobile-nav-link"
                     />
                   ))}
+                  <Link
+                    href={SITE_NAV_CTA.href}
+                    onClick={closeMobile}
+                    className={cn(
+                      "site-mobile-nav-link site-mobile-nav-link-cta",
+                      pathname.startsWith(SITE_NAV_CTA.href) && "site-mobile-nav-link-cta-active",
+                    )}
+                  >
+                    {t(SITE_NAV_CTA.labelKey)}
+                  </Link>
                 </nav>
 
                 <p className="site-mobile-nav-title">Справочник</p>

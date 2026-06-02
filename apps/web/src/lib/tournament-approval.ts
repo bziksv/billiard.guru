@@ -1,10 +1,12 @@
 import { randomUUID } from "crypto";
 import { writeAuditLog } from "@/lib/audit";
+import { clubOwnedByPlayer } from "@/lib/club-access";
 import { getNearbyCityIds, NOTIFY_RADIUS_KM } from "@/lib/geo";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import {
   answerCallbackQuery,
+  clearInlineKeyboard,
   sendTelegramMessage,
   tournamentApprovalKeyboard,
 } from "@/lib/telegram";
@@ -136,6 +138,19 @@ async function notifyNearbyPlayers(tournamentId: string) {
   });
 }
 
+async function canApproveTournamentClub(
+  club: { id: string; phone: string; telegramId: string | null },
+  telegramId: string,
+): Promise<boolean> {
+  if (club.telegramId === telegramId) return true;
+
+  const player = await prisma.player.findFirst({
+    where: { telegramId, isVerified: true },
+    select: { id: true, phone: true, telegramId: true, role: true },
+  });
+  return clubOwnedByPlayer(club, player);
+}
+
 export async function approveTournamentByClub(
   token: string,
   telegramId: string,
@@ -151,7 +166,7 @@ export async function approveTournamentByClub(
   if (tournament.status !== "PENDING_CLUB_APPROVAL") {
     return { ok: false, message: "Турнир уже опубликован или отклонён." };
   }
-  if (tournament.club.telegramId !== telegramId) {
+  if (!(await canApproveTournamentClub(tournament.club, telegramId))) {
     return {
       ok: false,
       message: "Подтвердить может только владелец клуба в Telegram.",
@@ -175,11 +190,13 @@ export async function approveTournamentByClub(
     entityId: tournament.id,
   });
 
-  await notifyNearbyPlayers(tournament.id);
+  void notifyNearbyPlayers(tournament.id).catch((err) => {
+    logger.error({ err, tournamentId: tournament.id }, "Nearby player notifications failed");
+  });
 
   return {
     ok: true,
-    message: `✅ Турнир «${tournament.name}» опубликован. Уведомления отправлены игрокам поблизости.`,
+    message: `✅ Турнир «${tournament.name}» опубликован на billiard.guru.\nУведомления игрокам поблизости отправляются.`,
   };
 }
 
@@ -198,7 +215,7 @@ export async function rejectTournamentByClub(
   if (tournament.status !== "PENDING_CLUB_APPROVAL") {
     return { ok: false, message: "Турнир уже обработан." };
   }
-  if (tournament.club.telegramId !== telegramId) {
+  if (!(await canApproveTournamentClub(tournament.club, telegramId))) {
     return { ok: false, message: "Отклонить может только владелец клуба." };
   }
 
@@ -228,19 +245,35 @@ export async function handleTournamentApprovalCallback(
   data: string,
   telegramId: string,
   callbackQueryId: string,
+  sourceMessage?: { chatId: string; messageId: number },
 ): Promise<boolean> {
   const approveMatch = data.match(/^tournament_approve_([a-f0-9-]+)$/i);
   const rejectMatch = data.match(/^tournament_reject_([a-f0-9-]+)$/i);
   const token = approveMatch?.[1] ?? rejectMatch?.[1];
   if (!token) return false;
 
-  const result = approveMatch
-    ? await approveTournamentByClub(token, telegramId)
-    : await rejectTournamentByClub(token, telegramId);
+  // Сразу снимаем «Загрузка…» в Telegram — тяжёлая работа после ответа.
+  await answerCallbackQuery(callbackQueryId);
 
-  await answerCallbackQuery(callbackQueryId, result.ok ? "Готово" : "Ошибка");
-  await sendTelegramMessage(telegramId, result.message);
-  return true;
+  try {
+    const result = approveMatch
+      ? await approveTournamentByClub(token, telegramId)
+      : await rejectTournamentByClub(token, telegramId);
+
+    if (sourceMessage) {
+      await clearInlineKeyboard(sourceMessage.chatId, sourceMessage.messageId);
+    }
+
+    await sendTelegramMessage(telegramId, result.message);
+    return true;
+  } catch (err) {
+    logger.error({ err, data, telegramId }, "Tournament approval callback error");
+    await sendTelegramMessage(
+      telegramId,
+      "⚠️ Не удалось обработать запрос. Попробуйте ещё раз или опубликуйте турнир на сайте.",
+    );
+    return true;
+  }
 }
 
 export async function handleTournamentApprovalMessage(

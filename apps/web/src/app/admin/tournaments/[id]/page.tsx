@@ -313,6 +313,34 @@ export default function AdminTournamentManagePage() {
     await reload();
   }
 
+  async function resetAllMatches() {
+    if (!tournament) return;
+    const res = await fetch("/api/tournaments/bracket", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tournamentId: tournament.id }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось отменить встречи");
+    }
+    await reload();
+  }
+
+  async function regenerateBracketGrid() {
+    if (!tournament) return;
+    const res = await fetch("/api/tournaments/bracket", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tournamentId: tournament.id, regenerate: true }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось пересоздать сетку");
+    }
+    await reload();
+  }
+
   if (loading || !tournament) {
     return <p className="text-sm text-zinc-500">Загрузка…</p>;
   }
@@ -487,6 +515,8 @@ export default function AdminTournamentManagePage() {
           onCancelRegistration={cancelRegistration}
           onConfirmTeam={confirmTeam}
           onGenerateBracket={generateBracket}
+          onResetAllMatches={resetAllMatches}
+          onRegenerateBracket={regenerateBracketGrid}
           onSaveMatchResult={saveMatchResult}
           onCancelMatchResult={cancelMatchResult}
           onUpdated={reload}

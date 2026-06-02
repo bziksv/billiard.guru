@@ -7,6 +7,7 @@ import {
   parseConfirmToken,
   removeKeyboard,
   sendTelegramMessage,
+  answerCallbackQuery,
 } from "@/lib/telegram";
 import {
   handleLoginCallback,
@@ -32,6 +33,7 @@ export interface TelegramUpdate {
     id: string;
     data?: string;
     from: { id: number; username?: string };
+    message?: { message_id: number; chat: { id: number } };
   };
 }
 
@@ -172,15 +174,23 @@ export async function processTelegramUpdate(
     const telegramId = String(update.callback_query.from.id);
     const data = update.callback_query.data ?? "";
     if (data.startsWith("tournament_")) {
+      const sourceMessage = update.callback_query.message
+        ? {
+            chatId: String(update.callback_query.message.chat.id),
+            messageId: update.callback_query.message.message_id,
+          }
+        : undefined;
       try {
         const handled = await handleTournamentApprovalCallback(
           data,
           telegramId,
           update.callback_query.id,
+          sourceMessage,
         );
         if (handled) return;
       } catch (err) {
         logger.error({ err }, "Tournament approval callback failed");
+        await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
       }
       return;
     }

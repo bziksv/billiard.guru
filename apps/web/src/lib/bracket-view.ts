@@ -21,6 +21,24 @@ export type SwissStandingView = BracketTeamView & {
   seed?: number | null;
 };
 
+/** Автопроход (×): только 1-й тур, один участник без пары. Иначе — «ожидание». */
+export function matchAutopassBye(match: BracketMatchView): {
+  isBye: boolean;
+  /** Строка с × (1 — верх, 2 — низ) */
+  phantomRow: 1 | 2 | null;
+} {
+  if (match.round !== 1) {
+    return { isBye: false, phantomRow: null };
+  }
+  if (match.team1 && !match.team2) {
+    return { isBye: true, phantomRow: 2 };
+  }
+  if (!match.team1 && match.team2) {
+    return { isBye: true, phantomRow: 1 };
+  }
+  return { isBye: false, phantomRow: null };
+}
+
 export function groupMatchesByRound(matches: BracketMatchView[]) {
   const map = new Map<number, BracketMatchView[]>();
   for (const match of matches) {

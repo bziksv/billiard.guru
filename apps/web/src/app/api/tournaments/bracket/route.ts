@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
-import { generateTournamentPairing, cancelMatchResult, saveMatchResult } from "@/lib/bracket-service";
+import { generateTournamentPairing, cancelMatchResult, saveMatchResult, resetAllMatchResults, regenerateBracket } from "@/lib/bracket-service";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import {
@@ -10,27 +10,34 @@ import {
   requireTournamentManageAccess,
   tournamentManageActorType,
 } from "@/lib/tournament-manage";
-import { matchCancelSchema, matchResultSchema } from "@/lib/validators";
+import { matchCancelSchema, matchResultSchema, bracketGenerateSchema, bracketResetSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
   const log = createRequestLogger(randomUUID());
   try {
-    const { tournamentId } = await request.json();
-    if (!tournamentId) {
-      return NextResponse.json({ error: "Укажите турнир" }, { status: 400 });
-    }
-
+    const body = bracketGenerateSchema.parse(await request.json());
+    const { tournamentId, regenerate } = body;
     const { session } = await requireTournamentManageAccess(tournamentId);
 
-    await generateTournamentPairing(prisma, tournamentId);
-
-    await writeAuditLog({
-      actorType: tournamentManageActorType(session),
-      actorId: session.playerId,
-      action: "tournament.bracket.generate",
-      entityType: "tournament",
-      entityId: tournamentId,
-    });
+    if (regenerate) {
+      await regenerateBracket(prisma, tournamentId);
+      await writeAuditLog({
+        actorType: tournamentManageActorType(session),
+        actorId: session.playerId,
+        action: "tournament.bracket.regenerate",
+        entityType: "tournament",
+        entityId: tournamentId,
+      });
+    } else {
+      await generateTournamentPairing(prisma, tournamentId);
+      await writeAuditLog({
+        actorType: tournamentManageActorType(session),
+        actorId: session.playerId,
+        action: "tournament.bracket.generate",
+        entityType: "tournament",
+        entityId: tournamentId,
+      });
+    }
 
     const matches = await prisma.tournamentMatch.findMany({
       where: { tournamentId },
@@ -42,7 +49,7 @@ export async function POST(request: NextRequest) {
       orderBy: [{ round: "asc" }, { slot: "asc" }],
     });
 
-    log.info({ tournamentId, matches: matches.length }, "Pair bracket generated");
+    log.info({ tournamentId, matches: matches.length }, regenerate ? "Bracket regenerated" : "Pair bracket generated");
     return NextResponse.json({ matches });
   } catch (error) {
     log.error({ error }, "Bracket generation failed");
@@ -107,6 +114,44 @@ export async function DELETE(request: NextRequest) {
     if (authResp) return authResp;
     const message =
       error instanceof Error ? error.message : "Не удалось отменить результат";
+    return NextResponse.json({ error: message }, { status: 400 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const log = createRequestLogger(randomUUID());
+  try {
+    const { tournamentId } = bracketResetSchema.parse(await request.json());
+    const { session } = await requireTournamentManageAccess(tournamentId);
+
+    await resetAllMatchResults(prisma, tournamentId);
+
+    await writeAuditLog({
+      actorType: tournamentManageActorType(session),
+      actorId: session.playerId,
+      action: "tournament.bracket.reset",
+      entityType: "tournament",
+      entityId: tournamentId,
+    });
+
+    const matches = await prisma.tournamentMatch.findMany({
+      where: { tournamentId },
+      include: {
+        team1: { include: { player1: true, player2: true } },
+        team2: { include: { player1: true, player2: true } },
+        winnerTeam: { include: { player1: true, player2: true } },
+      },
+      orderBy: [{ round: "asc" }, { slot: "asc" }],
+    });
+
+    log.info({ tournamentId, matches: matches.length }, "All match results reset");
+    return NextResponse.json({ matches });
+  } catch (error) {
+    log.error({ error }, "Bracket reset failed");
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
+    const message =
+      error instanceof Error ? error.message : "Не удалось отменить встречи";
     return NextResponse.json({ error: message }, { status: 400 });
   }
 }

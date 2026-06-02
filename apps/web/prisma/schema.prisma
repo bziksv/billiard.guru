@@ -65,6 +65,34 @@ enum IdeaVoteValue {
   DISLIKE
 }
 
+/// Разовая игра или регулярные встречи («Покатать»).
+enum PlayListingScheduleType {
+  ONE_TIME
+  RECURRING
+}
+
+enum PlayListingStatus {
+  OPEN
+  MATCHED
+  CLOSED
+}
+
+/// Что ищет автор объявления.
+enum PlayListingKind {
+  SPARRING
+  PARTNER
+  OPPONENT
+  TRAINING
+  OTHER
+}
+
+enum PlayListingResponseStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  WITHDRAWN
+}
+
 model Country {
   id     String @id @default(cuid())
   nameRu String @unique @map("name_ru")
@@ -80,8 +108,9 @@ model City {
   country   Country @relation(fields: [countryId], references: [id])
   latitude  Float?  @map("latitude")
   longitude Float?  @map("longitude")
-  players   Player[]
-  clubs     Club[]
+  players      Player[]
+  clubs        Club[]
+  playListings PlayListing[]
 
   @@unique([countryId, nameRu])
   @@map("cities")
@@ -125,6 +154,7 @@ model Club {
   news           ClubNews[]
   tableBookings  TableBooking[]
   ideas          Idea[]
+  playListings   PlayListing[]
   staff          ClubStaff[]
 
   @@index([phone])
@@ -221,9 +251,11 @@ model Player {
   teamsAsPlayer1 TournamentTeam[] @relation("TeamPlayer1")
   teamsAsPlayer2 TournamentTeam[] @relation("TeamPlayer2")
   loginChallenges LoginChallenge[]
-  ideas           Idea[]
-  ideaVotes       IdeaVote[]
-  tableBookings   TableBooking[]
+  ideas                Idea[]
+  ideaVotes            IdeaVote[]
+  playListings         PlayListing[]
+  playListingResponses PlayListingResponse[]
+  tableBookings        TableBooking[]
   clubStaff            ClubStaff[]
   coachReviewsReceived CoachRating[] @relation("CoachReviewsReceived")
   coachReviewsGiven    CoachRating[] @relation("CoachReviewsGiven")
@@ -430,4 +462,57 @@ model IdeaVote {
 
   @@unique([ideaId, playerId])
   @@map("idea_votes")
+}
+
+/// Объявление «Покатать» — игрок ищет партнёра/соперника для игры.
+model PlayListing {
+  id           String                  @id @default(cuid())
+  authorId     String                  @map("author_id")
+  author       Player                  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  cityId       String                  @map("city_id")
+  city         City                    @relation(fields: [cityId], references: [id])
+  clubId       String?                 @map("club_id")
+  club         Club?                   @relation(fields: [clubId], references: [id], onDelete: SetNull)
+  title        String
+  body         String?                 @db.Text
+  kind         PlayListingKind         @default(SPARRING)
+  scheduleType PlayListingScheduleType @map("schedule_type")
+  /// Для разовой игры — дата и время начала.
+  playAt       DateTime?               @map("play_at")
+  /// Для регулярных встреч — дни недели 0=вс … 6=сб (JSON-массив чисел).
+  weekdays     Json?
+  timeFrom     String?                 @map("time_from")
+  timeTo       String?                 @map("time_to")
+  gameFormat   String?                 @map("game_format")
+  ratingMin    Float?                  @map("rating_min")
+  ratingMax    Float?                  @map("rating_max")
+  playersNeeded Int                    @default(1) @map("players_needed")
+  status       PlayListingStatus       @default(OPEN)
+  expiresAt    DateTime?               @map("expires_at")
+  createdAt    DateTime                @default(now()) @map("created_at")
+  updatedAt    DateTime                @updatedAt @map("updated_at")
+
+  responses PlayListingResponse[]
+
+  @@index([cityId, status, createdAt])
+  @@index([authorId, createdAt])
+  @@index([status, expiresAt])
+  @@map("play_listings")
+}
+
+/// Отклик на объявление «Покатать».
+model PlayListingResponse {
+  id        String                    @id @default(cuid())
+  listingId String                    @map("listing_id")
+  listing   PlayListing               @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  playerId  String                    @map("player_id")
+  player    Player                    @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  message   String?                   @db.Text
+  status    PlayListingResponseStatus @default(PENDING)
+  createdAt DateTime                  @default(now()) @map("created_at")
+  updatedAt DateTime                  @updatedAt @map("updated_at")
+
+  @@unique([listingId, playerId])
+  @@index([playerId, createdAt])
+  @@map("play_listing_responses")
 }

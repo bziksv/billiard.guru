@@ -13,7 +13,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { StatusBadge } from "@/components/admin/status-badge";
-import type { AdminTournament } from "@/lib/tournament-admin";
+import { FORMAT_OPTIONS, type AdminTournament } from "@/lib/tournament-admin";
 import { adminTabClass } from "@/lib/admin-ui";
 
 interface Club {
@@ -47,15 +47,6 @@ const STATUS_OPTIONS = [
   { value: "OPEN", label: "Открыта регистрация" },
   { value: "ACTIVE", label: "Идёт" },
   { value: "FINISHED", label: "Завершён" },
-];
-
-const FORMAT_OPTIONS = [
-  { value: "OLYMPIC", label: "Олимпийская (фикс. сетка, одиночный)" },
-  { value: "SWISS", label: "Швейцарская (по турам, одиночный)" },
-  { value: "FIXED_SWISS", label: "Швейцарская (фикс. сетка, одиночный)" },
-  { value: "PAIR_OLYMPIC", label: "Парный (фикс. сетка)" },
-  { value: "PAIR_SWISS", label: "Парный швейцарская (по турам)" },
-  { value: "FIXED_PAIR_SWISS", label: "Парный швейцарская (фикс. сетка)" },
 ];
 
 const CURRENT_STATUSES = new Set([

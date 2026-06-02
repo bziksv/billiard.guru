@@ -94,6 +94,44 @@ export const IdeaVoteValue = {
 export type IdeaVoteValue = (typeof IdeaVoteValue)[keyof typeof IdeaVoteValue]
 
 
+export const PlayListingScheduleType = {
+  ONE_TIME: 'ONE_TIME',
+  RECURRING: 'RECURRING'
+} as const
+
+export type PlayListingScheduleType = (typeof PlayListingScheduleType)[keyof typeof PlayListingScheduleType]
+
+
+export const PlayListingStatus = {
+  OPEN: 'OPEN',
+  MATCHED: 'MATCHED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type PlayListingStatus = (typeof PlayListingStatus)[keyof typeof PlayListingStatus]
+
+
+export const PlayListingKind = {
+  SPARRING: 'SPARRING',
+  PARTNER: 'PARTNER',
+  OPPONENT: 'OPPONENT',
+  TRAINING: 'TRAINING',
+  OTHER: 'OTHER'
+} as const
+
+export type PlayListingKind = (typeof PlayListingKind)[keyof typeof PlayListingKind]
+
+
+export const PlayListingResponseStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  WITHDRAWN: 'WITHDRAWN'
+} as const
+
+export type PlayListingResponseStatus = (typeof PlayListingResponseStatus)[keyof typeof PlayListingResponseStatus]
+
+
 export const TableBookingKind = {
   PLAYER: 'PLAYER',
   CLUB: 'CLUB',

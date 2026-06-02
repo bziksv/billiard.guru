@@ -401,7 +401,9 @@ export const ModelName = {
   RatingChange: 'RatingChange',
   AuditLog: 'AuditLog',
   Idea: 'Idea',
-  IdeaVote: 'IdeaVote'
+  IdeaVote: 'IdeaVote',
+  PlayListing: 'PlayListing',
+  PlayListingResponse: 'PlayListingResponse'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1609,6 +1611,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlayListing: {
+      payload: Prisma.$PlayListingPayload<ExtArgs>
+      fields: Prisma.PlayListingFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayListingFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayListingFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload>
+        }
+        findFirst: {
+          args: Prisma.PlayListingFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayListingFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload>
+        }
+        findMany: {
+          args: Prisma.PlayListingFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload>[]
+        }
+        create: {
+          args: Prisma.PlayListingCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload>
+        }
+        createMany: {
+          args: Prisma.PlayListingCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.PlayListingDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload>
+        }
+        update: {
+          args: Prisma.PlayListingUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayListingDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayListingUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.PlayListingUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingPayload>
+        }
+        aggregate: {
+          args: Prisma.PlayListingAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayListing>
+        }
+        groupBy: {
+          args: Prisma.PlayListingGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayListingGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayListingCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayListingCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlayListingResponse: {
+      payload: Prisma.$PlayListingResponsePayload<ExtArgs>
+      fields: Prisma.PlayListingResponseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayListingResponseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayListingResponseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload>
+        }
+        findFirst: {
+          args: Prisma.PlayListingResponseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayListingResponseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload>
+        }
+        findMany: {
+          args: Prisma.PlayListingResponseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload>[]
+        }
+        create: {
+          args: Prisma.PlayListingResponseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload>
+        }
+        createMany: {
+          args: Prisma.PlayListingResponseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.PlayListingResponseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload>
+        }
+        update: {
+          args: Prisma.PlayListingResponseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayListingResponseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayListingResponseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.PlayListingResponseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayListingResponsePayload>
+        }
+        aggregate: {
+          args: Prisma.PlayListingResponseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayListingResponse>
+        }
+        groupBy: {
+          args: Prisma.PlayListingResponseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayListingResponseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayListingResponseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayListingResponseCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1942,6 +2076,45 @@ export const IdeaVoteScalarFieldEnum = {
 export type IdeaVoteScalarFieldEnum = (typeof IdeaVoteScalarFieldEnum)[keyof typeof IdeaVoteScalarFieldEnum]
 
 
+export const PlayListingScalarFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  cityId: 'cityId',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body',
+  kind: 'kind',
+  scheduleType: 'scheduleType',
+  playAt: 'playAt',
+  weekdays: 'weekdays',
+  timeFrom: 'timeFrom',
+  timeTo: 'timeTo',
+  gameFormat: 'gameFormat',
+  ratingMin: 'ratingMin',
+  ratingMax: 'ratingMax',
+  playersNeeded: 'playersNeeded',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlayListingScalarFieldEnum = (typeof PlayListingScalarFieldEnum)[keyof typeof PlayListingScalarFieldEnum]
+
+
+export const PlayListingResponseScalarFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  playerId: 'playerId',
+  message: 'message',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PlayListingResponseScalarFieldEnum = (typeof PlayListingResponseScalarFieldEnum)[keyof typeof PlayListingResponseScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2194,6 +2367,31 @@ export const IdeaVoteOrderByRelevanceFieldEnum = {
 export type IdeaVoteOrderByRelevanceFieldEnum = (typeof IdeaVoteOrderByRelevanceFieldEnum)[keyof typeof IdeaVoteOrderByRelevanceFieldEnum]
 
 
+export const PlayListingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  authorId: 'authorId',
+  cityId: 'cityId',
+  clubId: 'clubId',
+  title: 'title',
+  body: 'body',
+  timeFrom: 'timeFrom',
+  timeTo: 'timeTo',
+  gameFormat: 'gameFormat'
+} as const
+
+export type PlayListingOrderByRelevanceFieldEnum = (typeof PlayListingOrderByRelevanceFieldEnum)[keyof typeof PlayListingOrderByRelevanceFieldEnum]
+
+
+export const PlayListingResponseOrderByRelevanceFieldEnum = {
+  id: 'id',
+  listingId: 'listingId',
+  playerId: 'playerId',
+  message: 'message'
+} as const
+
+export type PlayListingResponseOrderByRelevanceFieldEnum = (typeof PlayListingResponseOrderByRelevanceFieldEnum)[keyof typeof PlayListingResponseOrderByRelevanceFieldEnum]
+
+
 
 /**
  * Field references
@@ -2316,6 +2514,34 @@ export type EnumIdeaStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'IdeaVoteValue'
  */
 export type EnumIdeaVoteValueFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IdeaVoteValue'>
+    
+
+
+/**
+ * Reference to a field of type 'PlayListingKind'
+ */
+export type EnumPlayListingKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlayListingKind'>
+    
+
+
+/**
+ * Reference to a field of type 'PlayListingScheduleType'
+ */
+export type EnumPlayListingScheduleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlayListingScheduleType'>
+    
+
+
+/**
+ * Reference to a field of type 'PlayListingStatus'
+ */
+export type EnumPlayListingStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlayListingStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'PlayListingResponseStatus'
+ */
+export type EnumPlayListingResponseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PlayListingResponseStatus'>
     
 
 /**
@@ -2446,6 +2672,8 @@ export type GlobalOmitConfig = {
   auditLog?: Prisma.AuditLogOmit
   idea?: Prisma.IdeaOmit
   ideaVote?: Prisma.IdeaVoteOmit
+  playListing?: Prisma.PlayListingOmit
+  playListingResponse?: Prisma.PlayListingResponseOmit
 }
 
 /* Types for Logging */

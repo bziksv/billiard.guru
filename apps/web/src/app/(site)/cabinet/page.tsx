@@ -225,6 +225,21 @@ export default async function CabinetPage() {
             </ul>
           </section>
         )}
+
+        <section>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="site-section-title">Покатать</h2>
+            <Link href="/pokatat?tab=create" className="site-btn-primary text-sm">
+              Опубликовать
+            </Link>
+          </div>
+          <p className="mb-4 text-sm text-zinc-400">
+            Объявления, где и с кем вы хотите поиграть — разово или на постоянке.
+          </p>
+          <Link href="/pokatat?tab=mine" className="text-sm text-emerald-400 hover:underline">
+            Мои объявления и отклики →
+          </Link>
+        </section>
       </PageMain>
     </>
   );

@@ -18,10 +18,13 @@ export function BracketScrollCenter({
   children,
   className,
   centerX,
+  contentHeight,
 }: {
   children: ReactNode;
   className?: string;
   centerX: number;
+  /** Для высоких fixed-сеток — начальная прокрутка по вертикали к центру. */
+  contentHeight?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const panRef = useRef({
@@ -38,7 +41,10 @@ export function BracketScrollCenter({
     const el = ref.current;
     if (!el) return;
     el.scrollLeft = Math.max(0, centerX - el.clientWidth / 2);
-  }, [centerX]);
+    if (contentHeight != null && contentHeight > el.clientHeight) {
+      el.scrollTop = Math.max(0, (contentHeight - el.clientHeight) / 2);
+    }
+  }, [centerX, contentHeight]);
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (event.button !== 0) return;

@@ -6,6 +6,7 @@ import {
   teamRating,
   type TeamWithPlayers,
 } from "@/lib/pair-tournament";
+import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 
 export interface AdminTournamentParticipant {
   id: string;
@@ -207,7 +208,7 @@ function computeOlympicPairStandings(t: AdminTournament): TournamentStandingRow[
         m.winnerTeam &&
         m.team1 &&
         m.team2 &&
-        m.status === "FINISHED",
+        m.status === "FINISHED" || m.status === "WALKOVER",
     );
     const losers = roundMatches
       .map((m) =>
@@ -246,10 +247,10 @@ export const STATUS_OPTIONS = [
 export const FORMAT_OPTIONS = [
   { value: "OLYMPIC", label: "Олимпийская (фикс. сетка, одиночный)" },
   { value: "SWISS", label: "Швейцарская (по турам, одиночный)" },
-  { value: "FIXED_SWISS", label: "Швейцарская (фикс. сетка, одиночный)" },
+  { value: "FIXED_SWISS", label: TOURNAMENT_FORMAT_LABELS.FIXED_SWISS! },
   { value: "PAIR_OLYMPIC", label: "Парный (фикс. сетка)" },
   { value: "PAIR_SWISS", label: "Парный швейцарская (по турам)" },
-  { value: "FIXED_PAIR_SWISS", label: "Парный швейцарская (фикс. сетка)" },
+  { value: "FIXED_PAIR_SWISS", label: TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS! },
 ];
 
 export const tournamentAdminInclude = {

@@ -313,6 +313,34 @@ export function ClubOwnerTournamentManagePage({
     await reload();
   }
 
+  async function resetAllMatches() {
+    if (!tournament) return;
+    const res = await fetch("/api/tournaments/bracket", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tournamentId: tournament.id }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось отменить встречи");
+    }
+    await reload();
+  }
+
+  async function regenerateBracketGrid() {
+    if (!tournament) return;
+    const res = await fetch("/api/tournaments/bracket", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tournamentId: tournament.id, regenerate: true }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось пересоздать сетку");
+    }
+    await reload();
+  }
+
   if (loading || !tournament) {
     return <p className="text-sm text-zinc-500">Загрузка…</p>;
   }
@@ -382,7 +410,7 @@ export function ClubOwnerTournamentManagePage({
       </div>
 
       {tournament.status === "OPEN" && (
-        <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+        <section className="admin-card p-6">
           <h2 className="mb-4 font-semibold">Регистрация участников</h2>
           <div className="max-w-2xl space-y-3">
             {isPair ? (
@@ -441,7 +469,7 @@ export function ClubOwnerTournamentManagePage({
         </section>
       )}
 
-      <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+      <section className="admin-card p-6">
         <TournamentManageView
           tournament={tournament}
           clubOptions={clubOptions}
@@ -453,6 +481,8 @@ export function ClubOwnerTournamentManagePage({
           onCancelRegistration={cancelRegistration}
           onConfirmTeam={confirmTeam}
           onGenerateBracket={generateBracket}
+          onResetAllMatches={resetAllMatches}
+          onRegenerateBracket={regenerateBracketGrid}
           onSaveMatchResult={saveMatchResult}
           onCancelMatchResult={cancelMatchResult}
           onUpdated={reload}

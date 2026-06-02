@@ -1,3 +1,6 @@
+/** CTA-кнопка в шапке — «Покатать». */
+export const SITE_NAV_CTA = { href: "/pokatat", labelKey: "nav.pokatat" as const };
+
 /** Основная навигация в шапке. */
 export const SITE_NAV_MAIN = [
   { href: "/", labelKey: "nav.home" as const },
@@ -15,7 +18,7 @@ export const SITE_GUIDE_NAV = [
 ] as const;
 
 /** Все разделы — для подвала и прочих списков. */
-export const SITE_NAV = [...SITE_NAV_MAIN, ...SITE_GUIDE_NAV] as const;
+export const SITE_NAV = [...SITE_NAV_MAIN, SITE_NAV_CTA, ...SITE_GUIDE_NAV] as const;
 
 export type SiteLabelKey =
   | (typeof SITE_NAV)[number]["labelKey"]
@@ -36,7 +39,8 @@ export type SiteLabelKey =
   | "empty.tournaments"
   | "empty.clubs"
   | "empty.players"
-  | "empty.coaches";
+  | "empty.coaches"
+  | "empty.pokatat";
 
 /** Тексты UI — сейчас RU, позже locale → dictionary. */
 export const SITE_COPY: Record<SiteLabelKey, string> = {
@@ -48,6 +52,7 @@ export const SITE_COPY: Record<SiteLabelKey, string> = {
   "nav.rules": "Правила",
   "nav.brackets": "Сетки",
   "nav.ideas": "Идеи",
+  "nav.pokatat": "Покатать",
   "nav.guide": "Справочник",
   "nav.login": "Войти",
   "nav.logout": "Выйти",
@@ -60,7 +65,7 @@ export const SITE_COPY: Record<SiteLabelKey, string> = {
   "geo.city": "Город",
   "home.hero.title": "Турниры и бильярдное сообщество",
   "home.hero.subtitle":
-    "Публикуйте турниры и новости, находите клубы и игроков. Скоро — спарринг-партнёр через Telegram.",
+    "Публикуйте турниры и новости, находите клубы и игроков. Ищите партнёра для игры в разделе «Покатать».",
   "home.local": "Турниры в вашем регионе",
   "home.upcoming": "Ближайшие турниры",
   "home.explore": "Разделы",
@@ -68,6 +73,7 @@ export const SITE_COPY: Record<SiteLabelKey, string> = {
   "empty.clubs": "В этом регионе пока нет клубов.",
   "empty.players": "Игроков пока нет.",
   "empty.coaches": "Тренеров в этом регионе пока нет.",
+  "empty.pokatat": "В этом регионе пока нет объявлений «Покатать».",
 };
 
 export function t(key: SiteLabelKey): string {
