@@ -21,6 +21,7 @@ import {
   fixedSwissR12TrunkYByTarget,
   FIXED_SWISS_BRACKET_UNIT,
   FIXED_SWISS_CARD_H,
+  FIXED_SWISS_COL_W,
   shouldDrawFixedSwissLossEdge,
   shouldDrawFixedSwissWinEdge,
   isFixedSwissRound12Edge,
@@ -355,7 +356,7 @@ function forkPath(
     fromPos.col,
     toPos.col,
     layout.minCol,
-    layout.colWidth,
+    layout.colWidth ?? FIXED_SWISS_COL_W,
     trunkY.get(edge.toId) ?? pts.from.y,
   );
 }

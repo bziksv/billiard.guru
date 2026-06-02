@@ -3912,7 +3912,6 @@ html.dark {
   --bracket-row-winner-bg: rgb(6 78 59 / 0.55);
   --bracket-row-winner-text: #ecfdf5;
   --bracket-row-loser-text: #71717a;
-  --bracket-row-loser-decoration: #52525b;
   --bracket-bye-text: #34d399;
   --bracket-bye-done-text: #6ee7b7;
   --bracket-meta-text: #a1a1aa;
@@ -3936,7 +3935,6 @@ html.light {
   --bracket-row-winner-bg: rgb(209 250 229 / 0.95);
   --bracket-row-winner-text: #065f46;
   --bracket-row-loser-text: #a1a1aa;
-  --bracket-row-loser-decoration: #d4d4d8;
   --bracket-bye-text: #047857;
   --bracket-bye-done-text: #059669;
   --bracket-meta-text: #71717a;
