@@ -12,17 +12,28 @@ export interface TeamWithPlayers {
   player2?: TeamPlayer | null;
 }
 
+export function isFixedSwiss16BronzeFormat(format: string): boolean {
+  return (
+    format === "FIXED_SWISS_16_BRONZE" || format === "FIXED_PAIR_SWISS_16_BRONZE"
+  );
+}
+
 export function isSwissFormat(format: string): boolean {
   return (
     format === "SWISS" ||
     format === "PAIR_SWISS" ||
     format === "FIXED_SWISS" ||
-    format === "FIXED_PAIR_SWISS"
+    format === "FIXED_PAIR_SWISS" ||
+    isFixedSwiss16BronzeFormat(format)
   );
 }
 
 export function isFixedSwissFormat(format: string): boolean {
-  return format === "FIXED_SWISS" || format === "FIXED_PAIR_SWISS";
+  return (
+    format === "FIXED_SWISS" ||
+    format === "FIXED_PAIR_SWISS" ||
+    isFixedSwiss16BronzeFormat(format)
+  );
 }
 
 export function isDynamicSwissFormat(format: string): boolean {
@@ -33,20 +44,36 @@ export function isSoloFormat(format: string): boolean {
   return (
     format === "SWISS" ||
     format === "FIXED_SWISS" ||
-    format === "OLYMPIC"
+    format === "FIXED_SWISS_16_BRONZE" ||
+    format === "OLYMPIC" ||
+    format === "OLYMPIC_1L_BRONZE"
   );
 }
 
 export function isSwissPairFormat(format: string): boolean {
-  return format === "PAIR_SWISS" || format === "FIXED_PAIR_SWISS";
+  return (
+    format === "PAIR_SWISS" ||
+    format === "FIXED_PAIR_SWISS" ||
+    format === "FIXED_PAIR_SWISS_16_BRONZE"
+  );
 }
 
 export function isOlympicFormat(format: string): boolean {
-  return format === "OLYMPIC" || format === "PAIR_OLYMPIC";
+  return (
+    format === "OLYMPIC" ||
+    format === "OLYMPIC_1L_BRONZE" ||
+    format === "PAIR_OLYMPIC" ||
+    format === "PAIR_OLYMPIC_1L_BRONZE"
+  );
+}
+
+/** Олимпийская сетка с отдельным матчем за 3–4 место (проигравшие полуфиналов). */
+export function isOlympicBronzeFormat(format: string): boolean {
+  return format === "OLYMPIC_1L_BRONZE" || format === "PAIR_OLYMPIC_1L_BRONZE";
 }
 
 export function isOlympicPairFormat(format: string): boolean {
-  return format === "PAIR_OLYMPIC";
+  return format === "PAIR_OLYMPIC" || format === "PAIR_OLYMPIC_1L_BRONZE";
 }
 
 export function isPairFormat(format: string): boolean {
@@ -200,6 +227,43 @@ export function buildOlympicBracket(seededTeamIds: string[]): BracketMatchInput[
   }
 
   return matches;
+}
+
+/** Слот матча за 3–4 место в финальном туре (рядом с финалом, slot 1). */
+export const OLYMPIC_BRONZE_MATCH_SLOT = 2;
+
+/**
+ * Олимпийская сетка + матч за 3–4 (тот же тур, что финал, слот 2).
+ * Нужно минимум 4 участника (полуфиналы).
+ */
+export function buildOlympicBracketWithBronze(
+  seededTeamIds: string[],
+): BracketMatchInput[] {
+  const matches = buildOlympicBracket(seededTeamIds);
+  const size = nextPowerOfTwo(seededTeamIds.length);
+  const rounds = Math.log2(size);
+  if (rounds < 2) return matches;
+
+  matches.push({
+    round: rounds,
+    slot: OLYMPIC_BRONZE_MATCH_SLOT,
+    team1Id: null,
+    team2Id: null,
+  });
+  return matches;
+}
+
+export function getOlympicBronzeMatch(
+  matches: Array<{ round: number; slot: number }>,
+): { round: number; slot: number } | null {
+  if (matches.length === 0) return null;
+  const maxRound = Math.max(...matches.map((m) => m.round));
+  const bronze = matches.find(
+    (m) => m.round === maxRound && m.slot === OLYMPIC_BRONZE_MATCH_SLOT,
+  );
+  return bronze
+    ? { round: bronze.round, slot: bronze.slot }
+    : null;
 }
 
 export function getNextMatchSlot(

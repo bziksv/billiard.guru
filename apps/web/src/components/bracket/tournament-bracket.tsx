@@ -6,7 +6,8 @@ import {
 import {
   isDynamicSwissFormat,
   isFixedSwissFormat,
-  isOlympicPairFormat,
+  isOlympicBronzeFormat,
+  isOlympicFormat,
 } from "@/lib/pair-tournament";
 import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
 import { OlympicBracketView } from "@/components/bracket/olympic-bracket-view";
@@ -43,8 +44,13 @@ export function TournamentBracket({
     return <SwissBracketView matches={matches} standings={standings} />;
   }
 
-  if (isOlympicPairFormat(format) || format === "OLYMPIC") {
-    return <OlympicBracketView matches={matches} />;
+  if (isOlympicFormat(format)) {
+    return (
+      <OlympicBracketView
+        matches={matches}
+        withBronzeMatch={isOlympicBronzeFormat(format)}
+      />
+    );
   }
 
   const rounds = groupMatchesByRound(matches);

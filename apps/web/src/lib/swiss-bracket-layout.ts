@@ -64,12 +64,16 @@ export function gridFooterHeight(lines = 2): number {
   return lines * GRID_FOOTER_LINE_H + 8;
 }
 
-export function gridCardHeight(hasHandicap = false, footerLines = 2) {
+export function gridCardHeight(
+  hasHandicap = false,
+  footerLines = 2,
+  handicapH = 18,
+) {
   return (
     GRID_META_H +
     GRID_ROW_H * 2 +
     gridFooterHeight(footerLines) +
-    (hasHandicap ? 18 : 0)
+    (hasHandicap ? handicapH : 0)
   );
 }
 

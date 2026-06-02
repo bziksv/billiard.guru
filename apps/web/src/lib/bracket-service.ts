@@ -11,16 +11,21 @@ import {
   getFixedSwissLinksForMatchCount,
   type FixedSwissLink,
 } from "@/lib/fixed-swiss-grid";
+import { logger } from "@/lib/logger";
+import { notifyMatchStartScheduled } from "@/lib/match-start-notification";
 import {
   buildOlympicBracket,
+  buildOlympicBracketWithBronze,
   buildSwissPairings,
   getNextMatchSlot,
   isDynamicSwissFormat,
   isFixedSwissFormat,
+  isOlympicBronzeFormat,
   isOlympicFormat,
   isOlympicPairFormat,
   isSwissFormat,
   isSwissPairFormat,
+  OLYMPIC_BRONZE_MATCH_SLOT,
   teamRating,
 } from "@/lib/pair-tournament";
 
@@ -28,6 +33,45 @@ type Db = Pick<
   PrismaClient,
   "tournamentMatch" | "tournamentTeam" | "tournament" | "tournamentRegistration"
 >;
+
+type MatchSlotRow = {
+  id: string;
+  round: number;
+  slot: number;
+  team1Id: string | null;
+  team2Id: string | null;
+  status: string;
+  winnerTeamId: string | null;
+};
+
+function slotMapKey(round: number, slot: number) {
+  return `${round}:${slot}`;
+}
+
+/** Кэш слотов на один проход processByes — меньше повторных SELECT по турниру. */
+type BracketByeCache = {
+  tournamentId: string;
+  format: string;
+  matchCount: number;
+  maxRound: number;
+  slotMap: Map<string, MatchSlotRow>;
+  byId: Map<string, MatchSlotRow>;
+};
+
+async function assignSeeds(db: Db, tournamentId: string, seeded: { id: string }[]) {
+  await db.tournamentTeam.updateMany({
+    where: { tournamentId },
+    data: { seed: null },
+  });
+  await Promise.all(
+    seeded.map((team, index) =>
+      db.tournamentTeam.update({
+        where: { id: team.id },
+        data: { seed: index + 1 },
+      }),
+    ),
+  );
+}
 
 export interface MatchResultInput {
   matchId: string;
@@ -46,6 +90,20 @@ function parseOptionalDate(value: string | null | undefined) {
     throw new Error("Некорректная дата");
   }
   return date;
+}
+
+async function maybeNotifyMatchStartScheduled(
+  input: MatchResultInput,
+  previousStartedAt: Date | null,
+  startedAt: Date | null | undefined,
+) {
+  if (input.startedAt === undefined || startedAt == null) return;
+  if (previousStartedAt?.getTime() === startedAt.getTime()) return;
+  try {
+    await notifyMatchStartScheduled(input.matchId, startedAt);
+  } catch (err) {
+    logger.error({ err, matchId: input.matchId }, "Match start notification failed");
+  }
 }
 
 async function revokeSwissWin(db: Db, teamId: string) {
@@ -259,12 +317,16 @@ async function assignTeamToSlot(
   slot: number,
   teamSlot: 1 | 2,
   teamId: string,
+  slotMap?: Map<string, MatchSlotRow>,
 ) {
-  const target = await db.tournamentMatch.findUnique({
-    where: {
-      tournamentId_round_slot: { tournamentId, round, slot },
-    },
-  });
+  const cached = slotMap?.get(slotMapKey(round, slot));
+  const target =
+    cached ??
+    (await db.tournamentMatch.findUnique({
+      where: {
+        tournamentId_round_slot: { tournamentId, round, slot },
+      },
+    }));
   if (!target) return;
 
   const data =
@@ -276,13 +338,95 @@ async function assignTeamToSlot(
     (teamSlot === 1 && target.team1Id && target.team1Id !== teamId) ||
     (teamSlot === 2 && target.team2Id && target.team2Id !== teamId)
   ) {
-    return;
+    throw new Error(
+      `Слот уже занят (тур ${round}, слот ${slot}, позиция ${teamSlot})`,
+    );
   }
 
   await db.tournamentMatch.update({
     where: { id: target.id },
     data,
   });
+
+  if (cached) {
+    if (teamSlot === 1) cached.team1Id = cached.team1Id ?? teamId;
+    else cached.team2Id = cached.team2Id ?? teamId;
+  }
+}
+
+async function forceAssignTeamToSlot(
+  db: Db,
+  tournamentId: string,
+  round: number,
+  slot: number,
+  teamSlot: 1 | 2,
+  teamId: string,
+) {
+  const target = await db.tournamentMatch.findUnique({
+    where: {
+      tournamentId_round_slot: { tournamentId, round, slot },
+    },
+  });
+  if (!target) return;
+
+  const field = teamSlot === 1 ? "team1Id" : "team2Id";
+  await db.tournamentMatch.update({
+    where: { id: target.id },
+    data: { [field]: teamId },
+  });
+}
+
+/** Пересчитать расстановку по завершённым встречам (исправляет устаревшие links). */
+export async function replayFixedSwissAdvances(db: Db, tournamentId: string) {
+  const tournament = await db.tournament.findUnique({
+    where: { id: tournamentId },
+  });
+  if (!tournament || !isFixedSwissFormat(tournament.format)) return;
+
+  const allMatches = await db.tournamentMatch.findMany({
+    where: { tournamentId },
+    orderBy: [{ round: "asc" }, { slot: "asc" }],
+  });
+  const matchCount = allMatches.length;
+  const maxRound = Math.max(...allMatches.map((m) => m.round), 0);
+  const links = getFixedSwissLinksForMatchCount(matchCount, maxRound);
+
+  await db.tournamentMatch.updateMany({
+    where: { tournamentId, round: { gte: 2 } },
+    data: { team1Id: null, team2Id: null },
+  });
+
+  for (const m of allMatches) {
+    if (!m.winnerTeamId) continue;
+
+    const winLink = findFixedSwissLink(links, m.round, m.slot, "win");
+    if (winLink) {
+      await forceAssignTeamToSlot(
+        db,
+        tournamentId,
+        winLink.toRound,
+        winLink.toSlot,
+        winLink.toTeam,
+        m.winnerTeamId,
+      );
+    }
+
+    const loserId =
+      m.team1Id === m.winnerTeamId ? m.team2Id : m.team1Id;
+    if (loserId) {
+      const loseLink = findFixedSwissLink(links, m.round, m.slot, "loss");
+      if (loseLink) {
+        await forceAssignTeamToSlot(
+          db,
+          tournamentId,
+          loseLink.toRound,
+          loseLink.toSlot,
+          loseLink.toTeam,
+          loserId,
+        );
+      }
+    }
+  }
 }
 
 async function advanceFixedSwissResult(
@@ -299,6 +443,7 @@ async function advanceFixedSwissResult(
   matchCount: number,
   maxRound: number,
   matchStatus: MatchStatus = "FINISHED",
+  slotMap?: Map<string, MatchSlotRow>,
 ) {
   const loserId =
     match.team1Id === winnerTeamId ? match.team2Id : match.team1Id;
@@ -308,6 +453,11 @@ async function advanceFixedSwissResult(
     where: { id: match.id },
     data: { winnerTeamId, status: matchStatus },
   });
+  const cached = slotMap?.get(slotMapKey(match.round, match.slot));
+  if (cached) {
+    cached.winnerTeamId = winnerTeamId;
+    cached.status = matchStatus;
+  }
   await awardSwissWin(db, winnerTeamId);
 
   const winLink = findFixedSwissLink(links, match.round, match.slot, "win");
@@ -319,6 +469,7 @@ async function advanceFixedSwissResult(
       winLink.toSlot,
       winLink.toTeam,
       winnerTeamId,
+      slotMap,
     );
   }
 
@@ -332,6 +483,7 @@ async function advanceFixedSwissResult(
         loseLink.toSlot,
         loseLink.toTeam,
         loserId,
+        slotMap,
       );
     }
   }
@@ -342,11 +494,26 @@ export async function advanceWinner(
   matchId: string,
   winnerTeamId: string,
   matchStatus: MatchStatus = "FINISHED",
+  byeCache?: BracketByeCache,
 ) {
-  const match = await db.tournamentMatch.findUnique({
-    where: { id: matchId },
-    include: { tournament: true },
-  });
+  const cachedRow = byeCache?.byId.get(matchId);
+
+  const match = cachedRow
+    ? {
+        id: cachedRow.id,
+        round: cachedRow.round,
+        slot: cachedRow.slot,
+        tournamentId: byeCache!.tournamentId,
+        team1Id: cachedRow.team1Id,
+        team2Id: cachedRow.team2Id,
+        winnerTeamId: cachedRow.winnerTeamId,
+        tournament: { format: byeCache!.format },
+      }
+    : await db.tournamentMatch.findUnique({
+        where: { id: matchId },
+        include: { tournament: true },
+      });
+
   if (!match) throw new Error("Матч не найден");
 
   if (match.winnerTeamId) {
@@ -357,27 +524,52 @@ export async function advanceWinner(
     throw new Error("Команда не участвует в этом матче");
   }
 
+  const tournamentId = cachedRow
+    ? byeCache!.tournamentId
+    : (match as { tournamentId: string }).tournamentId;
+
   if (isFixedSwissFormat(match.tournament.format)) {
-    const allMatches = await db.tournamentMatch.findMany({
-      where: { tournamentId: match.tournamentId },
-    });
-    const matchCount = allMatches.length;
-    const maxRound = Math.max(...allMatches.map((m) => m.round), 0);
-    await advanceFixedSwissResult(
-      db,
-      {
-        id: match.id,
-        round: match.round,
-        slot: match.slot,
-        tournamentId: match.tournamentId,
-        team1Id: match.team1Id,
-        team2Id: match.team2Id,
-      },
-      winnerTeamId,
-      matchCount,
-      maxRound,
-      matchStatus,
-    );
+    const matchCount = byeCache?.matchCount;
+    const maxRound = byeCache?.maxRound;
+    if (matchCount === undefined || maxRound === undefined) {
+      const allMatches = await db.tournamentMatch.findMany({
+        where: { tournamentId },
+        select: { round: true },
+      });
+      await advanceFixedSwissResult(
+        db,
+        {
+          id: match.id,
+          round: match.round,
+          slot: match.slot,
+          tournamentId,
+          team1Id: match.team1Id,
+          team2Id: match.team2Id,
+        },
+        winnerTeamId,
+        allMatches.length,
+        Math.max(0, ...allMatches.map((m) => m.round)),
+        matchStatus,
+        byeCache?.slotMap,
+      );
+    } else {
+      await advanceFixedSwissResult(
+        db,
+        {
+          id: match.id,
+          round: match.round,
+          slot: match.slot,
+          tournamentId,
+          team1Id: match.team1Id,
+          team2Id: match.team2Id,
+        },
+        winnerTeamId,
+        matchCount,
+        maxRound,
+        matchStatus,
+        byeCache?.slotMap,
+      );
+    }
     return;
   }
 
@@ -388,6 +580,10 @@ export async function advanceWinner(
       status: matchStatus,
     },
   });
+  if (cachedRow) {
+    cachedRow.winnerTeamId = winnerTeamId;
+    cachedRow.status = matchStatus;
+  }
 
   if (isDynamicSwissFormat(match.tournament.format)) {
     await awardSwissWin(db, winnerTeamId);
@@ -395,51 +591,202 @@ export async function advanceWinner(
   }
 
   const next = getNextMatchSlot(match.round, match.slot);
+  const nextCached = byeCache?.slotMap.get(slotMapKey(next.round, next.slot));
+  if (nextCached) {
+    const data =
+      next.teamSlot === 1
+        ? { team1Id: nextCached.team1Id ?? winnerTeamId }
+        : { team2Id: nextCached.team2Id ?? winnerTeamId };
+    await db.tournamentMatch.update({
+      where: { id: nextCached.id },
+      data,
+    });
+    if (next.teamSlot === 1) nextCached.team1Id = nextCached.team1Id ?? winnerTeamId;
+    else nextCached.team2Id = nextCached.team2Id ?? winnerTeamId;
+    await routeOlympicSemiLoserToBronze(
+      db,
+      tournamentId,
+      match.tournament.format,
+      match.round,
+      match.slot,
+      winnerTeamId,
+      match.team1Id,
+      match.team2Id,
+      byeCache,
+    );
+    return;
+  }
+
   const nextMatch = await db.tournamentMatch.findUnique({
     where: {
       tournamentId_round_slot: {
-        tournamentId: match.tournamentId,
+        tournamentId,
         round: next.round,
         slot: next.slot,
       },
     },
   });
 
-  if (!nextMatch) return;
+  if (!nextMatch) {
+    await routeOlympicSemiLoserToBronze(
+      db,
+      tournamentId,
+      match.tournament.format,
+      match.round,
+      match.slot,
+      winnerTeamId,
+      match.team1Id,
+      match.team2Id,
+      byeCache,
+    );
+    return;
+  }
 
   await db.tournamentMatch.update({
     where: { id: nextMatch.id },
     data: next.teamSlot === 1 ? { team1Id: winnerTeamId } : { team2Id: winnerTeamId },
   });
+
+  await routeOlympicSemiLoserToBronze(
+    db,
+    tournamentId,
+    match.tournament.format,
+    match.round,
+    match.slot,
+    winnerTeamId,
+    match.team1Id,
+    match.team2Id,
+    byeCache,
+  );
 }
 
-async function finishSwissBye(db: Db, matchId: string, teamId: string) {
-  const match = await db.tournamentMatch.findUnique({
-    where: { id: matchId },
-    include: { tournament: true },
+async function routeOlympicSemiLoserToBronze(
+  db: Db,
+  tournamentId: string,
+  format: string,
+  semiRound: number,
+  semiSlot: number,
+  winnerTeamId: string,
+  team1Id: string | null,
+  team2Id: string | null,
+  byeCache?: BracketByeCache,
+) {
+  if (!isOlympicBronzeFormat(format)) return;
+
+  const loserId =
+    team1Id === winnerTeamId
+      ? team2Id
+      : team2Id === winnerTeamId
+        ? team1Id
+        : null;
+  if (!loserId) return;
+
+  let maxRound = byeCache?.maxRound;
+  if (maxRound === undefined) {
+    const rows = await db.tournamentMatch.findMany({
+      where: { tournamentId },
+      select: { round: true },
+    });
+    maxRound = Math.max(0, ...rows.map((m) => m.round));
+  }
+  if (semiRound !== maxRound - 1) return;
+
+  const teamSlot: 1 | 2 = semiSlot === 1 ? 1 : 2;
+  const bronzeKey = slotMapKey(maxRound, OLYMPIC_BRONZE_MATCH_SLOT);
+  const bronzeCached = byeCache?.slotMap.get(bronzeKey);
+
+  if (bronzeCached) {
+    const data =
+      teamSlot === 1
+        ? { team1Id: bronzeCached.team1Id ?? loserId }
+        : { team2Id: bronzeCached.team2Id ?? loserId };
+    await db.tournamentMatch.update({ where: { id: bronzeCached.id }, data });
+    if (teamSlot === 1) bronzeCached.team1Id = bronzeCached.team1Id ?? loserId;
+    else bronzeCached.team2Id = bronzeCached.team2Id ?? loserId;
+    return;
+  }
+
+  const bronzeMatch = await db.tournamentMatch.findUnique({
+    where: {
+      tournamentId_round_slot: {
+        tournamentId,
+        round: maxRound,
+        slot: OLYMPIC_BRONZE_MATCH_SLOT,
+      },
+    },
   });
+  if (!bronzeMatch) return;
+
+  await db.tournamentMatch.update({
+    where: { id: bronzeMatch.id },
+    data: teamSlot === 1 ? { team1Id: loserId } : { team2Id: loserId },
+  });
+}
+
+async function finishSwissBye(
+  db: Db,
+  matchId: string,
+  teamId: string,
+  byeCache?: BracketByeCache,
+) {
+  const cached = byeCache?.byId.get(matchId);
+  const match = cached
+    ? {
+        id: cached.id,
+        round: cached.round,
+        slot: cached.slot,
+        tournamentId: byeCache!.tournamentId,
+        team1Id: cached.team1Id,
+        team2Id: cached.team2Id,
+        tournament: { format: byeCache!.format },
+      }
+    : await db.tournamentMatch.findUnique({
+        where: { id: matchId },
+        include: { tournament: true },
+      });
   if (!match) return;
 
+  const tournamentId = cached ? byeCache!.tournamentId : match.tournamentId;
+
   if (isFixedSwissFormat(match.tournament.format)) {
-    const allMatches = await db.tournamentMatch.findMany({
-      where: { tournamentId: match.tournamentId },
-    });
-    const matchCount = allMatches.length;
-    const maxRound = Math.max(...allMatches.map((m) => m.round), 0);
-    await advanceFixedSwissResult(
-      db,
-      {
-        id: match.id,
-        round: match.round,
-        slot: match.slot,
-        tournamentId: match.tournamentId,
-        team1Id: match.team1Id,
-        team2Id: match.team2Id,
-      },
-      teamId,
-      matchCount,
-      maxRound,
-    );
+    if (byeCache) {
+      await advanceFixedSwissResult(
+        db,
+        {
+          id: match.id,
+          round: match.round,
+          slot: match.slot,
+          tournamentId,
+          team1Id: match.team1Id,
+          team2Id: match.team2Id,
+        },
+        teamId,
+        byeCache.matchCount,
+        byeCache.maxRound,
+        "FINISHED",
+        byeCache.slotMap,
+      );
+    } else {
+      const allMatches = await db.tournamentMatch.findMany({
+        where: { tournamentId },
+        select: { round: true },
+      });
+      await advanceFixedSwissResult(
+        db,
+        {
+          id: match.id,
+          round: match.round,
+          slot: match.slot,
+          tournamentId,
+          team1Id: match.team1Id,
+          team2Id: match.team2Id,
+        },
+        teamId,
+        allMatches.length,
+        Math.max(0, ...allMatches.map((m) => m.round)),
+        "FINISHED",
+      );
+    }
     return;
   }
 
@@ -447,6 +794,10 @@ async function finishSwissBye(db: Db, matchId: string, teamId: string) {
     where: { id: matchId },
     data: { winnerTeamId: teamId, status: "FINISHED" },
   });
+  if (cached) {
+    cached.winnerTeamId = teamId;
+    cached.status = "FINISHED";
+  }
   await awardSwissWin(db, teamId);
 }
 
@@ -507,29 +858,48 @@ function soloTeamAgainstIncomingPhantom(
   return phantomSlot === emptySlot ? soloTeamId : null;
 }
 
+function buildByeCache(
+  tournamentId: string,
+  format: string,
+  allSlots: MatchSlotRow[],
+): BracketByeCache {
+  const slotMap = new Map(allSlots.map((m) => [slotMapKey(m.round, m.slot), m]));
+  const byId = new Map(allSlots.map((m) => [m.id, m]));
+  return {
+    tournamentId,
+    format,
+    matchCount: allSlots.length,
+    maxRound: Math.max(0, ...allSlots.map((m) => m.round)),
+    slotMap,
+    byId,
+  };
+}
+
 export async function processByes(db: Db, tournamentId: string, format: string) {
   let changed = true;
   while (changed) {
     changed = false;
-    const matches = await db.tournamentMatch.findMany({
-      where: {
-        tournamentId,
-        status: "SCHEDULED",
-        winnerTeamId: null,
+    const allSlots = await db.tournamentMatch.findMany({
+      where: { tournamentId },
+      select: {
+        id: true,
+        round: true,
+        slot: true,
+        team1Id: true,
+        team2Id: true,
+        status: true,
+        winnerTeamId: true,
       },
       orderBy: [{ round: "asc" }, { slot: "asc" }],
     });
 
-    const allSlots: DbMatchSlot[] = await db.tournamentMatch.findMany({
-      where: { tournamentId },
-      select: { round: true, slot: true, team1Id: true, team2Id: true },
-      orderBy: [{ round: "asc" }, { slot: "asc" }],
-    });
+    const byeCache = buildByeCache(tournamentId, format, allSlots);
+    const matches = allSlots.filter(
+      (m) => m.status === "SCHEDULED" && !m.winnerTeamId,
+    );
 
-    const matchCount = allSlots.length;
-    const maxRound = Math.max(...allSlots.map((m) => m.round), 0);
     const fixedLinks = isFixedSwissFormat(format)
-      ? getFixedSwissLinksForMatchCount(matchCount, maxRound)
+      ? getFixedSwissLinksForMatchCount(byeCache.matchCount, byeCache.maxRound)
       : null;
 
     for (const match of matches) {
@@ -553,7 +923,7 @@ export async function processByes(db: Db, tournamentId: string, format: string) 
             fixedLinks,
           );
           if (phantomWinner) {
-            await advanceWinner(db, match.id, phantomWinner);
+            await advanceWinner(db, match.id, phantomWinner, "FINISHED", byeCache);
             changed = true;
           }
         }
@@ -561,9 +931,9 @@ export async function processByes(db: Db, tournamentId: string, format: string) 
       }
 
       if (isSwissFormat(format)) {
-        await finishSwissBye(db, match.id, soloTeamId);
+        await finishSwissBye(db, match.id, soloTeamId, byeCache);
       } else {
-        await advanceWinner(db, match.id, soloTeamId);
+        await advanceWinner(db, match.id, soloTeamId, "FINISHED", byeCache);
       }
       changed = true;
     }
@@ -576,7 +946,9 @@ export async function generatePairBracket(db: Db, tournamentId: string) {
   });
   if (!tournament) throw new Error("Турнир не найден");
   if (!isOlympicPairFormat(tournament.format)) {
-    throw new Error("Олимпийская сетка доступна только для парного олимпийского турнира");
+    throw new Error(
+      "Олимпийская сетка доступна только для парного олимпийского турнира (PAIR_OLYMPIC / PAIR_OLYMPIC_1L_BRONZE)",
+    );
   }
 
   const teams = await db.tournamentTeam.findMany({
@@ -590,22 +962,15 @@ export async function generatePairBracket(db: Db, tournamentId: string) {
   }
 
   const seeded = [...teams].sort((a, b) => teamRating(b) - teamRating(a));
-
-  await db.tournamentTeam.updateMany({
-    where: { tournamentId },
-    data: { seed: null },
-  });
-
-  for (let i = 0; i < seeded.length; i++) {
-    await db.tournamentTeam.update({
-      where: { id: seeded[i]!.id },
-      data: { seed: i + 1 },
-    });
-  }
+  await assignSeeds(db, tournamentId, seeded);
 
   await db.tournamentMatch.deleteMany({ where: { tournamentId } });
 
-  const bracket = buildOlympicBracket(seeded.map((t) => t.id));
+  const build =
+    tournament.format === "PAIR_OLYMPIC_1L_BRONZE"
+      ? buildOlympicBracketWithBronze
+      : buildOlympicBracket;
+  const bracket = build(seeded.map((t) => t.id));
   await db.tournamentMatch.createMany({
     data: bracket.map((m) => ({
       tournamentId,
@@ -627,31 +992,50 @@ export async function generatePairBracket(db: Db, tournamentId: string) {
 async function ensureSoloTeams(db: Db, tournamentId: string) {
   const registrations = await db.tournamentRegistration.findMany({
     where: { tournamentId, status: "CONFIRMED" },
+    select: { playerId: true, source: true },
   });
+  if (registrations.length === 0) return;
 
+  const playerIds = registrations.map((r) => r.playerId);
+  const existingTeams = await db.tournamentTeam.findMany({
+    where: { tournamentId, player1Id: { in: playerIds } },
+    select: { id: true, player1Id: true, status: true },
+  });
+  const teamByPlayer = new Map(existingTeams.map((t) => [t.player1Id, t]));
+
+  const confirmIds: string[] = [];
+  const toCreate: {
+    tournamentId: string;
+    player1Id: string;
+    source: (typeof registrations)[0]["source"];
+    status: "CONFIRMED";
+    confirmedAt: Date;
+  }[] = [];
+
+  const now = new Date();
   for (const reg of registrations) {
-    const existing = await db.tournamentTeam.findFirst({
-      where: { tournamentId, player1Id: reg.playerId },
-    });
-    if (existing) {
-      if (existing.status !== "CONFIRMED") {
-        await db.tournamentTeam.update({
-          where: { id: existing.id },
-          data: { status: "CONFIRMED", confirmedAt: new Date() },
-        });
-      }
+    const team = teamByPlayer.get(reg.playerId);
+    if (team) {
+      if (team.status !== "CONFIRMED") confirmIds.push(team.id);
       continue;
     }
-
-    await db.tournamentTeam.create({
-      data: {
-        tournamentId,
-        player1Id: reg.playerId,
-        source: reg.source,
-        status: "CONFIRMED",
-        confirmedAt: new Date(),
-      },
+    toCreate.push({
+      tournamentId,
+      player1Id: reg.playerId,
+      source: reg.source,
+      status: "CONFIRMED",
+      confirmedAt: now,
     });
+  }
+
+  if (confirmIds.length > 0) {
+    await db.tournamentTeam.updateMany({
+      where: { id: { in: confirmIds } },
+      data: { status: "CONFIRMED", confirmedAt: now },
+    });
+  }
+  if (toCreate.length > 0) {
+    await db.tournamentTeam.createMany({ data: toCreate });
   }
 }
 
@@ -660,7 +1044,7 @@ export async function generateSoloOlympicBracket(db: Db, tournamentId: string) {
     where: { id: tournamentId },
   });
   if (!tournament) throw new Error("Турнир не найден");
-  if (tournament.format !== "OLYMPIC") {
+  if (tournament.format !== "OLYMPIC" && tournament.format !== "OLYMPIC_1L_BRONZE") {
     throw new Error("Олимпийская сетка доступна только для одиночного олимпийского турнира");
   }
 
@@ -679,22 +1063,15 @@ export async function generateSoloOlympicBracket(db: Db, tournamentId: string) {
   const seeded = [...teams].sort(
     (a, b) => teamRating(b) - teamRating(a),
   );
-
-  await db.tournamentTeam.updateMany({
-    where: { tournamentId },
-    data: { seed: null },
-  });
-
-  for (let i = 0; i < seeded.length; i++) {
-    await db.tournamentTeam.update({
-      where: { id: seeded[i]!.id },
-      data: { seed: i + 1 },
-    });
-  }
+  await assignSeeds(db, tournamentId, seeded);
 
   await db.tournamentMatch.deleteMany({ where: { tournamentId } });
 
-  const bracket = buildOlympicBracket(seeded.map((t) => t.id));
+  const build =
+    tournament.format === "OLYMPIC_1L_BRONZE"
+      ? buildOlympicBracketWithBronze
+      : buildOlympicBracket;
+  const bracket = build(seeded.map((t) => t.id));
   await db.tournamentMatch.createMany({
     data: bracket.map((m) => ({
       tournamentId,
@@ -718,7 +1095,7 @@ async function seedTeamsForFixedSwiss(
   tournamentId: string,
   format: string,
 ) {
-  if (format === "FIXED_SWISS") {
+  if (format === "FIXED_SWISS" || format === "FIXED_SWISS_16_BRONZE") {
     await ensureSoloTeams(db, tournamentId);
   }
 
@@ -733,19 +1110,7 @@ async function seedTeamsForFixedSwiss(
   }
 
   const seeded = [...teams].sort((a, b) => teamRating(b) - teamRating(a));
-
-  await db.tournamentTeam.updateMany({
-    where: { tournamentId },
-    data: { seed: null },
-  });
-
-  for (let i = 0; i < seeded.length; i++) {
-    await db.tournamentTeam.update({
-      where: { id: seeded[i]!.id },
-      data: { seed: i + 1 },
-    });
-  }
-
+  await assignSeeds(db, tournamentId, seeded);
   return seeded;
 }
 
@@ -755,7 +1120,9 @@ export async function generateFixedSwissGrid(db: Db, tournamentId: string) {
   });
   if (!tournament) throw new Error("Турнир не найден");
   if (!isFixedSwissFormat(tournament.format)) {
-    throw new Error("Фиксированная швейцарская сетка доступна только для формата FIXED_SWISS / FIXED_PAIR_SWISS");
+    throw new Error(
+      "Фиксированная швейцарская сетка доступна только для FIXED_SWISS / FIXED_SWISS_16_BRONZE / парных аналогов",
+    );
   }
 
   const existing = await db.tournamentMatch.count({ where: { tournamentId } });
@@ -764,7 +1131,7 @@ export async function generateFixedSwissGrid(db: Db, tournamentId: string) {
   }
 
   const seeded = await seedTeamsForFixedSwiss(db, tournamentId, tournament.format);
-  const template = buildFixedSwissTemplate(seeded.length);
+  const template = buildFixedSwissTemplate(seeded.length, tournament.format);
   const bracket = buildOlympicBracket(seeded.map((t) => t.id));
 
   const round1BySlot = new Map(
@@ -881,7 +1248,7 @@ export async function generateTournamentPairing(db: Db, tournamentId: string) {
     await generatePairBracket(db, tournamentId);
     return;
   }
-  if (tournament.format === "OLYMPIC") {
+  if (tournament.format === "OLYMPIC" || tournament.format === "OLYMPIC_1L_BRONZE") {
     await generateSoloOlympicBracket(db, tournamentId);
     return;
   }
@@ -903,6 +1270,27 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
     include: { tournament: true },
   });
   if (!match) throw new Error("Матч не найден");
+
+  const roundOneBye =
+    match.round === 1 &&
+    ((match.team1Id && !match.team2Id) ||
+      (!match.team1Id && match.team2Id));
+  const scoreTouched =
+    input.team1Score !== undefined || input.team2Score !== undefined;
+  if (
+    scoreTouched &&
+    !roundOneBye &&
+    (!match.team1Id || !match.team2Id)
+  ) {
+    throw new Error("Нельзя указать счёт до определения соперника");
+  }
+  if (
+    input.winnerTeamId &&
+    !roundOneBye &&
+    (!match.team1Id || !match.team2Id)
+  ) {
+    throw new Error("Матч ещё не готов");
+  }
 
   const startedAt = parseOptionalDate(input.startedAt);
   const finishedAt = parseOptionalDate(input.finishedAt);
@@ -927,6 +1315,8 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
       ...autoTimes,
     },
   });
+
+  await maybeNotifyMatchStartScheduled(input, match.startedAt, startedAt ?? null);
 
   if (!input.winnerTeamId) {
     return db.tournamentMatch.findUnique({

@@ -112,7 +112,12 @@ export function PlayerCardModal({
               <div>
                 <p className="text-lg font-medium">{name}</p>
                 {preview && preview.id === playerId && (
-                  <p className="font-mono text-emerald-400">{formatRating(preview.rating)}</p>
+                  <p className="text-sm text-zinc-500">
+                    Рейтинг{" "}
+                    <span className="font-mono text-emerald-400">
+                      {formatRating(preview.rating)}
+                    </span>
+                  </p>
                 )}
                 <p className="mt-1 text-sm text-zinc-500">Загрузка…</p>
               </div>
@@ -141,11 +146,16 @@ export function PlayerCardModal({
               )}
               <div>
                 <p className="text-lg font-medium">{name}</p>
-                <p className="font-mono text-emerald-400">{formatRating(player.rating)}</p>
               </div>
             </div>
 
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="text-zinc-500">Рейтинг</dt>
+                <dd className="mt-0.5 font-mono text-emerald-400">
+                  {formatRating(player.rating)}
+                </dd>
+              </div>
               {player.city && (
                 <div>
                   <dt className="text-zinc-500">Город</dt>

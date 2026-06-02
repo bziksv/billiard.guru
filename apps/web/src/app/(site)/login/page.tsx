@@ -10,6 +10,9 @@ import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
 
 type Step = "phone" | "register" | "confirm" | "login";
 
+const authPanelClass =
+  "rounded-xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900/60 dark:bg-emerald-950/30";
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -170,8 +173,8 @@ function LoginForm() {
 
   return (
     <div className="site-card mx-auto w-full max-w-md p-8">
-      <h1 className="text-2xl font-bold">Вход и регистрация</h1>
-      <p className="mt-2 text-sm text-zinc-400">
+      <h1 className="text-2xl font-bold text-[var(--text-primary)]">Вход и регистрация</h1>
+      <p className="mt-2 text-sm text-[var(--text-secondary)]">
         Один номер телефона: если вы уже в базе — вход через Telegram; если нет — короткая
         регистрация и подтверждение в боте @{TELEGRAM_BOT_USERNAME}.
       </p>
@@ -179,7 +182,7 @@ function LoginForm() {
       {step === "phone" && (
         <form onSubmit={startAuth} className="mt-6 space-y-4">
           <label className="block text-sm">
-            <span className="mb-1 block text-zinc-400">Телефон</span>
+            <span className="mb-1 block text-[var(--text-secondary)]">Телефон</span>
             <PhoneInput
               countryName={countryName}
               value={phone}
@@ -190,7 +193,7 @@ function LoginForm() {
               required
             />
           </label>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={loading || !phoneValid}
@@ -203,11 +206,11 @@ function LoginForm() {
 
       {step === "register" && (
         <form onSubmit={submitRegister} className="mt-6 space-y-4">
-          {info && <p className="text-sm text-emerald-300/90">{info}</p>}
-          <p className="text-xs text-zinc-500 tabular-nums">{phone}</p>
+          {info && <p className="text-sm text-emerald-800 dark:text-emerald-300/90">{info}</p>}
+          <p className="text-xs text-[var(--text-muted)] tabular-nums">{phone}</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-sm">
-              <span className="mb-1 block text-zinc-400">Фамилия</span>
+              <span className="mb-1 block text-[var(--text-secondary)]">Фамилия</span>
               <input
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -217,7 +220,7 @@ function LoginForm() {
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block text-zinc-400">Имя</span>
+              <span className="mb-1 block text-[var(--text-secondary)]">Имя</span>
               <input
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -233,7 +236,7 @@ function LoginForm() {
             onCountryChange={(c) => setCountryName(c?.nameRu ?? "Россия")}
             required
           />
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
             type="submit"
             disabled={loading}
@@ -241,23 +244,23 @@ function LoginForm() {
           >
             {loading ? "Регистрация…" : "Зарегистрироваться"}
           </button>
-          <button type="button" onClick={resetToPhone} className="text-xs text-zinc-400 underline">
+          <button type="button" onClick={resetToPhone} className="text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]">
             Другой номер
           </button>
         </form>
       )}
 
       {step === "confirm" && (
-        <div className="mt-6 space-y-4 rounded-xl border border-emerald-900/60 bg-emerald-950/30 p-4">
-          {info && <p className="text-sm text-emerald-300">{info}</p>}
-          <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-300">
+        <div className={`mt-6 ${authPanelClass} space-y-4`}>
+          {info && <p className="text-sm text-emerald-800 dark:text-emerald-300">{info}</p>}
+          <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-600 dark:text-zinc-300">
             <li>
               Откройте{" "}
               <a
                 href={confirmLink ?? `https://t.me/${TELEGRAM_BOT_USERNAME}`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-emerald-400 underline"
+                className="font-medium text-emerald-700 underline dark:text-emerald-400"
               >
                 бота в Telegram
               </a>
@@ -265,7 +268,7 @@ function LoginForm() {
             <li>Нажмите «Поделиться контактом» или Start по ссылке</li>
             <li>Вернитесь сюда и нажмите «Войти»</li>
           </ol>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
             type="button"
             disabled={loading}
@@ -274,30 +277,38 @@ function LoginForm() {
           >
             {loading ? "Проверка…" : "Войти после подтверждения"}
           </button>
-          <button type="button" onClick={resetToPhone} className="text-xs text-zinc-400 underline">
+          <button
+            type="button"
+            onClick={resetToPhone}
+            className="pt-1 text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]"
+          >
             Другой номер
           </button>
         </div>
       )}
 
       {step === "login" && (
-        <div className="mt-6 space-y-3 rounded-xl border border-emerald-900/60 bg-emerald-950/30 p-4">
-          <p className="text-sm text-emerald-300">
+        <div className={`mt-6 ${authPanelClass} space-y-3`}>
+          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
             {polling
               ? "Откройте Telegram и нажмите «Подтвердить вход»…"
               : "Обработка…"}
           </p>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-[var(--text-muted)]">
             Сообщение отправлено на привязанный аккаунт.
           </p>
-          <button type="button" onClick={resetToPhone} className="text-xs text-zinc-400 underline">
+          <button
+            type="button"
+            onClick={resetToPhone}
+            className="pt-1 text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]"
+          >
             Отменить
           </button>
         </div>
       )}
 
-      <p className="mt-6 text-center text-sm text-zinc-500">
-        <Link href="/" className="text-emerald-400 hover:underline">
+      <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
+        <Link href="/" className="font-medium text-emerald-700 hover:underline dark:text-emerald-400">
           На главную
         </Link>
       </p>
@@ -308,7 +319,7 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <SiteContainer className="flex flex-1 flex-col items-center justify-center py-16">
-      <Suspense fallback={<div className="text-zinc-500">Загрузка…</div>}>
+      <Suspense fallback={<div className="text-[var(--text-muted)]">Загрузка…</div>}>
         <LoginForm />
       </Suspense>
     </SiteContainer>

@@ -4,6 +4,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { BookingCancelButton } from "@/components/site/booking-cancel-button";
 import { RegistrationCancelButton } from "@/components/site/registration-cancel-button";
 import { CoachProfileEditor } from "@/components/cabinet/coach-profile-editor";
+import { NotificationPreferencesEditor } from "@/components/cabinet/notification-preferences-editor";
 import { PlayerAboutEditor } from "@/components/cabinet/player-about-editor";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
@@ -107,6 +108,8 @@ export default async function CabinetPage() {
             )}
           </div>
         </SiteCard>
+
+        <NotificationPreferencesEditor />
 
         <PlayerAboutEditor playerId={player.id} />
 

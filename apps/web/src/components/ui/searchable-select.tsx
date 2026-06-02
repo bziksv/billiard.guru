@@ -5,6 +5,8 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 export interface SearchableSelectOption {
   value: string;
   label: string;
+  /** Показать в списке, но нельзя выбрать */
+  disabled?: boolean;
 }
 
 interface SearchableSelectProps {
@@ -66,6 +68,7 @@ export function SearchableSelect({
   }
 
   function select(option: SearchableSelectOption) {
+    if (option.disabled) return;
     onChange(option.value);
     setOpen(false);
     setQuery("");
@@ -107,9 +110,12 @@ export function SearchableSelect({
               setOpen(false);
               setQuery("");
             }
-            if (e.key === "Enter" && open && filtered.length === 1) {
-              e.preventDefault();
-              select(filtered[0]!);
+            if (e.key === "Enter" && open) {
+              const pick = filtered.filter((o) => !o.disabled);
+              if (pick.length === 1) {
+                e.preventDefault();
+                select(pick[0]!);
+              }
             }
           }}
           className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
@@ -129,12 +135,16 @@ export function SearchableSelect({
                     type="button"
                     role="option"
                     aria-selected={option.value === value}
+                    aria-disabled={option.disabled || undefined}
+                    disabled={option.disabled}
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => select(option)}
-                    className={`w-full px-3 py-2 text-left text-sm hover:bg-zinc-800 ${
-                      option.value === value
-                        ? "bg-zinc-800 text-emerald-400"
-                        : "text-zinc-200"
+                    className={`w-full px-3 py-2 text-left text-sm ${
+                      option.disabled
+                        ? "cursor-not-allowed text-zinc-500 opacity-60"
+                        : option.value === value
+                          ? "bg-zinc-800 text-emerald-400"
+                          : "text-zinc-200 hover:bg-zinc-800"
                     }`}
                   >
                     {option.label}

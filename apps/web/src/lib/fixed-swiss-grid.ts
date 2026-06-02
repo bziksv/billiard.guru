@@ -15,8 +15,8 @@ export type FixedSwissTemplate = {
   matchesPerRound: number;
   matches: BracketMatchInput[];
   links: FixedSwissLink[];
-  /** TS «16-8»: ts168 = 27 встреч (7 колонок); ts168legacy29 = 29 (9 колонок) */
-  variant?: "ts168" | "ts168legacy29" | "168legacy" | "classic";
+  /** TS «16-8»: ts168 = 27 встреч; ts168bronze = 28 (+ матч за 3–4); ts168legacy29 = 29 */
+  variant?: "ts168" | "ts168bronze" | "ts168legacy29" | "168legacy" | "classic";
 };
 
 function nextPowerOfTwo(n: number): number {
@@ -99,14 +99,14 @@ function buildFixedSwissTsTemplate(): FixedSwissTemplate {
 
   for (let slot = 5; slot <= 8; slot++) {
     const k = slot - 4;
-    const toTeam = slotParityTeam(slot);
     links.push({
       fromRound: 2,
       fromSlot: slot,
       kind: "win",
       toRound: 3,
       toSlot: k + 4,
-      toTeam,
+      /** Верхняя R2 → team1 в 1/4; крест → team2 (crossToQuarter ниже). */
+      toTeam: 1,
     });
     links.push({
       fromRound: 2,
@@ -144,6 +144,43 @@ function buildFixedSwissTsTemplate(): FixedSwissTemplate {
     matches,
     links,
     variant: "ts168",
+  };
+}
+
+/**
+ * TS 16-8 + матч за 3–4 (#28): проигравшие полуфиналов (#25, #26) → #28.
+ * Финал (#27) — места 1–2; победитель #28 — 3-е, проигравший — 4-е.
+ */
+export function buildFixedSwissTsBronzeTemplate(): FixedSwissTemplate {
+  const base = buildFixedSwissTsTemplate();
+  const matches = [
+    ...base.matches,
+    { round: 5, slot: 2, team1Id: null, team2Id: null },
+  ];
+  const links: FixedSwissLink[] = [
+    ...base.links,
+    {
+      fromRound: 4,
+      fromSlot: 1,
+      kind: "loss",
+      toRound: 5,
+      toSlot: 2,
+      toTeam: 1,
+    },
+    {
+      fromRound: 4,
+      fromSlot: 2,
+      kind: "loss",
+      toRound: 5,
+      toSlot: 2,
+      toTeam: 2,
+    },
+  ];
+  return {
+    ...base,
+    matches,
+    links,
+    variant: "ts168bronze",
   };
 }
 
@@ -413,14 +450,14 @@ function buildFixedSwiss168LegacyTemplate(): FixedSwissTemplate {
 
   for (let slot = 5; slot <= 8; slot++) {
     const k = slot - 4;
-    const toTeam = slotParityTeam(slot);
     links.push({
       fromRound: 2,
       fromSlot: slot,
       kind: "win",
       toRound: 3,
       toSlot: k + 4,
-      toTeam,
+      /** Верхняя R2 → team1 в 1/4; крест → team2 (crossToQuarter ниже). */
+      toTeam: 1,
     });
     links.push({
       fromRound: 2,
@@ -499,7 +536,10 @@ function buildFixedSwissClassicTemplate(gridSize: number): FixedSwissTemplate {
   return { gridSize, rounds, matchesPerRound, matches, links, variant: "classic" };
 }
 
-export function buildFixedSwissTemplate(participantCount: number): FixedSwissTemplate {
+export function buildFixedSwissTemplate(
+  participantCount: number,
+  format?: string,
+): FixedSwissTemplate {
   const gridSize = nextPowerOfTwo(participantCount);
   if (gridSize < 4) {
     throw new Error("Фиксированная швейцарская сетка: минимум 4 участника");
@@ -509,6 +549,12 @@ export function buildFixedSwissTemplate(participantCount: number): FixedSwissTem
   }
 
   if (gridSize === 16) {
+    if (
+      format === "FIXED_SWISS_16_BRONZE" ||
+      format === "FIXED_PAIR_SWISS_16_BRONZE"
+    ) {
+      return buildFixedSwissTsBronzeTemplate();
+    }
     return buildFixedSwissTsTemplate();
   }
 
@@ -553,9 +599,14 @@ export function isFixedSwissTsLegacy29MatchCount(matchCount: number): boolean {
   return matchCount === 29;
 }
 
+/** TS 16-8 с матчем за 3–4: 28 встреч, 7 колонок. */
+export function isFixedSwissTsBronzeMatchCount(matchCount: number): boolean {
+  return matchCount === 28;
+}
+
 /** TS 16-8 или legacy 29 — для UI линий и подписей колонок. */
 export function isFixedSwiss168MatchCount(matchCount: number): boolean {
-  return matchCount === 27 || matchCount === 29;
+  return matchCount === 27 || matchCount === 28 || matchCount === 29;
 }
 
 /** Старая платформенная сетка 27 встреч (5 туров, без TS-нумерации). */
@@ -569,7 +620,7 @@ export function isFixedSwiss168LegacyMatchCount(
 }
 
 export function inferFixedSwissGridSize(matchCount: number): number {
-  if (matchCount === 29 || matchCount === 27) return 16;
+  if (matchCount === 29 || matchCount === 27 || matchCount === 28) return 16;
   for (let size = 4; size <= 64; size *= 2) {
     const rounds = Math.log2(size) + 1;
     if ((size / 2) * rounds === matchCount) return size;
@@ -586,6 +637,12 @@ export function fixedSwissTsMatchNo(round: number, slot: number): number {
   if (round === 4) return 24 + slot;
   if (round === 5) return 26 + slot;
   throw new Error(`Некорректный слот TS 16-8: тур ${round}, слот ${slot}`);
+}
+
+/** Нумерация TS 28 (финал #27, матч за 3–4 — #28). */
+export function fixedSwissTsBronzeMatchNo(round: number, slot: number): number {
+  if (round === 5 && slot === 2) return 28;
+  return fixedSwissTsMatchNo(round, slot);
 }
 
 /** Нумерация для старых сеток 27 встреч / 6 туров (2×1/4 + место 5–6). */
@@ -646,10 +703,73 @@ export function fixedSwissMatchNo(
   ) {
     return fixedSwiss168MatchNo(round, slot);
   }
+  if (isFixedSwissTsBronzeMatchCount(matchCount)) {
+    return fixedSwissTsBronzeMatchNo(round, slot);
+  }
   if (isFixedSwissTsMatchCount(matchCount, maxRound) || matchCount === 27) {
     return fixedSwissTsMatchNo(round, slot);
   }
   throw new Error(`Нет нумерации 16-8 для ${matchCount} встреч`);
+}
+
+/** Итоговое место участника по номеру встречи (#13–#27 и варианты legacy). */
+export function fixedSwissProtocolPlace(
+  matchNo: number,
+  role: "winner" | "loser",
+  matchCount: number,
+  maxRound?: number,
+): number | null {
+  if (role === "winner") {
+    if (isFixedSwissTsLegacy29MatchCount(matchCount) && matchNo === 29) return 1;
+    if (isFixedSwissTsLegacy27SixRound(matchCount, maxRound) && matchNo === 27) {
+      return 1;
+    }
+    if (isFixedSwissTsBronzeMatchCount(matchCount) && matchNo === 28) return 3;
+    if (matchNo === 27) return 1;
+    return null;
+  }
+
+  if (isFixedSwissTsBronzeMatchCount(matchCount)) {
+    if (matchNo === 27) return 2;
+    if (matchNo === 28) return 4;
+    if (matchNo === 25 || matchNo === 26) return null;
+    if (matchNo >= 21 && matchNo <= 24) return 5 + (matchNo - 21);
+    if (matchNo >= 17 && matchNo <= 20) return 9 + (matchNo - 17);
+    if (matchNo >= 13 && matchNo <= 16) return 13 + (matchNo - 13);
+    return null;
+  }
+
+  if (isFixedSwissTsLegacy29MatchCount(matchCount)) {
+    if (matchNo === 29) return 2;
+    if (matchNo === 27) return 3;
+    if (matchNo === 28) return 4;
+    if (matchNo === 25) return 5;
+    if (matchNo === 26) return 6;
+    if (matchNo === 23) return 7;
+    if (matchNo === 24) return 8;
+    if (matchNo >= 17 && matchNo <= 20) return 9 + (matchNo - 17);
+    if (matchNo >= 13 && matchNo <= 16) return 13 + (matchNo - 13);
+    return null;
+  }
+
+  if (isFixedSwissTsLegacy27SixRound(matchCount, maxRound)) {
+    if (matchNo === 27) return 2;
+    if (matchNo === 25) return 3;
+    if (matchNo === 26) return 4;
+    if (matchNo === 23) return 5;
+    if (matchNo === 24) return 6;
+    if (matchNo >= 17 && matchNo <= 20) return 9 + (matchNo - 17);
+    if (matchNo >= 13 && matchNo <= 16) return 13 + (matchNo - 13);
+    return null;
+  }
+
+  if (matchNo === 27) return 2;
+  if (matchNo === 25) return 3;
+  if (matchNo === 26) return 4;
+  if (matchNo >= 21 && matchNo <= 24) return 5 + (matchNo - 21);
+  if (matchNo >= 17 && matchNo <= 20) return 9 + (matchNo - 17);
+  if (matchNo >= 13 && matchNo <= 16) return 13 + (matchNo - 13);
+  return null;
 }
 
 export function getFixedSwissLinksForGrid(
@@ -665,6 +785,9 @@ export function getFixedSwissLinksForGrid(
   }
   if (gridSize === 16 && isFixedSwissTsLegacy27SixRound(matchCount ?? 0, maxRound)) {
     return buildFixedSwissTsLegacy27SixRoundTemplate().links;
+  }
+  if (gridSize === 16 && matchCount === 28) {
+    return buildFixedSwissTsBronzeTemplate().links;
   }
   if (gridSize === 16) {
     return buildFixedSwissTsTemplate().links;

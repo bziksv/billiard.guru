@@ -9,6 +9,12 @@ import { prisma } from "@/lib/prisma";
 import { buildConfirmLink } from "@/lib/telegram";
 import { requireTournamentManageAccess, tournamentManageActorType } from "@/lib/tournament-manage";
 import { canCancelRegistration } from "@/lib/tournament-registration";
+import {
+  notifyTournamentRegisteredByClub,
+  notifyTournamentRegistrationConfirmed,
+  notifyTournamentRegistrationRejected,
+  notifyTournamentSelfRegistered,
+} from "@/lib/tournament-registration-notify";
 import { tournamentRegistrationSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
@@ -63,6 +69,11 @@ export async function POST(request: NextRequest) {
           entityType: "tournament_registration",
           entityId: registration.id,
         });
+        if (data.source === "CLUB") {
+          await notifyTournamentRegisteredByClub(registration.id);
+        } else if (data.source === "SELF") {
+          await notifyTournamentSelfRegistered(registration.id);
+        }
         const confirmLink = player.confirmToken
           ? buildConfirmLink(player.confirmToken)
           : null;
@@ -92,6 +103,12 @@ export async function POST(request: NextRequest) {
       entityType: "tournament_registration",
       entityId: registration.id,
     });
+
+    if (data.source === "CLUB") {
+      await notifyTournamentRegisteredByClub(registration.id);
+    } else if (data.source === "SELF") {
+      await notifyTournamentSelfRegistered(registration.id);
+    }
 
     const confirmLink = player.confirmToken
       ? buildConfirmLink(player.confirmToken)
@@ -184,6 +201,12 @@ export async function PATCH(request: NextRequest) {
       entityType: "tournament_registration",
       entityId: registration.id,
     });
+
+    if (status === "CONFIRMED") {
+      await notifyTournamentRegistrationConfirmed(registration.id);
+    } else if (status === "REJECTED") {
+      await notifyTournamentRegistrationRejected(registration.id);
+    }
 
     return NextResponse.json(registration);
   } catch {

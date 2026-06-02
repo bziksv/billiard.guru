@@ -39,18 +39,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const matches = await prisma.tournamentMatch.findMany({
-      where: { tournamentId },
-      include: {
-        team1: { include: { player1: true, player2: true } },
-        team2: { include: { player1: true, player2: true } },
-        winnerTeam: { include: { player1: true, player2: true } },
-      },
-      orderBy: [{ round: "asc" }, { slot: "asc" }],
-    });
+    const matchCount = await prisma.tournamentMatch.count({ where: { tournamentId } });
 
-    log.info({ tournamentId, matches: matches.length }, regenerate ? "Bracket regenerated" : "Pair bracket generated");
-    return NextResponse.json({ matches });
+    log.info({ tournamentId, matches: matchCount }, regenerate ? "Bracket regenerated" : "Pair bracket generated");
+    return NextResponse.json({ ok: true, matchCount });
   } catch (error) {
     log.error({ error }, "Bracket generation failed");
     const authResp = authErrorResponse(error);

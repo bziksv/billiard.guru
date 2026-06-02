@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { BracketMatchView } from "@/lib/bracket-view";
+import {
+  isMatchReadyForResult,
+  matchAutopassBye,
+  type BracketMatchView,
+} from "@/lib/bracket-view";
 import {
   defaultScoreInput,
   isMatchResolved,
@@ -103,10 +107,8 @@ export function MatchResultModal({
   if (!open || !match) return null;
 
   const finished = isMatchResolved(match.status, match.winnerTeamId);
-  const roundOneBye = Boolean(
-    match.round === 1 &&
-      ((match.team1 && !match.team2) || (!match.team1 && match.team2)),
-  );
+  const { isBye: roundOneBye } = matchAutopassBye(match);
+  const resultReady = isMatchReadyForResult(match);
   const team1Label = match.team1 ? teamLabel(match.team1) : "—";
   const team2Label = match.team2
     ? teamLabel(match.team2)
@@ -149,6 +151,10 @@ export function MatchResultModal({
   /** Обновление времени и счёта уже завершённой встречи (без смены победителя). */
   async function saveFinishedMatchData() {
     setError(null);
+    if (!resultReady) {
+      setError("Соперник ещё не определён");
+      return;
+    }
     const parsed = parseMatchScoreInputs(team1Score, team2Score);
     if (!parsed.ok) {
       setError(parsed.error);
@@ -198,6 +204,10 @@ export function MatchResultModal({
 
   async function saveResult() {
     setError(null);
+    if (!resultReady) {
+      setError("Соперник ещё не определён — дождитесь соперника");
+      return;
+    }
     const parsed = parseMatchScoreInputs(team1Score, team2Score);
     if (!parsed.ok) {
       setError(parsed.error);
@@ -274,10 +284,10 @@ export function MatchResultModal({
   const parsedScores = parseMatchScoreInputs(team1Score, team2Score);
   const canFixResult =
     roundOneBye ||
-    !match.team1 ||
-    !match.team2 ||
-    (parsedScores.ok &&
+    (resultReady &&
+      parsedScores.ok &&
       validateMatchScoresForFinish(parsedScores.s1, parsedScores.s2) === null);
+  const scoresDisabled = !resultReady && !finished;
 
   return (
     <div
@@ -310,6 +320,12 @@ export function MatchResultModal({
         </div>
 
         <div className="space-y-5 px-5 py-5">
+          {!resultReady && !finished && (
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+              Соперник ещё не определён — счёт и результат недоступны. Можно сохранить
+              только время начала или завершения.
+            </p>
+          )}
           <div className="bracket-modal-score-box p-4">
             <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-3">
               <label className="min-w-0 text-center">
@@ -319,7 +335,8 @@ export function MatchResultModal({
                   min="0"
                   value={team1Score}
                   onChange={(e) => setTeam1Score(e.target.value)}
-                  className="admin-input w-full px-2 py-2 text-center font-mono text-lg tabular-nums"
+                  disabled={scoresDisabled}
+                  className="admin-input w-full px-2 py-2 text-center font-mono text-lg tabular-nums disabled:opacity-50"
                   placeholder="0"
                   aria-label={`Счёт: ${team1Label}`}
                 />
@@ -341,7 +358,7 @@ export function MatchResultModal({
                   min="0"
                   value={team2Score}
                   onChange={(e) => setTeam2Score(e.target.value)}
-                  disabled={roundOneBye || !match.team2}
+                  disabled={scoresDisabled || roundOneBye || !match.team2}
                   className="admin-input w-full px-2 py-2 text-center font-mono text-lg tabular-nums disabled:opacity-50"
                   placeholder="0"
                   aria-label={`Счёт: ${team2Label}`}

@@ -3,6 +3,7 @@ import { writeAuditLog } from "@/lib/audit";
 import { getCurrentPlayer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isPairFormat } from "@/lib/public-display";
+import { notifyTournamentSelfRegistered } from "@/lib/tournament-registration-notify";
 import { z } from "zod";
 
 const selfRegisterSchema = z.object({
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
           entityType: "tournament_registration",
           entityId: registration.id,
         });
+        await notifyTournamentSelfRegistered(registration.id);
         return NextResponse.json(registration, { status: 200 });
       }
       return NextResponse.json(
@@ -88,6 +90,8 @@ export async function POST(request: NextRequest) {
       entityType: "tournament_registration",
       entityId: registration.id,
     });
+
+    await notifyTournamentSelfRegistered(registration.id);
 
     return NextResponse.json(registration, { status: 201 });
   } catch {

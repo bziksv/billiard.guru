@@ -28,14 +28,19 @@ import {
   isFixedSwissRound23Edge,
   isFixedSwissForkEdge,
   fixedSwissPlacementLabel,
+  fixedSwissTs28PlacementByMatchNo,
 } from "../src/lib/fixed-swiss-layout";
 import {
   buildFixedSwissTemplate,
+  buildFixedSwissTsBronzeTemplate,
   fixedSwiss168MatchNo,
+  fixedSwissTsBronzeMatchNo,
   fixedSwissTsMatchNo,
+  fixedSwissProtocolPlace,
   inferFixedSwissGridSize,
   isFixedSwiss168LegacyMatchCount,
   isFixedSwiss168MatchCount,
+  isFixedSwissTsBronzeMatchCount,
   isFixedSwissTsLegacy29MatchCount,
   isFixedSwissTsMatchCount,
 } from "../src/lib/fixed-swiss-grid";
@@ -85,7 +90,15 @@ const mpr = 8;
 const cardH = FIXED_SWISS_CARD_H;
 
 assert.equal(buildFixedSwissTemplate(16).matches.length, 27);
+assert.equal(
+  buildFixedSwissTemplate(16, "FIXED_SWISS_16_BRONZE").matches.length,
+  28,
+);
+assert.equal(buildFixedSwissTsBronzeTemplate().matches.length, 28);
 assert.equal(inferFixedSwissGridSize(27), 16);
+assert.equal(inferFixedSwissGridSize(28), 16);
+assert.equal(isFixedSwissTsBronzeMatchCount(28), true);
+assert.equal(isFixedSwiss168MatchCount(28), true);
 assert.equal(isFixedSwissTsMatchCount(27), true);
 assert.equal(isFixedSwissTsMatchCount(27, 5), true);
 assert.equal(isFixedSwissTsLegacy29MatchCount(29), true);
@@ -101,6 +114,29 @@ assert.equal(fixedSwissTsMatchNo(3, 8), 24);
 assert.equal(fixedSwissTsMatchNo(4, 1), 25);
 assert.equal(fixedSwissTsMatchNo(4, 2), 26);
 assert.equal(fixedSwissTsMatchNo(5, 1), 27);
+assert.equal(fixedSwissTsBronzeMatchNo(5, 1), 27);
+assert.equal(fixedSwissTsBronzeMatchNo(5, 2), 28);
+
+assert.equal(fixedSwissProtocolPlace(27, "winner", 28), 1);
+assert.equal(fixedSwissProtocolPlace(27, "loser", 28), 2);
+assert.equal(fixedSwissProtocolPlace(28, "winner", 28), 3);
+assert.equal(fixedSwissProtocolPlace(28, "loser", 28), 4);
+assert.equal(fixedSwissProtocolPlace(25, "loser", 28), null);
+assert.equal(fixedSwissTs28PlacementByMatchNo(28), "матч за 3–4 место");
+assert.equal(fixedSwissTs28PlacementByMatchNo(25), "полуфинал");
+
+{
+  const bronzeLinks = buildFixedSwissTsBronzeTemplate().links;
+  const semi1Loss = bronzeLinks.find(
+    (l) =>
+      l.fromRound === 4 &&
+      l.fromSlot === 1 &&
+      l.kind === "loss" &&
+      l.toRound === 5 &&
+      l.toSlot === 2,
+  );
+  assert.ok(semi1Loss, "полуфинал #25 loser → #28");
+}
 
 {
   const links = buildFixedSwissTemplate(16).links;
@@ -118,6 +154,16 @@ assert.equal(fixedSwissTsMatchNo(5, 1), 27);
   assert.equal(loss12?.toTeam, 1, "#12 loser → cross #17 team1");
   assert.equal(win13?.toSlot, 1, "#13 winner → cross #17");
   assert.equal(win13?.toTeam, 2, "#13 winner → cross #17 team2");
+  const win10 = links.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 6 && l.kind === "win",
+  );
+  const crossWin17 = links.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 1 && l.kind === "win",
+  );
+  assert.equal(win10?.toSlot, 6, "#10 winner → #22");
+  assert.equal(win10?.toTeam, 1, "#10 winner → #22 team1");
+  assert.equal(crossWin17?.toSlot, 6, "#17 winner → #22");
+  assert.equal(crossWin17?.toTeam, 2, "#17 winner → #22 team2");
 }
 
 assert.equal(fixedSwissTsMatchCol(2, 1), -1);
@@ -153,6 +199,15 @@ assert.equal(
   "card #25 must not map to legacy #23 when maxRound is 6",
 );
 assert.equal(fixedSwissPlacementLabel(3, 5, 5, 8, 27, 21), "место 5–8");
+
+assert.equal(fixedSwissProtocolPlace(27, "winner", 27, 5), 1);
+assert.equal(fixedSwissProtocolPlace(27, "loser", 27, 5), 2);
+assert.equal(fixedSwissProtocolPlace(25, "loser", 27, 5), 3);
+assert.equal(fixedSwissProtocolPlace(26, "loser", 27, 5), 4);
+assert.equal(fixedSwissProtocolPlace(21, "loser", 27, 5), 5);
+assert.equal(fixedSwissProtocolPlace(17, "loser", 27, 5), 9);
+assert.equal(fixedSwissProtocolPlace(13, "loser", 27, 5), 13);
+assert.equal(fixedSwissProtocolPlace(12, "loser", 27, 5), null);
 
 assert.equal(layoutTs.positions.get("r2s1")!.col, -1);
 assert.equal(layoutTs.positions.get("r2s5")!.col, 1);

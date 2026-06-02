@@ -1,8 +1,9 @@
 import type { CSSProperties } from "react";
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
 import { teamLabel, teamRating, type TeamPlayer } from "@/lib/pair-tournament";
-import type { BracketMatchView } from "@/lib/bracket-view";
+import { isMatchReadyForResult, type BracketMatchView } from "@/lib/bracket-view";
 import { isMatchResolved } from "@/lib/match-result";
+import { GRID_META_H } from "@/lib/swiss-bracket-layout";
 import { cn } from "@/lib/cn";
 
 function ScoreSlot({
@@ -112,6 +113,8 @@ function TeamLine({
 
 export function BracketMatchCard({
   match,
+  matchNumber,
+  placementLabel,
   className,
   style,
   onMatchClick,
@@ -119,6 +122,10 @@ export function BracketMatchCard({
   showMatchScore = false,
 }: {
   match: BracketMatchView;
+  /** Как в эталоне LlbBracketMatch — только #{номер} в шапке */
+  matchNumber?: number;
+  /** Подвал: «матч за 3–4», «место 1–2» и т.п. */
+  placementLabel?: string | null;
   className?: string;
   style?: CSSProperties;
   onMatchClick?: (match: BracketMatchView) => void;
@@ -143,7 +150,10 @@ export function BracketMatchCard({
     !!match.team2 &&
     (match.team1Score != null || match.team2Score != null);
 
-  const openMatch = onMatchClick ? () => onMatchClick(match) : undefined;
+  const openMatch =
+    onMatchClick && (isMatchReadyForResult(match) || finished)
+      ? () => onMatchClick(match)
+      : undefined;
 
   const handicap =
     match.team1 && match.team2
@@ -166,13 +176,39 @@ export function BracketMatchCard({
     <div
       className={cn(
         "bracket-match-card",
-        (!handicap || handicap === "Без форы") && "bracket-match-card--compact",
+        (!handicap || handicap === "Без форы") && !matchNumber && "bracket-match-card--compact",
         finished && winnerId && "bracket-match-card--finished",
         interactiveAdmin && onMatchClick && "bracket-match-card--interactive",
+        roundOneBye && "llb-bracket-match--round1-bye",
+        roundOneBye && byeFinished && "llb-bracket-match--round1-bye-done",
         className,
       )}
       style={style}
     >
+      {matchNumber !== undefined &&
+        (openMatch ? (
+          <button
+            type="button"
+            data-bracket-interactive
+            onClick={openMatch}
+            className="llb-bracket-match__meta bracket-match-meta--clickable flex w-full items-center justify-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
+            style={{ height: GRID_META_H }}
+            title="Результат встречи"
+          >
+            <span className="bracket-round-label font-semibold tabular-nums">
+              #{matchNumber}
+            </span>
+          </button>
+        ) : (
+          <div
+            className="llb-bracket-match__meta flex items-center justify-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
+            style={{ height: GRID_META_H }}
+          >
+            <span className="bracket-round-label font-semibold tabular-nums">
+              #{matchNumber}
+            </span>
+          </div>
+        ))}
       <TeamLine
         team={soloSide === 2 ? null : match.team1}
         isWinner={team1Wins}
@@ -242,6 +278,20 @@ export function BracketMatchCard({
           </div>
         )
       )}
+      {placementLabel ? (
+        openMatch ? (
+          <button
+            type="button"
+            data-bracket-interactive
+            onClick={openMatch}
+            className="bracket-match-meta bracket-match-meta--clickable text-center"
+          >
+            {placementLabel}
+          </button>
+        ) : (
+          <div className="bracket-match-meta text-center">{placementLabel}</div>
+        )
+      ) : null}
     </div>
   );
 }

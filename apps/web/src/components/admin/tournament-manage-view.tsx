@@ -21,6 +21,7 @@ import { formatRating } from "@/lib/rating";
 import {
   isDynamicSwissFormat,
   isFixedSwissFormat,
+  isOlympicBronzeFormat,
   isOlympicFormat,
   isPairFormat,
   isSwissFormat,
@@ -29,12 +30,12 @@ import {
   type TeamWithPlayers,
 } from "@/lib/pair-tournament";
 import { isOutdatedFixedSwiss27Bracket } from "@/lib/fixed-swiss-grid";
+import { useBracketFormatOptions } from "@/hooks/use-bracket-format-options";
 import {
   STATUS_OPTIONS,
   computeTournamentStandings,
   type AdminTournament,
 } from "@/lib/tournament-admin";
-import { useBracketFormatOptions } from "@/hooks/use-bracket-format-options";
 import {
   canCancelRegistration,
 } from "@/lib/tournament-registration";
@@ -44,10 +45,25 @@ import {
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 import { adminTabClass } from "@/lib/admin-ui";
+import {
+  buildBracketMatchNumbers,
+  filterCompletedMatches,
+  filterCurrentMatches,
+  filterUpcomingMatches,
+  formatMatchDateTime,
+  matchParticipantsLabel,
+  matchScoreLabel,
+} from "@/lib/tournament-match-schedule";
 
 type Team = AdminTournament["teams"][number] & TeamWithPlayers;
 type Match = AdminTournament["matches"][number];
-type ManageTab = "participants" | "bracket" | "protocol";
+type ManageTab =
+  | "participants"
+  | "bracket"
+  | "current-matches"
+  | "upcoming-matches"
+  | "completed-matches"
+  | "protocol";
 
 function RegistrationActionButton({
   variant,
@@ -76,13 +92,16 @@ function RegistrationActionButton({
   );
 }
 
+export type TournamentManageViewMode = "full" | "tournament" | "bracket";
+
 export function TournamentManageView({
   tournament: t,
   clubOptions,
   playerOptions,
   bracketLoading,
   embedded = false,
-  initialTab = "participants",
+  viewMode = "full",
+  initialTab,
   onConfirmRegistration,
   onRejectRegistration,
   onCancelRegistration,
@@ -100,6 +119,9 @@ export function TournamentManageView({
   playerOptions: { value: string; label: string }[];
   bracketLoading: boolean;
   embedded?: boolean;
+  /** full — все вкладки (кабинет клуба); tournament — только участники; bracket — сетка и встречи */
+  viewMode?: TournamentManageViewMode;
+  /** @deprecated используйте viewMode="bracket" */
   initialTab?: ManageTab;
   onConfirmRegistration: (id: string) => void | Promise<void>;
   onRejectRegistration: (id: string) => void | Promise<void>;
@@ -113,7 +135,19 @@ export function TournamentManageView({
   onUpdated: () => void;
   onDelete: () => void;
 }) {
-  const [tab, setTab] = useState<ManageTab>(initialTab);
+  const effectiveViewMode: TournamentManageViewMode =
+    initialTab === "bracket" ? "bracket" : viewMode;
+  const [tab, setTab] = useState<ManageTab>(
+    effectiveViewMode === "bracket" ? "bracket" : "participants",
+  );
+  const showParticipants = effectiveViewMode !== "bracket";
+  const showBracketSection = effectiveViewMode !== "tournament";
+  const showTabBar =
+    showBracketSection &&
+    (effectiveViewMode === "bracket" || (embedded && effectiveViewMode === "full"));
+  const bracketTabOpen = (name: ManageTab) =>
+    showBracketSection &&
+    (effectiveViewMode === "bracket" ? tab === name : !embedded || tab === name);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [editName, setEditName] = useState(t.name);
@@ -188,6 +222,9 @@ export function TournamentManageView({
   const finalRound = rounds.at(-1)?.[0];
   const bracketLocked = t.matches.length > 0;
   const activeTeams = t.teams.filter((team) => team.status !== "CANCELLED");
+  const inactiveTeams = t.teams.filter(
+    (team) => team.status === "CANCELLED" || team.status === "REJECTED",
+  );
   const canModifyRegistrations = canCancelRegistration(t.status, "organizer");
   const participantCount = pair
     ? activeTeams.length
@@ -209,6 +246,22 @@ export function TournamentManageView({
         team2: m.team2,
       })),
     [t.matches],
+  );
+  const currentMatches = useMemo(
+    () => filterCurrentMatches(bracketMatches),
+    [bracketMatches],
+  );
+  const upcomingMatches = useMemo(
+    () => filterUpcomingMatches(bracketMatches, t.format),
+    [bracketMatches, t.format],
+  );
+  const completedMatches = useMemo(
+    () => filterCompletedMatches(bracketMatches, t.format),
+    [bracketMatches, t.format],
+  );
+  const bracketMatchNumbers = useMemo(
+    () => buildBracketMatchNumbers(bracketMatches, t.format),
+    [bracketMatches, t.format],
   );
 
   return (
@@ -298,15 +351,11 @@ export function TournamentManageView({
             searchPlaceholder="Поиск клуба…"
           />
           <SearchableSelect
-            options={
-              formatOptionsLoading
-                ? [{ value: editFormat, label: "Загрузка форматов…" }]
-                : formatOptions
-            }
+            options={formatOptionsLoading ? [] : formatOptions}
             value={editFormat}
             onChange={setEditFormat}
-            placeholder="Формат"
-            searchPlaceholder="Формат…"
+            placeholder={formatOptionsLoading ? "Загрузка форматов…" : "Формат"}
+            searchPlaceholder="Поиск формата…"
             disabled={formatOptionsLoading}
           />
           <SearchableSelect
@@ -338,27 +387,54 @@ export function TournamentManageView({
         <p className="whitespace-pre-wrap text-sm text-zinc-300">{t.description}</p>
       )}
 
-      {embedded && !editing && (
+      {showTabBar && !editing && (
         <div>
-          <h2 className="mb-3 font-semibold">
-            {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
-          </h2>
+          {effectiveViewMode === "full" && (
+            <h2 className="mb-3 font-semibold">
+              {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
+            </h2>
+          )}
           <div className="admin-tab-bar">
-          <button
-            type="button"
-            onClick={() => setTab("participants")}
-            className={adminTabClass(tab === "participants")}
-          >
-            Участники
-            {participantCount > 0 ? ` (${participantCount})` : ""}
-          </button>
+          {effectiveViewMode === "full" && (
+            <button
+              type="button"
+              onClick={() => setTab("participants")}
+              className={adminTabClass(tab === "participants")}
+            >
+              Участники
+              {participantCount > 0 ? ` (${participantCount})` : ""}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setTab("bracket")}
             className={adminTabClass(tab === "bracket")}
           >
             Сетка
-            {rounds.length > 0 ? ` · ${maxRound} ${swiss ? "тур." : "раунд."}` : ""}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("current-matches")}
+            className={adminTabClass(tab === "current-matches")}
+          >
+            Текущие встречи
+            {currentMatches.length > 0 ? ` (${currentMatches.length})` : ""}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("upcoming-matches")}
+            className={adminTabClass(tab === "upcoming-matches")}
+          >
+            Предстоящие встречи
+            {upcomingMatches.length > 0 ? ` (${upcomingMatches.length})` : ""}
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("completed-matches")}
+            className={adminTabClass(tab === "completed-matches")}
+          >
+            Завершённые встречи
+            {completedMatches.length > 0 ? ` (${completedMatches.length})` : ""}
           </button>
           <button
             type="button"
@@ -371,7 +447,7 @@ export function TournamentManageView({
         </div>
       )}
 
-      {(!embedded || tab === "participants") && (
+      {showParticipants && (effectiveViewMode === "tournament" || !embedded || tab === "participants") && (
         <ParticipantsTab
           t={t}
           pair={pair}
@@ -379,6 +455,7 @@ export function TournamentManageView({
           confirmedRegistrations={confirmedRegistrations}
           otherRegistrations={otherRegistrations}
           activeTeams={activeTeams}
+          inactiveTeams={inactiveTeams}
           playerOptions={playerOptions}
           bracketLocked={bracketLocked}
           canModifyRegistrations={canModifyRegistrations}
@@ -390,7 +467,7 @@ export function TournamentManageView({
         />
       )}
 
-      {(!embedded || tab === "bracket") && (
+      {bracketTabOpen("bracket") && (
         <BracketTab
           t={t}
           format={t.format}
@@ -400,6 +477,7 @@ export function TournamentManageView({
           currentRoundOpen={currentRoundOpen}
           bracketLoading={bracketLoading}
           bracketMatches={bracketMatches}
+          matchNumbers={bracketMatchNumbers}
           onGenerateBracket={onGenerateBracket}
           onResetAllMatches={onResetAllMatches}
           onRegenerateBracket={onRegenerateBracket}
@@ -408,7 +486,37 @@ export function TournamentManageView({
         />
       )}
 
-      {(!embedded || tab === "protocol") && (
+      {bracketTabOpen("current-matches") && (
+        <MatchesScheduleTab
+          variant="current"
+          matches={currentMatches}
+          matchNumbers={bracketMatchNumbers}
+          onSaveMatchResult={onSaveMatchResult}
+          onCancelMatchResult={onCancelMatchResult}
+        />
+      )}
+
+      {bracketTabOpen("upcoming-matches") && (
+        <MatchesScheduleTab
+          variant="upcoming"
+          matches={upcomingMatches}
+          matchNumbers={bracketMatchNumbers}
+          onSaveMatchResult={onSaveMatchResult}
+          onCancelMatchResult={onCancelMatchResult}
+        />
+      )}
+
+      {bracketTabOpen("completed-matches") && (
+        <MatchesScheduleTab
+          variant="completed"
+          matches={completedMatches}
+          matchNumbers={bracketMatchNumbers}
+          onSaveMatchResult={onSaveMatchResult}
+          onCancelMatchResult={onCancelMatchResult}
+        />
+      )}
+
+      {bracketTabOpen("protocol") && (
         <ProtocolTab
           t={t}
           swiss={swiss}
@@ -428,6 +536,7 @@ function ParticipantsTab({
   confirmedRegistrations,
   otherRegistrations,
   activeTeams,
+  inactiveTeams,
   playerOptions,
   bracketLocked,
   canModifyRegistrations,
@@ -443,6 +552,7 @@ function ParticipantsTab({
   confirmedRegistrations: AdminTournament["registrations"];
   otherRegistrations: AdminTournament["registrations"];
   activeTeams: Team[];
+  inactiveTeams: Team[];
   playerOptions: { value: string; label: string }[];
   bracketLocked: boolean;
   canModifyRegistrations: boolean;
@@ -562,28 +672,97 @@ function ParticipantsTab({
       )}
 
       {!pair && otherRegistrations.length > 0 && (
-        <ul className="space-y-2">
-          {otherRegistrations.map((r) => (
-            <li key={r.id} className="tournament-participant-card opacity-80">
-              <div className="min-w-0 flex-1">
-                <div className="tournament-participant-name">
-                  {r.player.lastName} {r.player.firstName}
-                  <span className="tournament-participant-meta ml-1 font-normal">
-                    · рейтинг {r.player.rating}
-                  </span>
+        <div>
+          <p className="tournament-section-label">
+            Снятые и отклонённые ({otherRegistrations.length})
+          </p>
+          <ul className="space-y-2">
+            {otherRegistrations.map((r) => (
+              <li key={r.id} className="tournament-participant-card opacity-80">
+                <div className="min-w-0 flex-1">
+                  <div className="tournament-participant-name">
+                    {r.player.lastName} {r.player.firstName}
+                    <span className="tournament-participant-meta ml-1 font-normal">
+                      · рейтинг {r.player.rating}
+                    </span>
+                  </div>
+                  <PlayerContactLinks
+                    phone={r.player.phone}
+                    telegramUsername={r.player.telegramUsername}
+                  />
                 </div>
-                <PlayerContactLinks
-                  phone={r.player.phone}
-                  telegramUsername={r.player.telegramUsername}
-                />
-              </div>
-              <StatusBadge
-                status={r.status}
-                label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
-              />
-            </li>
-          ))}
-        </ul>
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                  <StatusBadge
+                    status={r.status}
+                    label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
+                  />
+                  {canModifyRegistrations &&
+                    t.status === "OPEN" &&
+                    (r.status === "CANCELLED" || r.status === "REJECTED") && (
+                      <RegistrationActionButton
+                        variant="primary"
+                        loadingLabel={
+                          r.status === "CANCELLED" ? "Регистрируем…" : "Подтверждаем…"
+                        }
+                        onClick={() => onConfirmRegistration(r.id)}
+                      >
+                        {r.status === "CANCELLED" ? "Зарегистрировать снова" : "Подтвердить"}
+                      </RegistrationActionButton>
+                    )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {pair && inactiveTeams.length > 0 && (
+        <div>
+          <p className="tournament-section-label">
+            Снятые и отклонённые пары ({inactiveTeams.length})
+          </p>
+          <ul className="space-y-2">
+            {inactiveTeams.map((team) => (
+              <li
+                key={team.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-zinc-900 px-3 py-2 text-sm opacity-80"
+              >
+                <div className="min-w-0 flex-1">
+                  <div>{teamLabel(team)}</div>
+                  <div className="mt-1 space-y-0.5">
+                    <PlayerContactLinks
+                      phone={team.player1.phone}
+                      telegramUsername={team.player1.telegramUsername}
+                    />
+                    {team.player2 && (
+                      <PlayerContactLinks
+                        phone={team.player2.phone}
+                        telegramUsername={team.player2.telegramUsername}
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge
+                    status={team.status}
+                    label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
+                  />
+                  {canModifyRegistrations && t.status === "OPEN" && !bracketLocked && (
+                    <RegistrationActionButton
+                      variant="primary"
+                      loadingLabel={
+                        team.status === "CANCELLED" ? "Регистрируем…" : "Подтверждаем…"
+                      }
+                      onClick={() => onConfirmTeam(team.id)}
+                    >
+                      {team.status === "CANCELLED" ? "Зарегистрировать снова" : "Подтвердить"}
+                    </RegistrationActionButton>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {!pair && t.registrations.length === 0 && (
@@ -606,6 +785,7 @@ function BracketTab({
   currentRoundOpen,
   bracketLoading,
   bracketMatches,
+  matchNumbers,
   onGenerateBracket,
   onResetAllMatches,
   onRegenerateBracket,
@@ -620,6 +800,7 @@ function BracketTab({
   currentRoundOpen: boolean;
   bracketLoading: boolean;
   bracketMatches: BracketMatchView[];
+  matchNumbers: Map<string, number>;
   onGenerateBracket: () => void | Promise<void>;
   onResetAllMatches?: () => void | Promise<void>;
   onRegenerateBracket?: () => void | Promise<void>;
@@ -647,13 +828,6 @@ function BracketTab({
     id: string;
     preview?: TeamPlayer;
   } | null>(null);
-
-  const matchNumbers = useMemo(() => {
-    const sorted = [...bracketMatches].sort(
-      (a, b) => a.round - b.round || a.slot - b.slot,
-    );
-    return new Map(sorted.map((m, i) => [m.id, i + 1]));
-  }, [bracketMatches]);
 
   async function handleSaveMatchResult(payload: MatchResultPayload) {
     setMatchSaving(true);
@@ -808,13 +982,14 @@ function BracketTab({
       ) : (
         <>
           <p className="tournament-hint">
-            {olympic
-              ? "Имя — профиль игрока · рамка счёта или строка «Фора» — результат встречи."
-              : "Зажмите фон сетки и тащите. Имя — карточка игрока, счёт / # / подвал — результат встречи."}
+            Зажмите фон сетки и тащите. Имя — карточка игрока, счёт / # / «Фора» — результат
+            встречи.
           </p>
           {olympic ? (
             <OlympicBracketView
               matches={bracketMatches}
+              matchNumbers={matchNumbers}
+              withBronzeMatch={isOlympicBronzeFormat(format)}
               onMatchClick={setModalMatch}
               onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
               showMatchScore
@@ -871,6 +1046,117 @@ function BracketTab({
   );
 }
 
+function MatchesScheduleTab({
+  variant,
+  matches,
+  matchNumbers,
+  onSaveMatchResult,
+  onCancelMatchResult,
+}: {
+  variant: "current" | "upcoming" | "completed";
+  matches: BracketMatchView[];
+  matchNumbers: Map<string, number>;
+  onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
+  onCancelMatchResult?: (matchId: string) => Promise<void>;
+}) {
+  const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
+  const [matchSaving, setMatchSaving] = useState(false);
+
+  async function handleSaveMatchResult(payload: MatchResultPayload) {
+    setMatchSaving(true);
+    try {
+      await onSaveMatchResult(payload);
+    } finally {
+      setMatchSaving(false);
+    }
+  }
+
+  async function handleCancelMatchResult(matchId: string) {
+    if (!onCancelMatchResult) return;
+    setMatchSaving(true);
+    try {
+      await onCancelMatchResult(matchId);
+    } finally {
+      setMatchSaving(false);
+    }
+  }
+
+  const emptyHint =
+    variant === "current"
+      ? "Нет встреч в процессе. Начало фиксируется в карточке встречи на сетке."
+      : variant === "upcoming"
+        ? "Нет готовых встреч — дождитесь соперников или сформируйте следующий тур."
+        : "Пока нет завершённых встреч.";
+  const showScore = variant === "current" || variant === "completed";
+  const rowHint =
+    variant === "completed"
+      ? "Нажмите на строку, чтобы открыть карточку встречи, изменить данные или отменить результат."
+      : "Нажмите на строку, чтобы открыть карточку встречи и зафиксировать результат.";
+
+  return (
+    <div className="space-y-4">
+      {matches.length === 0 ? (
+        <p className="tournament-hint text-sm">{emptyHint}</p>
+      ) : (
+        <div className="admin-table-wrap overflow-x-auto">
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead className="admin-thead">
+              <tr>
+                <th className="px-4 py-3 font-medium">#</th>
+                <th className="px-4 py-3 font-medium">Встреча</th>
+                {showScore && (
+                  <th className="px-4 py-3 font-medium">Счёт</th>
+                )}
+                <th className="px-4 py-3 font-medium">Начало</th>
+                <th className="px-4 py-3 font-medium">Окончание</th>
+              </tr>
+            </thead>
+            <tbody>
+              {matches.map((match) => (
+                  <tr
+                    key={match.id}
+                    className="admin-table-row cursor-pointer border-t border-[var(--admin-border)] hover:bg-zinc-800/40"
+                    onClick={() => setModalMatch(match)}
+                  >
+                    <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">
+                      {matchNumbers.get(match.id) ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 font-medium">
+                      {matchParticipantsLabel(match)}
+                    </td>
+                    {showScore && (
+                      <td className="px-4 py-3 font-mono">
+                        {matchScoreLabel(match)}
+                      </td>
+                    )}
+                    <td className="px-4 py-3 font-mono tournament-participant-meta">
+                      {formatMatchDateTime(match.startedAt)}
+                    </td>
+                    <td className="px-4 py-3 font-mono tournament-participant-meta">
+                      {match.finishedAt
+                        ? formatMatchDateTime(match.finishedAt)
+                        : "—"}
+                    </td>
+                  </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      <p className="tournament-hint text-xs">{rowHint}</p>
+      <MatchResultModal
+        match={modalMatch}
+        matchNumber={modalMatch ? matchNumbers.get(modalMatch.id) : undefined}
+        open={modalMatch !== null}
+        saving={matchSaving}
+        onClose={() => setModalMatch(null)}
+        onSave={handleSaveMatchResult}
+        onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
+      />
+    </div>
+  );
+}
+
 function ProtocolTab({
   t,
   swiss,
@@ -919,11 +1205,12 @@ function ProtocolTab({
         </p>
       ) : (
         <div className="admin-table-wrap overflow-x-auto">
-          <table className="w-full min-w-[480px] text-left text-sm">
+          <table className="w-full min-w-[560px] text-left text-sm">
             <thead className="admin-thead">
               <tr>
                 <th className="px-4 py-3 font-medium">Место</th>
                 <th className="px-4 py-3 font-medium">Участник</th>
+                <th className="px-4 py-3 font-medium">Город</th>
                 <th className="px-4 py-3 font-medium">Рейтинг</th>
                 {showSwissPoints && (
                   <th className="px-4 py-3 font-medium">Очки</th>
@@ -933,9 +1220,12 @@ function ProtocolTab({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={`${row.place}-${row.label}`} className="admin-table-row border-t border-[var(--admin-border)]">
-                  <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">{row.place}</td>
+                <tr key={`${row.place ?? "x"}-${row.label}`} className="admin-table-row border-t border-[var(--admin-border)]">
+                  <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">
+                    {row.place ?? "—"}
+                  </td>
                   <td className="px-4 py-3 font-medium">{row.label}</td>
+                  <td className="px-4 py-3 tournament-participant-meta">{row.city}</td>
                   <td className="px-4 py-3 font-mono tournament-participant-meta">{formatRating(row.rating)}</td>
                   {showSwissPoints && (
                     <td className="px-4 py-3 font-mono">{row.points ?? 0}</td>
@@ -1152,7 +1442,7 @@ function PairTeamRow({
           status={team.status}
           label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
         />
-        {team.status === "PENDING" && (
+        {(team.status === "PENDING" || team.status === "REJECTED") && (
           <RegistrationActionButton variant="primary" loadingLabel="Подтверждаем…" onClick={onConfirm}>
             Подтвердить
           </RegistrationActionButton>

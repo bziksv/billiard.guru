@@ -58,8 +58,13 @@ export function TournamentListCard({
               {starting ? "Запуск…" : "Начать турнир"}
             </button>
           )}
+          {(t.status === "ACTIVE" || t.matches.length > 0) && (
+            <Link href={`/admin/brackets/tournament/${t.id}`} className="admin-btn-primary">
+              Сетка
+            </Link>
+          )}
           <Link href={`/admin/tournaments/${t.id}`} className="admin-btn-secondary">
-            {t.status === "ACTIVE" ? "Ведение" : "Управление"}
+            {t.status === "ACTIVE" ? "Участники" : "Управление"}
           </Link>
         </div>
       </div>

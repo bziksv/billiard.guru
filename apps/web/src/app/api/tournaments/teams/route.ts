@@ -14,6 +14,11 @@ import {
   requireTournamentManageAccess,
   tournamentManageActorType,
 } from "@/lib/tournament-manage";
+import {
+  notifyTournamentTeamRegisteredByClub,
+  notifyTournamentTeamRegistrationConfirmed,
+  notifyTournamentTeamRegistrationRejected,
+} from "@/lib/tournament-registration-notify";
 import { tournamentTeamSchema, tournamentTeamUpdateSchema } from "@/lib/validators";
 
 async function findPlayerTeamConflict(
@@ -114,6 +119,9 @@ export async function POST(request: NextRequest) {
     });
 
     log.info({ teamId: team.id }, "Pair team registered");
+    if (data.source === "CLUB") {
+      await notifyTournamentTeamRegisteredByClub(team.id);
+    }
     return NextResponse.json(team, { status: 201 });
   } catch (error) {
     log.error({ error }, "Team registration failed");
@@ -262,6 +270,12 @@ export async function PATCH(request: NextRequest) {
         entityType: "tournament_team",
         entityId: team.id,
       });
+
+      if (data.status === "CONFIRMED") {
+        await notifyTournamentTeamRegistrationConfirmed(team.id);
+      } else if (data.status === "REJECTED") {
+        await notifyTournamentTeamRegistrationRejected(team.id);
+      }
 
       return NextResponse.json(team);
     }

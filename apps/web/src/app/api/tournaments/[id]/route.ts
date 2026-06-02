@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
+import {
+  getBracketFormatSettings,
+  isBracketFormatSelectable,
+} from "@/lib/bracket-formats/settings-server";
 import { isPairFormat } from "@/lib/pair-tournament";
 import { prisma } from "@/lib/prisma";
 import { tournamentAdminInclude } from "@/lib/tournament-admin";
@@ -43,6 +47,20 @@ export async function PATCH(
     const { session } = await requireTournamentManageAccess(id);
     const body = await request.json();
     const data = tournamentUpdateSchema.parse(body);
+
+    if (data.format !== undefined) {
+      const formatSettings = await getBracketFormatSettings(data.format);
+      if (!isBracketFormatSelectable(formatSettings)) {
+        return NextResponse.json(
+          {
+            error: formatSettings.maintenanceMode
+              ? "Этот тип сетки на техобслуживании"
+              : "Этот тип сетки отключён в настройках админки",
+          },
+          { status: 400 },
+        );
+      }
+    }
 
     if (data.status === "ACTIVE") {
       const current = await prisma.tournament.findUnique({
