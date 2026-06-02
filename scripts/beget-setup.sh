@@ -4,12 +4,59 @@
 #
 #   cd ~/billiard.guru/setka
 #   ./scripts/beget-setup.sh
+#
+# При падении сборки восстанавливает предыдущий standalone (чтобы не оставить 403).
+# В конце — ./scripts/beget-verify.sh (HTTP + symlink + Passenger).
 set -euo pipefail
 
 SITE_ROOT="${SITE_ROOT:-$HOME/billiard.guru}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 WEB="$REPO_ROOT/apps/web"
 STANDALONE="$WEB/.next/standalone"
+STANDALONE_BACKUP="$SITE_ROOT/.standalone-backup"
+DEPLOY_OK=0
+
+restore_standalone_if_failed() {
+  local ec=$?
+  if [ "$DEPLOY_OK" = "1" ] || [ "$ec" -eq 0 ]; then
+    exit "$ec"
+  fi
+  if [ ! -f "$STANDALONE_BACKUP/server.js" ]; then
+    echo ""
+    echo "⚠ Сборка упала (код $ec), резервного standalone нет — сайт может отдавать 403."
+    echo "  Исправьте ошибку сборки и запустите ./scripts/beget-setup.sh снова."
+    exit "$ec"
+  fi
+  echo ""
+  echo "⚠ Сборка упала (код $ec). Восстанавливаем предыдущий standalone (без 403)…"
+  rm -rf "$STANDALONE"
+  mkdir -p "$(dirname "$STANDALONE")"
+  cp -a "$STANDALONE_BACKUP" "$STANDALONE"
+  mkdir -p "$STANDALONE/public" "$STANDALONE/.next"
+  if [ ! -d "$STANDALONE/.next/static" ] && [ -d "$WEB/.next/static" ]; then
+    cp -r "$WEB/.next/static" "$STANDALONE/.next/static" 2>/dev/null || true
+  fi
+  if [ -f "$WEB/.env" ]; then
+    cp "$WEB/.env" "$STANDALONE/.env"
+    ln -sfn "$WEB/.env" "$STANDALONE/.env.local"
+  fi
+  ln -sfn "$STANDALONE/public" "$SITE_ROOT/public_html"
+  mkdir -p "$STANDALONE/tmp"
+  touch "$STANDALONE/tmp/restart.txt"
+  echo "  ✓ Откат выполнен. Исправьте ошибку сборки и запустите скрипт снова."
+  exit "$ec"
+}
+
+trap restore_standalone_if_failed EXIT
+
+backup_current_standalone() {
+  if [ ! -f "$STANDALONE/server.js" ]; then
+    return 0
+  fi
+  echo "→ Резервная копия текущего standalone (на случай падения build)…"
+  rm -rf "$STANDALONE_BACKUP"
+  cp -a "$STANDALONE" "$STANDALONE_BACKUP"
+}
 
 find_working_node() {
   local candidate dir
@@ -87,6 +134,7 @@ else
 fi
 
 echo "→ npm run build…"
+backup_current_standalone
 load_env_for_build
 NODE_ENV=production npm run build:beget
 
@@ -170,6 +218,17 @@ if [ -n "${TELEGRAM_BOT_TOKEN:-}" ]; then
       && echo "  ✓ webhook установлен" \
       || echo "  ⚠ не удалось установить webhook (проверьте TELEGRAM_BOT_TOKEN)"
   fi
+fi
+
+DEPLOY_OK=1
+
+echo ""
+echo "→ Проверка сайта…"
+chmod +x "$REPO_ROOT/scripts/beget-verify.sh"
+if ! "$REPO_ROOT/scripts/beget-verify.sh"; then
+  echo ""
+  echo "Проверка не пройдена. Диагностика: ./scripts/beget-diagnose.sh"
+  exit 1
 fi
 
 echo ""

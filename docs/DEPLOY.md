@@ -128,6 +128,14 @@ git pull
 
 Типичная ошибка: **«You don't have permission to access this resource»** — Apache не видит приложение Passenger, а не ошибка Next.js.
 
+### Почему «каждый раз» после git pull
+
+1. `./scripts/beget-setup.sh` запускает `npm run build`
+2. Next.js **удаляет `.next/`** в начале сборки
+3. Если сборка **падает** (TypeScript, env) — каталог `standalone/` пропадает, а `public_html` указывает в никуда → **403**
+
+**С версии с `beget-verify.sh`:** перед build делается резервная копия standalone; при падении сборки скрипт **откатывает** предыдущую версию. В конце — автоматическая проверка HTTP.
+
 **Частые причины:**
 
 1. **Битая ссылка `public_html`** — после неудачной сборки `npm run build` каталог `.next/standalone` исчез, а symlink остался.
@@ -154,3 +162,15 @@ git pull
 ```
 
 Если `beget-setup.sh` падает — сайт останется 403 до успешной сборки. Смотрите вывод скрипта (Node, `npm run build`, DATABASE_URL).
+
+**Проверка после деплоя (обязательно):**
+
+```bash
+cd ~/billiard.guru/setka
+./scripts/beget-verify.sh
+# или с Mac:
+curl -s -o /dev/null -w "%{http_code}" -L https://billiard.guru/
+# ожидается 200, не 403
+```
+
+`beget-setup.sh` вызывает `beget-verify.sh` автоматически в конце.

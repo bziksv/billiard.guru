@@ -1,0 +1,43 @@
+---
+description: Beget деплой — не оставлять 403, проверять после сборки и правок build/tsconfig
+alwaysApply: true
+---
+
+# Beget: деплой и 403 Forbidden
+
+**403 на billiard.guru** — почти всегда Apache/Passenger, не баг Next.js в рантайме.
+
+## Типичная цепочка «каждый раз 403»
+
+1. `git pull` → `./scripts/beget-setup.sh`
+2. **`npm run build` падает** (TypeScript, Prisma, env)
+3. Next.js **стирает `.next/`** в начале сборки → `standalone/` исчезает
+4. `public_html` всё ещё указывает на **несуществующий** каталог → **403**
+
+Пока сборка не прошла до конца, сайт может быть сломан.
+
+## Обязательно для агента
+
+После правок, влияющих на prod-сборку (`apps/web` TS, `tsconfig`, `next.config`, `package.json`, `scripts/beget-setup.sh`):
+
+1. Локально: `cd apps/web && npm run build:beget` — **без ошибок**
+2. `scripts/` **не** должны ломать `next build` — в `apps/web/tsconfig.json` они в `exclude`
+3. После деплоя (или когда пользователь жалуется на 403): напомнить на сервере:
+   ```bash
+   cd ~/billiard.guru/setka && git pull && ./scripts/beget-setup.sh
+   ```
+   Скрипт сам откатывает standalone при падении сборки и гоняет `./scripts/beget-verify.sh`.
+
+4. Проверка prod (агент **сам**):
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" -L https://billiard.guru/
+   ```
+   Ожидается **200** (или 301/302), **не 403**.
+
+5. Если 403 — `./scripts/beget-diagnose.sh`, затем полный `./scripts/beget-setup.sh` (не только `touch restart.txt`).
+
+## Не ломать деплой
+
+- Тестовые скрипты в `apps/web/scripts/` — только `tsx`, не включать в tsconfig Next без нужды
+- Prisma client на Beget — из git; после `schema.prisma` на Mac: `npm run db:generate` → commit
+- Документация: `docs/DEPLOY.md`, раздел «403 Forbidden»

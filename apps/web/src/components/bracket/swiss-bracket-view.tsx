@@ -302,7 +302,7 @@ export function SwissBracketView({
                       fromPos.col,
                       toPos.col,
                       layout.minCol,
-                      layout.colWidth,
+                      colW,
                       trunkY,
                     )
                   : crossToQuarter
@@ -312,7 +312,7 @@ export function SwissBracketView({
                         fromPos.col,
                         toPos.col,
                         layout.minCol,
-                        layout.colWidth,
+                        colW,
                         edge.fromTeamSlot ?? 0,
                       )
                     : gridFixedConnectorPath(
@@ -322,7 +322,7 @@ export function SwissBracketView({
                         fromPos.col,
                         toPos.col,
                         layout.minCol,
-                        layout.colWidth,
+                        colW,
                         0,
                       );
                 const r1LowerFork = isFixedSwissR1LowerLossEdge(

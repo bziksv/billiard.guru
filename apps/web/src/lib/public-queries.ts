@@ -98,18 +98,18 @@ export const playListingListInclude = {
 } satisfies Prisma.PlayListingInclude;
 
 export const playListingListOrderBy = [
-  { createdAt: "desc" as const },
-] as const;
+  { createdAt: "desc" },
+] satisfies Prisma.PlayListingOrderByWithRelationInput[];
 
 export const coachListInclude = {
   city: { include: { country: true } },
 } satisfies Prisma.PlayerInclude;
 
 export const coachListOrderBy = [
-  { coachReviewCount: "desc" as const },
-  { coachReviewAvg: "desc" as const },
-  { lastName: "asc" as const },
-] as const;
+  { coachReviewCount: "desc" },
+  { coachReviewAvg: "desc" },
+  { lastName: "asc" },
+] satisfies Prisma.PlayerOrderByWithRelationInput[];
 
 export const tournamentListInclude = {
   club: { include: { city: { include: { country: true } } } },

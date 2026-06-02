@@ -7,6 +7,7 @@ import {
   computePlayListingExpiresAt,
   serializePlayListing,
 } from "@/lib/play-listing-server";
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   playListingGeoWhere,
@@ -49,12 +50,21 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const where = {
+    const where: Prisma.PlayListingWhereInput = {
       ...playListingGeoWhere(resolvedGeo),
       ...(scheduleType === "ONE_TIME" || scheduleType === "RECURRING"
         ? { scheduleType }
         : {}),
-      ...(kind ? { kind: kind as "SPARRING" | "PARTNER" | "OPPONENT" | "TRAINING" | "OTHER" } : {}),
+      ...(kind
+        ? {
+            kind: kind as
+              | "SPARRING"
+              | "PARTNER"
+              | "OPPONENT"
+              | "TRAINING"
+              | "OTHER",
+          }
+        : {}),
     };
 
     const listings = await prisma.playListing.findMany({
@@ -138,7 +148,7 @@ export async function POST(request: NextRequest) {
         kind: data.kind,
         scheduleType: data.scheduleType,
         playAt,
-        weekdays: data.scheduleType === "RECURRING" ? data.weekdays : null,
+        weekdays: data.scheduleType === "RECURRING" ? data.weekdays : undefined,
         timeFrom: data.timeFrom || null,
         timeTo: data.timeTo || null,
         gameFormat: data.gameFormat || null,
