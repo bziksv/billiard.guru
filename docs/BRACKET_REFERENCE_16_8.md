@@ -104,5 +104,6 @@ cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts
 ## Связанные документы
 
 - [FIXED_SWISS_BRACKET_LINES.md](./FIXED_SWISS_BRACKET_LINES.md) — только SVG и trunk Y  
+- [BRACKET_REFERENCE_32_16.md](./BRACKET_REFERENCE_32_16.md) — эталон 32→16 (59 встреч)  
 - [ADMIN.md](./ADMIN.md) — операции организатора  
 - Правило Cursor: `.cursor/rules/bracket-reference-16-8.mdc`

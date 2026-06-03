@@ -58,6 +58,7 @@ export default function AdminBracketTournamentPage() {
     cancelMatchResult,
     resetAllMatches,
     regenerateBracketGrid,
+    deleteBracketGrid,
   } = useAdminTournamentBracketActions(id, reload);
 
   const clubOptions = useMemo(
@@ -66,6 +67,13 @@ export default function AdminBracketTournamentPage() {
   );
 
   const noop = useCallback(async () => {}, []);
+
+  const handleDeleteBracket = useCallback(async () => {
+    await deleteBracketGrid();
+    const formatCode = tournament?.format;
+    const def = formatCode ? getBracketFormat(formatCode) : null;
+    router.push(def ? `/admin/brackets/formats/${def.code}` : "/admin/brackets");
+  }, [deleteBracketGrid, router, tournament?.format]);
 
   async function deleteTournament() {
     if (!tournament) return;
@@ -155,6 +163,7 @@ export default function AdminBracketTournamentPage() {
           onGenerateBracket={generateBracket}
           onResetAllMatches={resetAllMatches}
           onRegenerateBracket={regenerateBracketGrid}
+          onDeleteBracket={handleDeleteBracket}
           onSaveMatchResult={saveMatchResult}
           onCancelMatchResult={cancelMatchResult}
           onUpdated={reload}

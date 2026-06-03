@@ -13,6 +13,7 @@ import {
   teamRating,
   type TeamWithPlayers,
 } from "@/lib/pair-tournament";
+import type { BracketParticipantRules } from "@/lib/bracket-participant-rules";
 type PlayerWithCity = {
   city?: { nameRu: string } | null;
 };
@@ -90,6 +91,8 @@ export interface AdminTournament {
   registrations: AdminTournamentParticipant[];
   teams: AdminTournamentTeam[];
   matches: AdminTournamentMatch[];
+  /** Лимиты участников для формата (из /admin/brackets). */
+  participantRules?: BracketParticipantRules;
 }
 
 export function countConfirmedParticipants(t: AdminTournament): number {

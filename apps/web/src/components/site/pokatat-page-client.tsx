@@ -232,7 +232,7 @@ export function PokatatPageClient({
           </div>
 
           {loading ? (
-            <p className="text-sm text-zinc-500">Загрузка…</p>
+            <p className="home-card-body text-sm">Загрузка…</p>
           ) : listings.length === 0 ? (
             <>
               <EmptyState
@@ -264,14 +264,14 @@ export function PokatatPageClient({
       {tab === "create" && (
         <SiteCard>
           {!isLoggedIn ? (
-            <div className="space-y-3 text-sm text-zinc-400">
+            <div className="home-card-body space-y-3 text-sm">
               <p>Публиковать объявления могут зарегистрированные игроки.</p>
               <Link href="/login?next=/pokatat?tab=create" className="site-btn-primary inline-flex">
                 Войти
               </Link>
             </div>
           ) : !isVerified ? (
-            <p className="text-sm text-amber-400/90">
+            <p className="text-sm text-amber-700 dark:text-amber-400/90">
               Подтвердите регистрацию в Telegram — после этого можно публиковать объявления.
             </p>
           ) : (
@@ -283,7 +283,7 @@ export function PokatatPageClient({
               }}
             >
               <section className="space-y-4">
-                <h3 className="text-sm font-medium text-zinc-300">О чём объявление</h3>
+                <h3 className="site-form-section-title">О чём объявление</h3>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
@@ -317,16 +317,16 @@ export function PokatatPageClient({
                 </div>
               </section>
 
-              <section className="space-y-4 border-t border-zinc-800 pt-6">
-                <h3 className="text-sm font-medium text-zinc-300">Когда играете</h3>
+              <section className="site-section-divider space-y-4 pt-6">
+                <h3 className="site-form-section-title">Когда играете</h3>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => setScheduleType("ONE_TIME")}
                     className={
                       scheduleType === "ONE_TIME"
-                        ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white"
-                        : "rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400"
+                        ? "site-chip site-chip--active"
+                        : "site-chip"
                     }
                   >
                     Разово
@@ -336,8 +336,8 @@ export function PokatatPageClient({
                     onClick={() => setScheduleType("RECURRING")}
                     className={
                       scheduleType === "RECURRING"
-                        ? "rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white"
-                        : "rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400"
+                        ? "site-chip site-chip--active"
+                        : "site-chip"
                     }
                   >
                     На постоянке
@@ -347,7 +347,7 @@ export function PokatatPageClient({
                 {scheduleType === "ONE_TIME" ? (
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block text-sm">
-                      <span className="mb-1 block text-zinc-500">Дата</span>
+                      <span className="site-form-label mb-1 block">Дата</span>
                       <input
                         type="date"
                         value={playDate}
@@ -358,7 +358,7 @@ export function PokatatPageClient({
                       />
                     </label>
                     <label className="block text-sm">
-                      <span className="mb-1 block text-zinc-500">Время</span>
+                      <span className="site-form-label mb-1 block">Время</span>
                       <input
                         type="time"
                         value={playTime}
@@ -371,7 +371,7 @@ export function PokatatPageClient({
                 ) : (
                   <div className="space-y-4">
                     <div>
-                      <p className="mb-2 text-xs text-zinc-500">Дни недели</p>
+                      <p className="site-form-label mb-2">Дни недели</p>
                       <div className="flex flex-wrap gap-2">
                         {WEEKDAY_LABELS.map((label, day) => (
                           <button
@@ -380,8 +380,8 @@ export function PokatatPageClient({
                             onClick={() => toggleWeekday(day)}
                             className={
                               weekdays.includes(day)
-                                ? "rounded-lg bg-emerald-600 px-3 py-1.5 text-sm text-white"
-                                : "rounded-lg border border-zinc-700 px-3 py-1.5 text-sm text-zinc-400"
+                                ? "site-chip site-chip--sm site-chip--active"
+                                : "site-chip site-chip--sm"
                             }
                           >
                             {label}
@@ -391,7 +391,7 @@ export function PokatatPageClient({
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="block text-sm">
-                        <span className="mb-1 block text-zinc-500">С</span>
+                        <span className="site-form-label mb-1 block">С</span>
                         <input
                           type="time"
                           value={timeFrom}
@@ -401,7 +401,7 @@ export function PokatatPageClient({
                         />
                       </label>
                       <label className="block text-sm">
-                        <span className="mb-1 block text-zinc-500">До</span>
+                        <span className="site-form-label mb-1 block">До</span>
                         <input
                           type="time"
                           value={timeTo}
@@ -414,8 +414,8 @@ export function PokatatPageClient({
                 )}
               </section>
 
-              <section className="space-y-4 border-t border-zinc-800 pt-6">
-                <h3 className="text-sm font-medium text-zinc-300">Где и с кем</h3>
+              <section className="site-section-divider space-y-4 pt-6">
+                <h3 className="site-form-section-title">Где и с кем</h3>
                 <CitySelect value={cityId} onChange={setCityId} required />
                 <SearchableSelect
                   label="Клуб (необязательно)"
@@ -427,7 +427,7 @@ export function PokatatPageClient({
                 />
                 <div className="grid gap-4 sm:grid-cols-3">
                   <label className="block text-sm">
-                    <span className="mb-1 block text-zinc-500">Рейтинг от</span>
+                    <span className="site-form-label mb-1 block">Рейтинг от</span>
                     <input
                       type="number"
                       step="0.5"
@@ -440,7 +440,7 @@ export function PokatatPageClient({
                     />
                   </label>
                   <label className="block text-sm">
-                    <span className="mb-1 block text-zinc-500">Рейтинг до</span>
+                    <span className="site-form-label mb-1 block">Рейтинг до</span>
                     <input
                       type="number"
                       step="0.5"
@@ -453,7 +453,7 @@ export function PokatatPageClient({
                     />
                   </label>
                   <label className="block text-sm">
-                    <span className="mb-1 block text-zinc-500">Сколько игроков</span>
+                    <span className="site-form-label mb-1 block">Сколько игроков</span>
                     <input
                       type="number"
                       min="1"
@@ -466,7 +466,7 @@ export function PokatatPageClient({
                 </div>
               </section>
 
-              {submitError && <p className="text-sm text-red-400">{submitError}</p>}
+              {submitError && <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>}
 
               <button
                 type="submit"
@@ -500,7 +500,7 @@ export function PokatatPageClient({
       )}
 
       {tab === "browse" && geoQuery && (
-        <p className="text-xs text-zinc-600">
+        <p className="home-card-muted text-xs">
           Фильтр региона применяется из панели выше{geoQuery ? "" : ""}.
         </p>
       )}

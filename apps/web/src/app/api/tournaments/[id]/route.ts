@@ -3,6 +3,7 @@ import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import {
   getBracketFormatSettings,
+  getResolvedParticipantRules,
   isBracketFormatSelectable,
 } from "@/lib/bracket-formats/settings-server";
 import { isPairFormat } from "@/lib/pair-tournament";
@@ -12,6 +13,7 @@ import {
   requireTournamentManageAccess,
   tournamentManageActorType,
 } from "@/lib/tournament-manage";
+import { assertTournamentFitsFormat } from "@/lib/tournament-participant-limit-server";
 import { tournamentUpdateSchema } from "@/lib/validators";
 
 export async function GET(
@@ -30,7 +32,9 @@ export async function GET(
       return NextResponse.json({ error: "Турнир не найден" }, { status: 404 });
     }
 
-    return NextResponse.json(tournament);
+    const participantRules = await getResolvedParticipantRules(tournament.format);
+
+    return NextResponse.json({ ...tournament, participantRules });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
@@ -60,6 +64,7 @@ export async function PATCH(
           { status: 400 },
         );
       }
+      await assertTournamentFitsFormat(data.format, id);
     }
 
     if (data.status === "ACTIVE") {
@@ -125,6 +130,9 @@ export async function PATCH(
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
+    if (error instanceof Error && error.message !== "Турнир не найден") {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json({ error: "Не удалось обновить турнир" }, { status: 500 });
   }
 }

@@ -193,13 +193,15 @@ export function MatchResultModal({
     await saveTimesOnly({ startOnly: true, startOverride: now, closeAfter: true });
   }
 
-  async function stampFinishNow() {
+  function stampFinishNow() {
     const now = nowDatetimeLocal();
     setFinishedAt(now);
     if (!startedAt) {
       setStartedAt(now);
     }
-    await saveTimesOnly({ startOnly: false, startOverride: startedAt || now });
+    // Счёт ещё не зафиксирован — только подставляем время; сохранение по «Зафиксировать результат».
+    if (resultReady || finished) return;
+    void saveTimesOnly({ startOnly: false, startOverride: startedAt || now });
   }
 
   async function saveResult() {
@@ -423,7 +425,7 @@ export function MatchResultModal({
                 <button
                   type="button"
                   disabled={saving}
-                  onClick={() => void stampFinishNow()}
+                  onClick={stampFinishNow}
                   className="admin-btn admin-btn--outline shrink-0 px-4 py-2 text-xs sm:w-24"
                 >
                   {saving ? "…" : "Сейчас"}

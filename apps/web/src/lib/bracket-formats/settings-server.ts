@@ -1,5 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import {
+  resolveBracketParticipantRules,
+  type BracketParticipantOverrides,
+  type BracketParticipantRules,
+} from "@/lib/bracket-participant-rules";
+import {
   BRACKET_FORMAT_CATALOG,
   type BracketFormatCode,
   isBracketFormatCode,
@@ -8,26 +13,59 @@ import {
 export type BracketFormatAdminSettings = {
   enabled: boolean;
   maintenanceMode: boolean;
+  hiddenInAdmin: boolean;
+  participantMin: number | null;
+  participantMax: number | null;
+  participantExact: number | null;
 };
 
 const DEFAULT_SETTINGS: BracketFormatAdminSettings = {
   enabled: true,
   maintenanceMode: false,
+  hiddenInAdmin: false,
+  participantMin: null,
+  participantMax: null,
+  participantExact: null,
 };
 
 function rowToSettings(row: {
   enabled: boolean;
   maintenanceMode: boolean;
+  hiddenInAdmin: boolean;
+  participantMin: number | null;
+  participantMax: number | null;
+  participantExact: number | null;
 }): BracketFormatAdminSettings {
   return {
     enabled: row.enabled,
     maintenanceMode: row.maintenanceMode,
+    hiddenInAdmin: row.hiddenInAdmin,
+    participantMin: row.participantMin,
+    participantMax: row.participantMax,
+    participantExact: row.participantExact,
+  };
+}
+
+function participantOverridesFromSettings(
+  settings: BracketFormatAdminSettings,
+): BracketParticipantOverrides {
+  return {
+    participantMin: settings.participantMin,
+    participantMax: settings.participantMax,
+    participantExact: settings.participantExact,
   };
 }
 
 /** Доступен при создании/смене формата турнира */
 export function isBracketFormatSelectable(settings: BracketFormatAdminSettings): boolean {
   return settings.enabled && !settings.maintenanceMode;
+}
+
+export async function getResolvedParticipantRules(
+  format: string,
+): Promise<BracketParticipantRules> {
+  const settings = await getBracketFormatSettings(format);
+  return resolveBracketParticipantRules(format, participantOverridesFromSettings(settings));
 }
 
 export async function getBracketFormatSettings(
@@ -62,6 +100,19 @@ export async function saveBracketFormatSettings(
   const next: BracketFormatAdminSettings = {
     enabled: patch.enabled ?? current.enabled,
     maintenanceMode: patch.maintenanceMode ?? current.maintenanceMode,
+    hiddenInAdmin: patch.hiddenInAdmin ?? current.hiddenInAdmin,
+    participantMin:
+      patch.participantMin !== undefined
+        ? patch.participantMin
+        : current.participantMin,
+    participantMax:
+      patch.participantMax !== undefined
+        ? patch.participantMax
+        : current.participantMax,
+    participantExact:
+      patch.participantExact !== undefined
+        ? patch.participantExact
+        : current.participantExact,
   };
   const row = await prisma.bracketFormatConfig.upsert({
     where: { formatCode },
@@ -69,10 +120,18 @@ export async function saveBracketFormatSettings(
       formatCode,
       enabled: next.enabled,
       maintenanceMode: next.maintenanceMode,
+      hiddenInAdmin: next.hiddenInAdmin,
+      participantMin: next.participantMin,
+      participantMax: next.participantMax,
+      participantExact: next.participantExact,
     },
     update: {
       enabled: next.enabled,
       maintenanceMode: next.maintenanceMode,
+      hiddenInAdmin: next.hiddenInAdmin,
+      participantMin: next.participantMin,
+      participantMax: next.participantMax,
+      participantExact: next.participantExact,
     },
   });
   return rowToSettings(row);
@@ -91,7 +150,7 @@ export type BracketFormatUiOption = {
   disabled: boolean;
 };
 
-/** Только форматы, доступные для создания/смены (без техобслуживания и выключенных) */
+/** Только форматы, доступные для создания/смене (без техобслуживания и выключенных) */
 export async function getBracketFormatOptionsForForms(): Promise<BracketFormatUiOption[]> {
   const settingsMap = await getAllBracketFormatSettings();
   return BRACKET_FORMAT_CATALOG.filter((f) => {

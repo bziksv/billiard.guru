@@ -6,8 +6,10 @@ alwaysApply: false
 
 # Fixed Swiss — линии (кратко)
 
-**Эталон целиком:** `docs/BRACKET_REFERENCE_16_8.md` + правило `bracket-reference-16-8.mdc`  
-**Только SVG:** `docs/FIXED_SWISS_BRACKET_LINES.md` — не ломать без явного запроса.
+**16→8:** `docs/BRACKET_REFERENCE_16_8.md` + `bracket-reference-16-8.mdc` + `docs/FIXED_SWISS_BRACKET_LINES.md`  
+**32→16:** `docs/BRACKET_REFERENCE_32_16.md` + `bracket-reference-32-16.mdc` + `docs/FIXED_SWISS_BRACKET_LINES_32_16.md`
+
+Не ломать whitelist SVG без явного запроса.
 
 ## Линии SVG
 

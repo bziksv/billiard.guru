@@ -6,13 +6,21 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { TournamentManageView } from "@/components/admin/tournament-manage-view";
 import type { MatchResultPayload } from "@/components/bracket/match-result-modal";
+import { TournamentParticipantLimitNotice } from "@/components/tournament/tournament-participant-limit-notice";
 import { SearchableMultiSelect, SearchableSelect } from "@/components/ui/searchable-select";
+import { getDefaultBracketParticipantRules } from "@/lib/bracket-participant-rules";
+import {
+  countActiveTournamentSlots,
+  slotsRemaining,
+  validateCanAddParticipants,
+} from "@/lib/tournament-participant-limit";
 import {
   canStartTournament,
   countConfirmedParticipants,
   type AdminTournament,
 } from "@/lib/tournament-admin";
 import { isPairFormat } from "@/lib/pair-tournament";
+import { formatPlayerSelectLabel } from "@/lib/player-select-label";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 interface Player {
@@ -20,6 +28,8 @@ interface Player {
   firstName: string;
   lastName: string;
   rating: number;
+  phone?: string | null;
+  city?: { nameRu: string; country?: { nameRu: string } | null } | null;
 }
 
 export function ClubOwnerTournamentManagePage({
@@ -89,7 +99,7 @@ export function ClubOwnerTournamentManagePage({
     () =>
       players.map((p) => ({
         value: p.id,
-        label: `${p.lastName} ${p.firstName} (рейтинг ${p.rating})`,
+        label: formatPlayerSelectLabel(p),
       })),
     [players],
   );
@@ -109,6 +119,43 @@ export function ClubOwnerTournamentManagePage({
     () => playerOptions.filter((p) => !registeredPlayerIds.has(p.value)),
     [playerOptions, registeredPlayerIds],
   );
+
+  const activeParticipantCount = useMemo(
+    () => (tournament ? countActiveTournamentSlots(tournament) : 0),
+    [tournament],
+  );
+
+  const participantRules = useMemo(
+    () =>
+      tournament?.participantRules ??
+      (tournament ? getDefaultBracketParticipantRules(tournament.format) : null),
+    [tournament],
+  );
+
+  const slotsLeft = useMemo(
+    () => (participantRules ? slotsRemaining(participantRules, activeParticipantCount) : Infinity),
+    [participantRules, activeParticipantCount],
+  );
+
+  function handlePlayerSelectChange(ids: string[]) {
+    if (!participantRules) {
+      setSelectedPlayerIds(ids);
+      return;
+    }
+    const maxSelectable = slotsRemaining(participantRules, activeParticipantCount);
+    if (ids.length > maxSelectable) {
+      const check = validateCanAddParticipants(
+        participantRules,
+        activeParticipantCount,
+        ids.length,
+      );
+      setRegError(check.ok ? null : check.error);
+      setSelectedPlayerIds(ids.slice(0, maxSelectable));
+      return;
+    }
+    setRegError(null);
+    setSelectedPlayerIds(ids);
+  }
 
   async function publishTournament() {
     if (!tournament) return;
@@ -240,6 +287,11 @@ export function ClubOwnerTournamentManagePage({
         });
         if (res.status === 409) skipped++;
         else if (res.ok) registered++;
+        else {
+          const data = await res.json();
+          setRegError(data.error ?? "Ошибка регистрации");
+          break;
+        }
       }
       setRegLoading(false);
       setSelectedPlayerIds([]);
@@ -361,6 +413,22 @@ export function ClubOwnerTournamentManagePage({
     await reload();
   }
 
+  async function deleteBracketGrid() {
+    if (!tournament) return;
+    setBracketLoading(true);
+    const res = await fetch("/api/tournaments/bracket", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tournamentId: tournament.id, deleteBracket: true }),
+    });
+    const data = await res.json();
+    setBracketLoading(false);
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось снести сетку");
+    }
+    await reload();
+  }
+
   if (loading || !tournament) {
     return <p className="text-sm text-zinc-500">Загрузка…</p>;
   }
@@ -444,7 +512,7 @@ export function ClubOwnerTournamentManagePage({
               onClick={deleteTournament}
               className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {deleting ? "Удаление…" : "Удалить"}
+              {deleting ? "Удаление…" : "Удалить турнир"}
             </button>
           </div>
         </div>
@@ -453,6 +521,13 @@ export function ClubOwnerTournamentManagePage({
       {tournament.status === "OPEN" && (
         <section className="admin-card p-6">
           <h2 className="mb-4 font-semibold">Регистрация участников</h2>
+          {participantRules && (
+            <TournamentParticipantLimitNotice
+              rules={participantRules}
+              activeCount={activeParticipantCount}
+              className="mb-4"
+            />
+          )}
           <div className="max-w-2xl space-y-3">
             {isPair ? (
               <>
@@ -482,9 +557,14 @@ export function ClubOwnerTournamentManagePage({
                 label="Игроки"
                 options={availablePlayerOptions}
                 values={selectedPlayerIds}
-                onChange={setSelectedPlayerIds}
-                placeholder="Выберите одного или нескольких игроков"
+                onChange={handlePlayerSelectChange}
+                placeholder={
+                  slotsLeft <= 0
+                    ? "Лимит сетки заполнен — смените формат или снимите участников"
+                    : "Выберите одного или нескольких игроков"
+                }
                 searchPlaceholder="Поиск игрока…"
+                disabled={slotsLeft <= 0}
               />
             )}
             {regError && <p className="text-sm text-red-400">{regError}</p>}
@@ -494,6 +574,7 @@ export function ClubOwnerTournamentManagePage({
               onClick={registerParticipant}
               disabled={
                 regLoading ||
+                slotsLeft <= 0 ||
                 (isPair ? !selectedPlayer || !selectedPlayer2 : selectedPlayerIds.length === 0)
               }
               className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
@@ -524,6 +605,7 @@ export function ClubOwnerTournamentManagePage({
           onGenerateBracket={generateBracket}
           onResetAllMatches={resetAllMatches}
           onRegenerateBracket={regenerateBracketGrid}
+          onDeleteBracket={deleteBracketGrid}
           onSaveMatchResult={saveMatchResult}
           onCancelMatchResult={cancelMatchResult}
           onUpdated={reload}

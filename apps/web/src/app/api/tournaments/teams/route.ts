@@ -19,6 +19,7 @@ import {
   notifyTournamentTeamRegistrationConfirmed,
   notifyTournamentTeamRegistrationRejected,
 } from "@/lib/tournament-registration-notify";
+import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
 import { tournamentTeamSchema, tournamentTeamUpdateSchema } from "@/lib/validators";
 
 async function findPlayerTeamConflict(
@@ -92,6 +93,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    await assertCanAddTournamentParticipants(data.tournamentId, 1);
+
     const team = await prisma.tournamentTeam.create({
       data: {
         tournamentId: data.tournamentId,
@@ -129,6 +132,9 @@ export async function POST(request: NextRequest) {
     if (authResp) return authResp;
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Ошибка валидации" }, { status: 400 });
+    }
+    if (error instanceof Error && error.message !== "Турнир не найден") {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
     return NextResponse.json({ error: "Ошибка регистрации команды" }, { status: 500 });
   }

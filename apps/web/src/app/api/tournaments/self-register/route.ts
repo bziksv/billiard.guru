@@ -3,6 +3,7 @@ import { writeAuditLog } from "@/lib/audit";
 import { getCurrentPlayer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isPairFormat } from "@/lib/public-display";
+import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
 import { notifyTournamentSelfRegistered } from "@/lib/tournament-registration-notify";
 import { z } from "zod";
 
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
     });
     if (existing) {
       if (existing.status === "REJECTED" || existing.status === "CANCELLED") {
+        await assertCanAddTournamentParticipants(tournamentId, 1);
         const registration = await prisma.tournamentRegistration.update({
           where: { id: existing.id },
           data: { status: "PENDING", source: "SELF", clubId: null },
@@ -94,7 +96,10 @@ export async function POST(request: NextRequest) {
     await notifyTournamentSelfRegistered(registration.id);
 
     return NextResponse.json(registration, { status: 201 });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message !== "Турнир не найден") {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json({ error: "Не удалось подать заявку" }, { status: 500 });
   }
 }

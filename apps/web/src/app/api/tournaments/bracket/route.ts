@@ -2,7 +2,14 @@ import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
-import { generateTournamentPairing, cancelMatchResult, saveMatchResult, resetAllMatchResults, regenerateBracket } from "@/lib/bracket-service";
+import {
+  generateTournamentPairing,
+  cancelMatchResult,
+  saveMatchResult,
+  resetAllMatchResults,
+  regenerateBracket,
+  deleteBracket,
+} from "@/lib/bracket-service";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import {
@@ -16,10 +23,19 @@ export async function POST(request: NextRequest) {
   const log = createRequestLogger(randomUUID());
   try {
     const body = bracketGenerateSchema.parse(await request.json());
-    const { tournamentId, regenerate } = body;
+    const { tournamentId, regenerate, deleteBracket: removeBracket } = body;
     const { session } = await requireTournamentManageAccess(tournamentId);
 
-    if (regenerate) {
+    if (removeBracket) {
+      await deleteBracket(prisma, tournamentId);
+      await writeAuditLog({
+        actorType: tournamentManageActorType(session),
+        actorId: session.playerId,
+        action: "tournament.bracket.delete",
+        entityType: "tournament",
+        entityId: tournamentId,
+      });
+    } else if (regenerate) {
       await regenerateBracket(prisma, tournamentId);
       await writeAuditLog({
         actorType: tournamentManageActorType(session),
@@ -41,7 +57,14 @@ export async function POST(request: NextRequest) {
 
     const matchCount = await prisma.tournamentMatch.count({ where: { tournamentId } });
 
-    log.info({ tournamentId, matches: matchCount }, regenerate ? "Bracket regenerated" : "Pair bracket generated");
+    log.info(
+      { tournamentId, matches: matchCount },
+      removeBracket
+        ? "Bracket deleted"
+        : regenerate
+          ? "Bracket regenerated"
+          : "Pair bracket generated",
+    );
     return NextResponse.json({ ok: true, matchCount });
   } catch (error) {
     log.error({ error }, "Bracket generation failed");

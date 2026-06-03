@@ -6,6 +6,7 @@ import {
   isBracketFormatCode,
 } from "@/lib/bracket-formats/catalog";
 import { prisma } from "@/lib/prisma";
+import { resolveBracketParticipantRules } from "@/lib/bracket-participant-rules";
 import { getAllBracketFormatSettings } from "@/lib/bracket-formats/settings-server";
 
 export async function GET(request: Request) {
@@ -18,6 +19,7 @@ export async function GET(request: Request) {
     const [counts, settingsMap] = await Promise.all([
       prisma.tournament.groupBy({
         by: ["format"],
+        where: { matches: { some: {} } },
         _count: { format: true },
       }),
       getAllBracketFormatSettings(),
@@ -27,19 +29,31 @@ export async function GET(request: Request) {
     );
 
     const formats = BRACKET_FORMAT_CATALOG.map((f) => {
-      const s = settingsMap[f.code] ?? { enabled: true, maintenanceMode: false };
+      const s = settingsMap[f.code] ?? {
+        enabled: true,
+        maintenanceMode: false,
+        hiddenInAdmin: false,
+        participantMin: null,
+        participantMax: null,
+        participantExact: null,
+      };
       return {
         ...f,
         tournamentCount: countByFormat[f.code] ?? 0,
         enabled: s.enabled,
         maintenanceMode: s.maintenanceMode,
+        hiddenInAdmin: s.hiddenInAdmin,
+        participantMin: s.participantMin,
+        participantMax: s.participantMax,
+        participantExact: s.participantExact,
+        participantRules: resolveBracketParticipantRules(f.code, s),
       };
     });
 
     if (formatCode && isBracketFormatCode(formatCode)) {
       const def = getBracketFormat(formatCode)!;
       const tournaments = await prisma.tournament.findMany({
-        where: { format: formatCode },
+        where: { format: formatCode, matches: { some: {} } },
         orderBy: { updatedAt: "desc" },
         take: 50,
         select: {
@@ -57,6 +71,14 @@ export async function GET(request: Request) {
           tournamentCount: countByFormat[formatCode] ?? 0,
           enabled: settingsMap[formatCode]?.enabled ?? true,
           maintenanceMode: settingsMap[formatCode]?.maintenanceMode ?? false,
+          hiddenInAdmin: settingsMap[formatCode]?.hiddenInAdmin ?? false,
+          participantMin: settingsMap[formatCode]?.participantMin ?? null,
+          participantMax: settingsMap[formatCode]?.participantMax ?? null,
+          participantExact: settingsMap[formatCode]?.participantExact ?? null,
+          participantRules: resolveBracketParticipantRules(
+            formatCode,
+            settingsMap[formatCode] ?? null,
+          ),
         },
         tournaments: tournaments.map((t) => ({
           id: t.id,

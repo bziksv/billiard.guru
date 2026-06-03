@@ -15,11 +15,17 @@ enum TournamentFormat {
   FIXED_SWISS
   /** 16→8 (27+1 встреч): эталон TS + матч за 3–4 (#28) */
   FIXED_SWISS_16_BRONZE
+  /** 32→16 (59 встреч): эталон LLB, олимпийка с 1/8 */
+  FIXED_SWISS_32
+  /** 32→16 (60 встреч): эталон + матч за 3–4 (#60 под финалом) */
+  FIXED_SWISS_32_BRONZE
   PAIR_OLYMPIC
   PAIR_OLYMPIC_1L_BRONZE
   PAIR_SWISS
   FIXED_PAIR_SWISS
   FIXED_PAIR_SWISS_16_BRONZE
+  FIXED_PAIR_SWISS_32
+  FIXED_PAIR_SWISS_32_BRONZE
 }
 
 enum RegistrationStatus {
@@ -563,6 +569,12 @@ model BracketFormatConfig {
   enabled           Boolean  @default(true)
   /// Техобслуживание: тип виден в админке, но недоступен при создании турнира
   maintenanceMode   Boolean  @default(false) @map("maintenance_mode")
+  /// Скрыт из списка «Типы сеток» в админке (турниры с форматом остаются)
+  hiddenInAdmin     Boolean  @default(false) @map("hidden_in_admin")
+  /// Переопределение лимита участников (null — значение по умолчанию для формата)
+  participantMin    Int?     @map("participant_min")
+  participantMax    Int?     @map("participant_max")
+  participantExact  Int?     @map("participant_exact")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("bracket_format_config")

@@ -1,6 +1,21 @@
 import type { BracketMatchView } from "@/lib/bracket-view";
-import { fixedSwissMatchNo } from "@/lib/fixed-swiss-grid";
-import { isFixedSwissFormat, teamLabel } from "@/lib/pair-tournament";
+import {
+  fixedSwissMatchNo,
+  inferFixedSwissGridSize,
+  isFixedSwissTs32BronzeMatchCount,
+  isFixedSwissTs32MatchCount,
+} from "@/lib/fixed-swiss-grid";
+import {
+  fixedSwissColumnLabel,
+  fixedSwissMatchColForCount,
+  fixedSwissPlacementLabel,
+} from "@/lib/fixed-swiss-layout";
+import { fixedSwissTs32StageByMatchNo } from "@/lib/fixed-swiss-ts-grid";
+import {
+  isFixedSwissFormat,
+  isOlympicFormat,
+  teamLabel,
+} from "@/lib/pair-tournament";
 
 export function isMatchFinished(match: BracketMatchView): boolean {
   return (
@@ -69,6 +84,60 @@ export function matchParticipantsLabel(match: BracketMatchView): string {
   const left = match.team1 ? teamLabel(match.team1) : "—";
   const right = match.team2 ? teamLabel(match.team2) : "—";
   return `${left} — ${right}`;
+}
+
+/** Колонка сетки / этап — как подписи на визуальной сетке. */
+export function matchStageLabel(
+  match: BracketMatchView,
+  format: string,
+  allMatches: BracketMatchView[],
+  matchNumber?: number,
+): string {
+  const maxRound = allMatches.reduce((max, m) => Math.max(max, m.round), 0);
+  const matchCount = allMatches.length;
+
+  if (isFixedSwissFormat(format) && matchCount > 0) {
+    try {
+      const col = fixedSwissMatchColForCount(
+        match.round,
+        match.slot,
+        matchCount,
+        maxRound,
+      );
+      const mpr = inferFixedSwissGridSize(matchCount) / 2;
+      const no =
+        matchNumber ??
+        fixedSwissMatchNo(match.round, match.slot, matchCount, maxRound);
+      const stageOverride =
+        isFixedSwissTs32MatchCount(matchCount) ||
+        isFixedSwissTs32BronzeMatchCount(matchCount)
+          ? fixedSwissTs32StageByMatchNo(no)
+          : null;
+      const stage =
+        stageOverride ?? fixedSwissColumnLabel(col, matchCount, maxRound);
+      const placement = fixedSwissPlacementLabel(
+        match.round,
+        match.slot,
+        maxRound,
+        mpr,
+        matchCount,
+        no,
+      );
+      return placement ? `${stage} · ${placement}` : stage;
+    } catch {
+      return `Тур ${match.round}`;
+    }
+  }
+
+  if (isOlympicFormat(format) && maxRound > 0) {
+    const fromFinal = maxRound - match.round;
+    if (fromFinal === 0) return "Финал";
+    if (fromFinal === 1) return "Полуфинал";
+    if (fromFinal === 2) return "1/4 финала";
+    if (fromFinal === 3) return "1/8 финала";
+  }
+
+  return `Тур ${match.round}`;
 }
 
 export function sortCurrentMatches(matches: BracketMatchView[]): BracketMatchView[] {

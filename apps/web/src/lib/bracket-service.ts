@@ -11,6 +11,8 @@ import {
   getFixedSwissLinksForMatchCount,
   type FixedSwissLink,
 } from "@/lib/fixed-swiss-grid";
+import { assertBracketParticipantCount } from "@/lib/bracket-participant-rules";
+import { getResolvedParticipantRules } from "@/lib/bracket-formats/settings-server";
 import { logger } from "@/lib/logger";
 import { notifyMatchStartScheduled } from "@/lib/match-start-notification";
 import {
@@ -33,6 +35,11 @@ type Db = Pick<
   PrismaClient,
   "tournamentMatch" | "tournamentTeam" | "tournament" | "tournamentRegistration"
 >;
+
+async function assertParticipantCountForFormat(format: string, count: number) {
+  const rules = await getResolvedParticipantRules(format);
+  assertBracketParticipantCount(format, count, rules);
+}
 
 type MatchSlotRow = {
   id: string;
@@ -961,6 +968,8 @@ export async function generatePairBracket(db: Db, tournamentId: string) {
     throw new Error("Нужно минимум 2 подтверждённые команды");
   }
 
+  await assertParticipantCountForFormat(tournament.format, teams.length);
+
   const seeded = [...teams].sort((a, b) => teamRating(b) - teamRating(a));
   await assignSeeds(db, tournamentId, seeded);
 
@@ -1060,6 +1069,8 @@ export async function generateSoloOlympicBracket(db: Db, tournamentId: string) {
     throw new Error("Нужно минимум 2 подтверждённых участника");
   }
 
+  await assertParticipantCountForFormat(tournament.format, teams.length);
+
   const seeded = [...teams].sort(
     (a, b) => teamRating(b) - teamRating(a),
   );
@@ -1095,7 +1106,12 @@ async function seedTeamsForFixedSwiss(
   tournamentId: string,
   format: string,
 ) {
-  if (format === "FIXED_SWISS" || format === "FIXED_SWISS_16_BRONZE") {
+  if (
+    format === "FIXED_SWISS" ||
+    format === "FIXED_SWISS_16_BRONZE" ||
+    format === "FIXED_SWISS_32" ||
+    format === "FIXED_SWISS_32_BRONZE"
+  ) {
     await ensureSoloTeams(db, tournamentId);
   }
 
@@ -1131,6 +1147,7 @@ export async function generateFixedSwissGrid(db: Db, tournamentId: string) {
   }
 
   const seeded = await seedTeamsForFixedSwiss(db, tournamentId, tournament.format);
+  await assertParticipantCountForFormat(tournament.format, seeded.length);
   const template = buildFixedSwissTemplate(seeded.length, tournament.format);
   const bracket = buildOlympicBracket(seeded.map((t) => t.id));
 
@@ -1180,6 +1197,8 @@ export async function generateSwissRound(db: Db, tournamentId: string) {
   if (teams.length < 2) {
     throw new Error("Нужно минимум 2 подтверждённые команды");
   }
+
+  await assertParticipantCountForFormat(tournament.format, teams.length);
 
   const existingMatches = await db.tournamentMatch.findMany({
     where: { tournamentId },
@@ -1515,6 +1534,35 @@ export async function resetAllMatchResults(db: Db, tournamentId: string) {
   }
 
   await processByes(db, tournamentId, tournament.format);
+}
+
+/** Удалить все встречи сетки без пересоздания (участники остаются). */
+export async function deleteBracket(db: Db, tournamentId: string) {
+  const tournament = await db.tournament.findUnique({
+    where: { id: tournamentId },
+  });
+  if (!tournament) throw new Error("Турнир не найден");
+
+  const existing = await db.tournamentMatch.count({ where: { tournamentId } });
+  if (existing === 0) {
+    throw new Error("Сетка не сформирована");
+  }
+
+  if (isSwissFormat(tournament.format)) {
+    await db.tournamentTeam.updateMany({
+      where: { tournamentId },
+      data: { swissPoints: 0 },
+    });
+  }
+
+  await db.tournamentMatch.deleteMany({ where: { tournamentId } });
+
+  if (tournament.status === "FINISHED") {
+    await db.tournament.update({
+      where: { id: tournamentId },
+      data: { status: "ACTIVE" },
+    });
+  }
 }
 
 export async function regenerateBracket(db: Db, tournamentId: string) {

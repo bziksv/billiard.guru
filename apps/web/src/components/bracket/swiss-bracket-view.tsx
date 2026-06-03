@@ -24,11 +24,15 @@ import {
   isFixedSwissForkEdge,
   isFixedSwissR1LowerLossEdge,
   isFixedSwissR23UpperLossEdge,
+  isFixedSwissUpperOlympicForkEdge,
   shouldDrawFixedSwissLossEdge,
   shouldDrawFixedSwissWinEdge,
 } from "@/lib/fixed-swiss-layout";
 import {
   isFixedSwiss168MatchCount,
+  isFixedSwissTs32BronzeMatchCount,
+  isFixedSwissTs32MatchCount,
+  isOutdatedFixedSwiss32Bracket,
 } from "@/lib/fixed-swiss-grid";
 import {
   buildSwissBracketLayout,
@@ -107,16 +111,55 @@ export function SwissBracketView({
     fixedGrid && useFixed168
       ? fixedSwissForkTrunkYByTarget(3, 4, layout.edges, forkTrunkFromY, matchById)
       : new Map<string, number>();
+  const is32Grid =
+    fixedGrid &&
+    useFixed168 &&
+    matches.length >= 55 &&
+    matches.length <= 64;
+  const is32Current =
+    is32Grid &&
+    (isFixedSwissTs32MatchCount(matches.length) ||
+      isFixedSwissTs32BronzeMatchCount(matches.length));
+  const is32Outdated =
+    is32Grid && isOutdatedFixedSwiss32Bracket(matches.length);
+  const r23TrunkY =
+    is32Outdated || is32Current
+      ? fixedSwissForkTrunkYByTarget(2, 3, layout.edges, forkTrunkFromY, matchById)
+      : new Map<string, number>();
+  const r35TrunkY =
+    is32Current
+      ? fixedSwissForkTrunkYByTarget(3, 5, layout.edges, forkTrunkFromY, matchById)
+      : new Map<string, number>();
   const r45TrunkY =
     fixedGrid && useFixed168
       ? fixedSwissForkTrunkYByTarget(4, 5, layout.edges, forkTrunkFromY, matchById)
       : new Map<string, number>();
+  const r56TrunkY =
+    fixedGrid && useFixed168
+      ? fixedSwissForkTrunkYByTarget(5, 6, layout.edges, forkTrunkFromY, matchById)
+      : new Map<string, number>();
+  const r67TrunkY =
+    is32Current
+      ? fixedSwissForkTrunkYByTarget(6, 7, layout.edges, forkTrunkFromY, matchById)
+      : new Map<string, number>();
 
-  function fixedSwissTrunkY(fromRound: number, toId: string, fallback: number) {
-    if (fromRound === 1) return r12TrunkY.get(toId) ?? fallback;
-    if (fromRound === 3) return r34TrunkY.get(toId) ?? fallback;
-    if (fromRound === 4) return r45TrunkY.get(toId) ?? fallback;
-    return fallback;
+  function fixedSwissTrunkY(
+    fromRound: number,
+    toRound: number,
+    toId: string,
+    fallback: number,
+  ) {
+    const key = `${fromRound}:${toRound}`;
+    const maps: Record<string, Map<string, number>> = {
+      "1:2": r12TrunkY,
+      "2:3": r23TrunkY,
+      "3:4": r34TrunkY,
+      "3:5": r35TrunkY,
+      "4:5": r45TrunkY,
+      "5:6": r56TrunkY,
+      "6:7": r67TrunkY,
+    };
+    return maps[key]?.get(toId) ?? fallback;
   }
 
   return (
@@ -243,10 +286,21 @@ export function SwissBracketView({
                 edge.fromTeamSlot != null &&
                 edge.toTeamSlot != null
               ) {
-                const isFork = isFixedSwissForkEdge(
-                  fromMatch.round,
-                  toMatch.round,
-                );
+                const isFork =
+                  isFixedSwissForkEdge(
+                    fromMatch.round,
+                    toMatch.round,
+                    matches.length,
+                    fromMatch.slot,
+                    toMatch.slot,
+                  ) ||
+                  isFixedSwissUpperOlympicForkEdge(
+                    fromMatch.round,
+                    toMatch.round,
+                    fromMatch.slot,
+                    toMatch.slot,
+                    matches.length,
+                  );
                 const isPhantomLoss =
                   edge.kind === "loss" &&
                   matchAutopassBye(fromMatch).isBye;
@@ -282,18 +336,25 @@ export function SwissBracketView({
                     edge.kind,
                     fromMatch.slot,
                     toMatch.slot,
+                    matches.length,
                   )
                 ) {
                   return null;
                 }
                 const trunkY = isFork
-                  ? fixedSwissTrunkY(fromMatch.round, edge.toId, points.from.y)
+                  ? fixedSwissTrunkY(
+                      fromMatch.round,
+                      toMatch.round,
+                      edge.toId,
+                      points.from.y,
+                    )
                   : points.from.y;
                 const crossToQuarter =
                   useFixed168 &&
                   isFixedSwissCrossToQuarterEdge(
                     fromMatch.round,
                     toMatch.round,
+                    matches.length,
                   );
                 const path = isFork
                   ? gridFixedForkConnectorPath(

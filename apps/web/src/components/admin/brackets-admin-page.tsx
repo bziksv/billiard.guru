@@ -2,9 +2,17 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { BracketParticipantLimitEditor } from "@/components/admin/bracket-participant-limit-editor";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { ConfirmModal } from "@/components/bracket/confirm-modal";
 import type { BracketFormatDefinition } from "@/lib/bracket-formats/catalog";
 import { BRACKET_FORMAT_CATALOG } from "@/lib/bracket-formats/catalog";
+import {
+  getDefaultBracketParticipantRules,
+  resolveBracketParticipantRules,
+  type BracketParticipantRules,
+} from "@/lib/bracket-participant-rules";
 import { adminTabClass } from "@/lib/admin-ui";
 import { cn } from "@/lib/cn";
 import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
@@ -13,6 +21,11 @@ type FormatRow = BracketFormatDefinition & {
   tournamentCount: number;
   enabled: boolean;
   maintenanceMode: boolean;
+  hiddenInAdmin: boolean;
+  participantMin: number | null;
+  participantMax: number | null;
+  participantExact: number | null;
+  participantRules: BracketParticipantRules;
 };
 
 interface ActiveTournament {
@@ -31,18 +44,38 @@ const LAYOUT_LABELS = {
 } as const;
 
 export function BracketsAdminPage() {
-  const [formats, setFormats] = useState<FormatRow[]>(
-    BRACKET_FORMAT_CATALOG.map((f) => ({
-      ...f,
-      tournamentCount: 0,
-      enabled: true,
-      maintenanceMode: false,
-    })),
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "tournaments" ? "tournaments" : "formats";
+  const [formats, setFormats] = useState<FormatRow[]>(() =>
+    BRACKET_FORMAT_CATALOG.map((f) => {
+      const defaults = getDefaultBracketParticipantRules(f.code);
+      return {
+        ...f,
+        tournamentCount: 0,
+        enabled: true,
+        maintenanceMode: false,
+        hiddenInAdmin: false,
+        participantMin: null,
+        participantMax: null,
+        participantExact: null,
+        participantRules: defaults,
+      };
+    }),
   );
   const [activeTournaments, setActiveTournaments] = useState<ActiveTournament[]>([]);
-  const [tab, setTab] = useState<"formats" | "tournaments">("formats");
+  const [tab, setTab] = useState<"formats" | "tournaments">(initialTab);
+  const [deleteTarget, setDeleteTarget] = useState<ActiveTournament | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [toggleError, setToggleError] = useState<string | null>(null);
+  const [savingParticipantCode, setSavingParticipantCode] = useState<string | null>(null);
+  const [showHiddenFormats, setShowHiddenFormats] = useState(false);
+  const [hideFormatTarget, setHideFormatTarget] = useState<FormatRow | null>(null);
+  const [hideFormatLoading, setHideFormatLoading] = useState(false);
+
+  const visibleFormats = formats.filter((f) => !f.hiddenInAdmin);
+  const hiddenFormats = formats.filter((f) => f.hiddenInAdmin);
 
   const load = useCallback(() => {
     return Promise.all([
@@ -52,10 +85,7 @@ export function BracketsAdminPage() {
       if (formatsData.formats) setFormats(formatsData.formats);
       const list = Array.isArray(tournaments) ? tournaments : [];
       const active = list
-        .filter(
-          (t: { status: string; matches?: { length?: number } }) =>
-            t.status === "ACTIVE" || (t.matches?.length ?? 0) > 0,
-        )
+        .filter((t: { matches?: { length?: number } }) => (t.matches?.length ?? 0) > 0)
         .map((t: ActiveTournament & { club: { name: string }; matches: unknown[] }) => ({
           id: t.id,
           name: t.name,
@@ -72,36 +102,100 @@ export function BracketsAdminPage() {
     load().finally(() => setLoading(false));
   }, [load]);
 
+  useEffect(() => {
+    if (searchParams.get("tab") === "tournaments") setTab("tournaments");
+  }, [searchParams]);
+
+  async function confirmDeleteBracket() {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    const res = await fetch("/api/tournaments/bracket", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tournamentId: deleteTarget.id, deleteBracket: true }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      setDeleteError(json.error ?? "Не удалось снести сетку");
+      setDeleteLoading(false);
+      return;
+    }
+    setActiveTournaments((rows) => rows.filter((t) => t.id !== deleteTarget.id));
+    setDeleteTarget(null);
+    setDeleteLoading(false);
+  }
+
   function applySettingsFromResponse(
-    settings: Record<string, { enabled: boolean; maintenanceMode: boolean }>,
+    settings: Record<
+      string,
+      {
+        enabled: boolean;
+        maintenanceMode: boolean;
+        hiddenInAdmin: boolean;
+        participantMin: number | null;
+        participantMax: number | null;
+        participantExact: number | null;
+      }
+    >,
   ) {
     setFormats((prev) =>
       prev.map((f) => {
         const s = settings[f.code];
         if (!s) return f;
-        return { ...f, enabled: s.enabled, maintenanceMode: s.maintenanceMode };
+        return {
+          ...f,
+          enabled: s.enabled,
+          maintenanceMode: s.maintenanceMode,
+          hiddenInAdmin: s.hiddenInAdmin,
+          participantMin: s.participantMin,
+          participantMax: s.participantMax,
+          participantExact: s.participantExact,
+          participantRules: resolveBracketParticipantRules(f.code, s),
+        };
       }),
     );
   }
 
   async function patchFormatSettings(
     formatCode: string,
-    patch: { enabled?: boolean; maintenanceMode?: boolean },
+    patch: {
+      enabled?: boolean;
+      maintenanceMode?: boolean;
+      hiddenInAdmin?: boolean;
+      participantMin?: number | null;
+      participantMax?: number | null;
+      participantExact?: number | null;
+      resetParticipantLimits?: boolean;
+    },
   ) {
     setToggleError(null);
-    setFormats((prev) =>
-      prev.map((f) =>
-        f.code === formatCode
-          ? {
-              ...f,
-              ...(patch.enabled !== undefined ? { enabled: patch.enabled } : {}),
-              ...(patch.maintenanceMode !== undefined
-                ? { maintenanceMode: patch.maintenanceMode }
-                : {}),
-            }
-          : f,
-      ),
-    );
+    const isParticipant = patch.resetParticipantLimits ||
+      patch.participantMin !== undefined ||
+      patch.participantMax !== undefined ||
+      patch.participantExact !== undefined;
+
+    if (isParticipant) {
+      setSavingParticipantCode(formatCode);
+    } else {
+      setFormats((prev) =>
+        prev.map((f) =>
+          f.code === formatCode
+            ? {
+                ...f,
+                ...(patch.enabled !== undefined ? { enabled: patch.enabled } : {}),
+                ...(patch.maintenanceMode !== undefined
+                  ? { maintenanceMode: patch.maintenanceMode }
+                  : {}),
+                ...(patch.hiddenInAdmin !== undefined
+                  ? { hiddenInAdmin: patch.hiddenInAdmin }
+                  : {}),
+              }
+            : f,
+        ),
+      );
+    }
+
     const res = await fetch("/api/admin/bracket-formats/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -111,9 +205,11 @@ export function BracketsAdminPage() {
     if (!res.ok) {
       setToggleError(json.error ?? "Не удалось сохранить");
       await load();
+      setSavingParticipantCode(null);
       return;
     }
     if (json.settings) applySettingsFromResponse(json.settings);
+    setSavingParticipantCode(null);
   }
 
   if (loading) {
@@ -142,7 +238,7 @@ export function BracketsAdminPage() {
           className={adminTabClass(tab === "formats")}
           onClick={() => setTab("formats")}
         >
-          Типы сеток ({formats.length})
+          Типы сеток ({visibleFormats.length})
         </button>
         <button
           type="button"
@@ -155,12 +251,13 @@ export function BracketsAdminPage() {
       </div>
 
       {tab === "formats" && (
+        <>
         <div className="grid gap-4 lg:grid-cols-2">
-          {formats.map((f) => (
+          {visibleFormats.map((f) => (
             <div
               key={f.code}
               className={cn(
-                "admin-card admin-card-interactive admin-bracket-format-card overflow-hidden",
+                "admin-card admin-bracket-format-card overflow-hidden",
                 !f.enabled && "admin-bracket-format-card--off",
                 f.maintenanceMode && f.enabled && "admin-bracket-format-card--maintenance",
                 f.isReference && !f.maintenanceMode && "admin-bracket-format-card--ref",
@@ -217,7 +314,7 @@ export function BracketsAdminPage() {
               </div>
               <Link
                 href={`/admin/brackets/formats/${f.code}`}
-                className="admin-bracket-format-card__body"
+                className="admin-bracket-format-card__body admin-card-interactive block"
               >
                 <h2 className="admin-bracket-format-card__title">{f.adminLabel}</h2>
                 {f.maintenanceMode && f.enabled && (
@@ -232,7 +329,7 @@ export function BracketsAdminPage() {
                     <dd className="admin-code inline">{f.code}</dd>
                   </div>
                   <div>
-                    <dt className="inline">Турниров: </dt>
+                    <dt className="inline">С сеткой: </dt>
                     <dd className="inline tabular-nums text-[var(--admin-text)]">
                       {f.tournamentCount}
                     </dd>
@@ -251,12 +348,68 @@ export function BracketsAdminPage() {
                   </div>
                 </dl>
                 <p className="admin-link mt-3 text-xs font-medium">
-                  Открыть управление форматом →
+                  Подробнее о формате →
                 </p>
               </Link>
+              <BracketParticipantLimitEditor
+                formatCode={f.code}
+                participantMin={f.participantMin}
+                participantMax={f.participantMax}
+                participantExact={f.participantExact}
+                participantRules={f.participantRules}
+                saving={savingParticipantCode === f.code}
+                onSave={(payload) => patchFormatSettings(f.code, payload)}
+                onReset={() =>
+                  patchFormatSettings(f.code, { resetParticipantLimits: true })
+                }
+              />
+              <div className="border-t border-[var(--admin-border)] px-4 py-3">
+                <button
+                  type="button"
+                  className="text-xs text-red-400 hover:underline"
+                  onClick={() => setHideFormatTarget(f)}
+                >
+                  Убрать из списка типов
+                </button>
+              </div>
             </div>
           ))}
         </div>
+        {hiddenFormats.length > 0 && (
+          <div className="admin-card mt-6 p-4">
+            <button
+              type="button"
+              className="admin-link text-sm"
+              onClick={() => setShowHiddenFormats((v) => !v)}
+            >
+              {showHiddenFormats ? "Скрыть" : "Показать"} убранные типы ({hiddenFormats.length})
+            </button>
+            {showHiddenFormats && (
+              <ul className="mt-3 space-y-2 text-sm">
+                {hiddenFormats.map((f) => (
+                  <li
+                    key={f.code}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--admin-border)] px-3 py-2"
+                  >
+                    <span className="text-[var(--admin-text)]">{f.adminLabel}</span>
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn--outline px-2 py-1 text-xs"
+                      onClick={() =>
+                        patchFormatSettings(f.code, {
+                          hiddenInAdmin: false,
+                        })
+                      }
+                    >
+                      Вернуть в список
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+        </>
       )}
 
       {tab === "tournaments" && (
@@ -289,7 +442,17 @@ export function BracketsAdminPage() {
                     {t.matchCount > 0 ? t.matchCount : "—"}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex justify-end gap-3">
+                    <div className="flex flex-wrap justify-end gap-2">
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--danger px-2 py-1 text-xs"
+                        onClick={() => {
+                          setDeleteError(null);
+                          setDeleteTarget(t);
+                        }}
+                      >
+                        Снести сетку
+                      </button>
                       <Link
                         href={`/admin/brackets/tournament/${t.id}`}
                         className="admin-btn admin-btn--primary text-xs"
@@ -319,6 +482,53 @@ export function BracketsAdminPage() {
           )}
         </div>
       )}
+
+      <ConfirmModal
+        open={hideFormatTarget !== null}
+        title="Убрать тип сетки из списка?"
+        description={
+          hideFormatTarget
+            ? `«${hideFormatTarget.adminLabel}» исчезнет из «Типы сеток». Турниры с этим форматом не удаляются — тип можно вернуть в «Показать убранные типы».`
+            : ""
+        }
+        confirmLabel="Да, убрать"
+        variant="danger"
+        loading={hideFormatLoading}
+        onConfirm={async () => {
+          if (!hideFormatTarget) return;
+          setHideFormatLoading(true);
+          await patchFormatSettings(hideFormatTarget.code, {
+            hiddenInAdmin: true,
+            enabled: false,
+          });
+          setHideFormatTarget(null);
+          setHideFormatLoading(false);
+        }}
+        onClose={() => {
+          if (hideFormatLoading) return;
+          setHideFormatTarget(null);
+        }}
+      />
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        title="Снести сетку? Турнир останется"
+        description={
+          deleteTarget
+            ? `У турнира «${deleteTarget.name}» будут удалены только ${deleteTarget.matchCount} встреч. Сам турнир, участники и регистрации сохранятся — сетку можно собрать заново.`
+            : ""
+        }
+        confirmLabel="Да, снести сетку"
+        variant="danger"
+        loading={deleteLoading}
+        error={deleteError}
+        onConfirm={confirmDeleteBracket}
+        onClose={() => {
+          if (deleteLoading) return;
+          setDeleteTarget(null);
+          setDeleteError(null);
+        }}
+      />
 
       <p className="admin-muted text-xs">
         Новый тип сетки: запись в{" "}

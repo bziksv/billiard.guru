@@ -15,6 +15,7 @@ import {
   notifyTournamentRegistrationRejected,
   notifyTournamentSelfRegistered,
 } from "@/lib/tournament-registration-notify";
+import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
 import { tournamentRegistrationSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
@@ -49,6 +50,7 @@ export async function POST(request: NextRequest) {
     });
     if (existing) {
       if (existing.status === "CANCELLED") {
+        await assertCanAddTournamentParticipants(data.tournamentId, 1);
         const registration = await prisma.tournamentRegistration.update({
           where: { id: existing.id },
           data: {
@@ -81,6 +83,8 @@ export async function POST(request: NextRequest) {
       }
       return NextResponse.json({ error: "Игрок уже зарегистрирован" }, { status: 409 });
     }
+
+    await assertCanAddTournamentParticipants(data.tournamentId, 1);
 
     const registration = await prisma.tournamentRegistration.create({
       data: {
@@ -118,6 +122,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
+    if (error instanceof Error && error.message !== "Турнир не найден") {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json({ error: "Ошибка регистрации" }, { status: 500 });
   }
 }

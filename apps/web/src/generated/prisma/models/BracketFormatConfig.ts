@@ -20,14 +20,32 @@ export type BracketFormatConfigModel = runtime.Types.Result.DefaultSelection<Pri
 
 export type AggregateBracketFormatConfig = {
   _count: BracketFormatConfigCountAggregateOutputType | null
+  _avg: BracketFormatConfigAvgAggregateOutputType | null
+  _sum: BracketFormatConfigSumAggregateOutputType | null
   _min: BracketFormatConfigMinAggregateOutputType | null
   _max: BracketFormatConfigMaxAggregateOutputType | null
+}
+
+export type BracketFormatConfigAvgAggregateOutputType = {
+  participantMin: number | null
+  participantMax: number | null
+  participantExact: number | null
+}
+
+export type BracketFormatConfigSumAggregateOutputType = {
+  participantMin: number | null
+  participantMax: number | null
+  participantExact: number | null
 }
 
 export type BracketFormatConfigMinAggregateOutputType = {
   formatCode: string | null
   enabled: boolean | null
   maintenanceMode: boolean | null
+  hiddenInAdmin: boolean | null
+  participantMin: number | null
+  participantMax: number | null
+  participantExact: number | null
   updatedAt: Date | null
 }
 
@@ -35,6 +53,10 @@ export type BracketFormatConfigMaxAggregateOutputType = {
   formatCode: string | null
   enabled: boolean | null
   maintenanceMode: boolean | null
+  hiddenInAdmin: boolean | null
+  participantMin: number | null
+  participantMax: number | null
+  participantExact: number | null
   updatedAt: Date | null
 }
 
@@ -42,15 +64,35 @@ export type BracketFormatConfigCountAggregateOutputType = {
   formatCode: number
   enabled: number
   maintenanceMode: number
+  hiddenInAdmin: number
+  participantMin: number
+  participantMax: number
+  participantExact: number
   updatedAt: number
   _all: number
 }
 
 
+export type BracketFormatConfigAvgAggregateInputType = {
+  participantMin?: true
+  participantMax?: true
+  participantExact?: true
+}
+
+export type BracketFormatConfigSumAggregateInputType = {
+  participantMin?: true
+  participantMax?: true
+  participantExact?: true
+}
+
 export type BracketFormatConfigMinAggregateInputType = {
   formatCode?: true
   enabled?: true
   maintenanceMode?: true
+  hiddenInAdmin?: true
+  participantMin?: true
+  participantMax?: true
+  participantExact?: true
   updatedAt?: true
 }
 
@@ -58,6 +100,10 @@ export type BracketFormatConfigMaxAggregateInputType = {
   formatCode?: true
   enabled?: true
   maintenanceMode?: true
+  hiddenInAdmin?: true
+  participantMin?: true
+  participantMax?: true
+  participantExact?: true
   updatedAt?: true
 }
 
@@ -65,6 +111,10 @@ export type BracketFormatConfigCountAggregateInputType = {
   formatCode?: true
   enabled?: true
   maintenanceMode?: true
+  hiddenInAdmin?: true
+  participantMin?: true
+  participantMax?: true
+  participantExact?: true
   updatedAt?: true
   _all?: true
 }
@@ -107,6 +157,18 @@ export type BracketFormatConfigAggregateArgs<ExtArgs extends runtime.Types.Exten
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BracketFormatConfigAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BracketFormatConfigSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BracketFormatConfigMinAggregateInputType
@@ -137,6 +199,8 @@ export type BracketFormatConfigGroupByArgs<ExtArgs extends runtime.Types.Extensi
   take?: number
   skip?: number
   _count?: BracketFormatConfigCountAggregateInputType | true
+  _avg?: BracketFormatConfigAvgAggregateInputType
+  _sum?: BracketFormatConfigSumAggregateInputType
   _min?: BracketFormatConfigMinAggregateInputType
   _max?: BracketFormatConfigMaxAggregateInputType
 }
@@ -145,8 +209,14 @@ export type BracketFormatConfigGroupByOutputType = {
   formatCode: string
   enabled: boolean
   maintenanceMode: boolean
+  hiddenInAdmin: boolean
+  participantMin: number | null
+  participantMax: number | null
+  participantExact: number | null
   updatedAt: Date
   _count: BracketFormatConfigCountAggregateOutputType | null
+  _avg: BracketFormatConfigAvgAggregateOutputType | null
+  _sum: BracketFormatConfigSumAggregateOutputType | null
   _min: BracketFormatConfigMinAggregateOutputType | null
   _max: BracketFormatConfigMaxAggregateOutputType | null
 }
@@ -173,6 +243,10 @@ export type BracketFormatConfigWhereInput = {
   formatCode?: Prisma.StringFilter<"BracketFormatConfig"> | string
   enabled?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
   maintenanceMode?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
+  hiddenInAdmin?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
+  participantMin?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
+  participantMax?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
+  participantExact?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
   updatedAt?: Prisma.DateTimeFilter<"BracketFormatConfig"> | Date | string
 }
 
@@ -180,6 +254,10 @@ export type BracketFormatConfigOrderByWithRelationInput = {
   formatCode?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
+  hiddenInAdmin?: Prisma.SortOrder
+  participantMin?: Prisma.SortOrderInput | Prisma.SortOrder
+  participantMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  participantExact?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _relevance?: Prisma.BracketFormatConfigOrderByRelevanceInput
 }
@@ -191,6 +269,10 @@ export type BracketFormatConfigWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BracketFormatConfigWhereInput | Prisma.BracketFormatConfigWhereInput[]
   enabled?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
   maintenanceMode?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
+  hiddenInAdmin?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
+  participantMin?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
+  participantMax?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
+  participantExact?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
   updatedAt?: Prisma.DateTimeFilter<"BracketFormatConfig"> | Date | string
 }, "formatCode">
 
@@ -198,10 +280,16 @@ export type BracketFormatConfigOrderByWithAggregationInput = {
   formatCode?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
+  hiddenInAdmin?: Prisma.SortOrder
+  participantMin?: Prisma.SortOrderInput | Prisma.SortOrder
+  participantMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  participantExact?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BracketFormatConfigCountOrderByAggregateInput
+  _avg?: Prisma.BracketFormatConfigAvgOrderByAggregateInput
   _max?: Prisma.BracketFormatConfigMaxOrderByAggregateInput
   _min?: Prisma.BracketFormatConfigMinOrderByAggregateInput
+  _sum?: Prisma.BracketFormatConfigSumOrderByAggregateInput
 }
 
 export type BracketFormatConfigScalarWhereWithAggregatesInput = {
@@ -211,6 +299,10 @@ export type BracketFormatConfigScalarWhereWithAggregatesInput = {
   formatCode?: Prisma.StringWithAggregatesFilter<"BracketFormatConfig"> | string
   enabled?: Prisma.BoolWithAggregatesFilter<"BracketFormatConfig"> | boolean
   maintenanceMode?: Prisma.BoolWithAggregatesFilter<"BracketFormatConfig"> | boolean
+  hiddenInAdmin?: Prisma.BoolWithAggregatesFilter<"BracketFormatConfig"> | boolean
+  participantMin?: Prisma.IntNullableWithAggregatesFilter<"BracketFormatConfig"> | number | null
+  participantMax?: Prisma.IntNullableWithAggregatesFilter<"BracketFormatConfig"> | number | null
+  participantExact?: Prisma.IntNullableWithAggregatesFilter<"BracketFormatConfig"> | number | null
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"BracketFormatConfig"> | Date | string
 }
 
@@ -218,6 +310,10 @@ export type BracketFormatConfigCreateInput = {
   formatCode: string
   enabled?: boolean
   maintenanceMode?: boolean
+  hiddenInAdmin?: boolean
+  participantMin?: number | null
+  participantMax?: number | null
+  participantExact?: number | null
   updatedAt?: Date | string
 }
 
@@ -225,6 +321,10 @@ export type BracketFormatConfigUncheckedCreateInput = {
   formatCode: string
   enabled?: boolean
   maintenanceMode?: boolean
+  hiddenInAdmin?: boolean
+  participantMin?: number | null
+  participantMax?: number | null
+  participantExact?: number | null
   updatedAt?: Date | string
 }
 
@@ -232,6 +332,10 @@ export type BracketFormatConfigUpdateInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -239,6 +343,10 @@ export type BracketFormatConfigUncheckedUpdateInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -246,6 +354,10 @@ export type BracketFormatConfigCreateManyInput = {
   formatCode: string
   enabled?: boolean
   maintenanceMode?: boolean
+  hiddenInAdmin?: boolean
+  participantMin?: number | null
+  participantMax?: number | null
+  participantExact?: number | null
   updatedAt?: Date | string
 }
 
@@ -253,6 +365,10 @@ export type BracketFormatConfigUpdateManyMutationInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -260,6 +376,10 @@ export type BracketFormatConfigUncheckedUpdateManyInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -273,13 +393,27 @@ export type BracketFormatConfigCountOrderByAggregateInput = {
   formatCode?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
+  hiddenInAdmin?: Prisma.SortOrder
+  participantMin?: Prisma.SortOrder
+  participantMax?: Prisma.SortOrder
+  participantExact?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type BracketFormatConfigAvgOrderByAggregateInput = {
+  participantMin?: Prisma.SortOrder
+  participantMax?: Prisma.SortOrder
+  participantExact?: Prisma.SortOrder
 }
 
 export type BracketFormatConfigMaxOrderByAggregateInput = {
   formatCode?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
+  hiddenInAdmin?: Prisma.SortOrder
+  participantMin?: Prisma.SortOrder
+  participantMax?: Prisma.SortOrder
+  participantExact?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -287,7 +421,17 @@ export type BracketFormatConfigMinOrderByAggregateInput = {
   formatCode?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
+  hiddenInAdmin?: Prisma.SortOrder
+  participantMin?: Prisma.SortOrder
+  participantMax?: Prisma.SortOrder
+  participantExact?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type BracketFormatConfigSumOrderByAggregateInput = {
+  participantMin?: Prisma.SortOrder
+  participantMax?: Prisma.SortOrder
+  participantExact?: Prisma.SortOrder
 }
 
 
@@ -296,6 +440,10 @@ export type BracketFormatConfigSelect<ExtArgs extends runtime.Types.Extensions.I
   formatCode?: boolean
   enabled?: boolean
   maintenanceMode?: boolean
+  hiddenInAdmin?: boolean
+  participantMin?: boolean
+  participantMax?: boolean
+  participantExact?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["bracketFormatConfig"]>
 
@@ -305,10 +453,14 @@ export type BracketFormatConfigSelectScalar = {
   formatCode?: boolean
   enabled?: boolean
   maintenanceMode?: boolean
+  hiddenInAdmin?: boolean
+  participantMin?: boolean
+  participantMax?: boolean
+  participantExact?: boolean
   updatedAt?: boolean
 }
 
-export type BracketFormatConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"formatCode" | "enabled" | "maintenanceMode" | "updatedAt", ExtArgs["result"]["bracketFormatConfig"]>
+export type BracketFormatConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"formatCode" | "enabled" | "maintenanceMode" | "hiddenInAdmin" | "participantMin" | "participantMax" | "participantExact" | "updatedAt", ExtArgs["result"]["bracketFormatConfig"]>
 
 export type $BracketFormatConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "BracketFormatConfig"
@@ -320,6 +472,16 @@ export type $BracketFormatConfigPayload<ExtArgs extends runtime.Types.Extensions
      * Техобслуживание: тип виден в админке, но недоступен при создании турнира
      */
     maintenanceMode: boolean
+    /**
+     * Скрыт из списка «Типы сеток» в админке (турниры с форматом остаются)
+     */
+    hiddenInAdmin: boolean
+    /**
+     * Переопределение лимита участников (null — значение по умолчанию для формата)
+     */
+    participantMin: number | null
+    participantMax: number | null
+    participantExact: number | null
     updatedAt: Date
   }, ExtArgs["result"]["bracketFormatConfig"]>
   composites: {}
@@ -693,6 +855,10 @@ export interface BracketFormatConfigFieldRefs {
   readonly formatCode: Prisma.FieldRef<"BracketFormatConfig", 'String'>
   readonly enabled: Prisma.FieldRef<"BracketFormatConfig", 'Boolean'>
   readonly maintenanceMode: Prisma.FieldRef<"BracketFormatConfig", 'Boolean'>
+  readonly hiddenInAdmin: Prisma.FieldRef<"BracketFormatConfig", 'Boolean'>
+  readonly participantMin: Prisma.FieldRef<"BracketFormatConfig", 'Int'>
+  readonly participantMax: Prisma.FieldRef<"BracketFormatConfig", 'Int'>
+  readonly participantExact: Prisma.FieldRef<"BracketFormatConfig", 'Int'>
   readonly updatedAt: Prisma.FieldRef<"BracketFormatConfig", 'DateTime'>
 }
     

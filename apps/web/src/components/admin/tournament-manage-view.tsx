@@ -29,7 +29,12 @@ import {
   teamRating,
   type TeamWithPlayers,
 } from "@/lib/pair-tournament";
-import { isOutdatedFixedSwiss27Bracket } from "@/lib/fixed-swiss-grid";
+import { isOutdatedFixedSwiss27Bracket, isOutdatedFixedSwiss32Bracket } from "@/lib/fixed-swiss-grid";
+import {
+  getDefaultBracketParticipantRules,
+  validateBracketParticipantCount,
+  type BracketParticipantRules,
+} from "@/lib/bracket-participant-rules";
 import { useBracketFormatOptions } from "@/hooks/use-bracket-format-options";
 import {
   STATUS_OPTIONS,
@@ -52,6 +57,7 @@ import {
   filterUpcomingMatches,
   formatMatchDateTime,
   matchParticipantsLabel,
+  matchStageLabel,
   matchScoreLabel,
 } from "@/lib/tournament-match-schedule";
 
@@ -109,6 +115,7 @@ export function TournamentManageView({
   onGenerateBracket,
   onResetAllMatches,
   onRegenerateBracket,
+  onDeleteBracket,
   onSaveMatchResult,
   onCancelMatchResult,
   onUpdated,
@@ -130,6 +137,7 @@ export function TournamentManageView({
   onGenerateBracket: () => void | Promise<void>;
   onResetAllMatches?: () => void | Promise<void>;
   onRegenerateBracket?: () => void | Promise<void>;
+  onDeleteBracket?: () => void | Promise<void>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
   onUpdated: () => void;
@@ -481,6 +489,7 @@ export function TournamentManageView({
           onGenerateBracket={onGenerateBracket}
           onResetAllMatches={onResetAllMatches}
           onRegenerateBracket={onRegenerateBracket}
+          onDeleteBracket={onDeleteBracket}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
         />
@@ -489,6 +498,8 @@ export function TournamentManageView({
       {bracketTabOpen("current-matches") && (
         <MatchesScheduleTab
           variant="current"
+          format={t.format}
+          allMatches={bracketMatches}
           matches={currentMatches}
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
@@ -499,6 +510,8 @@ export function TournamentManageView({
       {bracketTabOpen("upcoming-matches") && (
         <MatchesScheduleTab
           variant="upcoming"
+          format={t.format}
+          allMatches={bracketMatches}
           matches={upcomingMatches}
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
@@ -509,6 +522,8 @@ export function TournamentManageView({
       {bracketTabOpen("completed-matches") && (
         <MatchesScheduleTab
           variant="completed"
+          format={t.format}
+          allMatches={bracketMatches}
           matches={completedMatches}
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
@@ -789,6 +804,7 @@ function BracketTab({
   onGenerateBracket,
   onResetAllMatches,
   onRegenerateBracket,
+  onDeleteBracket,
   onSaveMatchResult,
   onCancelMatchResult,
 }: {
@@ -804,6 +820,7 @@ function BracketTab({
   onGenerateBracket: () => void | Promise<void>;
   onResetAllMatches?: () => void | Promise<void>;
   onRegenerateBracket?: () => void | Promise<void>;
+  onDeleteBracket?: () => void | Promise<void>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
 }) {
@@ -817,7 +834,7 @@ function BracketTab({
     return m.team1Score != null || m.team2Score != null;
   });
   const [confirmAction, setConfirmAction] = useState<
-    "reset-all" | "regenerate" | null
+    "reset-all" | "regenerate" | "delete-bracket" | null
   >(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [confirmError, setConfirmError] = useState<string | null>(null);
@@ -873,6 +890,11 @@ function BracketTab({
         setBracketNotice(
           "Сетка пересоздана: 27 встреч, 1/4 (#21–#24), крест → 1/4, полуфинал и финал.",
         );
+      } else if (confirmAction === "delete-bracket") {
+        if (!onDeleteBracket) return;
+        await onDeleteBracket();
+        setConfirmAction(null);
+        setBracketNotice("Сетка снесена. Турнир на месте — можно сформировать заново.");
       }
     } catch (e) {
       setConfirmError(e instanceof Error ? e.message : "Не удалось выполнить действие");
@@ -903,25 +925,54 @@ function BracketTab({
       ? "Сформировать 1-й тур"
       : `Сформировать тур ${maxRound + 1}`;
 
+  const participantRules: BracketParticipantRules =
+    t.participantRules ?? getDefaultBracketParticipantRules(t.format);
+  const participantCheck = validateBracketParticipantCount(
+    format,
+    confirmedCount,
+    participantRules,
+  );
+
   const generateDisabled =
     bracketLoading ||
     confirmLoading ||
     confirmedCount < 2 ||
+    !participantCheck.ok ||
     (oneShotGrid && maxRound > 0) ||
     (dynamicSwiss && maxRound > 0 && currentRoundOpen);
 
-  const outdatedFixedSwiss =
+  const regenerateDisabled =
+    bracketLoading || confirmLoading || !participantCheck.ok;
+
+  const outdatedFixedSwiss16 =
     fixedSwiss &&
     bracketMatches.length > 0 &&
     isOutdatedFixedSwiss27Bracket(bracketMatches);
 
+  const outdatedFixedSwiss32 =
+    fixedSwiss &&
+    bracketMatches.length > 0 &&
+    isOutdatedFixedSwiss32Bracket(bracketMatches.length);
+
   return (
     <div className="space-y-4">
-      {outdatedFixedSwiss && (
+      {outdatedFixedSwiss16 && (
         <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
           Сетка в базе устарела (2×1/4 вместо 4, крест не ведёт в 1/4). Нажмите{" "}
           <strong>«Сформировать заново»</strong>, чтобы получить эталон TS: #21–#24,
           нижняя тур 2 → 1/4, полуфинал #25–#26, финал #27.
+        </p>
+      )}
+      {outdatedFixedSwiss32 && (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Сетка на 32 устарела. Нажмите{" "}
+          <strong>«Сформировать заново»</strong>, чтобы получить эталон LLB (59 встреч,
+          10 колонок): 1/8 #41–#44, нижняя #48–#45, тур 4 #52–#49, 1/4 #53, финал #59.
+        </p>
+      )}
+      {!participantCheck.ok && (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+          {participantCheck.error}
         </p>
       )}
       {bracketNotice && (
@@ -951,6 +1002,19 @@ function BracketTab({
             Отменить все встречи
           </button>
         )}
+        {bracketMatches.length > 0 && onDeleteBracket && (
+          <button
+            type="button"
+            onClick={() => {
+              setConfirmError(null);
+              setConfirmAction("delete-bracket");
+            }}
+            disabled={bracketLoading || confirmLoading}
+            className="admin-btn admin-btn--danger px-4 py-2 text-sm disabled:opacity-50"
+          >
+            Удалить встречи
+          </button>
+        )}
         {bracketMatches.length > 0 && oneShotGrid && onRegenerateBracket && (
           <button
             type="button"
@@ -958,7 +1022,7 @@ function BracketTab({
               setConfirmError(null);
               setConfirmAction("regenerate");
             }}
-            disabled={bracketLoading || confirmLoading}
+            disabled={regenerateDisabled}
             className="admin-btn admin-btn--danger px-4 py-2 text-sm disabled:opacity-50"
           >
             Сформировать заново
@@ -967,6 +1031,10 @@ function BracketTab({
         <span className="tournament-hint">
           Подтверждённых: {confirmedCount}
           {confirmedCount < 2 && " (минимум 2)"}
+          {participantCheck.ok &&
+            participantRules.exact != null &&
+            maxRound === 0 &&
+            ` (нужно ${participantRules.exact})`}
           {dynamicSwiss && maxRound > 0 && currentRoundOpen && " · завершите текущий тур"}
           {fixedSwiss && maxRound === 0 && " · все встречи и переходы (#) будут созданы сразу"}
           {olympic && maxRound === 0 && " · олимпийская сетка целиком, как в приказе"}
@@ -1040,6 +1108,17 @@ function BracketTab({
             onConfirm={handleBracketConfirm}
             onClose={closeConfirm}
           />
+          <ConfirmModal
+            open={confirmAction === "delete-bracket"}
+            title="Снести сетку? Турнир останется"
+            description="Будут удалены только встречи. Турнир, участники и регистрации сохранятся — сетку можно собрать с нуля."
+            confirmLabel="Да, снести сетку"
+            variant="danger"
+            loading={confirmLoading}
+            error={confirmError}
+            onConfirm={handleBracketConfirm}
+            onClose={closeConfirm}
+          />
         </>
       )}
     </div>
@@ -1048,12 +1127,16 @@ function BracketTab({
 
 function MatchesScheduleTab({
   variant,
+  format,
+  allMatches,
   matches,
   matchNumbers,
   onSaveMatchResult,
   onCancelMatchResult,
 }: {
   variant: "current" | "upcoming" | "completed";
+  format: string;
+  allMatches: BracketMatchView[];
   matches: BracketMatchView[];
   matchNumbers: Map<string, number>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
@@ -1099,10 +1182,11 @@ function MatchesScheduleTab({
         <p className="tournament-hint text-sm">{emptyHint}</p>
       ) : (
         <div className="admin-table-wrap overflow-x-auto">
-          <table className="w-full min-w-[640px] text-left text-sm">
+          <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="admin-thead">
               <tr>
                 <th className="px-4 py-3 font-medium">#</th>
+                <th className="px-4 py-3 font-medium">Этап</th>
                 <th className="px-4 py-3 font-medium">Встреча</th>
                 {showScore && (
                   <th className="px-4 py-3 font-medium">Счёт</th>
@@ -1120,6 +1204,14 @@ function MatchesScheduleTab({
                   >
                     <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">
                       {matchNumbers.get(match.id) ?? "—"}
+                    </td>
+                    <td className="px-4 py-3 text-xs tournament-participant-meta">
+                      {matchStageLabel(
+                        match,
+                        format,
+                        allMatches,
+                        matchNumbers.get(match.id),
+                      )}
                     </td>
                     <td className="px-4 py-3 font-medium">
                       {matchParticipantsLabel(match)}

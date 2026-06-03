@@ -189,11 +189,15 @@ export const tournamentSchema = z.object({
     "SWISS",
     "FIXED_SWISS",
     "FIXED_SWISS_16_BRONZE",
+    "FIXED_SWISS_32",
+    "FIXED_SWISS_32_BRONZE",
     "PAIR_OLYMPIC",
     "PAIR_OLYMPIC_1L_BRONZE",
     "PAIR_SWISS",
     "FIXED_PAIR_SWISS",
     "FIXED_PAIR_SWISS_16_BRONZE",
+    "FIXED_PAIR_SWISS_32",
+    "FIXED_PAIR_SWISS_32_BRONZE",
   ]),
   startsAt: z.string().optional(),
   status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
@@ -210,11 +214,15 @@ export const tournamentUpdateSchema = z.object({
       "SWISS",
       "FIXED_SWISS",
       "FIXED_SWISS_16_BRONZE",
+      "FIXED_SWISS_32",
+      "FIXED_SWISS_32_BRONZE",
       "PAIR_OLYMPIC",
       "PAIR_OLYMPIC_1L_BRONZE",
       "PAIR_SWISS",
       "FIXED_PAIR_SWISS",
       "FIXED_PAIR_SWISS_16_BRONZE",
+      "FIXED_PAIR_SWISS_32",
+      "FIXED_PAIR_SWISS_32_BRONZE",
     ])
     .optional(),
   startsAt: z.string().optional().nullable(),
@@ -275,10 +283,15 @@ export const matchCancelSchema = z.object({
   matchId: z.string().min(1),
 });
 
-export const bracketGenerateSchema = z.object({
-  tournamentId: z.string().min(1),
-  regenerate: z.boolean().optional(),
-});
+export const bracketGenerateSchema = z
+  .object({
+    tournamentId: z.string().min(1),
+    regenerate: z.boolean().optional(),
+    deleteBracket: z.boolean().optional(),
+  })
+  .refine((data) => !(data.regenerate && data.deleteBracket), {
+    message: "Укажите только одно действие: regenerate или deleteBracket",
+  });
 
 export const bracketResetSchema = z.object({
   tournamentId: z.string().min(1),
@@ -388,10 +401,15 @@ export const playListingResponseUpdateSchema = z.object({
   status: z.enum(["ACCEPTED", "DECLINED", "WITHDRAWN"]),
 });
 
-/**
- * Отображаемое имя эталонного формата (27 встреч, 7 колонок).
- * Регламент: docs/BRACKET_REFERENCE_16_8.md
- */
+/** 32→16 + матч проигравших полуфиналистов за 3–4 место (#60). */
+export const FIXED_SWISS_32_BRONZE_FORMAT_LABEL =
+  "Сетка на 32 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
+
+/** 32→16 (59 встреч) — LLB: #41–#44 1/8, #45–#48 нижняя тур 3, #49–#52 тур 4, 1/4 с #53. */
+export const FIXED_SWISS_32_FORMAT_LABEL =
+  "Сетка на 32 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
+
+/** 16→8 (27 встреч, 7 колонок). */
 export const FIXED_SWISS_16_8_FORMAT_LABEL =
   "Сетка на 16 до 2 поражений, олимпийка с 1/4 с двумя 3 местами";
 
@@ -413,11 +431,15 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   SWISS: "Швейцарская (по турам)",
   FIXED_SWISS: FIXED_SWISS_16_8_FORMAT_LABEL,
   FIXED_SWISS_16_BRONZE: FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_32: FIXED_SWISS_32_FORMAT_LABEL,
+  FIXED_SWISS_32_BRONZE: FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   PAIR_OLYMPIC: "Парный (фикс. сетка)",
   PAIR_OLYMPIC_1L_BRONZE: `Парная: ${OLYMPIC_1L_BRONZE_FORMAT_LABEL}`,
   PAIR_SWISS: "Парный швейцарская (по турам)",
   FIXED_PAIR_SWISS: `Парная: ${FIXED_SWISS_16_8_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_16_BRONZE: `Парная: ${FIXED_SWISS_16_BRONZE_FORMAT_LABEL}`,
+  FIXED_PAIR_SWISS_32: `Парная: ${FIXED_SWISS_32_FORMAT_LABEL}`,
+  FIXED_PAIR_SWISS_32_BRONZE: `Парная: ${FIXED_SWISS_32_BRONZE_FORMAT_LABEL}`,
 };
 
 export const REGISTRATION_STATUS_LABELS: Record<string, string> = {

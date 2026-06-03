@@ -1,0 +1,36 @@
+---
+description: Эталон сетки 32→16 (Fixed Swiss) — LLB 59 встреч; не ломать без явного запроса
+globs: apps/web/src/lib/fixed-swiss*.ts,apps/web/src/lib/swiss-bracket-layout.ts,apps/web/src/lib/bracket-service.ts,apps/web/src/lib/bracket-view.ts,apps/web/src/components/bracket/**,apps/web/scripts/test-fixed-swiss-layout.ts,docs/BRACKET_REFERENCE_32_16.md,docs/FIXED_SWISS_BRACKET_LINES_32_16.md
+alwaysApply: false
+---
+
+# Эталон: Fixed Swiss 32→16
+
+**Полный регламент:** `docs/BRACKET_REFERENCE_32_16.md`  
+**Линии SVG:** `docs/FIXED_SWISS_BRACKET_LINES_32_16.md`  
+**UI-паттерны (карточка, модалка):** `docs/BRACKET_REFERENCE_16_8.md`
+
+Сетка **59 встреч, 10 колонок** (`FIXED_SWISS_32`) — **закреплённый эталон** LLB для 32 участников.
+
+## Не менять без явного запроса
+
+- `buildFixedSwissTs32Template()` и links в `fixed-swiss-ts-grid.ts`
+- `buildTsPositions32`, `fixedSwissTs32MatchNo`, `fixedSwissTs32OlympicToQuarterTarget`
+- `shouldDrawFixedSwissWinEdge` для `matchCount === 59` (whitelist SVG, без «шин»)
+- Y 1/8↔1/4, порядок #53–#56, колонки −4…+5
+- Подписи мест `fixedSwissTs32PlacementByMatchNo`
+
+## Ключевая логика
+
+- Верхняя R2 → 1/8: **пары** (#25+#26→#41 …), не slot→slot
+- Крест → тур 3: #40+#39→#48 …; тур 3→тур 4: #48→#52, #47→#51
+- 1/8→1/4: короткая линия col 2→3, same Y (#41↔#53 …)
+- Тур 4→1/4, верхняя→тур 4: **только подвал**, не SVG
+
+## Проверка
+
+```bash
+cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts
+```
+
+После смены links — **«Сформировать заново»** в админке.

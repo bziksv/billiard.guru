@@ -461,6 +461,10 @@ export const BracketFormatConfigScalarFieldEnum = {
   formatCode: 'formatCode',
   enabled: 'enabled',
   maintenanceMode: 'maintenanceMode',
+  hiddenInAdmin: 'hiddenInAdmin',
+  participantMin: 'participantMin',
+  participantMax: 'participantMax',
+  participantExact: 'participantExact',
   updatedAt: 'updatedAt'
 } as const
 

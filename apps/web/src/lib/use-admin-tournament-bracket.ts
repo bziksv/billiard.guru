@@ -86,6 +86,24 @@ export function useAdminTournamentBracketActions(
     await onReload();
   }, [tournamentId, onReload]);
 
+  const deleteBracketGrid = useCallback(async () => {
+    if (!tournamentId) return;
+    setBracketLoading(true);
+    try {
+      const res = await fetch("/api/tournaments/bracket", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tournamentId, deleteBracket: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "Не удалось удалить сетку");
+      }
+    } finally {
+      setBracketLoading(false);
+    }
+  }, [tournamentId]);
+
   return {
     bracketLoading,
     generateBracket,
@@ -93,5 +111,6 @@ export function useAdminTournamentBracketActions(
     cancelMatchResult,
     resetAllMatches,
     regenerateBracketGrid,
+    deleteBracketGrid,
   };
 }
