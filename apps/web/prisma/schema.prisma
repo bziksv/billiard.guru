@@ -19,6 +19,10 @@ enum TournamentFormat {
   FIXED_SWISS_32
   /** 32→16 (60 встреч): эталон + матч за 3–4 (#60 под финалом) */
   FIXED_SWISS_32_BRONZE
+  /** 64→32 (111 встреч): эталон LLB, олимпийка с 1/8 */
+  FIXED_SWISS_64
+  /** 64→32 (112 встреч): эталон + матч за 3–4 (#112 под финалом) */
+  FIXED_SWISS_64_BRONZE
   PAIR_OLYMPIC
   PAIR_OLYMPIC_1L_BRONZE
   PAIR_SWISS
@@ -26,6 +30,8 @@ enum TournamentFormat {
   FIXED_PAIR_SWISS_16_BRONZE
   FIXED_PAIR_SWISS_32
   FIXED_PAIR_SWISS_32_BRONZE
+  FIXED_PAIR_SWISS_64
+  FIXED_PAIR_SWISS_64_BRONZE
 }
 
 enum RegistrationStatus {
@@ -575,6 +581,8 @@ model BracketFormatConfig {
   participantMin    Int?     @map("participant_min")
   participantMax    Int?     @map("participant_max")
   participantExact  Int?     @map("participant_exact")
+  /// null — брать из BRACKET_FORMAT_CATALOG; иначе переопределение «эталон»
+  isReference       Boolean? @map("is_reference")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("bracket_format_config")

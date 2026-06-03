@@ -17,6 +17,8 @@ export type BracketFormatAdminSettings = {
   participantMin: number | null;
   participantMax: number | null;
   participantExact: number | null;
+  /** null — значение из каталога (isReference в catalog.ts) */
+  isReference: boolean | null;
 };
 
 const DEFAULT_SETTINGS: BracketFormatAdminSettings = {
@@ -26,6 +28,7 @@ const DEFAULT_SETTINGS: BracketFormatAdminSettings = {
   participantMin: null,
   participantMax: null,
   participantExact: null,
+  isReference: null,
 };
 
 function rowToSettings(row: {
@@ -35,6 +38,7 @@ function rowToSettings(row: {
   participantMin: number | null;
   participantMax: number | null;
   participantExact: number | null;
+  isReference: boolean | null;
 }): BracketFormatAdminSettings {
   return {
     enabled: row.enabled,
@@ -43,7 +47,18 @@ function rowToSettings(row: {
     participantMin: row.participantMin,
     participantMax: row.participantMax,
     participantExact: row.participantExact,
+    isReference: row.isReference,
   };
+}
+
+/** Эталон: переопределение в БД или isReference из каталога */
+export function resolveBracketFormatIsReference(
+  code: string,
+  settings: BracketFormatAdminSettings,
+): boolean {
+  if (settings.isReference !== null) return settings.isReference;
+  const fromCatalog = BRACKET_FORMAT_CATALOG.find((f) => f.code === code)?.isReference;
+  return fromCatalog ?? false;
 }
 
 function participantOverridesFromSettings(
@@ -113,6 +128,8 @@ export async function saveBracketFormatSettings(
       patch.participantExact !== undefined
         ? patch.participantExact
         : current.participantExact,
+    isReference:
+      patch.isReference !== undefined ? patch.isReference : current.isReference,
   };
   const row = await prisma.bracketFormatConfig.upsert({
     where: { formatCode },
@@ -124,6 +141,7 @@ export async function saveBracketFormatSettings(
       participantMin: next.participantMin,
       participantMax: next.participantMax,
       participantExact: next.participantExact,
+      isReference: next.isReference,
     },
     update: {
       enabled: next.enabled,
@@ -132,6 +150,7 @@ export async function saveBracketFormatSettings(
       participantMin: next.participantMin,
       participantMax: next.participantMax,
       participantExact: next.participantExact,
+      isReference: next.isReference,
     },
   });
   return rowToSettings(row);

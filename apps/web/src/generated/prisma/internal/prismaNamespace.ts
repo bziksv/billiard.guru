@@ -2488,6 +2488,7 @@ export const BracketFormatConfigScalarFieldEnum = {
   participantMin: 'participantMin',
   participantMax: 'participantMax',
   participantExact: 'participantExact',
+  isReference: 'isReference',
   updatedAt: 'updatedAt'
 } as const
 

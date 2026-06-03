@@ -7,7 +7,10 @@ import {
 } from "@/lib/bracket-formats/catalog";
 import { prisma } from "@/lib/prisma";
 import { resolveBracketParticipantRules } from "@/lib/bracket-participant-rules";
-import { getAllBracketFormatSettings } from "@/lib/bracket-formats/settings-server";
+import {
+  getAllBracketFormatSettings,
+  resolveBracketFormatIsReference,
+} from "@/lib/bracket-formats/settings-server";
 
 export async function GET(request: Request) {
   try {
@@ -46,6 +49,7 @@ export async function GET(request: Request) {
         participantMin: s.participantMin,
         participantMax: s.participantMax,
         participantExact: s.participantExact,
+        isReference: resolveBracketFormatIsReference(f.code, s),
         participantRules: resolveBracketParticipantRules(f.code, s),
       };
     });
@@ -75,6 +79,18 @@ export async function GET(request: Request) {
           participantMin: settingsMap[formatCode]?.participantMin ?? null,
           participantMax: settingsMap[formatCode]?.participantMax ?? null,
           participantExact: settingsMap[formatCode]?.participantExact ?? null,
+          isReference: resolveBracketFormatIsReference(
+            formatCode,
+            settingsMap[formatCode] ?? {
+              enabled: true,
+              maintenanceMode: false,
+              hiddenInAdmin: false,
+              participantMin: null,
+              participantMax: null,
+              participantExact: null,
+              isReference: null,
+            },
+          ),
           participantRules: resolveBracketParticipantRules(
             formatCode,
             settingsMap[formatCode] ?? null,

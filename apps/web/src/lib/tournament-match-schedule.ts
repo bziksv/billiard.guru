@@ -4,13 +4,18 @@ import {
   inferFixedSwissGridSize,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
+  isFixedSwissTs64BronzeMatchCount,
+  isFixedSwissTs64MatchCount,
 } from "@/lib/fixed-swiss-grid";
 import {
   fixedSwissColumnLabel,
   fixedSwissMatchColForCount,
   fixedSwissPlacementLabel,
 } from "@/lib/fixed-swiss-layout";
-import { fixedSwissTs32StageByMatchNo } from "@/lib/fixed-swiss-ts-grid";
+import {
+  fixedSwissTs32StageByMatchNo,
+  fixedSwissTs64StageByMatchNo,
+} from "@/lib/fixed-swiss-ts-grid";
 import {
   isFixedSwissFormat,
   isOlympicFormat,
@@ -112,7 +117,10 @@ export function matchStageLabel(
         isFixedSwissTs32MatchCount(matchCount) ||
         isFixedSwissTs32BronzeMatchCount(matchCount)
           ? fixedSwissTs32StageByMatchNo(no)
-          : null;
+          : isFixedSwissTs64MatchCount(matchCount) ||
+              isFixedSwissTs64BronzeMatchCount(matchCount)
+            ? fixedSwissTs64StageByMatchNo(no)
+            : null;
       const stage =
         stageOverride ?? fixedSwissColumnLabel(col, matchCount, maxRound);
       const placement = fixedSwissPlacementLabel(

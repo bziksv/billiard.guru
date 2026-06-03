@@ -14,6 +14,7 @@ const patchSchema = z
     enabled: z.boolean().optional(),
     maintenanceMode: z.boolean().optional(),
     hiddenInAdmin: z.boolean().optional(),
+    isReference: z.boolean().optional(),
     participantMin: z.number().int().nullable().optional(),
     participantMax: z.number().int().nullable().optional(),
     participantExact: z.number().int().nullable().optional(),
@@ -24,6 +25,7 @@ const patchSchema = z
       b.enabled !== undefined ||
       b.maintenanceMode !== undefined ||
       b.hiddenInAdmin !== undefined ||
+      b.isReference !== undefined ||
       b.participantMin !== undefined ||
       b.participantMax !== undefined ||
       b.participantExact !== undefined ||
@@ -78,6 +80,7 @@ export async function PATCH(request: NextRequest) {
       enabled: body.enabled,
       maintenanceMode: body.maintenanceMode,
       hiddenInAdmin: body.hiddenInAdmin,
+      isReference: body.isReference,
       ...participantPatch,
     });
     const settings = await getAllBracketFormatSettings();

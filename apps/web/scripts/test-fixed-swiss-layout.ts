@@ -33,6 +33,8 @@ import {
   fixedSwissTs28PlacementByMatchNo,
   fixedSwissTs32MatchCol,
   fixedSwissTs32PlacementByMatchNo,
+  fixedSwissTs64MatchCol,
+  fixedSwissTs64PlacementByMatchNo,
 } from "../src/lib/fixed-swiss-layout";
 import {
   buildFixedSwissTemplate,
@@ -50,6 +52,8 @@ import {
   isFixedSwissTsMatchCount,
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32BronzeMatchCount,
+  isFixedSwissTs64MatchCount,
+  isFixedSwissTs64BronzeMatchCount,
   isOutdatedFixedSwiss32Bracket,
 } from "../src/lib/fixed-swiss-grid";
 import {
@@ -870,5 +874,43 @@ const layout32Bronze = buildFixedSwissBracketLayout(mkGridTs32Bronze());
   );
 }
 assert.equal(layout32Bronze.matchNumbers.get("r7s2"), 60);
+
+// --- 64→32 (111/112 встреч) ---
+function mkGridTs64(): BracketMatchView[] {
+  const template = buildFixedSwissTemplate(64, "FIXED_SWISS_64");
+  return template.matches.map((m) => mkMatch(m.round, m.slot));
+}
+
+assert.equal(buildFixedSwissTemplate(64, "FIXED_SWISS_64").matches.length, 111);
+assert.equal(buildFixedSwissTemplate(64, "FIXED_SWISS_64_BRONZE").matches.length, 112);
+assert.equal(inferFixedSwissGridSize(111), 64);
+assert.equal(isFixedSwissTs64MatchCount(111), true);
+assert.equal(isFixedSwissTs64BronzeMatchCount(112), true);
+assert.equal(fixedSwissMatchNo(7, 1, 111), 111, "final #111");
+assert.equal(fixedSwissMatchNo(7, 2, 112), 112, "bronze #112");
+assert.equal(fixedSwissTs64MatchCol(3, 17), 2, "#81 in 1/8 column");
+assert.equal(fixedSwissTs64MatchCol(4, 1), -3, "lower tour 3 column");
+assert.equal(fixedSwissTs64MatchCol(5, 1), 3, "1/4 column");
+assert.equal(fixedSwissTs64PlacementByMatchNo(33, false), "место 49–64");
+assert.equal(fixedSwissTs64PlacementByMatchNo(81, false), null, "1/8 without place range");
+assert.equal(fixedSwissTs64PlacementByMatchNo(105, false), "место 5–8");
+assert.equal(fixedSwissProtocolPlace(111, "winner", 111), 1);
+assert.equal(fixedSwissProtocolPlace(112, "winner", 112), 3);
+const layout64 = buildFixedSwissBracketLayout(mkGridTs64());
+assert.equal(layout64.minCol, -4);
+assert.equal(layout64.maxCol, 5);
+assert.equal(layout64.matchNumbers.get("r7s1"), 111);
+
+function mkGridTs64Bronze(): BracketMatchView[] {
+  const template = buildFixedSwissTemplate(64, "FIXED_SWISS_64_BRONZE");
+  return template.matches.map((m) => mkMatch(m.round, m.slot));
+}
+const layout64Bronze = buildFixedSwissBracketLayout(mkGridTs64Bronze());
+{
+  const fin = layout64Bronze.positions.get("r7s1")!;
+  const bronze = layout64Bronze.positions.get("r7s2")!;
+  assert.equal(bronze.col, 5, "bronze in «Финал» column");
+  assert.equal(bronze.y, fin.y + FIXED_SWISS_CARD_H + 12, "#112 under #111");
+}
 
 console.log("fixed swiss layout tests passed");

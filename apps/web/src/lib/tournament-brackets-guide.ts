@@ -298,6 +298,34 @@ export const TOURNAMENT_BRACKETS_SECTIONS: GuideSection[] = [
     ],
   },
   {
+    id: "swiss-fixed-64",
+    title: TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_64!,
+    format: "FIXED_SWISS_64",
+    paragraphs: [
+      "Фиксированная швейцарская сетка на **64 участника** (63 bye в 1-м туре). **111 встреч**, **10 колонок** — масштаб эталона 32→16: нижняя ветка тур 1–4, oлимпийка с **1/8** (#81–#88), 1/4 с **#105**.",
+      "Регламент: **docs/BRACKET_REFERENCE_64_32.md**. После обновления шаблона — «Сформировать заново».",
+      `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_64}.`,
+    ],
+    bullets: [
+      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_64}».`,
+      "Нижняя: #33–#48 → крест #65–#80 → тур 3 #96–#89 → тур 4 #104–#97.",
+      "Верхняя: #49–#64 → 1/8 #81–#88 (парами) → 1/4 #105–#108.",
+    ],
+  },
+  {
+    id: "swiss-fixed-64-bronze",
+    title: TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_64_BRONZE!,
+    format: "FIXED_SWISS_64_BRONZE",
+    paragraphs: [
+      "Та же эталонная сетка 64→32 (111 встреч), что у FIXED_SWISS_64, плюс **#112** — матч проигравших полуфиналистов.",
+      "Матч **#112** отображается **в колонке «Финал» под финалом (#111)**.",
+      `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_64_BRONZE}.`,
+    ],
+    bullets: [
+      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_64_BRONZE}».`,
+    ],
+  },
+  {
     id: "pair-intro",
     title: "Парные турниры — общее",
     paragraphs: [

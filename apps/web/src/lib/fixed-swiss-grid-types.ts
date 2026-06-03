@@ -21,6 +21,8 @@ export type FixedSwissTemplate = {
     | "ts168bronze"
     | "ts3216"
     | "ts3216bronze"
+    | "ts6432"
+    | "ts6432bronze"
     | "ts168legacy29"
     | "168legacy"
     | "classic";

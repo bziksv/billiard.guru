@@ -12,6 +12,20 @@ export interface TeamWithPlayers {
   player2?: TeamPlayer | null;
 }
 
+export function isFixedSwiss64BronzeFormat(format: string): boolean {
+  return (
+    format === "FIXED_SWISS_64_BRONZE" || format === "FIXED_PAIR_SWISS_64_BRONZE"
+  );
+}
+
+export function isFixedSwiss64Format(format: string): boolean {
+  return (
+    format === "FIXED_SWISS_64" ||
+    format === "FIXED_PAIR_SWISS_64" ||
+    isFixedSwiss64BronzeFormat(format)
+  );
+}
+
 export function isFixedSwiss32BronzeFormat(format: string): boolean {
   return (
     format === "FIXED_SWISS_32_BRONZE" || format === "FIXED_PAIR_SWISS_32_BRONZE"
@@ -39,7 +53,8 @@ export function isSwissFormat(format: string): boolean {
     format === "FIXED_SWISS" ||
     format === "FIXED_PAIR_SWISS" ||
     isFixedSwiss16BronzeFormat(format) ||
-    isFixedSwiss32Format(format)
+    isFixedSwiss32Format(format) ||
+    isFixedSwiss64Format(format)
   );
 }
 
@@ -48,7 +63,8 @@ export function isFixedSwissFormat(format: string): boolean {
     format === "FIXED_SWISS" ||
     format === "FIXED_PAIR_SWISS" ||
     isFixedSwiss16BronzeFormat(format) ||
-    isFixedSwiss32Format(format)
+    isFixedSwiss32Format(format) ||
+    isFixedSwiss64Format(format)
   );
 }
 

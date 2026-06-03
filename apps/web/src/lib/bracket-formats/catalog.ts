@@ -2,6 +2,8 @@ import {
   FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_FORMAT_LABEL,
+  FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_64_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
   TOURNAMENT_FORMAT_LABELS,
@@ -16,13 +18,17 @@ export type BracketFormatCode =
   | "FIXED_SWISS_16_BRONZE"
   | "FIXED_SWISS_32"
   | "FIXED_SWISS_32_BRONZE"
+  | "FIXED_SWISS_64"
+  | "FIXED_SWISS_64_BRONZE"
   | "PAIR_OLYMPIC"
   | "PAIR_OLYMPIC_1L_BRONZE"
   | "PAIR_SWISS"
   | "FIXED_PAIR_SWISS"
   | "FIXED_PAIR_SWISS_16_BRONZE"
   | "FIXED_PAIR_SWISS_32"
-  | "FIXED_PAIR_SWISS_32_BRONZE";
+  | "FIXED_PAIR_SWISS_32_BRONZE"
+  | "FIXED_PAIR_SWISS_64"
+  | "FIXED_PAIR_SWISS_64_BRONZE";
 
 export interface BracketFormatDefinition {
   code: BracketFormatCode;
@@ -154,6 +160,42 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
   },
   {
+    code: "FIXED_SWISS_64",
+    adminLabel: FIXED_SWISS_64_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    isReference: true,
+    shortDescription:
+      "111 встреч, 10 колонок — эталон LLB 64→32: #81–#88 1/8, нижняя тур 1–4, 1/4 с #105.",
+    guideSectionId: "swiss-fixed-64",
+    docPaths: [
+      "docs/BRACKET_REFERENCE_64_32.md",
+      "docs/FIXED_SWISS_BRACKET_LINES_64_32.md",
+    ],
+    implementation: [
+      "fixed-swiss-ts-grid.ts — buildFixedSwissTs64Template()",
+      "fixed-swiss-layout.ts — buildTsPositions64",
+      "swiss-bracket-view.tsx",
+    ],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_SWISS_64_BRONZE",
+    adminLabel: FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    shortDescription:
+      "Эталон 64→32 (111 встреч) + #112 матч проигравших полуфиналистов; #112 под финалом в колонке «Финал».",
+    guideSectionId: "swiss-fixed-64-bronze",
+    docPaths: ["docs/BRACKET_REFERENCE_64_32.md"],
+    implementation: [
+      "fixed-swiss-ts-grid.ts — buildFixedSwissTs64Template(withBronze)",
+      "fixed-swiss-layout.ts — buildTsPositions64Bronze",
+      "swiss-bracket-view.tsx",
+    ],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
     code: "PAIR_OLYMPIC",
     adminLabel: "Парный (фикс. сетка)",
     pairing: "pair",
@@ -225,6 +267,28 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     shortDescription: "Парный аналог FIXED_SWISS_32_BRONZE (60 встреч на 32 команды).",
     guideSectionId: "swiss-fixed-32-bronze",
     docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
+    implementation: ["fixed-swiss-ts-grid.ts", "fixed-swiss-layout.ts"],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_PAIR_SWISS_64",
+    adminLabel: TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_64!,
+    pairing: "pair",
+    layout: "swiss_fixed",
+    shortDescription: "Парный аналог FIXED_SWISS_64 (64→32).",
+    guideSectionId: "pair-swiss-fixed-64",
+    docPaths: ["docs/BRACKET_REFERENCE_64_32.md"],
+    implementation: ["fixed-swiss-ts-grid.ts", "fixed-swiss-layout.ts"],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_PAIR_SWISS_64_BRONZE",
+    adminLabel: TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_64_BRONZE!,
+    pairing: "pair",
+    layout: "swiss_fixed",
+    shortDescription: "Парный аналог FIXED_SWISS_64_BRONZE (112 встреч на 64 команды).",
+    guideSectionId: "swiss-fixed-64-bronze",
+    docPaths: ["docs/BRACKET_REFERENCE_64_32.md"],
     implementation: ["fixed-swiss-ts-grid.ts", "fixed-swiss-layout.ts"],
     testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
   },

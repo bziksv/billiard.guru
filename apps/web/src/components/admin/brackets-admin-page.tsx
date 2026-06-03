@@ -136,6 +136,7 @@ export function BracketsAdminPage() {
         participantMin: number | null;
         participantMax: number | null;
         participantExact: number | null;
+        isReference: boolean | null;
       }
     >,
   ) {
@@ -143,6 +144,8 @@ export function BracketsAdminPage() {
       prev.map((f) => {
         const s = settings[f.code];
         if (!s) return f;
+        const catalogRef =
+          BRACKET_FORMAT_CATALOG.find((c) => c.code === f.code)?.isReference ?? false;
         return {
           ...f,
           enabled: s.enabled,
@@ -151,6 +154,7 @@ export function BracketsAdminPage() {
           participantMin: s.participantMin,
           participantMax: s.participantMax,
           participantExact: s.participantExact,
+          isReference: s.isReference ?? catalogRef,
           participantRules: resolveBracketParticipantRules(f.code, s),
         };
       }),
@@ -163,6 +167,7 @@ export function BracketsAdminPage() {
       enabled?: boolean;
       maintenanceMode?: boolean;
       hiddenInAdmin?: boolean;
+      isReference?: boolean;
       participantMin?: number | null;
       participantMax?: number | null;
       participantExact?: number | null;
@@ -189,6 +194,9 @@ export function BracketsAdminPage() {
                   : {}),
                 ...(patch.hiddenInAdmin !== undefined
                   ? { hiddenInAdmin: patch.hiddenInAdmin }
+                  : {}),
+                ...(patch.isReference !== undefined
+                  ? { isReference: patch.isReference }
                   : {}),
               }
             : f,
@@ -299,17 +307,27 @@ export function BracketsAdminPage() {
                       Техобслуживание (нельзя выбрать в новом турнире)
                     </span>
                   </label>
+                  <label className="flex cursor-pointer items-center gap-3 text-sm">
+                    <input
+                      type="checkbox"
+                      className="admin-checkbox"
+                      checked={f.isReference ?? false}
+                      onChange={(e) =>
+                        patchFormatSettings(f.code, {
+                          isReference: e.target.checked,
+                        })
+                      }
+                    />
+                    <span className="text-[var(--admin-text-secondary)]">
+                      Эталон отрисовки (подсветка карточки)
+                    </span>
+                  </label>
                 </div>
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
                   {f.maintenanceMode && f.enabled && (
                     <span className="admin-bracket-maint-chip">техобслуживание</span>
                   )}
                   {!f.enabled && <span className="admin-notify-chip">выкл</span>}
-                  {f.isReference && (
-                    <span className="admin-pill--ok text-[10px] font-medium uppercase">
-                      Эталон
-                    </span>
-                  )}
                 </div>
               </div>
               <Link

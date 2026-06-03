@@ -1110,7 +1110,9 @@ async function seedTeamsForFixedSwiss(
     format === "FIXED_SWISS" ||
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_32" ||
-    format === "FIXED_SWISS_32_BRONZE"
+    format === "FIXED_SWISS_32_BRONZE" ||
+    format === "FIXED_SWISS_64" ||
+    format === "FIXED_SWISS_64_BRONZE"
   ) {
     await ensureSoloTeams(db, tournamentId);
   }

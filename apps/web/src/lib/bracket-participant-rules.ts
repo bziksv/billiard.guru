@@ -15,6 +15,13 @@ export type BracketParticipantOverrides = {
   participantExact?: number | null;
 };
 
+const FIXED_SWISS_64_FORMATS = new Set([
+  "FIXED_SWISS_64",
+  "FIXED_SWISS_64_BRONZE",
+  "FIXED_PAIR_SWISS_64",
+  "FIXED_PAIR_SWISS_64_BRONZE",
+]);
+
 const FIXED_SWISS_32_FORMATS = new Set([
   "FIXED_SWISS_32",
   "FIXED_SWISS_32_BRONZE",
@@ -41,6 +48,21 @@ const DYNAMIC_SWISS_FORMATS = new Set(["SWISS", "PAIR_SWISS"]);
 export function getDefaultBracketParticipantRules(
   code: string,
 ): BracketParticipantRules {
+  if (FIXED_SWISS_64_FORMATS.has(code)) {
+    const withBronze =
+      code === "FIXED_SWISS_64_BRONZE" || code === "FIXED_PAIR_SWISS_64_BRONZE";
+    return {
+      min: 64,
+      max: 64,
+      exact: 64,
+      label: "ровно 64",
+      hint: withBronze
+        ? "Сетка «до 2 поражений» на 64 участника — 112 встреч (111 + матч за 3–4), нижняя тур 1–4, олимпийка с 1/8. " +
+          "Добавьте участников до 64 или смените формат."
+        : "Сетка «до 2 поражений» на 64 участника — 111 встреч, нижняя тур 1–4, олимпийка с 1/8. " +
+          "Добавьте участников до 64 или смените формат.",
+    };
+  }
   if (FIXED_SWISS_32_FORMATS.has(code)) {
     const withBronze =
       code === "FIXED_SWISS_32_BRONZE" || code === "FIXED_PAIR_SWISS_32_BRONZE";
@@ -200,6 +222,10 @@ export function assertBracketParticipantCount(
 
 export function isFixedSwiss16OnlyFormat(format: string): boolean {
   return FIXED_SWISS_16_FORMATS.has(format);
+}
+
+export function isFixedSwiss64OnlyFormat(format: string): boolean {
+  return FIXED_SWISS_64_FORMATS.has(format);
 }
 
 export function isFixedSwiss32OnlyFormat(format: string): boolean {

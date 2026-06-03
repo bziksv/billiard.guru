@@ -46,6 +46,7 @@ export type BracketFormatConfigMinAggregateOutputType = {
   participantMin: number | null
   participantMax: number | null
   participantExact: number | null
+  isReference: boolean | null
   updatedAt: Date | null
 }
 
@@ -57,6 +58,7 @@ export type BracketFormatConfigMaxAggregateOutputType = {
   participantMin: number | null
   participantMax: number | null
   participantExact: number | null
+  isReference: boolean | null
   updatedAt: Date | null
 }
 
@@ -68,6 +70,7 @@ export type BracketFormatConfigCountAggregateOutputType = {
   participantMin: number
   participantMax: number
   participantExact: number
+  isReference: number
   updatedAt: number
   _all: number
 }
@@ -93,6 +96,7 @@ export type BracketFormatConfigMinAggregateInputType = {
   participantMin?: true
   participantMax?: true
   participantExact?: true
+  isReference?: true
   updatedAt?: true
 }
 
@@ -104,6 +108,7 @@ export type BracketFormatConfigMaxAggregateInputType = {
   participantMin?: true
   participantMax?: true
   participantExact?: true
+  isReference?: true
   updatedAt?: true
 }
 
@@ -115,6 +120,7 @@ export type BracketFormatConfigCountAggregateInputType = {
   participantMin?: true
   participantMax?: true
   participantExact?: true
+  isReference?: true
   updatedAt?: true
   _all?: true
 }
@@ -213,6 +219,7 @@ export type BracketFormatConfigGroupByOutputType = {
   participantMin: number | null
   participantMax: number | null
   participantExact: number | null
+  isReference: boolean | null
   updatedAt: Date
   _count: BracketFormatConfigCountAggregateOutputType | null
   _avg: BracketFormatConfigAvgAggregateOutputType | null
@@ -247,6 +254,7 @@ export type BracketFormatConfigWhereInput = {
   participantMin?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
   participantMax?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
   participantExact?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
+  isReference?: Prisma.BoolNullableFilter<"BracketFormatConfig"> | boolean | null
   updatedAt?: Prisma.DateTimeFilter<"BracketFormatConfig"> | Date | string
 }
 
@@ -258,6 +266,7 @@ export type BracketFormatConfigOrderByWithRelationInput = {
   participantMin?: Prisma.SortOrderInput | Prisma.SortOrder
   participantMax?: Prisma.SortOrderInput | Prisma.SortOrder
   participantExact?: Prisma.SortOrderInput | Prisma.SortOrder
+  isReference?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _relevance?: Prisma.BracketFormatConfigOrderByRelevanceInput
 }
@@ -273,6 +282,7 @@ export type BracketFormatConfigWhereUniqueInput = Prisma.AtLeast<{
   participantMin?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
   participantMax?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
   participantExact?: Prisma.IntNullableFilter<"BracketFormatConfig"> | number | null
+  isReference?: Prisma.BoolNullableFilter<"BracketFormatConfig"> | boolean | null
   updatedAt?: Prisma.DateTimeFilter<"BracketFormatConfig"> | Date | string
 }, "formatCode">
 
@@ -284,6 +294,7 @@ export type BracketFormatConfigOrderByWithAggregationInput = {
   participantMin?: Prisma.SortOrderInput | Prisma.SortOrder
   participantMax?: Prisma.SortOrderInput | Prisma.SortOrder
   participantExact?: Prisma.SortOrderInput | Prisma.SortOrder
+  isReference?: Prisma.SortOrderInput | Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BracketFormatConfigCountOrderByAggregateInput
   _avg?: Prisma.BracketFormatConfigAvgOrderByAggregateInput
@@ -303,6 +314,7 @@ export type BracketFormatConfigScalarWhereWithAggregatesInput = {
   participantMin?: Prisma.IntNullableWithAggregatesFilter<"BracketFormatConfig"> | number | null
   participantMax?: Prisma.IntNullableWithAggregatesFilter<"BracketFormatConfig"> | number | null
   participantExact?: Prisma.IntNullableWithAggregatesFilter<"BracketFormatConfig"> | number | null
+  isReference?: Prisma.BoolNullableWithAggregatesFilter<"BracketFormatConfig"> | boolean | null
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"BracketFormatConfig"> | Date | string
 }
 
@@ -314,6 +326,7 @@ export type BracketFormatConfigCreateInput = {
   participantMin?: number | null
   participantMax?: number | null
   participantExact?: number | null
+  isReference?: boolean | null
   updatedAt?: Date | string
 }
 
@@ -325,6 +338,7 @@ export type BracketFormatConfigUncheckedCreateInput = {
   participantMin?: number | null
   participantMax?: number | null
   participantExact?: number | null
+  isReference?: boolean | null
   updatedAt?: Date | string
 }
 
@@ -336,6 +350,7 @@ export type BracketFormatConfigUpdateInput = {
   participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isReference?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -347,6 +362,7 @@ export type BracketFormatConfigUncheckedUpdateInput = {
   participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isReference?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -358,6 +374,7 @@ export type BracketFormatConfigCreateManyInput = {
   participantMin?: number | null
   participantMax?: number | null
   participantExact?: number | null
+  isReference?: boolean | null
   updatedAt?: Date | string
 }
 
@@ -369,6 +386,7 @@ export type BracketFormatConfigUpdateManyMutationInput = {
   participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isReference?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -380,6 +398,7 @@ export type BracketFormatConfigUncheckedUpdateManyInput = {
   participantMin?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantMax?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   participantExact?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  isReference?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -397,6 +416,7 @@ export type BracketFormatConfigCountOrderByAggregateInput = {
   participantMin?: Prisma.SortOrder
   participantMax?: Prisma.SortOrder
   participantExact?: Prisma.SortOrder
+  isReference?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -414,6 +434,7 @@ export type BracketFormatConfigMaxOrderByAggregateInput = {
   participantMin?: Prisma.SortOrder
   participantMax?: Prisma.SortOrder
   participantExact?: Prisma.SortOrder
+  isReference?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -425,6 +446,7 @@ export type BracketFormatConfigMinOrderByAggregateInput = {
   participantMin?: Prisma.SortOrder
   participantMax?: Prisma.SortOrder
   participantExact?: Prisma.SortOrder
+  isReference?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -432,6 +454,10 @@ export type BracketFormatConfigSumOrderByAggregateInput = {
   participantMin?: Prisma.SortOrder
   participantMax?: Prisma.SortOrder
   participantExact?: Prisma.SortOrder
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
 }
 
 
@@ -444,6 +470,7 @@ export type BracketFormatConfigSelect<ExtArgs extends runtime.Types.Extensions.I
   participantMin?: boolean
   participantMax?: boolean
   participantExact?: boolean
+  isReference?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["bracketFormatConfig"]>
 
@@ -457,10 +484,11 @@ export type BracketFormatConfigSelectScalar = {
   participantMin?: boolean
   participantMax?: boolean
   participantExact?: boolean
+  isReference?: boolean
   updatedAt?: boolean
 }
 
-export type BracketFormatConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"formatCode" | "enabled" | "maintenanceMode" | "hiddenInAdmin" | "participantMin" | "participantMax" | "participantExact" | "updatedAt", ExtArgs["result"]["bracketFormatConfig"]>
+export type BracketFormatConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"formatCode" | "enabled" | "maintenanceMode" | "hiddenInAdmin" | "participantMin" | "participantMax" | "participantExact" | "isReference" | "updatedAt", ExtArgs["result"]["bracketFormatConfig"]>
 
 export type $BracketFormatConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "BracketFormatConfig"
@@ -482,6 +510,10 @@ export type $BracketFormatConfigPayload<ExtArgs extends runtime.Types.Extensions
     participantMin: number | null
     participantMax: number | null
     participantExact: number | null
+    /**
+     * null — брать из BRACKET_FORMAT_CATALOG; иначе переопределение «эталон»
+     */
+    isReference: boolean | null
     updatedAt: Date
   }, ExtArgs["result"]["bracketFormatConfig"]>
   composites: {}
@@ -859,6 +891,7 @@ export interface BracketFormatConfigFieldRefs {
   readonly participantMin: Prisma.FieldRef<"BracketFormatConfig", 'Int'>
   readonly participantMax: Prisma.FieldRef<"BracketFormatConfig", 'Int'>
   readonly participantExact: Prisma.FieldRef<"BracketFormatConfig", 'Int'>
+  readonly isReference: Prisma.FieldRef<"BracketFormatConfig", 'Boolean'>
   readonly updatedAt: Prisma.FieldRef<"BracketFormatConfig", 'DateTime'>
 }
     

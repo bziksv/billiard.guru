@@ -191,6 +191,8 @@ export const tournamentSchema = z.object({
     "FIXED_SWISS_16_BRONZE",
     "FIXED_SWISS_32",
     "FIXED_SWISS_32_BRONZE",
+    "FIXED_SWISS_64",
+    "FIXED_SWISS_64_BRONZE",
     "PAIR_OLYMPIC",
     "PAIR_OLYMPIC_1L_BRONZE",
     "PAIR_SWISS",
@@ -401,6 +403,14 @@ export const playListingResponseUpdateSchema = z.object({
   status: z.enum(["ACCEPTED", "DECLINED", "WITHDRAWN"]),
 });
 
+/** 64→32 + матч проигравших полуфиналистов за 3–4 место (#112). */
+export const FIXED_SWISS_64_BRONZE_FORMAT_LABEL =
+  "Сетка на 64 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
+
+/** 64→32 (111 встреч) — масштаб LLB 32→16: #81–#88 1/8, нижняя тур 1–4, 1/4 с #105. */
+export const FIXED_SWISS_64_FORMAT_LABEL =
+  "Сетка на 64 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
+
 /** 32→16 + матч проигравших полуфиналистов за 3–4 место (#60). */
 export const FIXED_SWISS_32_BRONZE_FORMAT_LABEL =
   "Сетка на 32 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
@@ -433,6 +443,8 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_SWISS_16_BRONZE: FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32: FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_32_BRONZE: FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_64: FIXED_SWISS_64_FORMAT_LABEL,
+  FIXED_SWISS_64_BRONZE: FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
   PAIR_OLYMPIC: "Парный (фикс. сетка)",
   PAIR_OLYMPIC_1L_BRONZE: `Парная: ${OLYMPIC_1L_BRONZE_FORMAT_LABEL}`,
   PAIR_SWISS: "Парный швейцарская (по турам)",
@@ -440,6 +452,8 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_PAIR_SWISS_16_BRONZE: `Парная: ${FIXED_SWISS_16_BRONZE_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_32: `Парная: ${FIXED_SWISS_32_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_32_BRONZE: `Парная: ${FIXED_SWISS_32_BRONZE_FORMAT_LABEL}`,
+  FIXED_PAIR_SWISS_64: `Парная: ${FIXED_SWISS_64_FORMAT_LABEL}`,
+  FIXED_PAIR_SWISS_64_BRONZE: `Парная: ${FIXED_SWISS_64_BRONZE_FORMAT_LABEL}`,
 };
 
 export const REGISTRATION_STATUS_LABELS: Record<string, string> = {

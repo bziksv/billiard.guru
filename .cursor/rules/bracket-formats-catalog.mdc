@@ -17,4 +17,4 @@ alwaysApply: false
 
 `FORMAT_OPTIONS` для форм берётся из каталога. Настройки типов — `/admin/brackets` (`BracketFormatConfig`: `enabled`, `maintenanceMode`). API `/api/bracket-formats/options`: все `enabled`, на техобслуживании — `disabled` в селекте (видны, не выбираются).
 
-Эталон FIXED_SWISS (16→8) — `bracket-reference-16-8.mdc`. Эталон FIXED_SWISS_32 (32→16) — `bracket-reference-32-16.mdc`. Не ломать без явного запроса.
+Эталон FIXED_SWISS (16→8) — `bracket-reference-16-8.mdc`. Эталон FIXED_SWISS_32 (32→16) — `bracket-reference-32-16.mdc`. Эталон FIXED_SWISS_64 (64→32) — `bracket-reference-64-32.mdc`. Не ломать без явного запроса.

@@ -32,6 +32,8 @@ import {
   isFixedSwiss168MatchCount,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
+  isFixedSwissTs64BronzeMatchCount,
+  isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
 } from "@/lib/fixed-swiss-grid";
 import {
@@ -116,18 +118,28 @@ export function SwissBracketView({
     useFixed168 &&
     matches.length >= 55 &&
     matches.length <= 64;
+  const is64Grid =
+    fixedGrid &&
+    useFixed168 &&
+    (isFixedSwissTs64MatchCount(matches.length) ||
+      isFixedSwissTs64BronzeMatchCount(matches.length));
   const is32Current =
     is32Grid &&
     (isFixedSwissTs32MatchCount(matches.length) ||
       isFixedSwissTs32BronzeMatchCount(matches.length));
+  const is64Current =
+    is64Grid &&
+    (isFixedSwissTs64MatchCount(matches.length) ||
+      isFixedSwissTs64BronzeMatchCount(matches.length));
+  const isLargeCurrent = is32Current || is64Current;
   const is32Outdated =
     is32Grid && isOutdatedFixedSwiss32Bracket(matches.length);
   const r23TrunkY =
-    is32Outdated || is32Current
+    is32Outdated || isLargeCurrent
       ? fixedSwissForkTrunkYByTarget(2, 3, layout.edges, forkTrunkFromY, matchById)
       : new Map<string, number>();
   const r35TrunkY =
-    is32Current
+    isLargeCurrent
       ? fixedSwissForkTrunkYByTarget(3, 5, layout.edges, forkTrunkFromY, matchById)
       : new Map<string, number>();
   const r45TrunkY =
@@ -139,7 +151,7 @@ export function SwissBracketView({
       ? fixedSwissForkTrunkYByTarget(5, 6, layout.edges, forkTrunkFromY, matchById)
       : new Map<string, number>();
   const r67TrunkY =
-    is32Current
+    isLargeCurrent
       ? fixedSwissForkTrunkYByTarget(6, 7, layout.edges, forkTrunkFromY, matchById)
       : new Map<string, number>();
 
