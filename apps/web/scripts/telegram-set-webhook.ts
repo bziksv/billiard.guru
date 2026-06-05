@@ -60,6 +60,7 @@ async function main() {
           { command: "profile", description: "Мой профиль" },
           { command: "tournaments", description: "Мои турниры" },
           { command: "bookings", description: "Мои брони" },
+          { command: "book", description: "Забронировать стол" },
           { command: "notifications", description: "Уведомления" },
         ],
       }),
@@ -70,7 +71,7 @@ async function main() {
     description?: string;
   };
   if (commandsData.ok) {
-    console.log("✓ Bot commands: /start, /profile, /tournaments, /bookings, /notifications");
+    console.log("✓ Bot commands: /start, /profile, /tournaments, /bookings, /book, /notifications");
   } else {
     console.warn("⚠ setMyCommands:", commandsData.description ?? commandsData);
   }

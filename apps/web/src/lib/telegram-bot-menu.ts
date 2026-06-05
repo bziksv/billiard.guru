@@ -1,4 +1,7 @@
-import { formatRating } from "@/lib/rating";
+import {
+  loadBookableClubsInCity,
+  startBookingClubList,
+} from "@/lib/telegram-bot-booking";
 import { dispatchNotification } from "@/lib/notifications/dispatch";
 import {
   getPlayerNotificationPreferencesForCabinet,
@@ -6,6 +9,7 @@ import {
 } from "@/lib/notifications/player-preferences-server";
 import { playerName } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
+import { formatRating } from "@/lib/rating";
 import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
 import {
   answerCallbackQuery,
@@ -24,11 +28,17 @@ import type { Player, City, Country } from "@/generated/prisma/client";
 export const BOT_MENU_PROFILE = "👤 Мой Профиль";
 export const BOT_MENU_TOURNAMENTS = "🏆 Мои турниры";
 export const BOT_MENU_BOOKINGS = "🎱 Мои брони";
+export const BOT_MENU_BOOK = "📅 Забронировать";
 export const BOT_MENU_NOTIFICATIONS = "🔔 Уведомления";
 
 export const BOT_NOTIFY_TOGGLE_PREFIX = "bot_notify_toggle_";
 
-export type BotMenuAction = "profile" | "tournaments" | "bookings" | "notifications";
+export type BotMenuAction =
+  | "profile"
+  | "tournaments"
+  | "bookings"
+  | "book"
+  | "notifications";
 
 const LIST_LIMIT = 8;
 
@@ -54,7 +64,8 @@ export function mainMenuKeyboard() {
   return {
     keyboard: [
       [{ text: BOT_MENU_PROFILE }, { text: BOT_MENU_TOURNAMENTS }],
-      [{ text: BOT_MENU_BOOKINGS }, { text: BOT_MENU_NOTIFICATIONS }],
+      [{ text: BOT_MENU_BOOKINGS }, { text: BOT_MENU_BOOK }],
+      [{ text: BOT_MENU_NOTIFICATIONS }],
     ],
     resize_keyboard: true,
     is_persistent: true,
@@ -76,13 +87,22 @@ function tournamentsInlineKeyboard() {
   };
 }
 
-function bookingsInlineKeyboard() {
-  return {
-    inline_keyboard: [
-      [{ text: "Выбрать клуб", url: `${appUrlBase()}/clubs` }],
-      [{ text: "Кабинет", url: `${appUrlBase()}/cabinet` }],
-    ],
-  };
+function bookingsInlineKeyboard(clubs: { id: string; name: string }[]) {
+  type InlineButton =
+    | { text: string; callback_data: string }
+    | { text: string; url: string };
+  const rows: InlineButton[][] = [];
+  for (const club of clubs) {
+    const label = club.name.length > 28 ? `${club.name.slice(0, 25)}…` : club.name;
+    rows.push([{ text: `📍 ${label}`, callback_data: `bk1_${club.id}` }]);
+  }
+  if (clubs.length === 0) {
+    rows.push([{ text: "Клубы на сайте", url: `${appUrlBase()}/clubs` }]);
+  } else {
+    rows.push([{ text: "📅 Другой клуб города", callback_data: "bk0" }]);
+  }
+  rows.push([{ text: "Кабинет", url: `${appUrlBase()}/cabinet` }]);
+  return { inline_keyboard: rows };
 }
 
 export function parseBotMenuAction(text: string): BotMenuAction | null {
@@ -114,6 +134,13 @@ export function parseBotMenuAction(text: string): BotMenuAction | null {
     trimmed.startsWith("/notifications@")
   ) {
     return "notifications";
+  }
+  if (
+    trimmed === BOT_MENU_BOOK ||
+    trimmed === "/book" ||
+    trimmed.startsWith("/book@")
+  ) {
+    return "book";
   }
   return null;
 }
@@ -305,6 +332,8 @@ export async function handleBotMenuAction(
       return handleMyTournaments(telegramId);
     case "bookings":
       return handleMyBookings(telegramId);
+    case "book":
+      return startBookingClubList(telegramId);
     case "notifications":
       return handleMyNotifications(telegramId);
   }
@@ -342,18 +371,26 @@ export async function handleMyTournaments(telegramId: string): Promise<void> {
 }
 
 export async function handleMyBookings(telegramId: string): Promise<void> {
-  const player = await findVerifiedPlayerId(telegramId);
+  const player = await findVerifiedPlayerByTelegram(telegramId);
   if (!player) {
     await sendNotLinkedMessage(telegramId);
     return;
   }
 
   const bookings = await loadPlayerBookings(player.id);
+  const clubs = await loadBookableClubsInCity(player.cityId);
+  let text = formatBookingsTelegram(bookings);
+  if (clubs.length > 0) {
+    text += `\n\n<b>Забронировать в ${escapeHtml(player.city.nameRu)}:</b>`;
+  } else {
+    text += `\n\nВ ${escapeHtml(player.city.nameRu)} пока нет клубов с онлайн-бронированием.`;
+  }
+
   await dispatchNotification(
     "bot-bookings-summary",
     telegramId,
-    formatBookingsTelegram(bookings),
-    { replyMarkup: bookingsInlineKeyboard() },
+    text,
+    { replyMarkup: bookingsInlineKeyboard(clubs) },
   );
 }
 

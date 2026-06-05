@@ -216,6 +216,7 @@ const BOT_COMMANDS = [
   { command: "profile", description: "Мой профиль" },
   { command: "tournaments", description: "Мои турниры" },
   { command: "bookings", description: "Мои брони" },
+  { command: "book", description: "Забронировать стол" },
   { command: "notifications", description: "Уведомления" },
 ] as const;
 

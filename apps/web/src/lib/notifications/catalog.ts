@@ -539,6 +539,19 @@ export const NOTIFICATION_CATALOG = [
     hasButtons: true,
     examplePreview: "🔔 Уведомления… ✅/❌",
   },
+  {
+    id: "bot-booking-wizard",
+    title: "Бронирование стола",
+    description: "Клубы города игрока → формат → дата → время → подтверждение.",
+    category: "bot",
+    kind: "bot_reply",
+    channel: "telegram",
+    recipient: "Игрок",
+    trigger: "«📅 Забронировать», /book или клуб под «Мои брони»",
+    implementation: "telegram-bot-booking.ts → handleBookingCallback()",
+    hasButtons: true,
+    examplePreview: "📅 Забронировать стол… ✅ Забронировать",
+  },
 ] satisfies NotificationDefinition[];
 
 /** Все допустимые id для dispatchNotification (должны совпадать с каталогом). */

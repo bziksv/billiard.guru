@@ -227,6 +227,28 @@ export async function processTelegramUpdate(
       }
       return;
     }
+    if (data.startsWith("bk")) {
+      try {
+        const sourceMessage = update.callback_query.message
+          ? {
+              chatId: String(update.callback_query.message.chat.id),
+              messageId: update.callback_query.message.message_id,
+            }
+          : undefined;
+        const { handleBookingCallback } = await import("@/lib/telegram-bot-booking");
+        const handled = await handleBookingCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+          sourceMessage,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Booking callback failed");
+        await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
+      }
+      return;
+    }
     if (data.startsWith("bot_notify_toggle_")) {
       try {
         const sourceMessage = update.callback_query.message
