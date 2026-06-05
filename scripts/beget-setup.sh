@@ -217,6 +217,12 @@ if [ -n "${TELEGRAM_BOT_TOKEN:-}" ]; then
       | grep -q '"ok":true' \
       && echo "  ✓ webhook установлен" \
       || echo "  ⚠ не удалось установить webhook (проверьте TELEGRAM_BOT_TOKEN)"
+    curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setMyCommands" \
+      -H "Content-Type: application/json" \
+      -d '{"commands":[{"command":"start","description":"Начало работы"},{"command":"profile","description":"Мой профиль"},{"command":"tournaments","description":"Мои турниры"},{"command":"bookings","description":"Мои брони"},{"command":"notifications","description":"Уведомления"}]}' \
+      | grep -q '"ok":true' \
+      && echo "  ✓ команды бота (/start, /profile, …)" \
+      || echo "  ⚠ не удалось обновить команды бота"
   fi
 fi
 
