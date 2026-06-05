@@ -253,7 +253,10 @@ function formatNotificationsTelegram(
 function notificationsInlineKeyboard(
   prefs: Awaited<ReturnType<typeof getPlayerNotificationPreferencesForCabinet>>,
 ) {
-  const rows: { text: string; callback_data: string }[][] = [];
+  type InlineButton =
+    | { text: string; callback_data: string }
+    | { text: string; url: string };
+  const rows: InlineButton[][] = [];
   for (const item of prefs.items) {
     if (item.locked) continue;
     const mark = item.enabled ? "✅" : "❌";
