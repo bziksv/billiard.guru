@@ -58,6 +58,9 @@ async function main() {
         commands: [
           { command: "start", description: "Начало работы" },
           { command: "profile", description: "Мой профиль" },
+          { command: "tournaments", description: "Мои турниры" },
+          { command: "bookings", description: "Мои брони" },
+          { command: "notifications", description: "Уведомления" },
         ],
       }),
     },
@@ -67,7 +70,7 @@ async function main() {
     description?: string;
   };
   if (commandsData.ok) {
-    console.log("✓ Bot commands: /start, /profile");
+    console.log("✓ Bot commands: /start, /profile, /tournaments, /bookings, /notifications");
   } else {
     console.warn("⚠ setMyCommands:", commandsData.description ?? commandsData);
   }

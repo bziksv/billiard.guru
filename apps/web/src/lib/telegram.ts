@@ -187,6 +187,26 @@ export function contactRequestKeyboard() {
   };
 }
 
+/** Редактирует текст сообщения (например, после переключения уведомления). */
+export async function editTelegramMessage(
+  chatId: string,
+  messageId: number,
+  text: string,
+  options?: SendMessageOptions,
+): Promise<boolean> {
+  const body: Record<string, unknown> = {
+    chat_id: chatId,
+    message_id: messageId,
+    text,
+    parse_mode: "HTML",
+  };
+  if (options?.replyMarkup) {
+    body.reply_markup = options.replyMarkup;
+  }
+  const result = await telegramApi("editMessageText", body);
+  return result?.ok ?? false;
+}
+
 export function removeKeyboard() {
   return { remove_keyboard: true };
 }
@@ -194,6 +214,9 @@ export function removeKeyboard() {
 const BOT_COMMANDS = [
   { command: "start", description: "Начало работы" },
   { command: "profile", description: "Мой профиль" },
+  { command: "tournaments", description: "Мои турниры" },
+  { command: "bookings", description: "Мои брони" },
+  { command: "notifications", description: "Уведомления" },
 ] as const;
 
 /** Команды в меню Telegram (☰). */

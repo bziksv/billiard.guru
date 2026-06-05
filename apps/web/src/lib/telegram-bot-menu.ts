@@ -1,15 +1,36 @@
 import { formatRating } from "@/lib/rating";
 import { dispatchNotification } from "@/lib/notifications/dispatch";
+import {
+  getPlayerNotificationPreferencesForCabinet,
+  setPlayerNotificationEnabled,
+} from "@/lib/notifications/player-preferences-server";
 import { playerName } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
+import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
 import {
+  answerCallbackQuery,
   contactRequestKeyboard,
+  editTelegramMessage,
   sendTelegramMessage,
 } from "@/lib/telegram";
-import { USER_ROLE_LABELS } from "@/lib/validators";
+import {
+  REGISTRATION_STATUS_LABELS,
+  TOURNAMENT_FORMAT_LABELS,
+  TOURNAMENT_STATUS_LABELS,
+  USER_ROLE_LABELS,
+} from "@/lib/validators";
 import type { Player, City, Country } from "@/generated/prisma/client";
 
 export const BOT_MENU_PROFILE = "👤 Мой Профиль";
+export const BOT_MENU_TOURNAMENTS = "🏆 Мои турниры";
+export const BOT_MENU_BOOKINGS = "🎱 Мои брони";
+export const BOT_MENU_NOTIFICATIONS = "🔔 Уведомления";
+
+export const BOT_NOTIFY_TOGGLE_PREFIX = "bot_notify_toggle_";
+
+export type BotMenuAction = "profile" | "tournaments" | "bookings" | "notifications";
+
+const LIST_LIMIT = 8;
 
 type PlayerWithCity = Player & {
   city: City & { country: Country };
@@ -31,7 +52,10 @@ function escapeHtml(text: string): string {
 /** Постоянное меню для подтверждённых игроков. */
 export function mainMenuKeyboard() {
   return {
-    keyboard: [[{ text: BOT_MENU_PROFILE }]],
+    keyboard: [
+      [{ text: BOT_MENU_PROFILE }, { text: BOT_MENU_TOURNAMENTS }],
+      [{ text: BOT_MENU_BOOKINGS }, { text: BOT_MENU_NOTIFICATIONS }],
+    ],
     resize_keyboard: true,
     is_persistent: true,
   };
@@ -43,13 +67,60 @@ export function cabinetInlineKeyboard() {
   };
 }
 
-export function isProfileMenuRequest(text: string): boolean {
+function tournamentsInlineKeyboard() {
+  return {
+    inline_keyboard: [
+      [{ text: "Все турниры", url: `${appUrlBase()}/tournaments` }],
+      [{ text: "Кабинет", url: `${appUrlBase()}/cabinet` }],
+    ],
+  };
+}
+
+function bookingsInlineKeyboard() {
+  return {
+    inline_keyboard: [
+      [{ text: "Выбрать клуб", url: `${appUrlBase()}/clubs` }],
+      [{ text: "Кабинет", url: `${appUrlBase()}/cabinet` }],
+    ],
+  };
+}
+
+export function parseBotMenuAction(text: string): BotMenuAction | null {
   const trimmed = text.trim();
-  return (
+  if (
     trimmed === BOT_MENU_PROFILE ||
     trimmed === "/profile" ||
     trimmed.startsWith("/profile@")
-  );
+  ) {
+    return "profile";
+  }
+  if (
+    trimmed === BOT_MENU_TOURNAMENTS ||
+    trimmed === "/tournaments" ||
+    trimmed.startsWith("/tournaments@")
+  ) {
+    return "tournaments";
+  }
+  if (
+    trimmed === BOT_MENU_BOOKINGS ||
+    trimmed === "/bookings" ||
+    trimmed.startsWith("/bookings@")
+  ) {
+    return "bookings";
+  }
+  if (
+    trimmed === BOT_MENU_NOTIFICATIONS ||
+    trimmed === "/notifications" ||
+    trimmed.startsWith("/notifications@")
+  ) {
+    return "notifications";
+  }
+  return null;
+}
+
+/** @deprecated use parseBotMenuAction */
+export function isProfileMenuRequest(text: string): boolean {
+  return parseBotMenuAction(text) === "profile";
 }
 
 export function formatPlayerProfileTelegram(player: PlayerWithCity): string {
@@ -83,6 +154,21 @@ export async function findVerifiedPlayerByTelegram(telegramId: string) {
   });
 }
 
+async function findVerifiedPlayerId(telegramId: string) {
+  return prisma.player.findFirst({
+    where: { telegramId, isVerified: true },
+    select: { id: true },
+  });
+}
+
+async function sendNotLinkedMessage(telegramId: string) {
+  await sendTelegramMessage(
+    telegramId,
+    "❌ Профиль не найден.\n\nВойдите на billiard.guru/login и подтвердите Telegram — кнопкой ниже или по ссылке из письма.",
+    { replyMarkup: contactRequestKeyboard() },
+  );
+}
+
 export async function sendVerifiedWelcome(
   telegramId: string,
   player: Pick<Player, "lastName" | "firstName">,
@@ -94,14 +180,137 @@ export async function sendVerifiedWelcome(
   );
 }
 
+function formatTournamentsTelegram(
+  registrations: Awaited<ReturnType<typeof loadPlayerRegistrations>>,
+): string {
+  if (registrations.length === 0) {
+    return "🏆 <b>Мои турниры</b>\n\nПока нет регистраций.";
+  }
+
+  const lines = ["🏆 <b>Мои турниры</b>", ""];
+  for (const r of registrations.slice(0, LIST_LIMIT)) {
+    const status = REGISTRATION_STATUS_LABELS[r.status] ?? r.status;
+    const format =
+      TOURNAMENT_FORMAT_LABELS[r.tournament.format] ?? r.tournament.format;
+    const tStatus = TOURNAMENT_STATUS_LABELS[r.tournament.status] ?? r.tournament.status;
+    lines.push(
+      `• <b>${escapeHtml(r.tournament.name)}</b>`,
+      `  ${escapeHtml(status)} · ${escapeHtml(r.tournament.club.name)}`,
+      `  ${escapeHtml(format)} · ${escapeHtml(tStatus)}`,
+      "",
+    );
+  }
+  if (registrations.length > LIST_LIMIT) {
+    lines.push(`… и ещё ${registrations.length - LIST_LIMIT}. Откройте кабинет.`);
+  }
+  return lines.join("\n").trimEnd();
+}
+
+function formatBookingsTelegram(
+  bookings: Awaited<ReturnType<typeof loadPlayerBookings>>,
+): string {
+  if (bookings.length === 0) {
+    return "🎱 <b>Мои брони</b>\n\nНет предстоящих броней столов.";
+  }
+
+  const lines = ["🎱 <b>Мои брони</b>", ""];
+  for (const b of bookings.slice(0, LIST_LIMIT)) {
+    const status = REGISTRATION_STATUS_LABELS[b.status] ?? b.status;
+    lines.push(
+      `• <b>${escapeHtml(b.club.name)}</b> — ${escapeHtml(status)}`,
+      `  ${escapeHtml(bookingFormatLabel(b.tableFormat))} · ${escapeHtml(formatBookingRange(b.startsAt, b.endsAt))}`,
+      "",
+    );
+  }
+  if (bookings.length > LIST_LIMIT) {
+    lines.push(`… и ещё ${bookings.length - LIST_LIMIT}. Откройте кабинет.`);
+  }
+  return lines.join("\n").trimEnd();
+}
+
+function formatNotificationsTelegram(
+  prefs: Awaited<ReturnType<typeof getPlayerNotificationPreferencesForCabinet>>,
+): string {
+  const lines = ["🔔 <b>Уведомления</b>", ""];
+  if (!prefs.hasTelegram) {
+    lines.push("Telegram не привязан.");
+    return lines.join("\n");
+  }
+
+  for (const group of prefs.groups) {
+    lines.push(`<b>${escapeHtml(group.categoryLabel)}</b>`);
+    for (const item of group.items) {
+      const mark = item.enabled ? "✅" : "❌";
+      const lock = item.locked ? " 🔒" : "";
+      lines.push(`${mark} ${escapeHtml(item.title)}${lock}`);
+    }
+    lines.push("");
+  }
+  lines.push("Нажмите кнопку ниже, чтобы включить или выключить.");
+  return lines.join("\n").trimEnd();
+}
+
+function notificationsInlineKeyboard(
+  prefs: Awaited<ReturnType<typeof getPlayerNotificationPreferencesForCabinet>>,
+) {
+  const rows: { text: string; callback_data: string }[][] = [];
+  for (const item of prefs.items) {
+    if (item.locked) continue;
+    const mark = item.enabled ? "✅" : "❌";
+    rows.push([
+      {
+        text: `${mark} ${item.title}`,
+        callback_data: `${BOT_NOTIFY_TOGGLE_PREFIX}${item.id}`,
+      },
+    ]);
+  }
+  rows.push([{ text: "Кабинет на сайте", url: `${appUrlBase()}/cabinet` }]);
+  return { inline_keyboard: rows };
+}
+
+async function loadPlayerRegistrations(playerId: string) {
+  return prisma.tournamentRegistration.findMany({
+    where: {
+      playerId,
+      status: { notIn: ["CANCELLED", "REJECTED"] },
+    },
+    include: { tournament: { include: { club: true } } },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+async function loadPlayerBookings(playerId: string) {
+  return prisma.tableBooking.findMany({
+    where: {
+      playerId,
+      status: { notIn: ["CANCELLED", "REJECTED"] },
+      endsAt: { gte: new Date() },
+    },
+    include: { club: { select: { id: true, name: true } } },
+    orderBy: { startsAt: "asc" },
+  });
+}
+
+export async function handleBotMenuAction(
+  telegramId: string,
+  action: BotMenuAction,
+): Promise<void> {
+  switch (action) {
+    case "profile":
+      return handleMyProfile(telegramId);
+    case "tournaments":
+      return handleMyTournaments(telegramId);
+    case "bookings":
+      return handleMyBookings(telegramId);
+    case "notifications":
+      return handleMyNotifications(telegramId);
+  }
+}
+
 export async function handleMyProfile(telegramId: string): Promise<void> {
   const player = await findVerifiedPlayerByTelegram(telegramId);
   if (!player) {
-    await sendTelegramMessage(
-      telegramId,
-      "❌ Профиль не найден.\n\nВойдите на billiard.guru/login и подтвердите Telegram — кнопкой ниже или по ссылке из письма.",
-      { replyMarkup: contactRequestKeyboard() },
-    );
+    await sendNotLinkedMessage(telegramId);
     return;
   }
 
@@ -111,4 +320,100 @@ export async function handleMyProfile(telegramId: string): Promise<void> {
     formatPlayerProfileTelegram(player),
     { replyMarkup: cabinetInlineKeyboard() },
   );
+}
+
+export async function handleMyTournaments(telegramId: string): Promise<void> {
+  const player = await findVerifiedPlayerId(telegramId);
+  if (!player) {
+    await sendNotLinkedMessage(telegramId);
+    return;
+  }
+
+  const registrations = await loadPlayerRegistrations(player.id);
+  await dispatchNotification(
+    "bot-tournaments-summary",
+    telegramId,
+    formatTournamentsTelegram(registrations),
+    { replyMarkup: tournamentsInlineKeyboard() },
+  );
+}
+
+export async function handleMyBookings(telegramId: string): Promise<void> {
+  const player = await findVerifiedPlayerId(telegramId);
+  if (!player) {
+    await sendNotLinkedMessage(telegramId);
+    return;
+  }
+
+  const bookings = await loadPlayerBookings(player.id);
+  await dispatchNotification(
+    "bot-bookings-summary",
+    telegramId,
+    formatBookingsTelegram(bookings),
+    { replyMarkup: bookingsInlineKeyboard() },
+  );
+}
+
+export async function handleMyNotifications(telegramId: string): Promise<void> {
+  const player = await findVerifiedPlayerId(telegramId);
+  if (!player) {
+    await sendNotLinkedMessage(telegramId);
+    return;
+  }
+
+  const prefs = await getPlayerNotificationPreferencesForCabinet(player.id);
+  await dispatchNotification(
+    "bot-notifications-summary",
+    telegramId,
+    formatNotificationsTelegram(prefs),
+    { replyMarkup: notificationsInlineKeyboard(prefs) },
+  );
+}
+
+export async function handleNotificationToggleCallback(
+  data: string,
+  telegramId: string,
+  callbackQueryId: string,
+  sourceMessage?: { chatId: string; messageId: number },
+): Promise<boolean> {
+  if (!data.startsWith(BOT_NOTIFY_TOGGLE_PREFIX)) return false;
+
+  const notificationId = data.slice(BOT_NOTIFY_TOGGLE_PREFIX.length);
+  const player = await findVerifiedPlayerId(telegramId);
+  if (!player) {
+    await answerCallbackQuery(callbackQueryId, "Сначала привяжите профиль");
+    return true;
+  }
+
+  try {
+    const prefsBefore = await getPlayerNotificationPreferencesForCabinet(player.id);
+    const item = prefsBefore.items.find((i) => i.id === notificationId);
+    if (!item || item.locked) {
+      await answerCallbackQuery(callbackQueryId, "Нельзя изменить");
+      return true;
+    }
+
+    await setPlayerNotificationEnabled(player.id, notificationId, !item.enabled);
+    const prefs = await getPlayerNotificationPreferencesForCabinet(player.id);
+    const text = formatNotificationsTelegram(prefs);
+    const keyboard = notificationsInlineKeyboard(prefs);
+
+    if (sourceMessage) {
+      await editTelegramMessage(sourceMessage.chatId, sourceMessage.messageId, text, {
+        replyMarkup: keyboard,
+      });
+    } else {
+      await sendTelegramMessage(telegramId, text, { replyMarkup: keyboard });
+    }
+
+    const updated = prefs.items.find((i) => i.id === notificationId);
+    await answerCallbackQuery(
+      callbackQueryId,
+      updated?.enabled ? "Включено" : "Выключено",
+    );
+  } catch {
+    await answerCallbackQuery(callbackQueryId, "Ошибка сохранения");
+  }
+
+  return true;
 }

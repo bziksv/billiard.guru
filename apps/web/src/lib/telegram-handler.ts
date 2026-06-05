@@ -10,9 +10,10 @@ import {
   answerCallbackQuery,
 } from "@/lib/telegram";
 import {
-  handleMyProfile,
-  isProfileMenuRequest,
+  handleBotMenuAction,
+  handleNotificationToggleCallback,
   mainMenuKeyboard,
+  parseBotMenuAction,
   sendVerifiedWelcome,
 } from "@/lib/telegram-bot-menu";
 import {
@@ -226,6 +227,27 @@ export async function processTelegramUpdate(
       }
       return;
     }
+    if (data.startsWith("bot_notify_toggle_")) {
+      try {
+        const sourceMessage = update.callback_query.message
+          ? {
+              chatId: String(update.callback_query.message.chat.id),
+              messageId: update.callback_query.message.message_id,
+            }
+          : undefined;
+        const handled = await handleNotificationToggleCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+          sourceMessage,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Notification toggle callback failed");
+        await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
+      }
+      return;
+    }
     if (data.startsWith("login_")) {
       try {
         await handleLoginCallback(data, telegramId, update.callback_query.id);
@@ -294,14 +316,15 @@ export async function processTelegramUpdate(
     return;
   }
 
-  if (isProfileMenuRequest(text)) {
+  const menuAction = parseBotMenuAction(text);
+  if (menuAction) {
     try {
-      await handleMyProfile(telegramId);
+      await handleBotMenuAction(telegramId, menuAction);
     } catch (err) {
-      logger.error({ err }, "Profile menu failed");
+      logger.error({ err, menuAction }, "Bot menu action failed");
       await sendTelegramMessage(
         telegramId,
-        "⚠️ Не удалось загрузить профиль. Попробуйте позже.",
+        "⚠️ Не удалось загрузить данные. Попробуйте позже.",
       );
     }
     return;

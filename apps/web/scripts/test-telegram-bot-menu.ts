@@ -1,14 +1,20 @@
 import assert from "node:assert/strict";
 import {
+  BOT_MENU_BOOKINGS,
+  BOT_MENU_NOTIFICATIONS,
   BOT_MENU_PROFILE,
+  BOT_MENU_TOURNAMENTS,
   formatPlayerProfileTelegram,
-  isProfileMenuRequest,
+  parseBotMenuAction,
 } from "../src/lib/telegram-bot-menu";
 
-assert.equal(isProfileMenuRequest(BOT_MENU_PROFILE), true);
-assert.equal(isProfileMenuRequest("/profile"), true);
-assert.equal(isProfileMenuRequest("/profile@BilliardGuruBot"), true);
-assert.equal(isProfileMenuRequest("/start"), false);
+assert.equal(parseBotMenuAction(BOT_MENU_PROFILE), "profile");
+assert.equal(parseBotMenuAction("/profile"), "profile");
+assert.equal(parseBotMenuAction(BOT_MENU_TOURNAMENTS), "tournaments");
+assert.equal(parseBotMenuAction("/tournaments@BilliardGuruBot"), "tournaments");
+assert.equal(parseBotMenuAction(BOT_MENU_BOOKINGS), "bookings");
+assert.equal(parseBotMenuAction(BOT_MENU_NOTIFICATIONS), "notifications");
+assert.equal(parseBotMenuAction("/start"), null);
 
 const text = formatPlayerProfileTelegram({
   id: "p1",
