@@ -158,6 +158,44 @@ export async function sendTelegramMessage(
   return result?.ok ?? false;
 }
 
+/** Отправка PNG/JPEG в чат (планировка зала и т.п.). */
+export async function sendTelegramPhoto(
+  chatId: string,
+  photo: Buffer,
+  caption?: string,
+  options?: SendMessageOptions,
+  logMeta?: TelegramLogMeta,
+): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return false;
+
+  const form = new FormData();
+  form.append("chat_id", chatId);
+  if (caption) {
+    form.append("caption", caption);
+    form.append("parse_mode", "HTML");
+  }
+  if (options?.replyMarkup) {
+    form.append("reply_markup", JSON.stringify(options.replyMarkup));
+  }
+  form.append("photo", new Blob([new Uint8Array(photo)], { type: "image/png" }), "floor-plan.png");
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+      method: "POST",
+      body: form,
+    });
+    const json = (await res.json()) as { ok?: boolean; description?: string };
+    const result = json.ok ? { ok: true as const } : { ok: false as const, error: json.description ?? `HTTP ${res.status}` };
+    await logTelegramAttempt(caption ?? "[photo]", chatId, logMeta, result);
+    return result.ok;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "network_error";
+    await logTelegramAttempt(caption ?? "[photo]", chatId, logMeta, { ok: false, error: message });
+    return false;
+  }
+}
+
 export async function answerCallbackQuery(
   callbackQueryId: string,
   text?: string,
@@ -204,6 +242,26 @@ export async function editTelegramMessage(
     body.reply_markup = options.replyMarkup;
   }
   const result = await telegramApi("editMessageText", body);
+  return result?.ok ?? false;
+}
+
+/** Редактирует подпись к фото (шаг бронирования с планировкой). */
+export async function editTelegramPhotoCaption(
+  chatId: string,
+  messageId: number,
+  caption: string,
+  options?: SendMessageOptions,
+): Promise<boolean> {
+  const body: Record<string, unknown> = {
+    chat_id: chatId,
+    message_id: messageId,
+    caption,
+    parse_mode: "HTML",
+  };
+  if (options?.replyMarkup) {
+    body.reply_markup = options.replyMarkup;
+  }
+  const result = await telegramApi("editMessageCaption", body);
   return result?.ok ?? false;
 }
 

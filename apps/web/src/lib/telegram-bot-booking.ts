@@ -1,4 +1,5 @@
 import { writeAuditLog } from "@/lib/audit";
+import { renderFloorPlanPngForBooking } from "@/lib/floor-plan-image";
 import { parseFloorPlan } from "@/lib/club-floor-plan";
 import { clubTableFormatLabel, type ClubTableFormatId } from "@/lib/club-table-formats";
 import { notifyClubNewBooking } from "@/lib/club-booking-notify";
@@ -24,7 +25,9 @@ import {
 import {
   answerCallbackQuery,
   editTelegramMessage,
+  editTelegramPhotoCaption,
   sendTelegramMessage,
+  sendTelegramPhoto,
 } from "@/lib/telegram";
 
 const FMT_CODES: Record<ClubTableFormatId, string> = {
@@ -195,6 +198,13 @@ async function replyOrEdit(
   sourceMessage?: { chatId: string; messageId: number },
 ) {
   if (sourceMessage) {
+    const captionOk = await editTelegramPhotoCaption(
+      sourceMessage.chatId,
+      sourceMessage.messageId,
+      text,
+      { replyMarkup: keyboard },
+    );
+    if (captionOk) return;
     await editTelegramMessage(sourceMessage.chatId, sourceMessage.messageId, text, {
       replyMarkup: keyboard,
     });
@@ -443,12 +453,30 @@ async function showTableOrConfirmStep(
     },
   ]);
 
-  await replyOrEdit(
-    telegramId,
-    `📅 <b>${escapeHtml(club.name)}</b>\n${escapeHtml(formatBookingRange(startsAt, endsAt))}\n\nВыберите стол:`,
-    { inline_keyboard: rows },
-    sourceMessage,
-  );
+  const caption = [
+    `📅 <b>${escapeHtml(club.name)}</b>`,
+    escapeHtml(formatBookingRange(startsAt, endsAt)),
+    "",
+    "Выберите стол на плане:",
+  ].join("\n");
+
+  const png = await renderFloorPlanPngForBooking(club.floorPlan, format, tables);
+  if (png) {
+    if (sourceMessage) {
+      await editTelegramMessage(
+        sourceMessage.chatId,
+        sourceMessage.messageId,
+        `📅 <b>${escapeHtml(club.name)}</b>\n${escapeHtml(formatBookingRange(startsAt, endsAt))}`,
+        { replyMarkup: { inline_keyboard: [] } },
+      );
+    }
+    await sendTelegramPhoto(telegramId, png, caption, {
+      replyMarkup: { inline_keyboard: rows },
+    });
+    return;
+  }
+
+  await replyOrEdit(telegramId, `${caption}\n\n(План зала недоступен)`, { inline_keyboard: rows }, sourceMessage);
 }
 
 async function resolveTableByIndex(
@@ -785,17 +813,12 @@ export async function handleBookingCallback(
         "Клуб подтвердит заявку. Статус — в «Мои брони» или кабинете на сайте.",
       ].join("\n");
 
-      const keyboard = {
-        inline_keyboard: [[{ text: "Кабинет", url: `${appUrl()}/cabinet` }]] as InlineButton[][],
-      };
-
-      if (sourceMessage) {
-        await editTelegramMessage(sourceMessage.chatId, sourceMessage.messageId, text, {
-          replyMarkup: keyboard,
-        });
-      } else {
-        await sendTelegramMessage(telegramId, text, { replyMarkup: keyboard });
-      }
+      await replyOrEdit(
+        telegramId,
+        text,
+        { inline_keyboard: [[{ text: "Кабинет", url: `${appUrl()}/cabinet` }]] },
+        sourceMessage,
+      );
       return true;
     }
   } catch {

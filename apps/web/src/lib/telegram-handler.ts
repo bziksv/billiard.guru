@@ -419,4 +419,24 @@ export async function processTelegramUpdate(
     );
     return;
   }
+
+  // Любой другой текст — не оставляем пользователя без ответа
+  if (text.trim()) {
+    try {
+      const verifiedPlayer = await prisma.player.findFirst({
+        where: { telegramId, isVerified: true },
+      });
+      if (verifiedPlayer) {
+        await sendTelegramMessage(
+          telegramId,
+          "Не понял сообщение.\n\nВыберите пункт в меню ниже или отправьте /start.",
+          { replyMarkup: mainMenuKeyboard() },
+        );
+        return;
+      }
+    } catch (err) {
+      logger.error({ err }, "DB check skipped on unknown text");
+    }
+    await promptContactConfirmation(telegramId);
+  }
 }

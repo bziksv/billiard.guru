@@ -19,8 +19,10 @@ import {
 } from "@/components/admin/admin-nav-icons";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { usePendingBookingsBadge } from "@/components/manage/use-pending-bookings-badge";
 import { APP_NAME } from "@/lib/brand";
 import { cn } from "@/lib/cn";
+import { pendingBookingsBadgeLabel } from "@/lib/club-pending-bookings-badge";
 
 const STORAGE_KEY = "setka-manage-sidebar-collapsed";
 
@@ -51,25 +53,35 @@ function NavLink({
   icon: Icon,
   collapsed,
   active,
+  badge,
 }: {
   href: string;
   label: string;
   icon: ComponentType<{ className?: string }>;
   collapsed: boolean;
   active: boolean;
+  badge?: string | null;
 }) {
   return (
     <Link
       href={href}
-      title={collapsed ? label : undefined}
+      title={collapsed ? (badge ? `${label} · ${badge}` : label) : undefined}
       className={cn(
         "admin-nav-item",
         collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2",
         active && "admin-nav-item--active",
       )}
     >
-      <Icon className="h-5 w-5 shrink-0" />
-      {!collapsed && <span className="truncate">{label}</span>}
+      <span className="relative shrink-0">
+        <Icon className="h-5 w-5" />
+        {collapsed && badge && <span className="admin-nav-badge admin-nav-badge--dot" aria-hidden />}
+      </span>
+      {!collapsed && (
+        <>
+          <span className="min-w-0 flex-1 truncate">{label}</span>
+          {badge && <span className="admin-nav-badge shrink-0">{badge}</span>}
+        </>
+      )}
     </Link>
   );
 }
@@ -89,6 +101,8 @@ export function ClubOwnerSidebar({
   const [ready, setReady] = useState(false);
   const nav = navForClub(activeClubId);
   const activeClub = clubs.find((c) => c.id === activeClubId);
+  const pendingBookings = usePendingBookingsBadge(activeClubId);
+  const pendingBookingsBadge = pendingBookingsBadgeLabel(pendingBookings);
 
   useEffect(() => {
     if (localStorage.getItem(STORAGE_KEY) === "1") setCollapsed(true);
@@ -175,6 +189,7 @@ export function ClubOwnerSidebar({
             icon={item.icon}
             collapsed={collapsed}
             active={isActive(item.href, pathname, "exact" in item ? item.exact : undefined)}
+            badge={item.href.endsWith("/bookings") ? pendingBookingsBadge : null}
           />
         ))}
       </nav>

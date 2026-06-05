@@ -3742,6 +3742,32 @@ html.light .bookings-detail {
   color: var(--admin-nav-active-icon);
 }
 
+.admin-nav-badge {
+  border-radius: 9999px;
+  background-color: rgb(245 158 11 / 0.18);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fbbf24;
+  white-space: nowrap;
+}
+
+.admin-nav-item--active .admin-nav-badge {
+  background-color: rgb(245 158 11 / 0.28);
+  color: #fcd34d;
+}
+
+.admin-nav-badge--dot {
+  position: absolute;
+  right: -0.125rem;
+  top: -0.125rem;
+  height: 0.5rem;
+  width: 0.5rem;
+  padding: 0;
+  background-color: #fbbf24;
+}
+
 .admin-nav-muted {
   color: var(--admin-text-muted);
 }

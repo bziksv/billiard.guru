@@ -19,6 +19,7 @@ import {
 import { exportBookingsCsv, exportBookingsPrintHtml } from "@/lib/club-bookings-stats";
 import { bookingFormatLabel, formatBookingTableCaption } from "@/lib/table-booking";
 import { REGISTRATION_STATUS_LABELS } from "@/lib/validators";
+import { dispatchClubPendingBookings } from "@/lib/club-pending-bookings-badge";
 import { cn } from "@/lib/cn";
 
 const VISIBLE_DAYS = 7;
@@ -261,7 +262,9 @@ export function ClubBookingsManager({ clubId }: { clubId: string }) {
       setError(json.error ?? "Не удалось загрузить расписание");
       return;
     }
-    setData(json as CalendarPayload);
+    const payload = json as CalendarPayload;
+    setData(payload);
+    dispatchClubPendingBookings({ clubId, count: payload.stats.pending });
   }, [clubId, fromDay]);
 
   useEffect(() => {
