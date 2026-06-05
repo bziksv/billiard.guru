@@ -16,21 +16,14 @@ import { HomeStickyNav } from "@/components/home/home-sticky-nav";
 import { HomeTicker } from "@/components/home/home-ticker";
 import { getCurrentPlayer } from "@/lib/auth";
 import {
-  HOME_DEMO_CLUB_ADS,
-  HOME_DEMO_NEWS,
-  HOME_DEMO_PLAYER_ADS,
-  type HomeAnnouncement,
-} from "@/lib/home-content";
-import {
-  formatPlayListingSchedule,
-  PLAY_LISTING_KIND_LABELS,
-  PLAY_LISTING_SCHEDULE_LABELS,
-} from "@/lib/play-listing-display";
+  loadHomeBracketFormats,
+  loadHomeNews,
+  loadHomePlayAnnouncements,
+  loadHomeStats,
+} from "@/lib/home-data";
 import {
   clubGeoWhere,
   clubListInclude,
-  playListingGeoWhere,
-  playListingListInclude,
   playerGeoWhere,
   tournamentGeoWhere,
   tournamentListInclude,
@@ -63,7 +56,15 @@ export default async function HomePage({
     player?.city.countryId,
   );
 
-  const [localTournaments, clubs, topPlayers, stats, playListings] = await Promise.all([
+  const [
+    localTournaments,
+    clubs,
+    topPlayers,
+    stats,
+    news,
+    playAnnouncements,
+    bracketFormats,
+  ] = await Promise.all([
     prisma.tournament.findMany({
       where: tournamentGeoWhere(geo),
       include: tournamentListInclude,
@@ -82,51 +83,20 @@ export default async function HomePage({
       orderBy: [{ rating: "desc" }, { lastName: "asc" }],
       take: 8,
     }),
-    Promise.all([
-      prisma.tournament.count({ where: tournamentGeoWhere({}) }),
-      prisma.club.count({ where: { isVerified: true } }),
-      prisma.player.count({ where: { isVerified: true } }),
-    ]),
-    prisma.playListing.findMany({
-      where: playListingGeoWhere(geo),
-      include: playListingListInclude,
-      orderBy: { createdAt: "desc" },
-      take: 4,
-    }),
+    loadHomeStats(),
+    loadHomeNews(geo),
+    loadHomePlayAnnouncements(geo),
+    loadHomeBracketFormats(),
   ]);
 
-  const [tournamentsTotal, clubsTotal, playersTotal] = stats;
   const hasGeo = Boolean(geo.cityId || geo.countryId);
   const featured = localTournaments[0];
   const restTournaments = localTournaments.slice(1);
-
-  const playerAds: HomeAnnouncement[] =
-    playListings.length > 0
-      ? playListings.map((listing) => ({
-          id: listing.id,
-          kind: "player" as const,
-          title: listing.title,
-          body: listing.body ?? formatPlayListingSchedule(listing),
-          meta: [
-            PLAY_LISTING_KIND_LABELS[listing.kind],
-            PLAY_LISTING_SCHEDULE_LABELS[listing.scheduleType],
-            listing.city.nameRu,
-          ]
-            .filter(Boolean)
-            .join(" · "),
-          href: `/pokatat/${listing.id}`,
-        }))
-      : HOME_DEMO_PLAYER_ADS;
+  const { playerAds, clubAds } = playAnnouncements;
 
   return (
     <>
-      <HomeHero
-        stats={{
-          tournaments: tournamentsTotal,
-          clubs: clubsTotal,
-          players: playersTotal,
-        }}
-      />
+      <HomeHero stats={stats} />
 
       <HomeTicker />
 
@@ -143,11 +113,11 @@ export default async function HomePage({
       <HomeSection
         id="news"
         eyebrow="Лента"
-        title="Новости сообщества"
-        lead="Клубы и игроки публикуют анонсы — скоро через личный кабинет с модерацией."
+        title="Новости клубов"
+        lead="Анонсы турниров, акций и событий — клубы публикуют в профиле, здесь показываются свежие записи вашего региона."
       >
         <HomeReveal>
-          <HomeNewsGrid items={HOME_DEMO_NEWS} />
+          <HomeNewsGrid items={news} />
         </HomeReveal>
       </HomeSection>
 
@@ -155,7 +125,7 @@ export default async function HomePage({
         id="tournaments"
         eyebrow="Соревнования"
         title={hasGeo ? t("home.local") : t("home.upcoming")}
-        lead="Регистрация, сетки и результаты — всё на странице турнира."
+        lead="Регистрация, интерактивные сетки и результаты — на странице каждого турнира."
         action={{ href: hrefWithGeo("/tournaments", geo), label: "Все турниры" }}
         className="home-section-alt"
       >
@@ -203,15 +173,15 @@ export default async function HomePage({
       <HomeSection
         id="announcements"
         eyebrow="Доска"
-        title="Объявления"
-        lead="Спарринг, напарники, столы и акции — от игроков и клубов."
-        action={{ href: hrefWithGeo("/pokatat", geo), label: "Покатать" }}
+        title="Покатать"
+        lead="Спарринг, напарники и свободные столы — объявления от игроков и клубов."
+        action={{ href: hrefWithGeo("/pokatat", geo), label: "Все объявления" }}
         className="home-section-alt"
       >
         <HomeReveal>
           <HomeAnnouncements
             playerAds={playerAds}
-            clubAds={HOME_DEMO_CLUB_ADS}
+            clubAds={clubAds}
             pokatatHref={hrefWithGeo("/pokatat", geo)}
           />
         </HomeReveal>
@@ -221,7 +191,7 @@ export default async function HomePage({
         id="clubs"
         eyebrow="Площадки"
         title="Клубы"
-        lead="Фото, цены, отзывы игроков — рейтинг клубов в разработке."
+        lead="Фото, цены, бронь столов и турниры — профиль клуба на billiard.guru."
         action={{ href: hrefWithGeo("/clubs", geo), label: "Все клубы" }}
       >
         <HomeReveal>
@@ -233,7 +203,7 @@ export default async function HomePage({
         <HomeMission />
       </HomeReveal>
       <HomeReveal delay={80}>
-        <HomeGuideLinks />
+        <HomeGuideLinks bracketFormats={bracketFormats} />
       </HomeReveal>
       <HomeReveal delay={100}>
         <HomeCta />

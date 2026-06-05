@@ -1,16 +1,9 @@
 "use client";
 
-const ITEMS = [
-  "Турниры и сетки",
-  "Новости клубов и игроков",
-  "Рейтинг игроков",
-  "Telegram-бот для спарринга — скоро",
-  "Рассылки клубов в Telegram",
-  "Объявления и цены клубов",
-];
+import { HOME_TICKER_ITEMS } from "@/lib/home-content";
 
 export function HomeTicker() {
-  const line = [...ITEMS, ...ITEMS];
+  const line = [...HOME_TICKER_ITEMS, ...HOME_TICKER_ITEMS];
 
   return (
     <div className="home-ticker-bar overflow-hidden border-y py-2.5">

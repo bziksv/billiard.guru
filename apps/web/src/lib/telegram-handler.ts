@@ -12,10 +12,16 @@ import {
 import {
   handleBotMenuAction,
   handleNotificationToggleCallback,
-  mainMenuKeyboard,
+  buildMainMenuKeyboard,
   parseBotMenuAction,
   sendVerifiedWelcome,
+  BOT_MENU_CLUB_POKATAT,
 } from "@/lib/telegram-bot-menu";
+import {
+  clubPokatatMenuKeyboard,
+  handleClubPokatatCallback,
+  startClubPokatatMenu,
+} from "@/lib/telegram-bot-club-pokatat";
 import {
   handleLoginCallback,
   handleLoginTelegramMessage,
@@ -121,7 +127,7 @@ async function confirmPlayer(
   await sendTelegramMessage(
     telegramId,
     `✅ Регистрация подтверждена!\n<b>${player.lastName} ${player.firstName}</b>\n\nВы будете получать уведомления о турнирах на billiard.guru.`,
-    { replyMarkup: mainMenuKeyboard() },
+    { replyMarkup: await buildMainMenuKeyboard(telegramId) },
   );
   logger.info({ playerId: player.id, telegramId }, "Player confirmed");
 }
@@ -159,8 +165,8 @@ async function confirmClub(
 
   await sendTelegramMessage(
     telegramId,
-    `✅ Клуб «<b>${club.name}</b>» подтверждён!\nУправление: billiard.guru/manage`,
-    { replyMarkup: removeKeyboard() },
+    `✅ Клуб «<b>${club.name}</b>» подтверждён!\n\nУправление «Покатать» и уведомления — здесь в боте.\nСайт: billiard.guru/manage`,
+    { replyMarkup: clubPokatatMenuKeyboard() },
   );
   logger.info({ clubId: club.id, telegramId }, "Club confirmed");
 }
@@ -224,6 +230,27 @@ export async function processTelegramUpdate(
         if (handled) return;
       } catch (err) {
         logger.error({ err }, "Idea vote callback failed");
+      }
+      return;
+    }
+    if (data.startsWith("plm")) {
+      try {
+        const sourceMessage = update.callback_query.message
+          ? {
+              chatId: String(update.callback_query.message.chat.id),
+              messageId: update.callback_query.message.message_id,
+            }
+          : undefined;
+        const handled = await handleClubPokatatCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+          sourceMessage,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Club pokatat callback failed");
+        await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
       }
       return;
     }
@@ -352,9 +379,37 @@ export async function processTelegramUpdate(
     return;
   }
 
-  // /start — сразу отвечаем (без БД), потом проверяем статус
+  if (text.trim() === BOT_MENU_CLUB_POKATAT || text.trim() === "🌐 Управление на сайте") {
+    if (text.includes("Управление")) {
+      await sendTelegramMessage(
+        telegramId,
+        "🌐 Управление клубом на сайте:\nhttps://billiard.guru/manage",
+      );
+      return;
+    }
+    try {
+      await startClubPokatatMenu(telegramId);
+    } catch (err) {
+      logger.error({ err }, "Club pokatat menu failed");
+    }
+    return;
+  }
+
+  // /start — клуб, игрок или новый пользователь
   if (text.startsWith("/start") || text === "/start") {
     try {
+      const club = await prisma.club.findFirst({
+        where: { telegramId, isVerified: true },
+      });
+      if (club) {
+        await sendTelegramMessage(
+          telegramId,
+          `🏢 <b>${club.name}</b>\n\nВыберите «${BOT_MENU_CLUB_POKATAT}» для откликов на объявления.`,
+          { replyMarkup: clubPokatatMenuKeyboard() },
+        );
+        return;
+      }
+
       const verifiedPlayer = await prisma.player.findFirst({
         where: { telegramId, isVerified: true },
       });
@@ -430,7 +485,19 @@ export async function processTelegramUpdate(
         await sendTelegramMessage(
           telegramId,
           "Не понял сообщение.\n\nВыберите пункт в меню ниже или отправьте /start.",
-          { replyMarkup: mainMenuKeyboard() },
+          { replyMarkup: await buildMainMenuKeyboard(telegramId) },
+        );
+        return;
+      }
+
+      const club = await prisma.club.findFirst({
+        where: { telegramId, isVerified: true },
+      });
+      if (club) {
+        await sendTelegramMessage(
+          telegramId,
+          "Выберите пункт меню ниже или /start.",
+          { replyMarkup: clubPokatatMenuKeyboard() },
         );
         return;
       }

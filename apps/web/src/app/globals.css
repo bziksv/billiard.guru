@@ -1011,6 +1011,112 @@ html.light .site-dev-banner-link:hover {
   color: var(--accent);
 }
 
+/* SEO-лендинги форматов сеток (/brackets/[slug]) */
+.bracket-format-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(16 185 129 / 0.35);
+  background-color: rgb(16 185 129 / 0.12);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgb(110 231 183);
+}
+
+.bracket-format-chip-muted {
+  border-color: var(--border-subtle);
+  background-color: rgb(24 24 27 / 0.55);
+  color: var(--text-secondary);
+}
+
+.bracket-format-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.bracket-format-demo-card {
+  overflow: hidden;
+}
+
+.bracket-format-demo {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  background: linear-gradient(
+    180deg,
+    rgb(9 9 11 / 0.95) 0%,
+    rgb(24 24 27 / 0.65) 100%
+  );
+}
+
+.bracket-format-demo-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  border-radius: 9999px;
+  border: 1px solid rgb(16 185 129 / 0.4);
+  background-color: rgb(6 78 59 / 0.85);
+  padding: 0.25rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(167 243 208);
+}
+
+.bracket-format-demo-scroll {
+  overflow-x: auto;
+  padding: 1rem 0.75rem 0.5rem;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bracket-format-demo-note {
+  border-top: 1px solid var(--border-subtle);
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.bracket-format-cta {
+  border-color: rgb(16 185 129 / 0.35);
+  background: linear-gradient(
+    135deg,
+    rgb(6 78 59 / 0.35) 0%,
+    rgb(9 9 11 / 0.2) 60%
+  );
+}
+
+.bracket-format-cta-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+html.light .bracket-format-chip {
+  color: rgb(4 120 87);
+  background-color: rgb(209 250 229 / 0.65);
+}
+
+html.light .bracket-format-demo {
+  background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+}
+
+html.light .bracket-format-demo-badge {
+  background-color: rgb(209 250 229 / 0.95);
+  color: rgb(4 120 87);
+}
+
+html.light .bracket-format-cta {
+  background: linear-gradient(135deg, rgb(209 250 229 / 0.55) 0%, #fff 60%);
+}
+
 /* ── Status badges (site + admin) ── */
 :root,
 html.dark {

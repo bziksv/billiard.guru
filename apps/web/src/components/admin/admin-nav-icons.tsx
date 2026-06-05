@@ -32,6 +32,18 @@ export function IconPlayers({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function IconPokatat({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <circle cx="8" cy="9" r="2.5" />
+      <circle cx="16" cy="9" r="2.5" />
+      <path d="M5.5 20c0-2.5 1.1-4 2.5-4s2.5 1.5 2.5 4" />
+      <path d="M13.5 20c0-2.5 1.1-4 2.5-4s2.5 1.5 2.5 4" />
+      <circle cx="12" cy="12" r="2" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export function IconStaff({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>

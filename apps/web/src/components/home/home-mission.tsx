@@ -1,5 +1,19 @@
 import Link from "next/link";
+import type { HomeFeature } from "@/lib/home-content";
 import { HOME_FEATURES } from "@/lib/home-content";
+import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
+
+function FeatureCard({ icon, title, desc }: HomeFeature) {
+  return (
+    <>
+      <span className="text-2xl" aria-hidden>
+        {icon}
+      </span>
+      <h3 className="home-card-title mt-3 font-semibold">{title}</h3>
+      <p className="home-card-body mt-2 text-sm leading-relaxed">{desc}</p>
+    </>
+  );
+}
 
 export function HomeMission() {
   return (
@@ -11,36 +25,43 @@ export function HomeMission() {
               О платформе
             </p>
             <h2 className="home-section-title mt-3 text-2xl font-bold tracking-tight md:text-3xl">
-              Турниры сегодня — спарринг-партнёр завтра
+              Турниры, игра рядом и инструменты для клуба
             </h2>
             <p className="home-section-lead mt-4 leading-relaxed">
               <strong className="font-medium text-[var(--text-primary)]">billiard.guru</strong>{" "}
-              создан для публикации турниров, новостей бильярдного сообщества и поиска игры
-              рядом с вами. Клубы проводят события и рассылают уведомления подписчикам в
-              Telegram. Игроки ведут профиль, рейтинг и объявления.
+              — платформа для проведения турниров, публикации новостей и поиска игры в вашем
+              городе. Организаторы ведут сетки и протокол, клубы — брони и объявления,
+              игроки — рейтинг и «Покатать».
             </p>
             <p className="home-card-muted mt-4 leading-relaxed">
-              В ближайших релизах — Telegram-бот для подбора спарринг-партнёра в вашем
-              городе: укажите рейтинг, дисциплину и удобные клубы для игры.
+              Telegram-бот @{TELEGRAM_BOT_USERNAME}: турниры, уведомления о матчах, управление
+              клубом и доска объявлений — без установки приложения.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/tournaments" className="site-btn-primary">
                 Турниры
               </Link>
-              <Link href="/clubs" className="site-btn-secondary">
-                Клубы
+              <Link href="/brackets" className="site-btn-secondary">
+                Форматы сеток
+              </Link>
+              <Link href="/pokatat" className="site-btn-secondary">
+                Покатать
               </Link>
             </div>
           </div>
 
           <ul className="grid gap-4 sm:grid-cols-2">
             {HOME_FEATURES.map((f) => (
-              <li key={f.title} className="home-content-card rounded-2xl p-5">
-                <span className="text-2xl" aria-hidden>
-                  {f.icon}
-                </span>
-                <h3 className="home-card-title mt-3 font-semibold">{f.title}</h3>
-                <p className="home-card-body mt-2 text-sm leading-relaxed">{f.desc}</p>
+              <li key={f.title}>
+                {f.href ? (
+                  <Link href={f.href} className="home-content-card block rounded-2xl p-5 transition hover:border-emerald-800/40">
+                    <FeatureCard {...f} />
+                  </Link>
+                ) : (
+                  <div className="home-content-card rounded-2xl p-5">
+                    <FeatureCard {...f} />
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -66,7 +87,10 @@ export function HomeCta() {
           </p>
           <div className="relative mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/login" className="site-btn-primary px-8 py-3">
-              Войти через Telegram
+              Войти и создать турнир
+            </Link>
+            <Link href="/brackets" className="site-btn-secondary px-8 py-3">
+              Справочник сеток
             </Link>
             <Link href="/players" className="site-btn-secondary px-8 py-3">
               Рейтинг игроков

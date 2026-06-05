@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import {
   BOT_MENU_BOOKINGS,
+  BOT_MENU_CLUB_POKATAT,
   BOT_MENU_NOTIFICATIONS,
+  BOT_MENU_POKATAT,
   BOT_MENU_PROFILE,
   BOT_MENU_TOURNAMENTS,
   formatPlayerProfileTelegram,
@@ -13,6 +15,8 @@ assert.equal(parseBotMenuAction("/profile"), "profile");
 assert.equal(parseBotMenuAction(BOT_MENU_TOURNAMENTS), "tournaments");
 assert.equal(parseBotMenuAction("/tournaments@BilliardGuruBot"), "tournaments");
 assert.equal(parseBotMenuAction(BOT_MENU_BOOKINGS), "bookings");
+assert.equal(parseBotMenuAction(BOT_MENU_POKATAT), "pokatat");
+assert.equal(parseBotMenuAction(BOT_MENU_CLUB_POKATAT), "club_pokatat");
 assert.equal(parseBotMenuAction(BOT_MENU_NOTIFICATIONS), "notifications");
 assert.equal(parseBotMenuAction("/start"), null);
 

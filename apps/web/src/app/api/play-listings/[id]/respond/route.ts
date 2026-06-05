@@ -3,6 +3,7 @@ import { ZodError } from "zod";
 import { writeAuditLog } from "@/lib/audit";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { logger } from "@/lib/logger";
+import { notifyClubPlayListingResponse } from "@/lib/play-listing-notify";
 import { prisma } from "@/lib/prisma";
 import { playListingRespondSchema } from "@/lib/validators";
 
@@ -69,6 +70,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       actorId: player.id,
       summary: `Отклик на «${listing.title}»`,
     });
+
+    void notifyClubPlayListingResponse(listingId, response.id);
 
     return NextResponse.json(
       {

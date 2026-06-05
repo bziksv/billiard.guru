@@ -8,6 +8,7 @@ export type AuditSectionId =
   | "players"
   | "staff"
   | "bookings"
+  | "pokatat"
   | "tournaments"
   | "news"
   | "ideas"
@@ -23,6 +24,7 @@ export const AUDIT_SECTION_LABELS: Record<AuditSectionId, string> = {
   players: "Игроки клуба",
   staff: "Сотрудники",
   bookings: "Брони столов",
+  pokatat: "Покатать",
   tournaments: "Турниры",
   news: "Новости",
   ideas: "Идеи",
@@ -39,6 +41,7 @@ export function inferAuditSection(
 ): AuditSectionId | null {
   if (action.startsWith("club_staff.")) return "staff";
   if (action.startsWith("table_booking.") || entityType === "table_booking") return "bookings";
+  if (action.startsWith("play_listing.") || entityType === "play_listing") return "pokatat";
   if (
     action.startsWith("club_player_rating.") ||
     action.startsWith("club.player_rating.") ||
@@ -82,6 +85,10 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   "table_booking.rejected": "Бронь отклонена",
   "table_booking.cancelled": "Бронь отменена",
   "table_booking.note": "Заметка к брони",
+  "play_listing.manage.create": "Объявление клуба",
+  "play_listing.manage.update": "Изменено объявление",
+  "play_listing.manage.delete": "Удалено объявление",
+  "play_listing.manage.response": "Ответ на отклик",
   "tournament.create": "Создан турнир",
   "tournament.update": "Изменён турнир",
   "tournament.delete": "Удалён турнир",

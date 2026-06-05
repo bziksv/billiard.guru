@@ -26,7 +26,7 @@ function GuideTable({ headers, rows }: { headers: string[]; rows: string[][] }) 
   );
 }
 
-function GuideExampleBlock({ example }: { example: GuideExample }) {
+export function GuideExampleBlock({ example }: { example: GuideExample }) {
   return (
     <div className="guide-example">
       <h3 className="guide-example-title">{example.title}</h3>

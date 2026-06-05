@@ -52,6 +52,7 @@ export type PlayListingMinAggregateOutputType = {
   ratingMin: number | null
   ratingMax: number | null
   playersNeeded: string | null
+  publishedByClub: boolean | null
   status: $Enums.PlayListingStatus | null
   expiresAt: Date | null
   createdAt: Date | null
@@ -74,6 +75,7 @@ export type PlayListingMaxAggregateOutputType = {
   ratingMin: number | null
   ratingMax: number | null
   playersNeeded: string | null
+  publishedByClub: boolean | null
   status: $Enums.PlayListingStatus | null
   expiresAt: Date | null
   createdAt: Date | null
@@ -97,6 +99,7 @@ export type PlayListingCountAggregateOutputType = {
   ratingMin: number
   ratingMax: number
   playersNeeded: number
+  publishedByClub: number
   status: number
   expiresAt: number
   createdAt: number
@@ -131,6 +134,7 @@ export type PlayListingMinAggregateInputType = {
   ratingMin?: true
   ratingMax?: true
   playersNeeded?: true
+  publishedByClub?: true
   status?: true
   expiresAt?: true
   createdAt?: true
@@ -153,6 +157,7 @@ export type PlayListingMaxAggregateInputType = {
   ratingMin?: true
   ratingMax?: true
   playersNeeded?: true
+  publishedByClub?: true
   status?: true
   expiresAt?: true
   createdAt?: true
@@ -176,6 +181,7 @@ export type PlayListingCountAggregateInputType = {
   ratingMin?: true
   ratingMax?: true
   playersNeeded?: true
+  publishedByClub?: true
   status?: true
   expiresAt?: true
   createdAt?: true
@@ -286,6 +292,7 @@ export type PlayListingGroupByOutputType = {
   ratingMin: number | null
   ratingMax: number | null
   playersNeeded: string
+  publishedByClub: boolean
   status: $Enums.PlayListingStatus
   expiresAt: Date | null
   createdAt: Date
@@ -332,6 +339,7 @@ export type PlayListingWhereInput = {
   ratingMin?: Prisma.FloatNullableFilter<"PlayListing"> | number | null
   ratingMax?: Prisma.FloatNullableFilter<"PlayListing"> | number | null
   playersNeeded?: Prisma.StringFilter<"PlayListing"> | string
+  publishedByClub?: Prisma.BoolFilter<"PlayListing"> | boolean
   status?: Prisma.EnumPlayListingStatusFilter<"PlayListing"> | $Enums.PlayListingStatus
   expiresAt?: Prisma.DateTimeNullableFilter<"PlayListing"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PlayListing"> | Date | string
@@ -359,6 +367,7 @@ export type PlayListingOrderByWithRelationInput = {
   ratingMin?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
   playersNeeded?: Prisma.SortOrder
+  publishedByClub?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -390,6 +399,7 @@ export type PlayListingWhereUniqueInput = Prisma.AtLeast<{
   ratingMin?: Prisma.FloatNullableFilter<"PlayListing"> | number | null
   ratingMax?: Prisma.FloatNullableFilter<"PlayListing"> | number | null
   playersNeeded?: Prisma.StringFilter<"PlayListing"> | string
+  publishedByClub?: Prisma.BoolFilter<"PlayListing"> | boolean
   status?: Prisma.EnumPlayListingStatusFilter<"PlayListing"> | $Enums.PlayListingStatus
   expiresAt?: Prisma.DateTimeNullableFilter<"PlayListing"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PlayListing"> | Date | string
@@ -417,6 +427,7 @@ export type PlayListingOrderByWithAggregationInput = {
   ratingMin?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
   playersNeeded?: Prisma.SortOrder
+  publishedByClub?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -448,6 +459,7 @@ export type PlayListingScalarWhereWithAggregatesInput = {
   ratingMin?: Prisma.FloatNullableWithAggregatesFilter<"PlayListing"> | number | null
   ratingMax?: Prisma.FloatNullableWithAggregatesFilter<"PlayListing"> | number | null
   playersNeeded?: Prisma.StringWithAggregatesFilter<"PlayListing"> | string
+  publishedByClub?: Prisma.BoolWithAggregatesFilter<"PlayListing"> | boolean
   status?: Prisma.EnumPlayListingStatusWithAggregatesFilter<"PlayListing"> | $Enums.PlayListingStatus
   expiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PlayListing"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PlayListing"> | Date | string
@@ -468,6 +480,7 @@ export type PlayListingCreateInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -495,6 +508,7 @@ export type PlayListingUncheckedCreateInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -516,6 +530,7 @@ export type PlayListingUpdateInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -543,6 +558,7 @@ export type PlayListingUncheckedUpdateInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -567,6 +583,7 @@ export type PlayListingCreateManyInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -587,6 +604,7 @@ export type PlayListingUpdateManyMutationInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -610,6 +628,7 @@ export type PlayListingUncheckedUpdateManyInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -649,6 +668,7 @@ export type PlayListingCountOrderByAggregateInput = {
   ratingMin?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
   playersNeeded?: Prisma.SortOrder
+  publishedByClub?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -676,6 +696,7 @@ export type PlayListingMaxOrderByAggregateInput = {
   ratingMin?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
   playersNeeded?: Prisma.SortOrder
+  publishedByClub?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -698,6 +719,7 @@ export type PlayListingMinOrderByAggregateInput = {
   ratingMin?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
   playersNeeded?: Prisma.SortOrder
+  publishedByClub?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -880,6 +902,7 @@ export type PlayListingCreateWithoutCityInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -905,6 +928,7 @@ export type PlayListingUncheckedCreateWithoutCityInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -958,6 +982,7 @@ export type PlayListingScalarWhereInput = {
   ratingMin?: Prisma.FloatNullableFilter<"PlayListing"> | number | null
   ratingMax?: Prisma.FloatNullableFilter<"PlayListing"> | number | null
   playersNeeded?: Prisma.StringFilter<"PlayListing"> | string
+  publishedByClub?: Prisma.BoolFilter<"PlayListing"> | boolean
   status?: Prisma.EnumPlayListingStatusFilter<"PlayListing"> | $Enums.PlayListingStatus
   expiresAt?: Prisma.DateTimeNullableFilter<"PlayListing"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"PlayListing"> | Date | string
@@ -978,6 +1003,7 @@ export type PlayListingCreateWithoutClubInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1003,6 +1029,7 @@ export type PlayListingUncheckedCreateWithoutClubInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1050,6 +1077,7 @@ export type PlayListingCreateWithoutAuthorInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1075,6 +1103,7 @@ export type PlayListingUncheckedCreateWithoutAuthorInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1122,6 +1151,7 @@ export type PlayListingCreateWithoutResponsesInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1148,6 +1178,7 @@ export type PlayListingUncheckedCreateWithoutResponsesInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1184,6 +1215,7 @@ export type PlayListingUpdateWithoutResponsesInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1210,6 +1242,7 @@ export type PlayListingUncheckedUpdateWithoutResponsesInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1232,6 +1265,7 @@ export type PlayListingCreateManyCityInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1252,6 +1286,7 @@ export type PlayListingUpdateWithoutCityInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1277,6 +1312,7 @@ export type PlayListingUncheckedUpdateWithoutCityInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1300,6 +1336,7 @@ export type PlayListingUncheckedUpdateManyWithoutCityInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1322,6 +1359,7 @@ export type PlayListingCreateManyClubInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1342,6 +1380,7 @@ export type PlayListingUpdateWithoutClubInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1367,6 +1406,7 @@ export type PlayListingUncheckedUpdateWithoutClubInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1390,6 +1430,7 @@ export type PlayListingUncheckedUpdateManyWithoutClubInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1412,6 +1453,7 @@ export type PlayListingCreateManyAuthorInput = {
   ratingMin?: number | null
   ratingMax?: number | null
   playersNeeded?: string
+  publishedByClub?: boolean
   status?: $Enums.PlayListingStatus
   expiresAt?: Date | string | null
   createdAt?: Date | string
@@ -1432,6 +1474,7 @@ export type PlayListingUpdateWithoutAuthorInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1457,6 +1500,7 @@ export type PlayListingUncheckedUpdateWithoutAuthorInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1480,6 +1524,7 @@ export type PlayListingUncheckedUpdateManyWithoutAuthorInput = {
   ratingMin?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   playersNeeded?: Prisma.StringFieldUpdateOperationsInput | string
+  publishedByClub?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumPlayListingStatusFieldUpdateOperationsInput | $Enums.PlayListingStatus
   expiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1534,6 +1579,7 @@ export type PlayListingSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   ratingMin?: boolean
   ratingMax?: boolean
   playersNeeded?: boolean
+  publishedByClub?: boolean
   status?: boolean
   expiresAt?: boolean
   createdAt?: boolean
@@ -1564,13 +1610,14 @@ export type PlayListingSelectScalar = {
   ratingMin?: boolean
   ratingMax?: boolean
   playersNeeded?: boolean
+  publishedByClub?: boolean
   status?: boolean
   expiresAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PlayListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "cityId" | "clubId" | "title" | "body" | "kind" | "scheduleType" | "playAt" | "weekdays" | "timeFrom" | "timeTo" | "gameFormat" | "ratingMin" | "ratingMax" | "playersNeeded" | "status" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["playListing"]>
+export type PlayListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "cityId" | "clubId" | "title" | "body" | "kind" | "scheduleType" | "playAt" | "weekdays" | "timeFrom" | "timeTo" | "gameFormat" | "ratingMin" | "ratingMax" | "playersNeeded" | "publishedByClub" | "status" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["playListing"]>
 export type PlayListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
@@ -1613,6 +1660,10 @@ export type $PlayListingPayload<ExtArgs extends runtime.Types.Extensions.Interna
      * «1», «1-4», «пара на пару» и т.п.
      */
     playersNeeded: string
+    /**
+     * Опубликовано клубом через кабинет управления (не личное объявление игрока).
+     */
+    publishedByClub: boolean
     status: $Enums.PlayListingStatus
     expiresAt: Date | null
     createdAt: Date
@@ -2006,6 +2057,7 @@ export interface PlayListingFieldRefs {
   readonly ratingMin: Prisma.FieldRef<"PlayListing", 'Float'>
   readonly ratingMax: Prisma.FieldRef<"PlayListing", 'Float'>
   readonly playersNeeded: Prisma.FieldRef<"PlayListing", 'String'>
+  readonly publishedByClub: Prisma.FieldRef<"PlayListing", 'Boolean'>
   readonly status: Prisma.FieldRef<"PlayListing", 'PlayListingStatus'>
   readonly expiresAt: Prisma.FieldRef<"PlayListing", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"PlayListing", 'DateTime'>

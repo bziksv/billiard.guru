@@ -4,25 +4,16 @@ type ClubItem = {
   id: string;
   name: string;
   isVerified: boolean;
+  gamePrice?: string | null;
   city: { nameRu: string; country: { nameRu: string } };
   _count?: { tournaments: number };
 };
 
-/** Стабильный «рейтинг» для визуала до появления оценок в БД. */
-function previewRating(id: string) {
-  let h = 0;
-  for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i) * (i + 1)) % 1000;
-  return (4 + (h % 10) / 10).toFixed(1);
-}
-
-function Stars({ rating }: { rating: string }) {
-  const full = Math.floor(Number(rating));
-  return (
-    <span className="text-amber-500" aria-label={`Рейтинг ${rating}`}>
-      {"★".repeat(full)}
-      <span className="text-zinc-300">{"★".repeat(5 - full)}</span>
-    </span>
-  );
+function priceLabel(gamePrice: string | null | undefined) {
+  if (!gamePrice?.trim()) return null;
+  const firstLine = gamePrice.split("\n")[0]?.trim();
+  if (!firstLine) return null;
+  return firstLine.length > 48 ? `${firstLine.slice(0, 47)}…` : firstLine;
 }
 
 export function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
@@ -37,7 +28,9 @@ export function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
   return (
     <div className="grid gap-5 md:grid-cols-2">
       {clubs.map((club) => {
-        const rating = previewRating(club.id);
+        const price = priceLabel(club.gamePrice);
+        const tournamentCount = club._count?.tournaments ?? 0;
+
         return (
           <Link
             key={club.id}
@@ -59,14 +52,25 @@ export function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
               </div>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border-subtle)] px-4 py-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Stars rating={rating} />
-                <span className="home-card-body font-mono">{rating}</span>
-                <span className="home-card-muted text-[10px]">(скоро)</span>
+              <div className="home-card-muted flex flex-wrap gap-3 text-xs">
+                {price && <span>{price}</span>}
+                {club.isVerified && (
+                  <span className="text-emerald-600/90">подтверждён</span>
+                )}
               </div>
-              <div className="home-card-muted flex gap-3 text-xs">
-                <span>от 800 ₽/ч</span>
-                {club._count && <span>{club._count.tournaments} турн.</span>}
+              <div className="home-card-muted text-xs">
+                {tournamentCount > 0 ? (
+                  <span>
+                    {tournamentCount}{" "}
+                    {tournamentCount === 1
+                      ? "турнир"
+                      : tournamentCount < 5
+                        ? "турнира"
+                        : "турниров"}
+                  </span>
+                ) : (
+                  <span>бронь столов</span>
+                )}
               </div>
             </div>
           </Link>

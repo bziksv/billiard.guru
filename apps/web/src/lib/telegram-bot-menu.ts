@@ -2,6 +2,12 @@ import {
   loadBookableClubsInCity,
   startBookingClubList,
 } from "@/lib/telegram-bot-booking";
+import {
+  BOT_MENU_CLUB_POKATAT,
+  startClubPokatatMenu,
+  telegramUserHasClubPokatatAccess,
+} from "@/lib/telegram-bot-club-pokatat";
+import { BOT_MENU_POKATAT, handlePlayerPokatatMenu } from "@/lib/telegram-bot-pokatat";
 import { dispatchNotification } from "@/lib/notifications/dispatch";
 import {
   getPlayerNotificationPreferencesForCabinet,
@@ -30,6 +36,7 @@ export const BOT_MENU_TOURNAMENTS = "🏆 Мои турниры";
 export const BOT_MENU_BOOKINGS = "🎱 Мои брони";
 export const BOT_MENU_BOOK = "📅 Забронировать";
 export const BOT_MENU_NOTIFICATIONS = "🔔 Уведомления";
+export { BOT_MENU_POKATAT, BOT_MENU_CLUB_POKATAT };
 
 export const BOT_NOTIFY_TOGGLE_PREFIX = "bot_notify_toggle_";
 
@@ -38,6 +45,8 @@ export type BotMenuAction =
   | "tournaments"
   | "bookings"
   | "book"
+  | "pokatat"
+  | "club_pokatat"
   | "notifications";
 
 const LIST_LIMIT = 8;
@@ -59,14 +68,33 @@ function escapeHtml(text: string): string {
     .replace(/>/g, "&gt;");
 }
 
-/** Постоянное меню для подтверждённых игроков. */
+/** Постоянное меню для подтверждённых игроков (базовое, без проверки клуба). */
 export function mainMenuKeyboard() {
   return {
     keyboard: [
       [{ text: BOT_MENU_PROFILE }, { text: BOT_MENU_TOURNAMENTS }],
       [{ text: BOT_MENU_BOOKINGS }, { text: BOT_MENU_BOOK }],
+      [{ text: BOT_MENU_POKATAT }],
       [{ text: BOT_MENU_NOTIFICATIONS }],
     ],
+    resize_keyboard: true,
+    is_persistent: true,
+  };
+}
+
+/** Меню с кнопкой управления клубом, если есть доступ. */
+export async function buildMainMenuKeyboard(telegramId: string) {
+  const rows: { text: string }[][] = [
+    [{ text: BOT_MENU_PROFILE }, { text: BOT_MENU_TOURNAMENTS }],
+    [{ text: BOT_MENU_BOOKINGS }, { text: BOT_MENU_BOOK }],
+    [{ text: BOT_MENU_POKATAT }],
+  ];
+  if (await telegramUserHasClubPokatatAccess(telegramId)) {
+    rows.push([{ text: BOT_MENU_CLUB_POKATAT }]);
+  }
+  rows.push([{ text: BOT_MENU_NOTIFICATIONS }]);
+  return {
+    keyboard: rows,
     resize_keyboard: true,
     is_persistent: true,
   };
@@ -142,6 +170,16 @@ export function parseBotMenuAction(text: string): BotMenuAction | null {
   ) {
     return "book";
   }
+  if (
+    trimmed === BOT_MENU_POKATAT ||
+    trimmed === "/pokatat" ||
+    trimmed.startsWith("/pokatat@")
+  ) {
+    return "pokatat";
+  }
+  if (trimmed === BOT_MENU_CLUB_POKATAT || trimmed === "/club_pokatat") {
+    return "club_pokatat";
+  }
   return null;
 }
 
@@ -203,7 +241,7 @@ export async function sendVerifiedWelcome(
   await sendTelegramMessage(
     telegramId,
     `✅ <b>billiard.guru</b>\n\nВы вошли как <b>${escapeHtml(player.lastName)} ${escapeHtml(player.firstName)}</b>.\n\nВыберите пункт меню или откройте сайт.`,
-    { replyMarkup: mainMenuKeyboard() },
+    { replyMarkup: await buildMainMenuKeyboard(telegramId) },
   );
 }
 
@@ -334,6 +372,10 @@ export async function handleBotMenuAction(
       return handleMyBookings(telegramId);
     case "book":
       return startBookingClubList(telegramId);
+    case "pokatat":
+      return handlePlayerPokatatMenu(telegramId);
+    case "club_pokatat":
+      return startClubPokatatMenu(telegramId);
     case "notifications":
       return handleMyNotifications(telegramId);
   }

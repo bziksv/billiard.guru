@@ -8,7 +8,7 @@ import { HomeStatCounter } from "@/components/home/home-stat-counter";
 export function HomeHero({
   stats,
 }: {
-  stats: { tournaments: number; clubs: number; players: number };
+  stats: { tournaments: number; clubs: number; players: number; playListings?: number };
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const parallaxRef = useRef<HTMLDivElement>(null);
@@ -76,8 +76,8 @@ export function HomeHero({
           <span className="home-shimmer-text">бильярдное сообщество</span>
         </h1>
         <p className="home-animate-fade-up-delay-2 home-hero-body mt-6 max-w-xl text-lg leading-relaxed">
-          Публикуйте турниры, делитесь новостями, находите клубы и игроков.
-          Скоро — спарринг-партнёр через Telegram-бота.
+          Публикуйте турниры с интерактивными сетками, находите партнёра через «Покатать»,
+          бронируйте столы в клубах — на сайте и в Telegram-боте.
         </p>
 
         <div className="home-animate-fade-up-delay-3 mt-8 flex w-full max-w-md flex-col gap-2.5 sm:mt-10 sm:max-w-none sm:flex-row sm:flex-wrap sm:gap-3">
@@ -91,14 +91,14 @@ export function HomeHero({
             href="/login"
             className="site-btn-secondary w-full px-6 py-3 text-center text-base backdrop-blur-sm sm:w-auto sm:px-7 sm:py-3.5"
           >
-            Войти и публиковать
+            Создать турнир
           </Link>
-          <a
-            href="#news"
+          <Link
+            href="/brackets"
             className="site-btn-ghost home-hero-tagline w-full px-4 py-2.5 text-center text-sm sm:w-auto sm:py-3.5 sm:text-base"
           >
-            Новости ↓
-          </a>
+            Форматы сеток
+          </Link>
         </div>
 
         <dl className="home-animate-fade-up-delay-3 mt-16 grid max-w-xl grid-cols-3 gap-3 sm:gap-6">
@@ -123,7 +123,7 @@ export function HomeHero({
 
       <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2">
         <a
-          href="#news"
+          href="#tournaments"
           className="flex flex-col items-center gap-2 text-xs text-zinc-600 transition hover:text-zinc-400"
         >
           <span>листайте</span>

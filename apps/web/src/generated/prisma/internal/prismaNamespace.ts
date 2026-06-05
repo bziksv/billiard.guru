@@ -2507,6 +2507,7 @@ export const PlayListingScalarFieldEnum = {
   ratingMin: 'ratingMin',
   ratingMax: 'ratingMax',
   playersNeeded: 'playersNeeded',
+  publishedByClub: 'publishedByClub',
   status: 'status',
   expiresAt: 'expiresAt',
   createdAt: 'createdAt',

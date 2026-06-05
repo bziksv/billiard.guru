@@ -525,6 +525,8 @@ model PlayListing {
   ratingMax    Float?                  @map("rating_max")
   /// «1», «1-4», «пара на пару» и т.п.
   playersNeeded String                 @default("1") @map("players_needed") @db.VarChar(48)
+  /// Опубликовано клубом через кабинет управления (не личное объявление игрока).
+  publishedByClub Boolean              @default(false) @map("published_by_club")
   status       PlayListingStatus       @default(OPEN)
   expiresAt    DateTime?               @map("expires_at")
   createdAt    DateTime                @default(now()) @map("created_at")
