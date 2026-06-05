@@ -11,6 +11,8 @@ import {
   firstSelectableFormat,
   useBracketFormatOptions,
 } from "@/hooks/use-bracket-format-options";
+import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
+import { useTournamentDefaults } from "@/hooks/use-tournament-defaults";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 const CURRENT_STATUSES = new Set([
@@ -21,6 +23,8 @@ const CURRENT_STATUSES = new Set([
 ]);
 
 export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
+  const { defaults: tournamentDefaults, ready: defaultsReady } =
+    useTournamentDefaults();
   const { options: formatOptions, loading: formatOptionsLoading } =
     useBracketFormatOptions();
   const [tournaments, setTournaments] = useState<AdminTournament[]>([]);
@@ -78,11 +82,15 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
           clubId,
           format: newFormat,
           startsAt: form.get("startsAt") || undefined,
+          ratingMax: tournamentDefaults.limitByRating
+            ? Number(form.get("ratingMax"))
+            : null,
+          handicapHalfStep: form.get("handicapHalfStep") === "on",
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setCreateMessage(data.error ?? "Ошибка создания");
+        setCreateMessage(data.error ?? `Ошибка создания (${res.status})`);
         return;
       }
       await reloadTournaments();
@@ -139,7 +147,11 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
           <p className="mb-5 text-sm text-zinc-500">
             После создания в Telegram придёт запрос на публикацию турнира.
           </p>
-          <form onSubmit={createTournament} className="grid max-w-3xl gap-3">
+          <form
+            key={defaultsReady ? "defaults-ready" : "defaults-loading"}
+            onSubmit={createTournament}
+            className="grid max-w-3xl gap-3"
+          >
             <input
               name="name"
               required
@@ -170,6 +182,45 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               className="site-input w-full resize-y"
             />
             <input name="startsAt" type="datetime-local" className="site-input w-full" />
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="handicapHalfStep"
+                defaultChecked={tournamentDefaults.handicapHalfStep}
+                className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-emerald-600"
+              />
+              <span>
+                <span className="font-medium text-zinc-200">Учитывать рейтинг 0,5</span>
+                <span className="mt-1 block text-xs text-zinc-500">
+                  Включено: фора по системе 0,5 (например 3,5 vs 0 — 3 шара в каждой партии и +1 в
+                  нечётных). Если снять галку — только целая часть разницы (3,5 vs 0 — 3 шара в
+                  каждой, без доп. шара в нечётных).
+                </span>
+              </span>
+            </label>
+            {tournamentDefaults.limitByRating && (
+              <label className="block text-sm">
+                <span className="mb-1 block text-zinc-400">
+                  Максимальный рейтинг участников (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
+                </span>
+                <input
+                  name="ratingMax"
+                  type="number"
+                  step={RATING_STEP}
+                  min={0}
+                  max={MAX_PLAYER_RATING}
+                  required
+                  defaultValue={
+                    tournamentDefaults.ratingMax ?? 8
+                  }
+                  className="site-input w-full"
+                />
+                <span className="mt-1 block text-xs text-zinc-500">
+                  Сначала учитывается рейтинг в клубе, иначе общий. Игроки с рейтингом выше не
+                  получат уведомление и не смогут записаться.
+                </span>
+              </label>
+            )}
             <div className="flex flex-wrap items-center gap-4">
               <button
                 type="submit"
@@ -249,6 +300,9 @@ function TournamentRow({
           </div>
           <p className="mt-1 text-sm text-zinc-400">
             {TOURNAMENT_FORMAT_LABELS[t.format]}
+            {t.ratingMax != null && (
+              <> · до {formatRating(t.ratingMax)} по рейтингу</>
+            )}
           </p>
           {t.startsAt && (
             <p className="mt-1 text-xs text-zinc-500">{formatAdminDate(t.startsAt)}</p>

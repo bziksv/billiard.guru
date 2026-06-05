@@ -27,7 +27,8 @@ export const TournamentFormat = {
   FIXED_PAIR_SWISS_32: 'FIXED_PAIR_SWISS_32',
   FIXED_PAIR_SWISS_32_BRONZE: 'FIXED_PAIR_SWISS_32_BRONZE',
   FIXED_PAIR_SWISS_64: 'FIXED_PAIR_SWISS_64',
-  FIXED_PAIR_SWISS_64_BRONZE: 'FIXED_PAIR_SWISS_64_BRONZE'
+  FIXED_PAIR_SWISS_64_BRONZE: 'FIXED_PAIR_SWISS_64_BRONZE',
+  EXCEL_REF_64: 'EXCEL_REF_64'
 } as const
 
 export type TournamentFormat = (typeof TournamentFormat)[keyof typeof TournamentFormat]

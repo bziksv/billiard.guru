@@ -75,6 +75,7 @@ export const ModelName = {
   NotificationGlobalConfig: 'NotificationGlobalConfig',
   NotificationTypeConfig: 'NotificationTypeConfig',
   BracketFormatConfig: 'BracketFormatConfig',
+  TournamentDefaultsConfig: 'TournamentDefaultsConfig',
   TelegramDeliveryLog: 'TelegramDeliveryLog'
 } as const
 
@@ -274,6 +275,8 @@ export const TournamentScalarFieldEnum = {
   clubId: 'clubId',
   format: 'format',
   status: 'status',
+  ratingMax: 'ratingMax',
+  handicapHalfStep: 'handicapHalfStep',
   startsAt: 'startsAt',
   clubApprovalToken: 'clubApprovalToken',
   publishedAt: 'publishedAt',
@@ -470,6 +473,17 @@ export const BracketFormatConfigScalarFieldEnum = {
 } as const
 
 export type BracketFormatConfigScalarFieldEnum = (typeof BracketFormatConfigScalarFieldEnum)[keyof typeof BracketFormatConfigScalarFieldEnum]
+
+
+export const TournamentDefaultsConfigScalarFieldEnum = {
+  id: 'id',
+  handicapHalfStep: 'handicapHalfStep',
+  limitByRating: 'limitByRating',
+  ratingMax: 'ratingMax',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TournamentDefaultsConfigScalarFieldEnum = (typeof TournamentDefaultsConfigScalarFieldEnum)[keyof typeof TournamentDefaultsConfigScalarFieldEnum]
 
 
 export const TelegramDeliveryLogScalarFieldEnum = {
@@ -767,7 +781,8 @@ export const PlayListingOrderByRelevanceFieldEnum = {
   body: 'body',
   timeFrom: 'timeFrom',
   timeTo: 'timeTo',
-  gameFormat: 'gameFormat'
+  gameFormat: 'gameFormat',
+  playersNeeded: 'playersNeeded'
 } as const
 
 export type PlayListingOrderByRelevanceFieldEnum = (typeof PlayListingOrderByRelevanceFieldEnum)[keyof typeof PlayListingOrderByRelevanceFieldEnum]
@@ -803,6 +818,13 @@ export const BracketFormatConfigOrderByRelevanceFieldEnum = {
 } as const
 
 export type BracketFormatConfigOrderByRelevanceFieldEnum = (typeof BracketFormatConfigOrderByRelevanceFieldEnum)[keyof typeof BracketFormatConfigOrderByRelevanceFieldEnum]
+
+
+export const TournamentDefaultsConfigOrderByRelevanceFieldEnum = {
+  id: 'id'
+} as const
+
+export type TournamentDefaultsConfigOrderByRelevanceFieldEnum = (typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum)[keyof typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum]
 
 
 export const TelegramDeliveryLogOrderByRelevanceFieldEnum = {

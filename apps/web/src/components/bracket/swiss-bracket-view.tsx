@@ -20,7 +20,7 @@ import {
   gridFixedCrossToQuarterConnectorPath,
   gridFixedForkConnectorPath,
   gridFixedEdgePoints,
-  isFixedSwissCrossToQuarterEdge,
+  isFixedSwissCrossAtSourceYEdge,
   isFixedSwissForkEdge,
   isFixedSwissR1LowerLossEdge,
   isFixedSwissR23UpperLossEdge,
@@ -56,6 +56,7 @@ export function SwissBracketView({
   fixedGrid = false,
   onMatchClick,
   onPlayerClick,
+  handicapHalfStep = true,
 }: {
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
@@ -63,6 +64,7 @@ export function SwissBracketView({
   fixedGrid?: boolean;
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
+  handicapHalfStep?: boolean;
 }) {
   const layout = fixedGrid
     ? buildFixedSwissBracketLayout(matches)
@@ -105,13 +107,28 @@ export function SwissBracketView({
     ).from.y;
   };
 
+  const trunkMatchCount = matches.length;
   const r12TrunkY =
     fixedGrid && useFixed168
-      ? fixedSwissForkTrunkYByTarget(1, 2, layout.edges, forkTrunkFromY, matchById)
+      ? fixedSwissForkTrunkYByTarget(
+          1,
+          2,
+          layout.edges,
+          forkTrunkFromY,
+          matchById,
+          trunkMatchCount,
+        )
       : new Map<string, number>();
   const r34TrunkY =
     fixedGrid && useFixed168
-      ? fixedSwissForkTrunkYByTarget(3, 4, layout.edges, forkTrunkFromY, matchById)
+      ? fixedSwissForkTrunkYByTarget(
+          3,
+          4,
+          layout.edges,
+          forkTrunkFromY,
+          matchById,
+          trunkMatchCount,
+        )
       : new Map<string, number>();
   const is32Grid =
     fixedGrid &&
@@ -136,24 +153,79 @@ export function SwissBracketView({
     is32Grid && isOutdatedFixedSwiss32Bracket(matches.length);
   const r23TrunkY =
     is32Outdated || isLargeCurrent
-      ? fixedSwissForkTrunkYByTarget(2, 3, layout.edges, forkTrunkFromY, matchById)
+      ? fixedSwissForkTrunkYByTarget(
+          2,
+          3,
+          layout.edges,
+          forkTrunkFromY,
+          matchById,
+          trunkMatchCount,
+        )
       : new Map<string, number>();
   const r35TrunkY =
     isLargeCurrent
-      ? fixedSwissForkTrunkYByTarget(3, 5, layout.edges, forkTrunkFromY, matchById)
+      ? fixedSwissForkTrunkYByTarget(
+          3,
+          5,
+          layout.edges,
+          forkTrunkFromY,
+          matchById,
+          trunkMatchCount,
+        )
       : new Map<string, number>();
   const r45TrunkY =
     fixedGrid && useFixed168
-      ? fixedSwissForkTrunkYByTarget(4, 5, layout.edges, forkTrunkFromY, matchById)
+      ? fixedSwissForkTrunkYByTarget(
+          4,
+          5,
+          layout.edges,
+          forkTrunkFromY,
+          matchById,
+          trunkMatchCount,
+        )
       : new Map<string, number>();
   const r56TrunkY =
     fixedGrid && useFixed168
-      ? fixedSwissForkTrunkYByTarget(5, 6, layout.edges, forkTrunkFromY, matchById)
+      ? fixedSwissForkTrunkYByTarget(
+          5,
+          6,
+          layout.edges,
+          forkTrunkFromY,
+          matchById,
+          trunkMatchCount,
+        )
       : new Map<string, number>();
   const r67TrunkY =
     isLargeCurrent
-      ? fixedSwissForkTrunkYByTarget(6, 7, layout.edges, forkTrunkFromY, matchById)
+      ? fixedSwissForkTrunkYByTarget(
+          6,
+          7,
+          layout.edges,
+          forkTrunkFromY,
+          matchById,
+          trunkMatchCount,
+        )
       : new Map<string, number>();
+  const r53TrunkY = is64Current
+    ? fixedSwissForkTrunkYByTarget(
+        5,
+        3,
+        layout.edges,
+        forkTrunkFromY,
+        matchById,
+        trunkMatchCount,
+      )
+    : new Map<string, number>();
+  const r36TrunkY = is64Current
+    ? fixedSwissForkTrunkYByTarget(
+        3,
+        6,
+        layout.edges,
+        forkTrunkFromY,
+        matchById,
+        trunkMatchCount,
+      )
+    : new Map<string, number>();
 
   function fixedSwissTrunkY(
     fromRound: number,
@@ -167,7 +239,9 @@ export function SwissBracketView({
       "2:3": r23TrunkY,
       "3:4": r34TrunkY,
       "3:5": r35TrunkY,
+      "3:6": r36TrunkY,
       "4:5": r45TrunkY,
+      "5:3": r53TrunkY,
       "5:6": r56TrunkY,
       "6:7": r67TrunkY,
     };
@@ -353,6 +427,10 @@ export function SwissBracketView({
                 ) {
                   return null;
                 }
+                const isR12Fork =
+                  isFork &&
+                  fromMatch.round === 1 &&
+                  toMatch.round === 2;
                 const trunkY = isFork
                   ? fixedSwissTrunkY(
                       fromMatch.round,
@@ -363,22 +441,36 @@ export function SwissBracketView({
                   : points.from.y;
                 const crossToQuarter =
                   useFixed168 &&
-                  isFixedSwissCrossToQuarterEdge(
+                  isFixedSwissCrossAtSourceYEdge(
                     fromMatch.round,
                     toMatch.round,
+                    fromMatch.slot,
+                    toMatch.slot,
                     matches.length,
                   );
-                const path = isFork
-                  ? gridFixedForkConnectorPath(
+                const path = isR12Fork
+                  ? gridFixedConnectorPath(
                       points.from,
                       points.to,
+                      edge.kind,
                       fromPos.col,
                       toPos.col,
                       layout.minCol,
                       colW,
-                      trunkY,
+                      toMatch.slot,
                     )
-                  : crossToQuarter
+                  : isFork
+                    ? gridFixedForkConnectorPath(
+                        points.from,
+                        points.to,
+                        fromPos.col,
+                        toPos.col,
+                        layout.minCol,
+                        colW,
+                        trunkY,
+                        toMatch.slot,
+                      )
+                    : crossToQuarter
                     ? gridFixedCrossToQuarterConnectorPath(
                         points.from,
                         points.to,
@@ -476,6 +568,7 @@ export function SwissBracketView({
                   matchById={matchById}
                   onMatchClick={onMatchClick}
                   onPlayerClick={onPlayerClick}
+                  handicapHalfStep={handicapHalfStep}
                 />
               </div>
             );

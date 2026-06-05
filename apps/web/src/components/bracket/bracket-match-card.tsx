@@ -120,6 +120,7 @@ export function BracketMatchCard({
   onMatchClick,
   onPlayerClick,
   showMatchScore = false,
+  handicapHalfStep = true,
 }: {
   match: BracketMatchView;
   /** Как в эталоне LlbBracketMatch — только #{номер} в шапке */
@@ -131,6 +132,8 @@ export function BracketMatchCard({
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   showMatchScore?: boolean;
+  /** Учитывать шаг рейтинга 0,5 в форе (из настроек турнира). */
+  handicapHalfStep?: boolean;
 }) {
   const finished = isMatchResolved(match.status, match.winnerTeamId);
   const winnerId = match.winnerTeamId;
@@ -155,11 +158,13 @@ export function BracketMatchCard({
       ? () => onMatchClick(match)
       : undefined;
 
+  const handicapOpts = { halfStep: handicapHalfStep };
   const handicap =
     match.team1 && match.team2
       ? describeHandicap(
           Math.max(teamRating(match.team1), teamRating(match.team2)),
           Math.min(teamRating(match.team1), teamRating(match.team2)),
+          handicapOpts,
         )
       : null;
   const handicapShort =
@@ -167,6 +172,7 @@ export function BracketMatchCard({
       ? describeHandicapShort(
           Math.max(teamRating(match.team1), teamRating(match.team2)),
           Math.min(teamRating(match.team1), teamRating(match.team2)),
+          handicapOpts,
         )
       : null;
 

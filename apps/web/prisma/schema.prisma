@@ -32,6 +32,8 @@ enum TournamentFormat {
   FIXED_PAIR_SWISS_32_BRONZE
   FIXED_PAIR_SWISS_64
   FIXED_PAIR_SWISS_64_BRONZE
+  /** 64→32 эталон из Excel 64-16 ×2gr.xls (тест с эксельки) */
+  EXCEL_REF_64
 }
 
 enum RegistrationStatus {
@@ -346,6 +348,10 @@ model Tournament {
   club        Club             @relation(fields: [clubId], references: [id])
   format              TournamentFormat
   status              TournamentStatus @default(DRAFT)
+  /// Макс. рейтинг для записи и рассылки (клубный приоритетнее общего; null — без лимита)
+  ratingMax           Float?           @map("rating_max")
+  /// Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в нечётных)
+  handicapHalfStep    Boolean          @default(true) @map("handicap_half_step")
   startsAt            DateTime?        @map("starts_at")
   clubApprovalToken   String?          @unique @map("club_approval_token")
   publishedAt         DateTime?        @map("published_at")
@@ -517,7 +523,8 @@ model PlayListing {
   gameFormat   String?                 @map("game_format")
   ratingMin    Float?                  @map("rating_min")
   ratingMax    Float?                  @map("rating_max")
-  playersNeeded Int                    @default(1) @map("players_needed")
+  /// «1», «1-4», «пара на пару» и т.п.
+  playersNeeded String                 @default("1") @map("players_needed") @db.VarChar(48)
   status       PlayListingStatus       @default(OPEN)
   expiresAt    DateTime?               @map("expires_at")
   createdAt    DateTime                @default(now()) @map("created_at")
@@ -586,6 +593,17 @@ model BracketFormatConfig {
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   @@map("bracket_format_config")
+}
+
+/// Значения по умолчанию при создании турнира (одна строка, /admin/handicap).
+model TournamentDefaultsConfig {
+  id               String   @id @default("default")
+  handicapHalfStep Boolean  @default(true) @map("handicap_half_step")
+  limitByRating    Boolean  @default(true) @map("limit_by_rating")
+  ratingMax        Float?   @map("rating_max")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("tournament_defaults_config")
 }
 
 /// Журнал отправок Telegram: каждая попытка (успех / ошибка / пропуск с причиной).

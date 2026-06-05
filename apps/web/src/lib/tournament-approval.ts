@@ -16,6 +16,8 @@ import {
   sendTelegramMessage,
   tournamentApprovalKeyboard,
 } from "@/lib/telegram";
+import { formatRating } from "@/lib/rating";
+import { filterPlayersByTournamentRatingMax } from "@/lib/tournament-rating-limit-server";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 
 function appUrl(path = "") {
@@ -66,6 +68,10 @@ export async function requestClubTournamentApproval(tournamentId: string) {
   const descriptionBlock = tournament.description
     ? `\n\n${tournament.description.slice(0, 500)}${tournament.description.length > 500 ? "…" : ""}`
     : "";
+  const ratingBlock =
+    tournament.ratingMax != null
+      ? `\nРейтинг участников: до ${formatRating(tournament.ratingMax)} (сначала клубный, иначе общий).`
+      : "";
 
   await sendTelegramMessage(
     club.telegramId,
@@ -74,8 +80,9 @@ export async function requestClubTournamentApproval(tournamentId: string) {
       `<b>${tournament.name}</b>\n` +
       `${TOURNAMENT_FORMAT_LABELS[tournament.format] ?? tournament.format}\n` +
       `${club.city.nameRu} · ${formatStartsAt(tournament.startsAt)}` +
+      ratingBlock +
       descriptionBlock +
-      `\n\nПодтвердите публикацию — игрокам в радиусе ${NOTIFY_RADIUS_KM} км уйдёт уведомление.`,
+      `\n\nПодтвердите публикацию — игрокам в радиусе ${NOTIFY_RADIUS_KM} км с подходящим рейтингом уйдёт уведомление.`,
     { replyMarkup: tournamentApprovalKeyboard(token) },
     {
       notificationId: "tournament-approval-request",
@@ -116,10 +123,23 @@ async function notifyNearbyPlayers(tournamentId: string) {
     include: { city: true },
   });
 
+  const { eligible: ratingEligiblePlayers, skippedByRating } =
+    await filterPlayersByTournamentRatingMax(
+      players,
+      tournament.clubId,
+      tournament.ratingMax,
+    );
+  const ratingEligibleIds = new Set(ratingEligiblePlayers.map((p) => p.id));
+
   const link = appUrl(`/tournaments/${tournament.id}`);
   const descriptionBlock = tournament.description
     ? `\n${tournament.description.slice(0, 300)}${tournament.description.length > 300 ? "…" : ""}`
     : "";
+
+  const ratingAnnounce =
+    tournament.ratingMax != null
+      ? `\nРейтинг: до ${formatRating(tournament.ratingMax)}.`
+      : "";
 
   const fallbackText =
     `📣 <b>Новый турнир рядом с вами</b>\n\n` +
@@ -127,8 +147,12 @@ async function notifyNearbyPlayers(tournamentId: string) {
     `Клуб: ${tournament.club.name}, ${origin.nameRu}\n` +
     `${TOURNAMENT_FORMAT_LABELS[tournament.format] ?? tournament.format}\n` +
     `${formatStartsAt(tournament.startsAt)}` +
+    ratingAnnounce +
     descriptionBlock +
     `\n\nПодробнее: ${link}`;
+
+  const ratingMaxLabel =
+    tournament.ratingMax != null ? formatRating(tournament.ratingMax) : "";
 
   const templateVars = {
     tournamentName: tournament.name,
@@ -139,9 +163,10 @@ async function notifyNearbyPlayers(tournamentId: string) {
     description: tournament.description?.slice(0, 300) ?? "",
     link,
     radiusKm: String(NOTIFY_RADIUS_KM),
+    ratingMax: ratingMaxLabel,
   };
 
-  const intended = players
+  const intended = ratingEligiblePlayers
     .filter((p) => p.telegramId)
     .map((p) => ({ playerId: p.id, telegramId: p.telegramId! }));
 
@@ -164,6 +189,22 @@ async function notifyNearbyPlayers(tournamentId: string) {
         context: "tournament-nearby-announce",
         status: "skipped",
         skipReason: "no_telegram",
+        playerId: player.id,
+        entityType: "tournament",
+        entityId: tournamentId,
+        batchId,
+      });
+      continue;
+    }
+
+    if (!ratingEligibleIds.has(player.id)) {
+      skipped += 1;
+      await writeTelegramDeliveryLog({
+        notificationId: "tournament-nearby-announce",
+        context: "tournament-nearby-announce",
+        status: "skipped",
+        skipReason: "rating_above_max",
+        chatId: player.telegramId,
         playerId: player.id,
         entityType: "tournament",
         entityId: tournamentId,
@@ -211,6 +252,8 @@ async function notifyNearbyPlayers(tournamentId: string) {
       tournamentId,
       batchId,
       playersInRadius: players.length,
+      ratingEligible: ratingEligiblePlayers.length,
+      skippedByRating,
       sent,
       failed,
       skipped,
@@ -225,10 +268,13 @@ async function notifyNearbyPlayers(tournamentId: string) {
     action: "tournament.notify.nearby",
     entityType: "tournament",
     entityId: tournamentId,
-    summary: `Рассылка «турнир рядом»: отправлено ${sent}, ошибок ${failed}, пропущено ${skipped}`,
+    summary: `Рассылка «турнир рядом»: отправлено ${sent}, ошибок ${failed}, пропущено ${skipped}${skippedByRating > 0 ? ` (рейтинг: ${skippedByRating})` : ""}`,
     payload: {
       batchId,
       recipients: players.length,
+      ratingEligible: ratingEligiblePlayers.length,
+      skippedByRating,
+      ratingMax: tournament.ratingMax,
       sent,
       failed,
       skipped,

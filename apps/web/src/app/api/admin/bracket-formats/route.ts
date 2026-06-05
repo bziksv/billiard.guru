@@ -6,6 +6,7 @@ import {
   isBracketFormatCode,
 } from "@/lib/bracket-formats/catalog";
 import { prisma } from "@/lib/prisma";
+import type { TournamentFormat } from "@/generated/prisma/enums";
 import { resolveBracketParticipantRules } from "@/lib/bracket-participant-rules";
 import {
   getAllBracketFormatSettings,
@@ -57,7 +58,10 @@ export async function GET(request: Request) {
     if (formatCode && isBracketFormatCode(formatCode)) {
       const def = getBracketFormat(formatCode)!;
       const tournaments = await prisma.tournament.findMany({
-        where: { format: formatCode, matches: { some: {} } },
+        where: {
+          format: formatCode as TournamentFormat,
+          matches: { some: {} },
+        },
         orderBy: { updatedAt: "desc" },
         take: 50,
         select: {

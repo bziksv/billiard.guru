@@ -108,6 +108,12 @@ export async function PATCH(
         ...(data.startsAt !== undefined && {
           startsAt: data.startsAt ? new Date(data.startsAt) : null,
         }),
+        ...(data.clearRatingLimit === true && { ratingMax: null }),
+        ...(data.ratingMax !== undefined &&
+          data.clearRatingLimit !== true && { ratingMax: data.ratingMax }),
+        ...(data.handicapHalfStep !== undefined && {
+          handicapHalfStep: data.handicapHalfStep,
+        }),
       },
       include: tournamentAdminInclude,
     });

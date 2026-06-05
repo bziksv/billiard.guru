@@ -8,8 +8,10 @@ import { AsyncButton } from "@/components/ui/async-text-button";
 import { formatRating } from "@/lib/rating";
 import {
   formatGameFormat,
+  formatPlayersNeeded,
   formatPlayListingSchedule,
   formatRatingRange,
+  shouldShowPlayersNeededBadge,
   PLAY_LISTING_KIND_LABELS,
   PLAY_LISTING_RESPONSE_STATUS_LABELS,
   PLAY_LISTING_SCHEDULE_LABELS,
@@ -181,10 +183,10 @@ export function PlayListingDetailClient({
               <dd className="mt-1 text-zinc-200">{gameFormat}</dd>
             </div>
           )}
-          {listing.playersNeeded > 1 && (
+          {shouldShowPlayersNeededBadge(listing.playersNeeded) && (
             <div>
               <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Ищет</dt>
-              <dd className="mt-1 text-zinc-200">{listing.playersNeeded} игроков</dd>
+              <dd className="mt-1 text-zinc-200">{formatPlayersNeeded(listing.playersNeeded)}</dd>
             </div>
           )}
         </dl>

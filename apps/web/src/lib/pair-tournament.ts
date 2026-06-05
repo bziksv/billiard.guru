@@ -12,6 +12,15 @@ export interface TeamWithPlayers {
   player2?: TeamPlayer | null;
 }
 
+export function isExcelRef64Format(format: string): boolean {
+  return format === "EXCEL_REF_64";
+}
+
+/** FIXED_SWISS_* и EXCEL_REF_64 — одна топология/переходы в БД. */
+export function usesFixedSwissGridEngine(format: string): boolean {
+  return isFixedSwissFormat(format) || isExcelRef64Format(format);
+}
+
 export function isFixedSwiss64BronzeFormat(format: string): boolean {
   return (
     format === "FIXED_SWISS_64_BRONZE" || format === "FIXED_PAIR_SWISS_64_BRONZE"
@@ -54,7 +63,8 @@ export function isSwissFormat(format: string): boolean {
     format === "FIXED_PAIR_SWISS" ||
     isFixedSwiss16BronzeFormat(format) ||
     isFixedSwiss32Format(format) ||
-    isFixedSwiss64Format(format)
+    isFixedSwiss64Format(format) ||
+    isExcelRef64Format(format)
   );
 }
 
@@ -79,6 +89,9 @@ export function isSoloFormat(format: string): boolean {
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_32" ||
     format === "FIXED_SWISS_32_BRONZE" ||
+    format === "FIXED_SWISS_64" ||
+    format === "FIXED_SWISS_64_BRONZE" ||
+    format === "EXCEL_REF_64" ||
     format === "OLYMPIC" ||
     format === "OLYMPIC_1L_BRONZE"
   );

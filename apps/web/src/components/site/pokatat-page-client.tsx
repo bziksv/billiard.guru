@@ -10,6 +10,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { CLUB_TABLE_FORMATS } from "@/lib/club-table-formats";
 import {
   PLAY_LISTING_KIND_LABELS,
+  PLAY_LISTING_PLAYERS_NEEDED_PRESETS,
   WEEKDAY_LABELS,
 } from "@/lib/play-listing-display";
 import type { SerializedPlayListing } from "@/lib/play-listing-server";
@@ -164,7 +165,7 @@ export function PokatatPageClient({
       gameFormat: gameFormat || undefined,
       ratingMin: ratingMin ? Number(ratingMin) : undefined,
       ratingMax: ratingMax ? Number(ratingMax) : undefined,
-      playersNeeded: Number(playersNeeded) || 1,
+      playersNeeded: playersNeeded.trim() || "1",
     };
 
     const res = await fetch("/api/play-listings", {
@@ -452,16 +453,25 @@ export function PokatatPageClient({
                       className="site-input w-full"
                     />
                   </label>
-                  <label className="block text-sm">
+                  <label className="block text-sm sm:col-span-2">
                     <span className="site-form-label mb-1 block">Сколько игроков</span>
                     <input
-                      type="number"
-                      min="1"
-                      max="10"
+                      type="text"
+                      list="pokatat-players-needed"
                       value={playersNeeded}
                       onChange={(e) => setPlayersNeeded(e.target.value)}
+                      placeholder="1, 2, 1-4, пара на пару…"
                       className="site-input w-full"
+                      autoComplete="off"
                     />
+                    <datalist id="pokatat-players-needed">
+                      {PLAY_LISTING_PLAYERS_NEEDED_PRESETS.map((p) => (
+                        <option key={p} value={p} />
+                      ))}
+                    </datalist>
+                    <p className="home-card-muted mt-1 text-xs">
+                      Выберите из списка или введите своё: диапазон (1–4) или «пара на пару».
+                    </p>
                   </label>
                 </div>
               </section>

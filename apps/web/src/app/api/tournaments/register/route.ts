@@ -16,6 +16,7 @@ import {
   notifyTournamentSelfRegistered,
 } from "@/lib/tournament-registration-notify";
 import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
+import { assertPlayerEligibleForTournamentRating } from "@/lib/tournament-rating-limit-server";
 import { tournamentRegistrationSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
@@ -38,6 +39,14 @@ export async function POST(request: NextRequest) {
     const player = await prisma.player.findUnique({ where: { id: data.playerId } });
     if (!player) {
       return NextResponse.json({ error: "Игрок не найден" }, { status: 404 });
+    }
+
+    const ratingCheck = await assertPlayerEligibleForTournamentRating(
+      data.playerId,
+      tournament,
+    );
+    if (!ratingCheck.ok) {
+      return NextResponse.json({ error: ratingCheck.error }, { status: 400 });
     }
 
     const existing = await prisma.tournamentRegistration.findUnique({

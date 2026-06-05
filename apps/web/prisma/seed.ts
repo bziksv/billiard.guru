@@ -3,6 +3,7 @@ import { PrismaClient } from "../src/generated/prisma/client";
 import { createPrismaClient } from "../src/lib/prisma";
 import { GEO_DATA } from "./seed-data/geo";
 import { CITY_COORDINATES } from "./seed-data/city-coordinates";
+import { randomTestPlayerRating, testPlayerPhone } from "./seed-data/test-players";
 
 const prisma: PrismaClient = createPrismaClient();
 
@@ -49,8 +50,9 @@ async function main() {
     throw new Error("Город Воронеж не найден — сначала выполните seed geo");
   }
 
-  for (let i = 1; i <= 16; i++) {
-    const phone = `+790000000${String(i).padStart(2, "0")}`;
+  for (let i = 1; i <= 130; i++) {
+    const phone = testPlayerPhone(i);
+    const rating = randomTestPlayerRating();
     await prisma.player.upsert({
       where: { phone },
       update: {
@@ -58,7 +60,7 @@ async function main() {
         lastName: `Тест${i}`,
         cityId: voronezh.id,
         isVerified: true,
-        rating: i * 0.5,
+        rating,
         confirmToken: null,
       },
       create: {
@@ -67,12 +69,12 @@ async function main() {
         cityId: voronezh.id,
         phone,
         isVerified: true,
-        rating: i * 0.5,
+        rating,
         telegramUsername: `test_player_${i}`,
       },
     });
   }
-  console.log("Test players: Тест1 … Тест16 (+79000000001 … +79000000016)");
+  console.log("Test players: Тест1 … Тест130 (+79000000001 … +79000000130)");
 }
 
 main()

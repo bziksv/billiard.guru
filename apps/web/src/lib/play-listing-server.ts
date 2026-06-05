@@ -29,7 +29,7 @@ export type SerializedPlayListing = {
   gameFormat: string | null;
   ratingMin: number | null;
   ratingMax: number | null;
-  playersNeeded: number;
+  playersNeeded: string;
   status: string;
   expiresAt: string | null;
   createdAt: string;

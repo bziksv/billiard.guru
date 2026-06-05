@@ -20,6 +20,7 @@ import {
   notifyTournamentTeamRegistrationRejected,
 } from "@/lib/tournament-registration-notify";
 import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
+import { assertPlayerEligibleForTournamentRating } from "@/lib/tournament-rating-limit-server";
 import { tournamentTeamSchema, tournamentTeamUpdateSchema } from "@/lib/validators";
 
 async function findPlayerTeamConflict(
@@ -68,6 +69,16 @@ export async function POST(request: NextRequest) {
     });
     if (players.length !== 2) {
       return NextResponse.json({ error: "Игрок не найден" }, { status: 404 });
+    }
+
+    for (const p of players) {
+      const ratingCheck = await assertPlayerEligibleForTournamentRating(
+        p.id,
+        tournament,
+      );
+      if (!ratingCheck.ok) {
+        return NextResponse.json({ error: ratingCheck.error }, { status: 400 });
+      }
     }
 
     const duplicatePair = await prisma.tournamentTeam.findFirst({

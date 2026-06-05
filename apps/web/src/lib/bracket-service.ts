@@ -14,6 +14,7 @@ import {
 import { assertBracketParticipantCount } from "@/lib/bracket-participant-rules";
 import { getResolvedParticipantRules } from "@/lib/bracket-formats/settings-server";
 import { logger } from "@/lib/logger";
+import excelRef from "@/lib/excel-bracket-64-reference.json";
 import { notifyMatchStartScheduled } from "@/lib/match-start-notification";
 import {
   buildOlympicBracket,
@@ -21,12 +22,14 @@ import {
   buildSwissPairings,
   getNextMatchSlot,
   isDynamicSwissFormat,
+  isExcelRef64Format,
   isFixedSwissFormat,
   isOlympicBronzeFormat,
   isOlympicFormat,
   isOlympicPairFormat,
   isSwissFormat,
   isSwissPairFormat,
+  usesFixedSwissGridEngine,
   OLYMPIC_BRONZE_MATCH_SLOT,
   teamRating,
 } from "@/lib/pair-tournament";
@@ -163,7 +166,7 @@ function collectAdvanceTargets(
   const targets: { round: number; slot: number; teamSlot: 1 | 2; teamId: string }[] =
     [];
 
-  if (isFixedSwissFormat(format) && fixedSwissMatchCount) {
+  if (usesFixedSwissGridEngine(format) && fixedSwissMatchCount) {
     const links = getFixedSwissLinksForMatchCount(
       fixedSwissMatchCount,
       fixedSwissMaxRound,
@@ -244,10 +247,10 @@ export async function cancelMatchResult(db: Db, matchId: string) {
     }
   }
 
-  const fixedSwissMatchCount = isFixedSwissFormat(format)
+  const fixedSwissMatchCount = usesFixedSwissGridEngine(format)
     ? allMatches.length
     : undefined;
-  const fixedSwissMaxRound = isFixedSwissFormat(format)
+  const fixedSwissMaxRound = usesFixedSwissGridEngine(format)
     ? Math.max(...allMatches.map((m) => m.round), 0)
     : undefined;
   const targets = collectAdvanceTargets(
@@ -388,7 +391,7 @@ export async function replayFixedSwissAdvances(db: Db, tournamentId: string) {
   const tournament = await db.tournament.findUnique({
     where: { id: tournamentId },
   });
-  if (!tournament || !isFixedSwissFormat(tournament.format)) return;
+  if (!tournament || !usesFixedSwissGridEngine(tournament.format)) return;
 
   const allMatches = await db.tournamentMatch.findMany({
     where: { tournamentId },
@@ -535,7 +538,7 @@ export async function advanceWinner(
     ? byeCache!.tournamentId
     : (match as { tournamentId: string }).tournamentId;
 
-  if (isFixedSwissFormat(match.tournament.format)) {
+  if (usesFixedSwissGridEngine(match.tournament.format)) {
     const matchCount = byeCache?.matchCount;
     const maxRound = byeCache?.maxRound;
     if (matchCount === undefined || maxRound === undefined) {
@@ -755,7 +758,7 @@ async function finishSwissBye(
 
   const tournamentId = cached ? byeCache!.tournamentId : match.tournamentId;
 
-  if (isFixedSwissFormat(match.tournament.format)) {
+  if (usesFixedSwissGridEngine(match.tournament.format)) {
     if (byeCache) {
       await advanceFixedSwissResult(
         db,
@@ -905,7 +908,7 @@ export async function processByes(db: Db, tournamentId: string, format: string) 
       (m) => m.status === "SCHEDULED" && !m.winnerTeamId,
     );
 
-    const fixedLinks = isFixedSwissFormat(format)
+    const fixedLinks = usesFixedSwissGridEngine(format)
       ? getFixedSwissLinksForMatchCount(byeCache.matchCount, byeCache.maxRound)
       : null;
 
@@ -920,7 +923,7 @@ export async function processByes(db: Db, tournamentId: string, format: string) 
       if (!soloTeamId) continue;
 
       if (
-        (isOlympicFormat(format) || isFixedSwissFormat(format)) &&
+        (isOlympicFormat(format) || usesFixedSwissGridEngine(format)) &&
         match.round > 1
       ) {
         if (fixedLinks) {
@@ -1112,7 +1115,8 @@ async function seedTeamsForFixedSwiss(
     format === "FIXED_SWISS_32" ||
     format === "FIXED_SWISS_32_BRONZE" ||
     format === "FIXED_SWISS_64" ||
-    format === "FIXED_SWISS_64_BRONZE"
+    format === "FIXED_SWISS_64_BRONZE" ||
+    format === "EXCEL_REF_64"
   ) {
     await ensureSoloTeams(db, tournamentId);
   }
@@ -1166,6 +1170,64 @@ export async function generateFixedSwissGrid(db: Db, tournamentId: string) {
         slot: m.slot,
         team1Id: r1?.team1Id ?? null,
         team2Id: r1?.team2Id ?? null,
+      };
+    }),
+  });
+
+  await processByes(db, tournamentId, tournament.format);
+
+  await db.tournament.update({
+    where: { id: tournamentId },
+    data: { status: "ACTIVE" },
+  });
+}
+
+export async function generateExcelRef64Grid(db: Db, tournamentId: string) {
+  const tournament = await db.tournament.findUnique({
+    where: { id: tournamentId },
+  });
+  if (!tournament) throw new Error("Турнир не найден");
+  if (!isExcelRef64Format(tournament.format)) {
+    throw new Error("Сетка из Excel доступна только для формата EXCEL_REF_64");
+  }
+
+  const existing = await db.tournamentMatch.count({ where: { tournamentId } });
+  if (existing > 0) {
+    throw new Error("Сетка уже сформирована");
+  }
+
+  const seeded = await seedTeamsForFixedSwiss(db, tournamentId, tournament.format);
+  await assertParticipantCountForFormat(tournament.format, seeded.length);
+  const template = buildFixedSwissTemplate(seeded.length, "FIXED_SWISS_64");
+
+  const teamsWithSeed = await db.tournamentTeam.findMany({
+    where: { tournamentId, status: "CONFIRMED" },
+    select: { id: true, seed: true },
+  });
+  const seedToId = new Map(
+    teamsWithSeed
+      .filter((t): t is { id: string; seed: number } => t.seed != null)
+      .map((t) => [t.seed, t.id]),
+  );
+  const excelByNo = new Map(
+    excelRef.matches.map((m) => [m.no, m as { no: number; seed1?: number; seed2?: number }]),
+  );
+
+  await db.tournamentMatch.createMany({
+    data: template.matches.map((m) => {
+      let team1Id: string | null = null;
+      let team2Id: string | null = null;
+      if (m.round === 1) {
+        const ex = excelByNo.get(m.slot);
+        if (ex?.seed1 != null) team1Id = seedToId.get(ex.seed1) ?? null;
+        if (ex?.seed2 != null) team2Id = seedToId.get(ex.seed2) ?? null;
+      }
+      return {
+        tournamentId,
+        round: m.round,
+        slot: m.slot,
+        team1Id,
+        team2Id,
       };
     }),
   });
@@ -1271,6 +1333,10 @@ export async function generateTournamentPairing(db: Db, tournamentId: string) {
   }
   if (tournament.format === "OLYMPIC" || tournament.format === "OLYMPIC_1L_BRONZE") {
     await generateSoloOlympicBracket(db, tournamentId);
+    return;
+  }
+  if (isExcelRef64Format(tournament.format)) {
+    await generateExcelRef64Grid(db, tournamentId);
     return;
   }
   if (isFixedSwissFormat(tournament.format)) {
@@ -1501,7 +1567,7 @@ export async function resetAllMatchResults(db: Db, tournamentId: string) {
     return;
   }
 
-  if (!isFixedSwissFormat(tournament.format) && !isOlympicFormat(tournament.format)) {
+  if (!usesFixedSwissGridEngine(tournament.format) && !isOlympicFormat(tournament.format)) {
     throw new Error("Массовая отмена для этого формата пока не поддерживается");
   }
 
@@ -1578,7 +1644,7 @@ export async function regenerateBracket(db: Db, tournamentId: string) {
     throw new Error("Сетка не сформирована — используйте «Сформировать сетку»");
   }
 
-  if (!isFixedSwissFormat(tournament.format) && !isOlympicFormat(tournament.format)) {
+  if (!usesFixedSwissGridEngine(tournament.format) && !isOlympicFormat(tournament.format)) {
     throw new Error(
       "Пересоздание сетки доступно для фикс. швейцарской и олимпийской",
     );

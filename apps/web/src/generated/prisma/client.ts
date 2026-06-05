@@ -162,6 +162,11 @@ export type NotificationTypeConfig = Prisma.NotificationTypeConfigModel
  */
 export type BracketFormatConfig = Prisma.BracketFormatConfigModel
 /**
+ * Model TournamentDefaultsConfig
+ * Значения по умолчанию при создании турнира (одна строка, /admin/handicap).
+ */
+export type TournamentDefaultsConfig = Prisma.TournamentDefaultsConfigModel
+/**
  * Model TelegramDeliveryLog
  * Журнал отправок Telegram: каждая попытка (успех / ошибка / пропуск с причиной).
  */

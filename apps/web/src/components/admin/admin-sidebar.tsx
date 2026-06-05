@@ -35,7 +35,7 @@ const NAV: {
   { href: "/admin/brackets", label: "Сетки", icon: IconBrackets },
   { href: "/admin/notifications", label: "Уведомления", icon: IconNotifications },
   { href: "/admin/ideas", label: "Идеи", icon: IconIdeas },
-  { href: "/admin/handicap", label: "Калькулятор форы", icon: IconHandicap },
+  { href: "/admin/handicap", label: "Фора и расчёт", icon: IconHandicap },
   { href: "/admin/preview", label: "Просмотр как…", icon: IconCabinet },
 ];
 

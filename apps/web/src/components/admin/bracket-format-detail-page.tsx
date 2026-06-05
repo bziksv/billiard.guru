@@ -180,7 +180,7 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
     return (
       <div>
         <Link href="/admin/brackets" className="admin-link text-sm">
-          ← Сетки
+          ← Типы сеток
         </Link>
         <p className="admin-error-text mt-4">{error ?? "Формат не найден"}</p>
       </div>

@@ -113,6 +113,7 @@ export default async function TournamentBracketPage({
           format={tournament.format}
           matches={matches}
           standings={standings}
+          handicapHalfStep={tournament.handicapHalfStep}
         />
 
         <p className="text-center text-xs text-zinc-600">

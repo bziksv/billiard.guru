@@ -4,6 +4,7 @@ import { getCurrentPlayer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { isPairFormat } from "@/lib/public-display";
 import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
+import { assertPlayerEligibleForTournamentRating } from "@/lib/tournament-rating-limit-server";
 import { notifyTournamentSelfRegistered } from "@/lib/tournament-registration-notify";
 import { z } from "zod";
 
@@ -44,6 +45,14 @@ export async function POST(request: NextRequest) {
         { error: "На парный турнир заявку подаёт клуб-организатор" },
         { status: 400 },
       );
+    }
+
+    const ratingCheck = await assertPlayerEligibleForTournamentRating(
+      player.id,
+      tournament,
+    );
+    if (!ratingCheck.ok) {
+      return NextResponse.json({ error: ratingCheck.error }, { status: 400 });
     }
 
     const existing = await prisma.tournamentRegistration.findUnique({

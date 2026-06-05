@@ -1,4 +1,4 @@
-/** Фора по системе 0,5: шаг рейтинга = 0,5 шара (полный — в каждой партии, половинный — в нечётных). */
+/** Фора: при halfStep — шаг рейтинга 0,5 (полный шар в каждой партии, половинный — +1 в нечётных). */
 
 export interface HandicapBreakdown {
   ballsEveryGame: number;
@@ -6,22 +6,43 @@ export interface HandicapBreakdown {
   ratingDiff: number;
 }
 
+export type HandicapOptions = {
+  /** Учитывать дробную часть рейтинга (0,5). По умолчанию true. */
+  halfStep?: boolean;
+};
+
 function roundToHalf(value: number): number {
   return Math.round(value * 2) / 2;
+}
+
+function resolveHalfStep(options?: HandicapOptions): boolean {
+  return options?.halfStep !== false;
 }
 
 export function calculateHandicap(
   higherRating: number,
   lowerRating: number,
+  options?: HandicapOptions,
 ): HandicapBreakdown {
-  const diff = roundToHalf(Math.max(0, higherRating - lowerRating));
-  const fullBalls = Math.floor(diff);
-  const hasHalfStep = diff - fullBalls >= 0.25;
+  const halfStep = resolveHalfStep(options);
 
+  if (halfStep) {
+    const diff = roundToHalf(Math.max(0, higherRating - lowerRating));
+    const fullBalls = Math.floor(diff);
+    const hasHalfStep = diff - fullBalls >= 0.25;
+    return {
+      ratingDiff: diff,
+      ballsEveryGame: fullBalls,
+      extraBallOnOddGames: hasHalfStep,
+    };
+  }
+
+  const diff = Math.max(0, higherRating - lowerRating);
+  const fullBalls = Math.floor(diff);
   return {
     ratingDiff: diff,
     ballsEveryGame: fullBalls,
-    extraBallOnOddGames: hasHalfStep,
+    extraBallOnOddGames: false,
   };
 }
 
@@ -30,10 +51,12 @@ export function getHandicapForGame(
   higherRating: number,
   lowerRating: number,
   gameNumber: number,
+  options?: HandicapOptions,
 ): number {
   const { ballsEveryGame, extraBallOnOddGames } = calculateHandicap(
     higherRating,
     lowerRating,
+    options,
   );
   let balls = ballsEveryGame;
   if (extraBallOnOddGames && gameNumber % 2 === 1) {
@@ -45,14 +68,13 @@ export function getHandicapForGame(
 export function describeHandicap(
   higherRating: number,
   lowerRating: number,
+  options?: HandicapOptions,
 ): string {
-  const h = calculateHandicap(higherRating, lowerRating);
+  const h = calculateHandicap(higherRating, lowerRating, options);
   if (h.ratingDiff === 0) return "Без форы";
   const parts: string[] = [];
   if (h.ballsEveryGame > 0) {
-    parts.push(
-      `${h.ballsEveryGame} шар(а) в каждой партии`,
-    );
+    parts.push(`${h.ballsEveryGame} шар(а) в каждой партии`);
   }
   if (h.extraBallOnOddGames) {
     parts.push("1 шар в нечётных партиях");
@@ -64,8 +86,9 @@ export function describeHandicap(
 export function describeHandicapShort(
   higherRating: number,
   lowerRating: number,
+  options?: HandicapOptions,
 ): string {
-  const h = calculateHandicap(higherRating, lowerRating);
+  const h = calculateHandicap(higherRating, lowerRating, options);
   if (h.ratingDiff === 0) return "Без форы";
   const parts: string[] = [];
   if (h.ballsEveryGame > 0) {

@@ -5,10 +5,13 @@ import {
 } from "@/lib/bracket-view";
 import {
   isDynamicSwissFormat,
+  isExcelRef64Format,
   isFixedSwissFormat,
   isOlympicBronzeFormat,
   isOlympicFormat,
 } from "@/lib/pair-tournament";
+import { mapBracketMatchesByExcelNo } from "@/lib/excel-bracket-match-map";
+import { ExcelBracketView } from "@/components/bracket/excel-bracket-view";
 import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
 import { OlympicBracketView } from "@/components/bracket/olympic-bracket-view";
 import { SwissBracketView } from "@/components/bracket/swiss-bracket-view";
@@ -17,10 +20,12 @@ export function TournamentBracket({
   format,
   matches,
   standings = [],
+  handicapHalfStep = true,
 }: {
   format: string;
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
+  handicapHalfStep?: boolean;
 }) {
   if (matches.length === 0) {
     return (
@@ -30,18 +35,30 @@ export function TournamentBracket({
     );
   }
 
+  if (isExcelRef64Format(format)) {
+    const liveByMatchNo = mapBracketMatchesByExcelNo(matches);
+    return <ExcelBracketView liveByMatchNo={liveByMatchNo} />;
+  }
+
   if (isFixedSwissFormat(format)) {
     return (
       <SwissBracketView
         matches={matches}
         standings={standings}
         fixedGrid
+        handicapHalfStep={handicapHalfStep}
       />
     );
   }
 
   if (isDynamicSwissFormat(format)) {
-    return <SwissBracketView matches={matches} standings={standings} />;
+    return (
+      <SwissBracketView
+        matches={matches}
+        standings={standings}
+        handicapHalfStep={handicapHalfStep}
+      />
+    );
   }
 
   if (isOlympicFormat(format)) {
@@ -49,6 +66,7 @@ export function TournamentBracket({
       <OlympicBracketView
         matches={matches}
         withBronzeMatch={isOlympicBronzeFormat(format)}
+        handicapHalfStep={handicapHalfStep}
       />
     );
   }
@@ -63,7 +81,11 @@ export function TournamentBracket({
               Раунд {round}
             </p>
             {roundMatches.map((match) => (
-              <BracketMatchCard key={match.id} match={match} />
+              <BracketMatchCard
+                key={match.id}
+                match={match}
+                handicapHalfStep={handicapHalfStep}
+              />
             ))}
           </div>
         ))}

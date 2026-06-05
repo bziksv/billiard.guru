@@ -66,6 +66,7 @@ export function OlympicBracketView({
   onPlayerClick,
   showMatchScore = false,
   withBronzeMatch = false,
+  handicapHalfStep = true,
 }: {
   matches: BracketMatchView[];
   matchNumbers?: Map<string, number>;
@@ -74,6 +75,7 @@ export function OlympicBracketView({
   showMatchScore?: boolean;
   /** Матч за 3–4 в финальном туре (слот 2). */
   withBronzeMatch?: boolean;
+  handicapHalfStep?: boolean;
 }) {
   const rounds = groupMatchesByRound(matches);
   if (rounds.length === 0) return null;
@@ -173,6 +175,7 @@ export function OlympicBracketView({
                 onMatchClick={onMatchClick}
                 onPlayerClick={onPlayerClick}
                 showMatchScore={showMatchScore}
+                handicapHalfStep={handicapHalfStep}
               />
             </div>
           )),

@@ -4,6 +4,7 @@ import {
   FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_64_FORMAT_LABEL,
+  EXCEL_REF_64_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
   TOURNAMENT_FORMAT_LABELS,
@@ -11,6 +12,7 @@ import {
 
 /** Код формата = значение TournamentFormat в Prisma */
 export type BracketFormatCode =
+  | "EXCEL_REF_64"
   | "OLYMPIC"
   | "OLYMPIC_1L_BRONZE"
   | "SWISS"
@@ -50,6 +52,21 @@ export interface BracketFormatDefinition {
  * Реестр типов сеток. Новый формат → запись здесь → появится в /admin/brackets и в FORMAT_OPTIONS.
  */
 export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
+  {
+    code: "EXCEL_REF_64",
+    adminLabel: EXCEL_REF_64_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    shortDescription:
+      "64→32 из Excel 64-16 ×2gr.xls: разметка с листа «Сетка», посев 1-го тура из xls, переходы как в эталоне LLB.",
+    docPaths: ["64-16 ×2gr.xls"],
+    implementation: [
+      "excel-bracket-64-reference.json — export-excel-bracket-64.py",
+      "excel-bracket-view.tsx — отрисовка по row/col из xls",
+      "bracket-service.ts — generateExcelRef64Grid",
+    ],
+    testCommand: "cd apps/web && .venv-xls/bin/python3 scripts/export-excel-bracket-64.py",
+  },
   {
     code: "OLYMPIC",
     adminLabel: OLYMPIC_SINGLE_FORMAT_LABEL,
@@ -166,7 +183,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     layout: "swiss_fixed",
     isReference: true,
     shortDescription:
-      "111 встреч, 10 колонок — эталон LLB 64→32: #81–#88 1/8, нижняя тур 1–4, 1/4 с #105.",
+      "119 встреч — эталон LLB 64→32: #81–#88→#105–#112, #105–#112→#113–#116, финал #119.",
     guideSectionId: "swiss-fixed-64",
     docPaths: [
       "docs/BRACKET_REFERENCE_64_32.md",
@@ -185,7 +202,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     pairing: "single",
     layout: "swiss_fixed",
     shortDescription:
-      "Эталон 64→32 (111 встреч) + #112 матч проигравших полуфиналистов; #112 под финалом в колонке «Финал».",
+      "120 встреч — тот же эталон 64→32 (119), плюс #120: проигравшие #117 и #118; #120 под #119 в колонке «Финал».",
     guideSectionId: "swiss-fixed-64-bronze",
     docPaths: ["docs/BRACKET_REFERENCE_64_32.md"],
     implementation: [
@@ -286,7 +303,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     adminLabel: TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_64_BRONZE!,
     pairing: "pair",
     layout: "swiss_fixed",
-    shortDescription: "Парный аналог FIXED_SWISS_64_BRONZE (112 встреч на 64 команды).",
+    shortDescription: "Парный аналог FIXED_SWISS_64_BRONZE (120 встреч на 64 команды).",
     guideSectionId: "swiss-fixed-64-bronze",
     docPaths: ["docs/BRACKET_REFERENCE_64_32.md"],
     implementation: ["fixed-swiss-ts-grid.ts", "fixed-swiss-layout.ts"],

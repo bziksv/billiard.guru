@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { normalizePhone } from "@/lib/phone";
+import { MAX_PLAYER_RATING } from "@/lib/rating";
 import { CLUB_TABLE_FORMATS, type ClubTableFormatId } from "@/lib/club-table-formats";
 
 const tableFormatIds = CLUB_TABLE_FORMATS.map((f) => f.id) as [
@@ -11,6 +12,19 @@ const tableCountsSchema = z
   .record(z.enum(tableFormatIds), z.coerce.number().int().min(0).max(500))
   .optional()
   .nullable();
+
+/** Рейтинг с шагом 0,5. Объявлен до tournamentSchema, чтобы не было TDZ при импортах. */
+export const ratingStepSchema = z
+  .number()
+  .min(0)
+  .max(MAX_PLAYER_RATING)
+  .refine((v) => Math.abs(v * 2 - Math.round(v * 2)) < 1e-6, "Шаг рейтинга — 0,5");
+
+export const tournamentRatingMaxSchema = z.coerce
+  .number()
+  .min(0, "Минимум 0")
+  .max(MAX_PLAYER_RATING, `Максимум ${MAX_PLAYER_RATING}`)
+  .pipe(ratingStepSchema);
 
 export const phoneSchema = z
   .string()
@@ -200,8 +214,13 @@ export const tournamentSchema = z.object({
     "FIXED_PAIR_SWISS_16_BRONZE",
     "FIXED_PAIR_SWISS_32",
     "FIXED_PAIR_SWISS_32_BRONZE",
+    "FIXED_PAIR_SWISS_64",
+    "FIXED_PAIR_SWISS_64_BRONZE",
+    "EXCEL_REF_64",
   ]),
   startsAt: z.string().optional(),
+  ratingMax: tournamentRatingMaxSchema.nullable().optional(),
+  handicapHalfStep: z.boolean().optional().default(true),
   status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
 });
 
@@ -218,6 +237,8 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_SWISS_16_BRONZE",
       "FIXED_SWISS_32",
       "FIXED_SWISS_32_BRONZE",
+      "FIXED_SWISS_64",
+      "FIXED_SWISS_64_BRONZE",
       "PAIR_OLYMPIC",
       "PAIR_OLYMPIC_1L_BRONZE",
       "PAIR_SWISS",
@@ -225,12 +246,19 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_PAIR_SWISS_16_BRONZE",
       "FIXED_PAIR_SWISS_32",
       "FIXED_PAIR_SWISS_32_BRONZE",
+      "FIXED_PAIR_SWISS_64",
+      "FIXED_PAIR_SWISS_64_BRONZE",
+      "EXCEL_REF_64",
     ])
     .optional(),
   startsAt: z.string().optional().nullable(),
   status: z
     .enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"])
     .optional(),
+  ratingMax: tournamentRatingMaxSchema.nullable().optional(),
+  handicapHalfStep: z.boolean().optional(),
+  /** true — снять лимит рейтинга (ratingMax → null) */
+  clearRatingLimit: z.boolean().optional(),
 });
 
 export const tournamentRegistrationSchema = z.object({
@@ -323,12 +351,6 @@ export const ideaVoteSchema = z.object({
   value: z.enum(["LIKE", "DISLIKE"]),
 });
 
-const ratingStepSchema = z
-  .number()
-  .min(0)
-  .max(10)
-  .refine((v) => Math.abs(v * 2 - Math.round(v * 2)) < 1e-6, "Шаг рейтинга — 0,5");
-
 export const playListingCreateSchema = z
   .object({
     title: z.string().min(3, "Минимум 3 символа").max(120),
@@ -352,7 +374,12 @@ export const playListingCreateSchema = z
     gameFormat: z.enum(tableFormatIds).optional().or(z.literal("")),
     ratingMin: ratingStepSchema.optional().nullable(),
     ratingMax: ratingStepSchema.optional().nullable(),
-    playersNeeded: z.coerce.number().int().min(1).max(10).default(1),
+    playersNeeded: z
+      .string()
+      .trim()
+      .min(1, "Укажите, сколько игроков")
+      .max(48)
+      .default("1"),
   })
   .superRefine((data, ctx) => {
     if (data.scheduleType === "ONE_TIME" && !data.playAt) {
@@ -403,11 +430,14 @@ export const playListingResponseUpdateSchema = z.object({
   status: z.enum(["ACCEPTED", "DECLINED", "WITHDRAWN"]),
 });
 
-/** 64→32 + матч проигравших полуфиналистов за 3–4 место (#112). */
-export const FIXED_SWISS_64_BRONZE_FORMAT_LABEL =
-  "Сетка на 64 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
+/** Эталон 64→32 из Excel 64-16 ×2gr.xls */
+export const EXCEL_REF_64_FORMAT_LABEL = "тест с эксельки";
 
-/** 64→32 (111 встреч) — масштаб LLB 32→16: #81–#88 1/8, нижняя тур 1–4, 1/4 с #105. */
+/** 64→32 + матч проигравших полуфиналистов за 3–4 место (#120). */
+export const FIXED_SWISS_64_BRONZE_FORMAT_LABEL =
+  "Сетка на 64 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места";
+
+/** 64→32 (115 встреч) — эталон LLB: #105–#112→#113–#116, #117 1/4, #118 полуфинал, #119 финал. */
 export const FIXED_SWISS_64_FORMAT_LABEL =
   "Сетка на 64 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
 
@@ -454,6 +484,7 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_PAIR_SWISS_32_BRONZE: `Парная: ${FIXED_SWISS_32_BRONZE_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_64: `Парная: ${FIXED_SWISS_64_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_64_BRONZE: `Парная: ${FIXED_SWISS_64_BRONZE_FORMAT_LABEL}`,
+  EXCEL_REF_64: EXCEL_REF_64_FORMAT_LABEL,
 };
 
 export const REGISTRATION_STATUS_LABELS: Record<string, string> = {

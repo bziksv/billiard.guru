@@ -2,11 +2,13 @@ import Link from "next/link";
 import { formatRating } from "@/lib/rating";
 import {
   formatGameFormat,
+  formatPlayersNeeded,
   formatPlayListingSchedule,
   formatRatingRange,
   PLAY_LISTING_KIND_LABELS,
   PLAY_LISTING_SCHEDULE_LABELS,
   PLAY_LISTING_STATUS_LABELS,
+  shouldShowPlayersNeededBadge,
 } from "@/lib/play-listing-display";
 import type { SerializedPlayListing } from "@/lib/play-listing-server";
 import { SiteCard } from "@/components/site/site-card";
@@ -90,8 +92,8 @@ export function PlayListingCard({
             <span className="play-listing-card-meta"> · </span>
             {formatRating(listing.author.rating)}
           </span>
-          {listing.playersNeeded > 1 && (
-            <span>Ищет {listing.playersNeeded} игроков</span>
+          {shouldShowPlayersNeededBadge(listing.playersNeeded) && (
+            <span>Ищет {formatPlayersNeeded(listing.playersNeeded)}</span>
           )}
           {listing.myResponseStatus && listing.myResponseStatus !== "WITHDRAWN" && (
             <span className="font-medium text-emerald-500">Вы откликнулись</span>

@@ -16,6 +16,13 @@ import {
   teamLabel,
 } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
+import { formatRatingRange } from "@/lib/play-listing-display";
+import {
+  getEffectivePlayerRatingForTournament,
+  playerRatingExceedsTournamentMax,
+  tournamentRatingLimitMessage,
+} from "@/lib/tournament-rating-limit-server";
+import { formatRating } from "@/lib/rating";
 import {
   REGISTRATION_STATUS_LABELS,
   TOURNAMENT_FORMAT_LABELS,
@@ -108,6 +115,23 @@ export default async function TournamentPage({
     ? await getMyParticipation(tournament.id, player.id, pair)
     : null;
 
+  let registrationBlockedByRating: string | null = null;
+  if (player && tournament.ratingMax != null && !myParticipation) {
+    const effectiveRating = await getEffectivePlayerRatingForTournament(
+      player.id,
+      tournament.clubId,
+      player.rating,
+    );
+    if (playerRatingExceedsTournamentMax(effectiveRating, tournament.ratingMax)) {
+      registrationBlockedByRating = `Ваш рейтинг ${formatRating(effectiveRating)} — ${tournamentRatingLimitMessage(tournament.ratingMax).toLowerCase()}`;
+    }
+  }
+
+  const ratingLimitLabel =
+    tournament.ratingMax != null
+      ? formatRatingRange(null, tournament.ratingMax)
+      : null;
+
   return (
     <>
       <PageHeader title={tournament.name}>
@@ -134,6 +158,17 @@ export default async function TournamentPage({
             {tournament.club.city.nameRu}, {tournament.club.city.country.nameRu}
           </p>
           <p className="mt-1 text-sm text-zinc-500">{formatStartsAt(tournament.startsAt)}</p>
+          {ratingLimitLabel && (
+            <p className="mt-1 text-sm text-zinc-500">
+              Участники: {ratingLimitLabel} (сначала рейтинг в клубе, иначе общий)
+            </p>
+          )}
+          <p className="mt-1 text-sm text-zinc-500">
+            Фора:{" "}
+            {tournament.handicapHalfStep
+              ? "с учётом шага рейтинга 0,5"
+              : "только целая часть разницы рейтингов (без +1 в нечётных)"}
+          </p>
           {tournament.description && (
             <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
               {tournament.description}
@@ -243,7 +278,14 @@ export default async function TournamentPage({
                     Запись на парный турнир — через клуб-организатор. Попросите
                     администратора клуба зарегистрировать вашу пару.
                   </p>
+                  {registrationBlockedByRating && (
+                    <p className="mt-2 text-amber-200/90">{registrationBlockedByRating}</p>
+                  )}
                 </div>
+              ) : registrationBlockedByRating ? (
+                <p className="rounded-xl border border-amber-900/40 bg-amber-950/30 px-4 py-3 text-amber-200/90">
+                  {registrationBlockedByRating}
+                </p>
               ) : (
                 <TournamentRegisterButton tournamentId={tournament.id} />
               )}
@@ -266,6 +308,7 @@ export default async function TournamentPage({
               format={tournament.format}
               matches={bracketMatches}
               standings={standings}
+              handicapHalfStep={tournament.handicapHalfStep}
             />
           </section>
         )}

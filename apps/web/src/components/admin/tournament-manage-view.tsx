@@ -17,9 +17,11 @@ import { AsyncButton } from "@/components/ui/async-text-button";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap } from "@/lib/handicap";
-import { formatRating } from "@/lib/rating";
+import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
+import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
 import {
   isDynamicSwissFormat,
+  isExcelRef64Format,
   isFixedSwissFormat,
   isOlympicBronzeFormat,
   isOlympicFormat,
@@ -28,7 +30,10 @@ import {
   teamLabel,
   teamRating,
   type TeamWithPlayers,
+  usesFixedSwissGridEngine,
 } from "@/lib/pair-tournament";
+import { mapBracketMatchesByExcelNo } from "@/lib/excel-bracket-match-map";
+import { ExcelBracketView } from "@/components/bracket/excel-bracket-view";
 import { isOutdatedFixedSwiss27Bracket, isOutdatedFixedSwiss32Bracket } from "@/lib/fixed-swiss-grid";
 import {
   getDefaultBracketParticipantRules,
@@ -168,6 +173,13 @@ export function TournamentManageView({
   const [editStartsAt, setEditStartsAt] = useState(
     t.startsAt ? t.startsAt.slice(0, 16) : "",
   );
+  const [editHandicapHalfStep, setEditHandicapHalfStep] = useState(
+    t.handicapHalfStep !== false,
+  );
+  const [editLimitByRating, setEditLimitByRating] = useState(t.ratingMax != null);
+  const [editRatingMax, setEditRatingMax] = useState(
+    t.ratingMax != null ? String(t.ratingMax) : "8",
+  );
   const [editError, setEditError] = useState<string | null>(null);
   const [editSaving, setEditSaving] = useState(false);
 
@@ -182,6 +194,12 @@ export function TournamentManageView({
   async function saveEdit() {
     setEditSaving(true);
     setEditError(null);
+    const parsedMax = parseFloat(editRatingMax);
+    const ratingPayload = editLimitByRating
+      ? Number.isFinite(parsedMax)
+        ? { ratingMax: parsedMax }
+        : {}
+      : { clearRatingLimit: true };
     const res = await fetch(`/api/tournaments/${t.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -192,6 +210,8 @@ export function TournamentManageView({
         format: editFormat,
         status: editStatus,
         startsAt: editStartsAt || null,
+        handicapHalfStep: editHandicapHalfStep,
+        ...ratingPayload,
       }),
     });
     const data = await res.json();
@@ -287,9 +307,12 @@ export function TournamentManageView({
             status={t.status}
             label={TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
           />
-          <span className="text-sm text-zinc-400">
-            {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
-          </span>
+          <div className="text-sm text-zinc-400">
+            <span>
+              {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
+            </span>
+            <TournamentRatingRulesSummary tournament={t} className="mt-1 block text-zinc-500" />
+          </div>
           <div className="ml-auto flex items-center gap-3">
             <button
               type="button"
@@ -323,13 +346,16 @@ export function TournamentManageView({
             status={t.status}
             label={TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
           />
-          <span>
-            {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
-          </span>
+          <div className="min-w-0 flex-1">
+            <span>
+              {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
+            </span>
+            <TournamentRatingRulesSummary tournament={t} className="mt-1 block text-zinc-500" />
+          </div>
           <button
             type="button"
             onClick={() => setEditing((v) => !v)}
-            className="ml-auto text-xs text-emerald-400 hover:underline"
+            className="shrink-0 text-xs text-emerald-400 hover:underline"
           >
             {editing ? "Закрыть настройки" : "Настройки турнира"}
           </button>
@@ -379,6 +405,45 @@ export function TournamentManageView({
             onChange={(e) => setEditStartsAt(e.target.value)}
             className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
           />
+          <label className="flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={editHandicapHalfStep}
+              onChange={(e) => setEditHandicapHalfStep(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+            />
+            <span>
+              <span className="font-medium text-zinc-200">Учитывать рейтинг 0,5</span>
+              <span className="mt-1 block text-xs text-zinc-500">
+                Влияет на расчёт форы в сетке этого турнира.
+              </span>
+            </span>
+          </label>
+          <label className="flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={editLimitByRating}
+              onChange={(e) => setEditLimitByRating(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+            />
+            <span className="font-medium text-zinc-200">Лимит рейтинга участников</span>
+          </label>
+          {editLimitByRating && (
+            <label className="block text-sm">
+              <span className="mb-1 block text-zinc-400">
+                Максимальный рейтинг (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
+              </span>
+              <input
+                type="number"
+                step={RATING_STEP}
+                min={0}
+                max={MAX_PLAYER_RATING}
+                value={editRatingMax}
+                onChange={(e) => setEditRatingMax(e.target.value)}
+                className="w-full max-w-xs rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+              />
+            </label>
+          )}
           {editError && <p className="text-sm text-red-400">{editError}</p>}
           <button
             type="button"
@@ -825,9 +890,10 @@ function BracketTab({
   onCancelMatchResult?: (matchId: string) => Promise<void>;
 }) {
   const dynamicSwiss = isDynamicSwissFormat(format);
+  const excelRef = isExcelRef64Format(format);
   const fixedSwiss = isFixedSwissFormat(format);
   const olympic = isOlympicFormat(format);
-  const oneShotGrid = olympic || fixedSwiss;
+  const oneShotGrid = olympic || fixedSwiss || excelRef;
   const hasFinishedMatches = bracketMatches.some((m) => {
     if (!m.winnerTeamId) return false;
     if (m.team1 && m.team2) return true;
@@ -845,6 +911,11 @@ function BracketTab({
     id: string;
     preview?: TeamPlayer;
   } | null>(null);
+
+  const excelLiveByNo = useMemo(
+    () => (excelRef ? mapBracketMatchesByExcelNo(bracketMatches) : undefined),
+    [excelRef, bracketMatches],
+  );
 
   async function handleSaveMatchResult(payload: MatchResultPayload) {
     setMatchSaving(true);
@@ -909,7 +980,7 @@ function BracketTab({
     return () => window.clearTimeout(timer);
   }, [bracketNotice]);
 
-  if (!dynamicSwiss && !fixedSwiss && !olympic) {
+  if (!dynamicSwiss && !fixedSwiss && !olympic && !excelRef) {
     return (
       <div className="rounded-lg border border-dashed border-zinc-700 bg-zinc-900/40 px-4 py-8 text-center text-sm text-zinc-500">
         Сетка для этого формата пока не поддерживается.
@@ -1058,15 +1129,22 @@ function BracketTab({
               matches={bracketMatches}
               matchNumbers={matchNumbers}
               withBronzeMatch={isOlympicBronzeFormat(format)}
+              handicapHalfStep={t.handicapHalfStep !== false}
               onMatchClick={setModalMatch}
               onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
               showMatchScore
+            />
+          ) : excelRef ? (
+            <ExcelBracketView
+              liveByMatchNo={excelLiveByNo}
+              onMatchClick={setModalMatch}
             />
           ) : (
             <SwissBracketView
               matches={bracketMatches}
               showStandings={false}
               fixedGrid={fixedSwiss}
+              handicapHalfStep={t.handicapHalfStep !== false}
               onMatchClick={setModalMatch}
               onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
             />
@@ -1336,9 +1414,11 @@ function ProtocolTab({
 function MatchRow({
   match,
   onSetWinner,
+  handicapHalfStep = true,
 }: {
   match: Match;
   onSetWinner: (matchId: string, winnerTeamId: string) => void;
+  handicapHalfStep?: boolean;
 }) {
   const team1 = match.team1;
   const team2 = match.team2;
@@ -1353,7 +1433,11 @@ function MatchRow({
   }
 
   const handicap =
-    team1 && team2 ? describeHandicap(teamRating(team1), teamRating(team2)) : null;
+    team1 && team2
+      ? describeHandicap(teamRating(team1), teamRating(team2), {
+          halfStep: handicapHalfStep,
+        })
+      : null;
 
   return (
     <div className="rounded-lg bg-zinc-900 px-3 py-2 text-sm">

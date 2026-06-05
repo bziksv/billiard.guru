@@ -45,7 +45,8 @@ const LAYOUT_LABELS = {
 
 export function BracketsAdminPage() {
   const searchParams = useSearchParams();
-  const initialTab = searchParams.get("tab") === "tournaments" ? "tournaments" : "formats";
+  const initialTab =
+    searchParams.get("tab") === "tournaments" ? "tournaments" : "formats";
   const [formats, setFormats] = useState<FormatRow[]>(() =>
     BRACKET_FORMAT_CATALOG.map((f) => {
       const defaults = getDefaultBracketParticipantRules(f.code);
@@ -229,8 +230,9 @@ export function BracketsAdminPage() {
       <div>
         <h1 className="admin-page-title mb-2">Сетки</h1>
         <p className="admin-page-lead max-w-3xl">
-          Типы турнирных сеток (те же, что при создании турнира). Здесь — описание, код,
-          документация и турниры по каждому формату.           Выключенный тип скрыт в форме турнира. На техобслуживании — тоже скрыт при создании.
+          Типы турнирных сеток и турниры с уже сформированной сеткой. Вкладка{" "}
+          <strong>«Турниры с сеткой»</strong> — открыть визуальную сетку (#1…#119);{" "}
+          <strong>«Типы сеток»</strong> — описание форматов и настройки.
         </p>
       </div>
 

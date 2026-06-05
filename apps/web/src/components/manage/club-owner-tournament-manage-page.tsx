@@ -20,7 +20,12 @@ import {
   type AdminTournament,
 } from "@/lib/tournament-admin";
 import { isPairFormat } from "@/lib/pair-tournament";
-import { formatPlayerSelectLabel } from "@/lib/player-select-label";
+import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
+import {
+  formatTournamentPlayerSelectLabel,
+  playerExceedsTournamentRatingMax,
+} from "@/lib/tournament-rating-display";
+import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 interface Player {
@@ -41,6 +46,7 @@ export function ClubOwnerTournamentManagePage({
 }) {
   const { tid: tournamentId } = useParams<{ tid: string }>();
   const router = useRouter();
+  const clubPlayerRatings = useClubPlayerRatings(clubId);
   const [tournament, setTournament] = useState<AdminTournament | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,9 +105,9 @@ export function ClubOwnerTournamentManagePage({
     () =>
       players.map((p) => ({
         value: p.id,
-        label: formatPlayerSelectLabel(p),
+        label: formatTournamentPlayerSelectLabel(p, clubPlayerRatings[p.id]),
       })),
-    [players],
+    [players, clubPlayerRatings],
   );
 
   const isPair = tournament ? isPairFormat(tournament.format) : false;
@@ -115,10 +121,41 @@ export function ClubOwnerTournamentManagePage({
     );
   }, [tournament, isPair]);
 
-  const availablePlayerOptions = useMemo(
-    () => playerOptions.filter((p) => !registeredPlayerIds.has(p.value)),
-    [playerOptions, registeredPlayerIds],
-  );
+  const availablePlayerOptions = useMemo(() => {
+    const ratingMax = tournament?.ratingMax ?? null;
+    return playerOptions.filter((opt) => {
+      if (registeredPlayerIds.has(opt.value)) return false;
+      if (ratingMax == null) return true;
+      const player = players.find((p) => p.id === opt.value);
+      if (!player) return true;
+      return !playerExceedsTournamentRatingMax(
+        player.rating,
+        ratingMax,
+        clubPlayerRatings[player.id],
+      );
+    });
+  }, [
+    playerOptions,
+    registeredPlayerIds,
+    tournament?.ratingMax,
+    players,
+    clubPlayerRatings,
+  ]);
+
+  useEffect(() => {
+    if (tournament?.ratingMax == null) return;
+    setSelectedPlayerIds((ids) =>
+      ids.filter((id) => {
+        const player = players.find((p) => p.id === id);
+        if (!player) return false;
+        return !playerExceedsTournamentRatingMax(
+          player.rating,
+          tournament.ratingMax,
+          clubPlayerRatings[id],
+        );
+      }),
+    );
+  }, [tournament?.ratingMax, clubPlayerRatings, players]);
 
   const activeParticipantCount = useMemo(
     () => (tournament ? countActiveTournamentSlots(tournament) : 0),
@@ -455,8 +492,13 @@ export function ClubOwnerTournamentManagePage({
               />
             </div>
             <p className="mt-2 text-sm text-zinc-400">
-              {TOURNAMENT_FORMAT_LABELS[tournament.format]} · {clubName} · {confirmed} подтверждённых
+              {TOURNAMENT_FORMAT_LABELS[tournament.format]} · {clubName} · {confirmed}{" "}
+              подтверждённых
             </p>
+            <TournamentRatingRulesSummary
+              tournament={tournament}
+              className="mt-1 text-sm text-zinc-500"
+            />
             {tournament.status === "PENDING_CLUB_APPROVAL" && (
               <p className="mt-2 text-sm text-amber-400/90">
                 Ждёт публикации. Если кнопка в Telegram не сработала — нажмите «Опубликовать турнир».

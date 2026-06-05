@@ -1,7 +1,12 @@
 /** Рейтинг с шагом 0,5. После матча пересчитывается для обоих игроков. */
 
-const STEP = 0.5;
-const MIN_RATING = 0;
+export const RATING_STEP = 0.5;
+export const MIN_PLAYER_RATING = 0;
+/** Верхняя граница рейтинга в формах и лимите турнира (шаг 0,5). */
+export const MAX_PLAYER_RATING = 20;
+
+const STEP = RATING_STEP;
+const MIN_RATING = MIN_PLAYER_RATING;
 
 function roundToHalf(value: number): number {
   return Math.round(value * 2) / 2;

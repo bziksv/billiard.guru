@@ -190,3 +190,14 @@ export function contactRequestKeyboard() {
 export function removeKeyboard() {
   return { remove_keyboard: true };
 }
+
+const BOT_COMMANDS = [
+  { command: "start", description: "Начало работы" },
+  { command: "profile", description: "Мой профиль" },
+] as const;
+
+/** Команды в меню Telegram (☰). */
+export async function setTelegramBotCommands(): Promise<boolean> {
+  const result = await telegramApi("setMyCommands", { commands: BOT_COMMANDS });
+  return result?.ok ?? false;
+}

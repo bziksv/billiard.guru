@@ -29,6 +29,51 @@ export const PLAY_LISTING_RESPONSE_STATUS_LABELS: Record<string, string> = {
 
 export const WEEKDAY_LABELS = ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"] as const;
 
+/** Подсказки в форме «Покатать» — можно выбрать или ввести своё. */
+export const PLAY_LISTING_PLAYERS_NEEDED_PRESETS = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "1-2",
+  "1-3",
+  "1-4",
+  "2-4",
+  "пара на пару",
+  "пара",
+] as const;
+
+export function normalizePlayersNeededInput(raw: string): string {
+  return raw.trim().replace(/\s+/g, " ").replace(/–/g, "-");
+}
+
+/** Текст для карточки объявления: «1 игрока», «1–4 игрока», «пара на пару». */
+export function formatPlayersNeeded(raw: string | number): string {
+  const s = normalizePlayersNeededInput(String(raw));
+  if (!s) return "1 игрока";
+  const lower = s.toLowerCase();
+  if (lower.includes("пара")) return s;
+  if (/^\d+-\d+$/.test(s)) {
+    const [a, b] = s.split("-").map(Number);
+    const max = Math.max(a, b);
+    if (max === 1) return "1 игрока";
+    if (max >= 2 && max <= 4) return `${s.replace("-", "–")} игрока`;
+    return `${s.replace("-", "–")} игроков`;
+  }
+  const n = Number(s);
+  if (Number.isFinite(n) && n > 0 && String(n) === s) {
+    if (n === 1) return "1 игрока";
+    if (n >= 2 && n <= 4) return `${n} игрока`;
+    return `${n} игроков`;
+  }
+  return s;
+}
+
+export function shouldShowPlayersNeededBadge(raw: string | number): boolean {
+  const s = normalizePlayersNeededInput(String(raw));
+  return s !== "" && s !== "1";
+}
+
 export function parseWeekdays(raw: unknown): number[] {
   if (!Array.isArray(raw)) return [];
   return raw

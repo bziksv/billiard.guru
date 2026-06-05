@@ -7,6 +7,7 @@ import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { requestClubTournamentApproval } from "@/lib/tournament-approval";
 import { tournamentSchema } from "@/lib/validators";
+import { ZodError } from "zod";
 
 export async function GET() {
   try {
@@ -87,6 +88,8 @@ export async function POST(request: NextRequest) {
         format: data.format,
         status: "DRAFT",
         startsAt: data.startsAt ? new Date(data.startsAt) : null,
+        ratingMax: data.ratingMax,
+        handicapHalfStep: data.handicapHalfStep,
       },
       include: { club: { include: { city: true } } },
     });
@@ -107,7 +110,7 @@ export async function POST(request: NextRequest) {
       section: "tournaments",
       clubId: data.clubId,
       summary: `Турнир «${data.name}»`,
-      payload: { format: data.format, approvalSent: true },
+      payload: { format: data.format, ratingMax: data.ratingMax, approvalSent: true },
     });
 
     return NextResponse.json(
@@ -123,6 +126,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
+    if (error instanceof ZodError) {
+      const message = error.issues[0]?.message ?? "Проверьте поля формы";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+    if (error instanceof Error && error.message) {
+      log.error({ error }, "Tournament create failed");
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
     log.error({ error }, "Tournament create failed");
     return NextResponse.json({ error: "Не удалось создать турнир" }, { status: 500 });
   }

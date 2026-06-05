@@ -17,9 +17,11 @@ import {
   fixedSwissTs64StageByMatchNo,
 } from "@/lib/fixed-swiss-ts-grid";
 import {
+  isExcelRef64Format,
   isFixedSwissFormat,
   isOlympicFormat,
   teamLabel,
+  usesFixedSwissGridEngine,
 } from "@/lib/pair-tournament";
 
 export function isMatchFinished(match: BracketMatchView): boolean {
@@ -64,7 +66,7 @@ export function buildBracketMatchNumbers(
 ): Map<string, number> {
   const maxRound = matches.reduce((max, m) => Math.max(max, m.round), 0);
   const matchCount = matches.length;
-  const fixedSwiss = isFixedSwissFormat(format);
+  const fixedSwiss = usesFixedSwissGridEngine(format);
 
   if (fixedSwiss && matchCount > 0) {
     try {
@@ -101,7 +103,7 @@ export function matchStageLabel(
   const maxRound = allMatches.reduce((max, m) => Math.max(max, m.round), 0);
   const matchCount = allMatches.length;
 
-  if (isFixedSwissFormat(format) && matchCount > 0) {
+  if (usesFixedSwissGridEngine(format) && matchCount > 0) {
     try {
       const col = fixedSwissMatchColForCount(
         match.round,

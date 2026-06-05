@@ -80,6 +80,8 @@ export interface AdminTournament {
   format: string;
   status: string;
   clubId: string;
+  ratingMax?: number | null;
+  handicapHalfStep?: boolean;
   startsAt?: string | null;
   club: {
     name: string;

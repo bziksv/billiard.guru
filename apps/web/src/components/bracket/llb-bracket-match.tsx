@@ -259,6 +259,7 @@ export function LlbBracketMatch({
   matchById,
   onMatchClick,
   onPlayerClick,
+  handicapHalfStep = true,
 }: {
   match: BracketMatchView;
   matchNumber: number;
@@ -267,6 +268,7 @@ export function LlbBracketMatch({
   matchById: Map<string, BracketMatchView>;
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamWithPlayers["player1"]) => void;
+  handicapHalfStep?: boolean;
 }) {
   const finished = isMatchResolved(match.status, match.winnerTeamId);
   const winnerId = match.winnerTeamId;
@@ -334,11 +336,13 @@ export function LlbBracketMatch({
   const openResult =
     onMatchClick && canOpenResult ? () => onMatchClick(match) : undefined;
 
+  const handicapOpts = { halfStep: handicapHalfStep };
   const handicap =
     match.team1 && match.team2
       ? describeHandicap(
           Math.max(teamRating(match.team1), teamRating(match.team2)),
           Math.min(teamRating(match.team1), teamRating(match.team2)),
+          handicapOpts,
         )
       : null;
   const handicapShort =
@@ -346,6 +350,7 @@ export function LlbBracketMatch({
       ? describeHandicapShort(
           Math.max(teamRating(match.team1), teamRating(match.team2)),
           Math.min(teamRating(match.team1), teamRating(match.team2)),
+          handicapOpts,
         )
       : null;
   const showHandicap = handicap && handicap !== "Без форы";

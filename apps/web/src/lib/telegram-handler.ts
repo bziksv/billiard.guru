@@ -10,6 +10,12 @@ import {
   answerCallbackQuery,
 } from "@/lib/telegram";
 import {
+  handleMyProfile,
+  isProfileMenuRequest,
+  mainMenuKeyboard,
+  sendVerifiedWelcome,
+} from "@/lib/telegram-bot-menu";
+import {
   handleLoginCallback,
   handleLoginTelegramMessage,
 } from "@/lib/login-challenge";
@@ -114,7 +120,7 @@ async function confirmPlayer(
   await sendTelegramMessage(
     telegramId,
     `✅ Регистрация подтверждена!\n<b>${player.lastName} ${player.firstName}</b>\n\nВы будете получать уведомления о турнирах на billiard.guru.`,
-    { replyMarkup: removeKeyboard() },
+    { replyMarkup: mainMenuKeyboard() },
   );
   logger.info({ playerId: player.id, telegramId }, "Player confirmed");
 }
@@ -288,6 +294,19 @@ export async function processTelegramUpdate(
     return;
   }
 
+  if (isProfileMenuRequest(text)) {
+    try {
+      await handleMyProfile(telegramId);
+    } catch (err) {
+      logger.error({ err }, "Profile menu failed");
+      await sendTelegramMessage(
+        telegramId,
+        "⚠️ Не удалось загрузить профиль. Попробуйте позже.",
+      );
+    }
+    return;
+  }
+
   // /start — сразу отвечаем (без БД), потом проверяем статус
   if (text.startsWith("/start") || text === "/start") {
     try {
@@ -295,10 +314,7 @@ export async function processTelegramUpdate(
         where: { telegramId, isVerified: true },
       });
       if (verifiedPlayer) {
-        await sendTelegramMessage(
-          telegramId,
-          `✅ Вы уже подтверждены как <b>${verifiedPlayer.lastName} ${verifiedPlayer.firstName}</b>.`,
-        );
+        await sendVerifiedWelcome(telegramId, verifiedPlayer);
         return;
       }
     } catch (err) {
@@ -339,11 +355,15 @@ export async function processTelegramUpdate(
       },
     });
     if (anyPlayer?.isVerified) {
-      await sendTelegramMessage(
-        telegramId,
-        "✅ Этот номер уже подтверждён. Если это вы — всё в порядке!",
-        { replyMarkup: removeKeyboard() },
-      );
+      if (anyPlayer.telegramId === telegramId) {
+        await sendVerifiedWelcome(telegramId, anyPlayer);
+      } else {
+        await sendTelegramMessage(
+          telegramId,
+          "✅ Этот номер уже подтверждён. Если это вы — всё в порядке!",
+          { replyMarkup: removeKeyboard() },
+        );
+      }
       return;
     }
 

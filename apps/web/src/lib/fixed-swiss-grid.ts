@@ -477,6 +477,7 @@ export function buildFixedSwissTemplate(
     ) {
       return buildFixedSwissTsTemplateForGridSize(64, false);
     }
+    return buildFixedSwissTsTemplateForGridSize(64, false);
   }
 
   return buildFixedSwissClassicTemplate(gridSize);
@@ -538,7 +539,12 @@ export function isFixedSwiss168MatchCount(matchCount: number): boolean {
     matchCount === 63 ||
     matchCount === 64 ||
     matchCount === 111 ||
-    matchCount === 112
+    matchCount === 112 ||
+    matchCount === 114 ||
+    matchCount === 115 ||
+    matchCount === 116 ||
+    matchCount === 119 ||
+    matchCount === 120
   );
 }
 
@@ -555,7 +561,17 @@ export function isFixedSwiss168LegacyMatchCount(
 export function inferFixedSwissGridSize(matchCount: number): number {
   if (matchCount === 29 || matchCount === 27 || matchCount === 28) return 16;
   if (matchCount === 59 || matchCount === 60 || matchCount === 55 || matchCount === 56 || matchCount === 63 || matchCount === 64) return 32;
-  if (matchCount === 111 || matchCount === 112) return 64;
+  if (
+    matchCount === 111 ||
+    matchCount === 112 ||
+    matchCount === 114 ||
+    matchCount === 115 ||
+    matchCount === 116 ||
+    matchCount === 119 ||
+    matchCount === 120
+  ) {
+    return 64;
+  }
   for (let size = 4; size <= 64; size *= 2) {
     const rounds = Math.log2(size) + 1;
     if ((size / 2) * rounds === matchCount) return size;
@@ -674,8 +690,8 @@ export function fixedSwissProtocolPlace(
     if (isFixedSwissTsLegacy27SixRound(matchCount, maxRound) && matchNo === 27) {
       return 1;
     }
-    if (isFixedSwissTs64BronzeMatchCount(matchCount) && matchNo === 112) return 3;
-    if (isFixedSwissTs64MatchCount(matchCount) && matchNo === 111) return 1;
+    if (isFixedSwissTs64BronzeMatchCount(matchCount) && matchNo === 120) return 3;
+    if (isFixedSwissTs64MatchCount(matchCount) && matchNo === 119) return 1;
     if (isFixedSwissTs32BronzeMatchCount(matchCount) && matchNo === 60) return 3;
     if (isFixedSwissTs32MatchCount(matchCount) && matchNo === 59) return 1;
     if (isFixedSwissTsBronzeMatchCount(matchCount) && matchNo === 28) return 3;
@@ -745,16 +761,16 @@ function fixedSwissProtocolPlace64(
   withBronze: boolean,
 ): number | null {
   if (role === "winner") {
-    if (withBronze && matchNo === 112) return 3;
-    if (matchNo === 111) return 1;
+    if (withBronze && matchNo === 120) return 3;
+    if (matchNo === 119) return 1;
     return null;
   }
 
-  if (withBronze && matchNo === 111) return 2;
-  if (withBronze && matchNo === 112) return 4;
-  if (!withBronze && matchNo === 111) return 2;
-  if (!withBronze && matchNo === 109) return 3;
-  if (!withBronze && matchNo === 110) return 4;
+  if (withBronze && matchNo === 119) return 2;
+  if (withBronze && matchNo === 120) return 4;
+  if (!withBronze && matchNo === 119) return 2;
+  if (!withBronze && matchNo === 117) return 3;
+  if (!withBronze && matchNo === 118) return 4;
 
   if (matchNo >= 105 && matchNo <= 108) return matchNo - 100;
   if (matchNo >= 97 && matchNo <= 104) return matchNo - 88;
@@ -871,6 +887,10 @@ export function getFixedSwissLinksForGrid(
   }
   if (gridSize === 32 && isOutdatedFixedSwiss32Bracket(matchCount ?? 0)) {
     return buildFixedSwissTs32OutdatedTemplate(matchCount === 56 || matchCount === 64).links;
+  }
+  if (gridSize === 64) {
+    const withBronze = matchCount === 116 || matchCount === 112;
+    return buildFixedSwissTsTemplateForGridSize(64, withBronze).links;
   }
   return buildFixedSwissTemplate(gridSize).links;
 }

@@ -20,7 +20,11 @@ import {
   type AdminTournament,
 } from "@/lib/tournament-admin";
 import { isPairFormat } from "@/lib/pair-tournament";
-import { formatPlayerSelectLabel } from "@/lib/player-select-label";
+import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
+import {
+  formatTournamentPlayerSelectLabel,
+  playerExceedsTournamentRatingMax,
+} from "@/lib/tournament-rating-display";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 interface Club {
@@ -90,13 +94,16 @@ export default function AdminTournamentManagePage() {
     [clubs],
   );
 
+  const tournamentClubId = tournament?.clubId ?? "";
+  const clubPlayerRatings = useClubPlayerRatings(tournamentClubId);
+
   const playerOptions = useMemo(
     () =>
       players.map((p) => ({
         value: p.id,
-        label: formatPlayerSelectLabel(p),
+        label: formatTournamentPlayerSelectLabel(p, clubPlayerRatings[p.id]),
       })),
-    [players],
+    [players, clubPlayerRatings],
   );
 
   const isPair = tournament ? isPairFormat(tournament.format) : false;
@@ -110,10 +117,41 @@ export default function AdminTournamentManagePage() {
     );
   }, [tournament, isPair]);
 
-  const availablePlayerOptions = useMemo(
-    () => playerOptions.filter((p) => !registeredPlayerIds.has(p.value)),
-    [playerOptions, registeredPlayerIds],
-  );
+  const availablePlayerOptions = useMemo(() => {
+    const ratingMax = tournament?.ratingMax ?? null;
+    return playerOptions.filter((opt) => {
+      if (registeredPlayerIds.has(opt.value)) return false;
+      if (ratingMax == null) return true;
+      const player = players.find((p) => p.id === opt.value);
+      if (!player) return true;
+      return !playerExceedsTournamentRatingMax(
+        player.rating,
+        ratingMax,
+        clubPlayerRatings[player.id],
+      );
+    });
+  }, [
+    playerOptions,
+    registeredPlayerIds,
+    tournament?.ratingMax,
+    players,
+    clubPlayerRatings,
+  ]);
+
+  useEffect(() => {
+    if (tournament?.ratingMax == null) return;
+    setSelectedPlayerIds((ids) =>
+      ids.filter((id) => {
+        const player = players.find((p) => p.id === id);
+        if (!player) return false;
+        return !playerExceedsTournamentRatingMax(
+          player.rating,
+          tournament.ratingMax,
+          clubPlayerRatings[id],
+        );
+      }),
+    );
+  }, [tournament?.ratingMax, clubPlayerRatings, players]);
 
   const activeParticipantCount = useMemo(
     () => (tournament ? countActiveTournamentSlots(tournament) : 0),

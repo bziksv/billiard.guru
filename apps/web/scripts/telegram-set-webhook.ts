@@ -49,6 +49,29 @@ async function main() {
   }
   console.log("✓ Webhook:", webhookUrl);
 
+  const commandsRes = await fetch(
+    `https://api.telegram.org/bot${token}/setMyCommands`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        commands: [
+          { command: "start", description: "Начало работы" },
+          { command: "profile", description: "Мой профиль" },
+        ],
+      }),
+    },
+  );
+  const commandsData = (await commandsRes.json()) as {
+    ok: boolean;
+    description?: string;
+  };
+  if (commandsData.ok) {
+    console.log("✓ Bot commands: /start, /profile");
+  } else {
+    console.warn("⚠ setMyCommands:", commandsData.description ?? commandsData);
+  }
+
   const infoRes = await fetch(`https://api.telegram.org/bot${token}/getWebhookInfo`);
   const info = (await infoRes.json()) as {
     result?: { pending_update_count?: number; last_error_message?: string };

@@ -18,6 +18,7 @@ import {
   gridFixedForkConnectorPath,
   gridFixedR12ConnectorPath,
   fixedSwissForkTrunkYByTarget,
+  fixedSwissColumnGutter,
   fixedSwissR12TrunkYByTarget,
   FIXED_SWISS_BRACKET_UNIT,
   FIXED_SWISS_CARD_H,
@@ -34,6 +35,7 @@ import {
   fixedSwissTs32MatchCol,
   fixedSwissTs32PlacementByMatchNo,
   fixedSwissTs64MatchCol,
+  fixedSwissTs64ColumnLabel,
   fixedSwissTs64PlacementByMatchNo,
 } from "../src/lib/fixed-swiss-layout";
 import {
@@ -44,6 +46,7 @@ import {
   fixedSwissTsBronzeMatchNo,
   fixedSwissTsMatchNo,
   fixedSwissProtocolPlace,
+  getFixedSwissLinksForMatchCount,
   inferFixedSwissGridSize,
   isFixedSwiss168LegacyMatchCount,
   isFixedSwiss168MatchCount,
@@ -56,6 +59,7 @@ import {
   isFixedSwissTs64BronzeMatchCount,
   isOutdatedFixedSwiss32Bracket,
 } from "../src/lib/fixed-swiss-grid";
+import { fixedSwissTs64StageByMatchNo } from "../src/lib/fixed-swiss-ts-grid";
 import {
   GRID_LABEL_OFFSET,
   GRID_PAD,
@@ -349,6 +353,7 @@ assert.ok(
 
 assert.equal(isFixedSwissRound12Edge(1, 2), true);
 assert.equal(isFixedSwissRound23Edge(2, 3), true);
+assert.equal(isFixedSwissForkEdge(1, 2), true, "R1→R2 fork (#1+#2→#49, #3+#4→#50)");
 assert.equal(isFixedSwissForkEdge(2, 3), false, "R23 not fork — avoids vertical bus");
 
 assert.equal(shouldDrawFixedSwissWinEdge(0, 1, 1, 2, "win"), true);
@@ -391,7 +396,8 @@ assert.equal(isFixedSwissForkEdge(4, 5), true);
 assert.equal(shouldDrawFixedSwissLossEdge(0, -1, false, 1, 2), true);
 assert.equal(shouldDrawFixedSwissLossEdge(0, -1, false, 2, 3), false);
 assert.equal(shouldDrawFixedSwissLossEdge(0, -1, true, 1, 2), true);
-assert.equal(shouldDrawFixedSwissLossEdge(1, -2, false, 2, 3), false);
+assert.equal(shouldDrawFixedSwissLossEdge(1, -2, false, 2, 3), false, "#49 → #65: only footer");
+assert.equal(shouldDrawFixedSwissLossEdge(0, -2, false, 2, 3), false);
 
 assert.equal(
   shouldDrawFixedSwissWinEdge(0, -1, 1, 2, "loss"),
@@ -404,6 +410,7 @@ function forkPath(
   fromId: string,
   kind: "win" | "loss",
   trunkY: Map<string, number>,
+  laneKey = 0,
 ): string {
   const edge = layout.edges.find((e) => e.fromId === fromId && e.kind === kind);
   assert.ok(edge?.fromTeamSlot != null && edge.toTeamSlot != null);
@@ -425,6 +432,7 @@ function forkPath(
     layout.minCol,
     layout.colWidth ?? FIXED_SWISS_COL_W,
     trunkY.get(edge.toId) ?? pts.from.y,
+    laneKey,
   );
 }
 
@@ -875,31 +883,723 @@ const layout32Bronze = buildFixedSwissBracketLayout(mkGridTs32Bronze());
 }
 assert.equal(layout32Bronze.matchNumbers.get("r7s2"), 60);
 
-// --- 64→32 (111/112 встреч) ---
+// --- 64→32 (115/116 встреч; legacy 111/112/114) ---
 function mkGridTs64(): BracketMatchView[] {
   const template = buildFixedSwissTemplate(64, "FIXED_SWISS_64");
   return template.matches.map((m) => mkMatch(m.round, m.slot));
 }
 
-assert.equal(buildFixedSwissTemplate(64, "FIXED_SWISS_64").matches.length, 111);
-assert.equal(buildFixedSwissTemplate(64, "FIXED_SWISS_64_BRONZE").matches.length, 112);
-assert.equal(inferFixedSwissGridSize(111), 64);
-assert.equal(isFixedSwissTs64MatchCount(111), true);
-assert.equal(isFixedSwissTs64BronzeMatchCount(112), true);
-assert.equal(fixedSwissMatchNo(7, 1, 111), 111, "final #111");
-assert.equal(fixedSwissMatchNo(7, 2, 112), 112, "bronze #112");
-assert.equal(fixedSwissTs64MatchCol(3, 17), 2, "#81 in 1/8 column");
+assert.equal(buildFixedSwissTemplate(64, "FIXED_SWISS_64").matches.length, 119);
+assert.equal(buildFixedSwissTemplate(64, "FIXED_SWISS_64_BRONZE").matches.length, 120);
+assert.equal(inferFixedSwissGridSize(119), 64);
+assert.equal(inferFixedSwissGridSize(115), 64, "legacy 115");
+assert.equal(inferFixedSwissGridSize(114), 64, "legacy 114");
+assert.equal(inferFixedSwissGridSize(111), 64, "legacy 111");
+assert.equal(isFixedSwissTs64MatchCount(119), true);
+assert.equal(isFixedSwissTs64MatchCount(115), true, "legacy 115");
+assert.equal(isFixedSwissTs64BronzeMatchCount(120), true);
+assert.equal(isFixedSwissTs64BronzeMatchCount(116), true, "legacy 116");
+const MC64 = 119;
+assert.equal(fixedSwissMatchNo(1, 1, MC64), 1, "first tour #1");
+assert.equal(fixedSwissMatchNo(1, 32, MC64), 32);
+assert.equal(fixedSwissMatchNo(2, 1, MC64), 33, "lower tour 1 #33");
+assert.equal(fixedSwissMatchNo(2, 16, MC64), 48);
+assert.equal(fixedSwissMatchNo(2, 17, MC64), 49, "upper tour 1 #49");
+assert.equal(fixedSwissMatchNo(2, 32, MC64), 64);
+assert.equal(fixedSwissMatchNo(3, 1, MC64), 80, "lower tour 2 #80");
+assert.equal(fixedSwissMatchNo(3, 8, MC64), 73, "lower tour 2 #73");
+assert.equal(fixedSwissMatchNo(3, 9, MC64), 72, "lower tour 2 #72");
+assert.equal(fixedSwissMatchNo(3, 12, MC64), 69, "lower tour 2 #69");
+assert.equal(fixedSwissMatchNo(3, 13, MC64), 68, "lower tour 2 #68");
+assert.equal(fixedSwissMatchNo(3, 16, MC64), 65, "lower tour 2 #65");
+assert.equal(fixedSwissMatchNo(3, 33, MC64), 81, "upper tour 2 #81");
+assert.equal(fixedSwissMatchNo(3, 36, MC64), 84, "upper tour 2 #84");
+assert.equal(fixedSwissMatchNo(3, 21, MC64), 85, "upper tour 2 #85");
+assert.equal(fixedSwissMatchNo(3, 24, MC64), 88, "upper tour 2 #88");
+for (let n = 81; n <= 88; n++) {
+  let found = false;
+  for (let slot = 1; slot <= 36; slot++) {
+    if (fixedSwissMatchNo(3, slot, MC64) === n) found = true;
+  }
+  assert.ok(found, `upper tour 2 must include #${n}`);
+}
+for (let n = 65; n <= 80; n++) {
+  let found = false;
+  for (let slot = 1; slot <= 16; slot++) {
+    if (fixedSwissMatchNo(3, slot, MC64) === n) found = true;
+  }
+  assert.ok(found, `lower tour 2 must include #${n}`);
+}
+assert.equal(fixedSwissMatchNo(3, 17, MC64), 113, "1/8 #113 (→ from #105/#106)");
+assert.equal(fixedSwissMatchNo(3, 18, MC64), 114, "1/8 #114 (→ from #107/#108)");
+assert.equal(fixedSwissMatchNo(3, 19, MC64), 115, "1/8 #115 (→ from #109/#110)");
+assert.equal(fixedSwissTs64MatchCol(3, 18), 4, "#114 in 1/8 column");
+assert.equal(fixedSwissTs64MatchCol(3, 19), 4, "#115 in 1/8 column");
+assert.equal(fixedSwissMatchNo(3, 20, MC64), 116, "1/8 #116 (→ from #111/#112)");
+assert.equal(fixedSwissMatchNo(3, 9, MC64), 72, "lower tour 2 #72");
+assert.equal(fixedSwissMatchNo(3, 12, MC64), 69, "lower tour 2 #69");
+assert.equal(fixedSwissMatchNo(4, 5, MC64), 92, "lower tour 3 R4 #92");
+assert.equal(fixedSwissTs64MatchCol(3, 9), -2, "#72 in lower tour 2 column");
+assert.equal(fixedSwissTs64MatchCol(3, 16), -2, "#65 in lower tour 2 column");
+assert.equal(fixedSwissTs64MatchCol(3, 33), 2, "#81 in upper tour 2 column");
+assert.equal(fixedSwissTs64MatchCol(3, 21), 2, "#85 in upper tour 2 column");
+assert.equal(fixedSwissTs64StageByMatchNo(1), "Первый тур");
+assert.equal(fixedSwissTs64StageByMatchNo(92), "Нижняя, тур 3");
+assert.equal(fixedSwissTs64StageByMatchNo(118), "Полуфинал");
+assert.equal(fixedSwissTs64StageByMatchNo(117), "Полуфинал");
+assert.equal(fixedSwissTs64StageByMatchNo(113), "1/4 финала");
+assert.equal(fixedSwissTs64StageByMatchNo(105), "Верхняя, тур 3 · 1/8");
+assert.equal(fixedSwissTs64ColumnLabel(3), "Верхняя, тур 3 · 1/8");
+assert.equal(fixedSwissTs64ColumnLabel(5), "Полуфинал");
+assert.equal(fixedSwissMatchNo(7, 1, MC64), 119, "only final is #119");
+{
+  const links115 = getFixedSwissLinksForMatchCount(MC64);
+  const win85Link = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 21 && l.kind === "win",
+  );
+  assert.equal(win85Link?.toRound, 5, "#85 → #109 link");
+  assert.equal(win85Link?.toSlot, 5);
+  const win68 = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 13 && l.kind === "win",
+  );
+  assert.equal(win68?.toRound, 4, "#68 → #90");
+  assert.equal(win68?.toSlot, 7);
+  const win67 = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 14 && l.kind === "win",
+  );
+  assert.equal(win67?.toSlot, 7, "#67 also feeds #90");
+  const win66 = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 15 && l.kind === "win",
+  );
+  assert.equal(win66?.toRound, 4, "#66 → #89");
+  assert.equal(win66?.toSlot, 8);
+  const win65b = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 16 && l.kind === "win",
+  );
+  assert.equal(win65b?.toSlot, 8, "#65 also feeds #89");
+  const win87 = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 23 && l.kind === "win",
+  );
+  assert.equal(win87?.toRound, 5, "#87 → #111");
+  assert.equal(win87?.toSlot, 7);
+  const win41 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 9 && l.kind === "win",
+  );
+  assert.equal(win41?.toSlot, 9, "#41 winner → #72 (R3 slot 9)");
+  const win42 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 10 && l.kind === "win",
+  );
+  assert.equal(win42?.toSlot, 10, "#42 winner → #71");
+  const loss49 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 17 && l.kind === "loss",
+  );
+  assert.equal(loss49?.toSlot, 16, "#49 loser → #65");
+  const loss50 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 18 && l.kind === "loss",
+  );
+  assert.equal(loss50?.toSlot, 15, "#50 loser → #66");
+  for (let slot = 17; slot <= 32; slot++) {
+    const loss = links115.find(
+      (l) => l.fromRound === 2 && l.fromSlot === slot && l.kind === "loss",
+    );
+    assert.equal(
+      loss?.toSlot,
+      2 * 16 + 1 - slot,
+      `upper tour 1 slot ${slot} loser → cross slot ${33 - slot}`,
+    );
+  }
+  const win45 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 13 && l.kind === "win",
+  );
+  assert.equal(win45?.toSlot, 21, "#45 winner → #85 (R3 slot 21)");
+  const win47 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 15 && l.kind === "win",
+  );
+  assert.equal(win47?.toSlot, 15, "#47 winner → #66 (R3 slot 15)");
+  const win48 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 16 && l.kind === "win",
+  );
+  assert.equal(win48?.toSlot, 16, "#48 winner → #65 (R3 slot 16)");
+  const win37 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 5 && l.kind === "win",
+  );
+  assert.equal(win37?.toSlot, 5, "#37 winner → #76 (R3 slot 5)");
+  const win38 = links115.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 6 && l.kind === "win",
+  );
+  assert.equal(win38?.toSlot, 6, "#38 winner → #75 (R3 slot 6)");
+  const win72 = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 9 && l.kind === "win",
+  );
+  assert.equal(win72?.toSlot, 5, "#72 winner → #92 (R4 slot 5)");
+  const win71 = links115.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 10 && l.kind === "win",
+  );
+  assert.equal(win71?.toSlot, 5, "#71 also feeds #92");
+  const win92 = links115.find(
+    (l) => l.fromRound === 4 && l.fromSlot === 5 && l.kind === "win",
+  );
+  assert.equal(win92?.toRound, 3, "#92 winner → lower tour 4");
+  assert.equal(win92?.toSlot, 29, "#92 → #100 (R3 slot 29)");
+}
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 9, 5, MC64),
+  true,
+  "#72 → #92 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-3, -4, 4, 3, "win", 5, 29, MC64),
+  true,
+  "#92 → #100 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 13, 7, MC64),
+  true,
+  "#68 → #90 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 14, 7, MC64),
+  true,
+  "#67 → #90 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 15, 8, MC64),
+  true,
+  "#66 → #89 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 16, 8, MC64),
+  true,
+  "#65 → #89 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-3, -4, 4, 3, "win", 8, 32, MC64),
+  true,
+  "#89 → #97 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, 2, 2, 3, "win", 13, 21, MC64),
+  false,
+  "#45 → #85: only footer",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, 2, 2, 3, "win", 14, 22, MC64),
+  false,
+  "#46 → #86: only footer",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, -2, 2, 3, "win", 15, 15, MC64),
+  true,
+  "#47 → #66 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, -2, 2, 3, "win", 16, 16, MC64),
+  true,
+  "#48 → #65 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, 2, 2, 3, "win", 15, 23, MC64),
+  false,
+  "#47 → #87: no link",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, 2, 2, 3, "win", 16, 24, MC64),
+  false,
+  "#48 → #88: no link",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-3, -4, 4, 3, "win", 7, 31, MC64),
+  true,
+  "#90 → #98 SVG",
+);
+assert.equal(fixedSwissMatchNo(3, 5, MC64), 76, "#76 at R3 slot 5");
+assert.equal(fixedSwissMatchNo(3, 6, MC64), 75, "#75 at R3 slot 6");
+assert.equal(fixedSwissMatchNo(3, 21, MC64), 85, "#85 at R3 slot 21");
+assert.equal(fixedSwissTs64MatchCol(3, 33), 2, "#81 in upper tour 2 column");
+assert.equal(fixedSwissTs64MatchCol(3, 21), 2, "#85 in upper tour 2 column");
+assert.equal(fixedSwissMatchNo(3, 24, MC64), 88, "#88 at R3 slot 24");
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, -2, 2, 3, "win", 9, 21, MC64),
+  true,
+  "#41 → #72 SVG",
+);
+assert.equal(fixedSwissMatchNo(4, 1, MC64), 96, "lower tour 3 #96");
+assert.equal(fixedSwissMatchNo(5, 1, MC64), 105, "upper tour 3 #105");
+assert.equal(fixedSwissMatchNo(5, 5, MC64), 109);
+assert.equal(fixedSwissMatchNo(5, 6, MC64), 110);
+assert.equal(fixedSwissMatchNo(5, 7, MC64), 111);
+assert.equal(fixedSwissMatchNo(5, 8, MC64), 112, "upper tour 3 #112 (#88)");
+assert.equal(fixedSwissMatchNo(6, 1, MC64), 117, "1/4 #117");
+assert.equal(fixedSwissMatchNo(6, 2, MC64), 118);
+assert.equal(fixedSwissMatchNo(7, 1, MC64), 119, "final #119");
+assert.equal(fixedSwissMatchNo(7, 2, 116), 120, "bronze #120");
+assert.equal(fixedSwissTs64MatchCol(3, 21), 2, "upper tour 2 column");
+assert.equal(fixedSwissTs64MatchCol(3, 17), 4, "1/8 column");
 assert.equal(fixedSwissTs64MatchCol(4, 1), -3, "lower tour 3 column");
 assert.equal(fixedSwissTs64MatchCol(5, 1), 3, "1/4 column");
 assert.equal(fixedSwissTs64PlacementByMatchNo(33, false), "место 49–64");
-assert.equal(fixedSwissTs64PlacementByMatchNo(81, false), null, "1/8 without place range");
-assert.equal(fixedSwissTs64PlacementByMatchNo(105, false), "место 5–8");
-assert.equal(fixedSwissProtocolPlace(111, "winner", 111), 1);
-assert.equal(fixedSwissProtocolPlace(112, "winner", 112), 3);
+assert.equal(fixedSwissTs64PlacementByMatchNo(81, false), null, "upper tour 2 without place range");
+assert.equal(fixedSwissTs64PlacementByMatchNo(89, false), "место 25–32");
+assert.equal(fixedSwissTs64PlacementByMatchNo(96, false), "место 25–32");
+assert.equal(fixedSwissTs64PlacementByMatchNo(100, false), "место 17–24");
+assert.equal(fixedSwissTs64PlacementByMatchNo(105, false), "место 9–16");
+assert.equal(fixedSwissTs64PlacementByMatchNo(112, false), "место 9–16");
+assert.equal(fixedSwissTs64PlacementByMatchNo(113, false), "место 5–8");
+assert.equal(fixedSwissTs64PlacementByMatchNo(117, false), "место 3–4");
+assert.equal(fixedSwissTs64PlacementByMatchNo(118, false), "место 3–4");
+assert.equal(fixedSwissTs64PlacementByMatchNo(117, true), "полуфинал");
+assert.equal(fixedSwissProtocolPlace(119, "winner", MC64), 1);
+assert.equal(fixedSwissProtocolPlace(120, "winner", 116), 3);
 const layout64 = buildFixedSwissBracketLayout(mkGridTs64());
+assert.equal(
+  layout64.positions.get("r3s9")!.y,
+  layout64.positions.get("r2s9")!.y,
+  "#72 on same Y as #41",
+);
+assert.equal(
+  layout64.positions.get("r3s10")!.y,
+  layout64.positions.get("r2s10")!.y,
+  "#71 on same Y as #42",
+);
+assert.equal(layout64.positions.get("r3s9")!.col, -2, "#72 in lower tour 2 column");
+assert.equal(layout64.positions.get("r3s10")!.col, -2, "#71 in lower tour 2 column");
+assert.equal(
+  layout64.positions.get("r3s5")!.y,
+  layout64.positions.get("r2s5")!.y,
+  "#76 on same Y as #37",
+);
+assert.equal(
+  layout64.positions.get("r3s6")!.y,
+  layout64.positions.get("r2s6")!.y,
+  "#75 on same Y as #38",
+);
+assert.equal(layout64.positions.get("r3s13")!.col, -2, "#68 in lower tour 2");
+assert.equal(layout64.positions.get("r3s16")!.col, -2, "#65 in lower tour 2");
+assert.equal(
+  layout64.positions.get("r3s13")!.y,
+  layout64.positions.get("r2s13")!.y,
+  "#68 same Y as #45",
+);
+assert.equal(
+  layout64.positions.get("r3s16")!.y,
+  layout64.positions.get("r2s16")!.y,
+  "#65 same Y as #48",
+);
+assert.equal(layout64.positions.get("r3s33")!.col, 2, "#81 in upper tour 2");
+assert.equal(layout64.positions.get("r3s36")!.col, 2, "#84 in upper tour 2");
+assert.equal(layout64.positions.get("r3s21")!.col, 2, "#85 in upper tour 2");
+assert.equal(layout64.positions.get("r3s24")!.col, 2, "#88 in upper tour 2");
+assert.equal(layout64.matchNumbers.get("r3s13"), 68);
+assert.equal(layout64.matchNumbers.get("r3s16"), 65);
+assert.equal(layout64.matchNumbers.get("r3s33"), 81);
+assert.equal(layout64.matchNumbers.get("r3s24"), 88);
+assert.equal(
+  layout64.positions.get("r4s5")!.y,
+  (layout64.positions.get("r3s9")!.y + layout64.positions.get("r3s10")!.y) / 2,
+  "#92 between #72 and #71",
+);
+assert.equal(layout64.positions.get("r4s5")!.col, -3, "#92 in lower tour 3");
+assert.equal(fixedSwissMatchNo(3, 29, MC64), 100, "lower tour 4 #100");
+assert.equal(fixedSwissTs64MatchCol(3, 29), -4, "#100 in lower tour 4 column");
+assert.equal(
+  layout64.positions.get("r3s29")!.y,
+  layout64.positions.get("r4s5")!.y,
+  "#100 on same Y as #92",
+);
+assert.equal(layout64.positions.get("r3s29")!.col, -4, "#100 in lower tour 4");
+assert.equal(fixedSwissMatchNo(4, 7, MC64), 90, "lower tour 3 #90");
+assert.equal(fixedSwissMatchNo(3, 31, MC64), 98, "lower tour 4 #98");
+assert.equal(layout64.positions.get("r4s7")!.col, -3, "#90 in lower tour 3");
+assert.equal(
+  layout64.positions.get("r4s7")!.y,
+  (layout64.positions.get("r3s13")!.y + layout64.positions.get("r3s14")!.y) / 2,
+  "#90 between #68 and #67",
+);
+assert.equal(
+  layout64.positions.get("r3s31")!.y,
+  layout64.positions.get("r4s7")!.y,
+  "#98 on same Y as #90",
+);
+assert.equal(
+  layout64.positions.get("r4s8")!.y,
+  (layout64.positions.get("r3s15")!.y + layout64.positions.get("r3s16")!.y) / 2,
+  "#89 between #66 and #65",
+);
+assert.equal(
+  layout64.positions.get("r3s32")!.y,
+  layout64.positions.get("r4s8")!.y,
+  "#97 on same Y as #89",
+);
+assert.ok(
+  layout64.positions.get("r3s21")!.y < layout64.positions.get("r3s22")!.y,
+  "#85 above #86 in upper tour 2",
+);
 assert.equal(layout64.minCol, -4);
-assert.equal(layout64.maxCol, 5);
-assert.equal(layout64.matchNumbers.get("r7s1"), 111);
+assert.equal(layout64.maxCol, 6);
+assert.equal(layout64.matchNumbers.get("r7s1"), 119);
+{
+  const links64 = buildFixedSwissTemplate(64, "FIXED_SWISS_64").links;
+  const win49 = links64.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 17 && l.kind === "win",
+  );
+  assert.equal(win49?.toSlot, 33, "#49 winner → #81 (R3.33)");
+  const win85u = links64.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 21 && l.kind === "win",
+  );
+  assert.equal(win85u?.toRound, 5, "#85 winner → 1/8");
+  assert.equal(win85u?.toSlot, 5, "#85 → #109");
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 13 && l.kind === "win")
+      ?.toSlot,
+    7,
+    "#68 → #90 team1",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 14 && l.kind === "win")
+      ?.toSlot,
+    7,
+    "#67 → #90 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 15 && l.kind === "win")
+      ?.toSlot,
+    8,
+    "#66 → #89 team1",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 16 && l.kind === "win")
+      ?.toSlot,
+    8,
+    "#65 → #89 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 25 && l.kind === "win")
+      ?.toSlot,
+    5,
+    "#104 → #109 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 26 && l.kind === "win")
+      ?.toSlot,
+    6,
+    "#103 → #110 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 27 && l.kind === "win")
+      ?.toSlot,
+    7,
+    "#102 → #111 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 28 && l.kind === "win")
+      ?.toSlot,
+    8,
+    "#101 → #112 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 29 && l.kind === "win")
+      ?.toSlot,
+    1,
+    "#100 → #105 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 30 && l.kind === "win")
+      ?.toSlot,
+    2,
+    "#99 → #106 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 31 && l.kind === "win")
+      ?.toSlot,
+    3,
+    "#98 → #107 team2",
+  );
+  const win85b = links64.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 21 && l.kind === "win",
+  );
+  assert.equal(win85b?.toRound, 5, "#85 winner → 1/8");
+  assert.equal(win85b?.toSlot, 5, "#85 → #109");
+  const win86b = links64.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 22 && l.kind === "win",
+  );
+  assert.equal(win86b?.toSlot, 6, "#86 → #110");
+  const win90 = links64.find(
+    (l) => l.fromRound === 4 && l.fromSlot === 7 && l.kind === "win",
+  );
+  assert.equal(win90?.toRound, 3, "#90 winner → lower tour 4");
+  assert.equal(win90?.toSlot, 31, "#90 → #98 (R3 slot 31)");
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 32 && l.kind === "win")
+      ?.toSlot,
+    4,
+    "#97 → #108 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 33 && l.kind === "loss")
+      ?.toSlot,
+    27,
+    "#81 loser → #102",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 33 && l.kind === "loss")
+      ?.toTeam,
+    1,
+    "#81 loser → #102 team1",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 21 && l.kind === "loss")
+      ?.toSlot,
+    27,
+    "#85 loser → #102",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 21 && l.kind === "loss")
+      ?.toTeam,
+    2,
+    "#85 loser → #102 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 24 && l.kind === "loss")
+      ?.toSlot,
+    30,
+    "#88 loser → #99",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 24 && l.kind === "loss")
+      ?.toTeam,
+    2,
+    "#88 loser → #99 team2",
+  );
+  for (const [fromSlot, toSlot, toTeam, label] of [
+    [33, 27, 1, "#81 → #102"],
+    [34, 28, 1, "#82 → #101"],
+    [35, 29, 1, "#83 → #100"],
+    [36, 30, 1, "#84 → #99"],
+    [21, 27, 2, "#85 → #102"],
+    [22, 28, 2, "#86 → #101"],
+    [23, 29, 2, "#87 → #100"],
+    [24, 30, 2, "#88 → #99"],
+  ] as const) {
+    const loss = links64.find(
+      (l) =>
+        l.fromRound === 3 && l.fromSlot === fromSlot && l.kind === "loss",
+    );
+    assert.equal(loss?.toSlot, toSlot, `${label} slot`);
+    assert.equal(loss?.toTeam, toTeam, `${label} team`);
+  }
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 1 && l.kind === "win",
+    )?.toSlot,
+    17,
+    "#105 → #113 team1",
+  );
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 2 && l.kind === "win",
+    )?.toTeam,
+    2,
+    "#106 → #113 team2",
+  );
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 3 && l.kind === "win",
+    )?.toSlot,
+    18,
+    "#107 → #114 team1",
+  );
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 4 && l.kind === "win",
+    )?.toTeam,
+    2,
+    "#108 → #114 team2",
+  );
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 5 && l.kind === "win",
+    )?.toSlot,
+    19,
+    "#109 → #115 team1",
+  );
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 6 && l.kind === "win",
+    )?.toTeam,
+    2,
+    "#110 → #115 team2",
+  );
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 7 && l.kind === "win",
+    )?.toSlot,
+    20,
+    "#111 → #116 team1",
+  );
+  assert.equal(
+    links64.find(
+      (l) => l.fromRound === 5 && l.fromSlot === 8 && l.kind === "win",
+    )?.toTeam,
+    2,
+    "#112 → #116 team2",
+  );
+  assert.equal(
+    links64.find(
+      (l) =>
+        l.fromRound === 5 &&
+        l.fromSlot === 3 &&
+        l.kind === "win" &&
+        l.toRound === 6,
+    ),
+    undefined,
+    "#107 winner does not go straight to semi",
+  );
+  assert.equal(
+    links64.find(
+      (l) =>
+        l.fromRound === 5 &&
+        l.fromSlot === 1 &&
+        l.kind === "win" &&
+        l.toRound === 6,
+    ),
+    undefined,
+    "#105 winner does not go straight to semi",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 25 && l.kind === "win")
+      ?.toSlot,
+    5,
+    "#104 → #109 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 29 && l.kind === "win")
+      ?.toSlot,
+    1,
+    "#100 → #105 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 30 && l.kind === "win")
+      ?.toSlot,
+    2,
+    "#99 → #106 team2",
+  );
+  assert.equal(
+    links64.find((l) => l.fromRound === 3 && l.fromSlot === 31 && l.kind === "win")
+      ?.toSlot,
+    3,
+    "#98 → #107 team2",
+  );
+}
+assert.equal(fixedSwissMatchNo(5, 5, MC64), 109);
+assert.equal(fixedSwissMatchNo(5, 8, MC64), 112);
+assert.equal(
+  layout64.positions.get("r5s8")!.y,
+  layout64.positions.get("r3s24")!.y,
+  "#112 same Y as #88",
+);
+assert.equal(
+  layout64.positions.get("r5s5")!.y,
+  layout64.positions.get("r3s21")!.y,
+  "#109 same Y as #85",
+);
+assert.equal(
+  layout64.positions.get("r5s6")!.y,
+  layout64.positions.get("r3s22")!.y,
+  "#110 same Y as #86",
+);
+assert.equal(
+  layout64.positions.get("r5s7")!.y,
+  layout64.positions.get("r3s23")!.y,
+  "#111 same Y as #87",
+);
+assert.equal(
+  layout64.positions.get("r3s17")!.y,
+  (layout64.positions.get("r5s1")!.y + layout64.positions.get("r5s2")!.y) / 2,
+  "#113 between #105 and #106",
+);
+assert.equal(layout64.positions.get("r3s18")!.col, 4, "#114 in 1/8 column");
+assert.equal(
+  layout64.positions.get("r3s18")!.y,
+  (layout64.positions.get("r5s3")!.y + layout64.positions.get("r5s4")!.y) / 2,
+  "#114 between #107 and #108",
+);
+assert.equal(
+  layout64.positions.get("r3s19")!.y,
+  (layout64.positions.get("r5s5")!.y + layout64.positions.get("r5s6")!.y) / 2,
+  "#115 between #109 and #110",
+);
+assert.equal(
+  layout64.positions.get("r3s20")!.y,
+  (layout64.positions.get("r5s7")!.y + layout64.positions.get("r5s8")!.y) / 2,
+  "#116 between #111 and #112",
+);
+assert.equal(
+  layout64.positions.get("r6s1")!.y,
+  (layout64.positions.get("r3s17")!.y + layout64.positions.get("r3s18")!.y) / 2,
+  "#117 between #113 and #114",
+);
+assert.equal(
+  layout64.positions.get("r6s2")!.y,
+  (layout64.positions.get("r3s19")!.y + layout64.positions.get("r3s20")!.y) / 2,
+  "#118 between #115 and #116",
+);
+{
+  const links64b = buildFixedSwissTemplate(64, "FIXED_SWISS_64").links;
+  assert.equal(
+    links64b.find((l) => l.fromRound === 3 && l.fromSlot === 17 && l.kind === "win")
+      ?.toSlot,
+    1,
+    "#113 → #117 team1",
+  );
+  assert.equal(
+    links64b.find((l) => l.fromRound === 3 && l.fromSlot === 18 && l.kind === "win")
+      ?.toTeam,
+    2,
+    "#114 → #117 team2",
+  );
+  assert.equal(
+    links64b.find((l) => l.fromRound === 4 && l.fromSlot === 8 && l.kind === "win")
+      ?.toSlot,
+    32,
+    "#89 → #97 lower tour 4",
+  );
+  assert.equal(
+    links64b.find((l) => l.fromRound === 3 && l.fromSlot === 31 && l.kind === "win")
+      ?.toTeam,
+    2,
+    "#98 → #111 team2",
+  );
+  assert.ok(
+    !links64b.some((l) => l.fromRound === 4 && l.fromSlot === 5 && l.toRound === 6),
+    "R4.5 not into R6",
+  );
+}
+assert.equal(
+  shouldDrawFixedSwissWinEdge(4, 5, 3, 6, "win", 17, 1, MC64),
+  true,
+  "#113 → #117 line",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(5, 6, 6, 7, "win", 1, 1, MC64),
+  true,
+  "#117+#118 → #119",
+);
+assert.equal(layout64.matchNumbers.get("r3s25"), 104, "lower tour 4 top #104");
+assert.equal(layout64.matchNumbers.get("r3s32"), 97, "lower tour 4 bottom #97");
+assert.equal(layout64.positions.get("r3s25")!.col, -4);
+assert.equal(layout64.positions.get("r3s32")!.col, -4);
+assert.ok(
+  layout64.positions.get("r3s25")!.y < layout64.positions.get("r3s32")!.y,
+  "#104 above #97 (104→103→…→97 top to bottom)",
+);
+for (let slot = 25; slot < 32; slot++) {
+  const above = layout64.positions.get(`r3s${slot}`)!;
+  const below = layout64.positions.get(`r3s${slot + 1}`)!;
+  assert.ok(
+    above.y < below.y,
+    `#${layout64.matchNumbers.get(`r3s${slot}`)} above #${layout64.matchNumbers.get(`r3s${slot + 1}`)}`,
+  );
+}
 
 function mkGridTs64Bronze(): BracketMatchView[] {
   const template = buildFixedSwissTemplate(64, "FIXED_SWISS_64_BRONZE");
@@ -907,10 +1607,274 @@ function mkGridTs64Bronze(): BracketMatchView[] {
 }
 const layout64Bronze = buildFixedSwissBracketLayout(mkGridTs64Bronze());
 {
+  const linksBronze = buildFixedSwissTemplate(64, "FIXED_SWISS_64_BRONZE").links;
+  assert.equal(
+    linksBronze.find((l) => l.fromRound === 6 && l.fromSlot === 1 && l.kind === "loss")
+      ?.toSlot,
+    2,
+    "#117 loser → #120",
+  );
+  assert.equal(
+    linksBronze.find((l) => l.fromRound === 6 && l.fromSlot === 2 && l.kind === "loss")
+      ?.toSlot,
+    2,
+    "#118 loser → #120",
+  );
+  assert.equal(linksBronze.length, buildFixedSwissTemplate(64, "FIXED_SWISS_64").links.length + 2);
   const fin = layout64Bronze.positions.get("r7s1")!;
   const bronze = layout64Bronze.positions.get("r7s2")!;
-  assert.equal(bronze.col, 5, "bronze in «Финал» column");
-  assert.equal(bronze.y, fin.y + FIXED_SWISS_CARD_H + 12, "#112 under #111");
+  assert.equal(bronze.col, 6, "bronze in «Финал» column");
+  assert.equal(layout64Bronze.matchNumbers.get("r7s2"), 120);
+  assert.equal(bronze.y, fin.y + FIXED_SWISS_CARD_H + 12, "#120 under #119");
 }
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 33, 1, MC64),
+  true,
+  "#81 → #105",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 34, 2, MC64),
+  true,
+  "#82 → #106",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 17, 33, MC64),
+  true,
+  "#49 → #81 fork",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 18, 33, MC64),
+  true,
+  "#50 → #81 fork",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(0, 1, 1, 2, "win", 1, 17, MC64),
+  true,
+  "R1 → верхняя тур 1 (#49)",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 24, 8, MC64),
+  true,
+  "#88 → #112 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 3, "win", 1, 17, MC64),
+  true,
+  "#105 → #113 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 3, "win", 2, 17, MC64),
+  true,
+  "#106 → #113 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 3, "win", 3, 18, MC64),
+  true,
+  "#107 → #114 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 3, "win", 4, 18, MC64),
+  true,
+  "#108 → #114 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 3, "win", 5, 19, MC64),
+  true,
+  "#109 → #115 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 3, "win", 8, 20, MC64),
+  true,
+  "#112 → #116 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 25, 5, MC64),
+  false,
+  "#104 → #109: only footer",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 27, 7, MC64),
+  false,
+  "#102 → #111: only footer",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 28, 8, MC64),
+  false,
+  "#101 → #112: only footer",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 29, 1, MC64),
+  false,
+  "#100 → #105: only footer",
+);
+{
+  const matchById64 = new Map(mkGridTs64().map((m) => [m.id, m]));
+  const getFromY64 = (
+    fromId: string,
+    toId: string,
+    fromTeamSlot: 1 | 2,
+    _toTeamSlot: 1 | 2,
+    kind: "win" | "loss",
+  ) => {
+    const fromPos = layout64.positions.get(fromId);
+    const toPos = layout64.positions.get(toId);
+    if (!fromPos || !toPos) return undefined;
+    return gridFixedEdgePoints(
+      fromPos,
+      toPos,
+      fromTeamSlot,
+      1,
+      kind,
+      layout64.minCol,
+    ).from.y;
+  };
+  const r23Trunk64 = fixedSwissForkTrunkYByTarget(
+    2,
+    3,
+    layout64.edges,
+    getFromY64,
+    matchById64,
+    MC64,
+  );
+  const id85 = mkGridTs64().find((m) => m.round === 3 && m.slot === 21)!.id;
+  const trunk85 = r23Trunk64.get(id85)!;
+  const y57 = getFromY64("r2s25", id85, 1, 1, "win")!;
+  const y58 = getFromY64("r2s26", id85, 2, 1, "win")!;
+  assert.ok(
+    Math.abs(trunk85 - (y57 + y58) / 2) < 1,
+    "#57+#58 fork trunk at #85 (excludes #45 bridge)",
+  );
+  const path57 = forkPath(layout64, "r2s25", "win", r23Trunk64, 21);
+  const path58 = forkPath(layout64, "r2s26", "win", r23Trunk64, 21);
+  const gutter57 = path57.match(/H (\d+) V/)?.[1];
+  const gutter58 = path58.match(/H (\d+) V/)?.[1];
+  assert.equal(gutter57, gutter58, "#57+#58 share fork gutter X");
+  const path49 = forkPath(layout64, "r2s17", "win", r23Trunk64, 33);
+  const path50 = forkPath(layout64, "r2s18", "win", r23Trunk64, 33);
+  const baseGutter12 = fixedSwissColumnGutter(
+    1,
+    2,
+    layout64.minCol,
+    layout64.colWidth ?? FIXED_SWISS_COL_W,
+  );
+  assert.equal(
+    path49.match(/H (\d+) V/)?.[1],
+    String(baseGutter12),
+    "#49→#81 fork gutter centered in col 1→2",
+  );
+  assert.equal(
+    path49.match(/H (\d+) V/)?.[1],
+    path50.match(/H (\d+) V/)?.[1],
+    "#49+#50 share fork gutter X",
+  );
+  const path63 = forkPath(layout64, "r2s31", "win", r23Trunk64, 24);
+  const path64 = forkPath(layout64, "r2s32", "win", r23Trunk64, 24);
+  assert.equal(
+    path63.match(/H (\d+) V/)?.[1],
+    path64.match(/H (\d+) V/)?.[1],
+    "#63+#64 share fork gutter X",
+  );
+  assert.ok(
+    !path58.includes(`V ${Math.round(trunk85 + 500)}`),
+    "#58→#85 fork does not drop far below #85",
+  );
+  assert.match(
+    path58,
+    new RegExp(`V ${Math.round(trunk85)}`),
+    "#58→#85 uses shared trunk Y",
+  );
+  const pts85109 = gridFixedEdgePoints(
+    layout64.positions.get("r3s21")!,
+    layout64.positions.get("r5s5")!,
+    1,
+    1,
+    "win",
+    layout64.minCol,
+  );
+  const path85109 = gridFixedConnectorPath(
+    pts85109.from,
+    pts85109.to,
+    "win",
+    2,
+    3,
+    layout64.minCol,
+    layout64.colWidth ?? FIXED_SWISS_COL_W,
+    0,
+  );
+  assert.ok(path85109.endsWith(`H ${pts85109.to.x}`), "#85→#109 reaches #109");
+  const pts4585 = gridFixedEdgePoints(
+    layout64.positions.get("r2s13")!,
+    layout64.positions.get("r3s21")!,
+    1,
+    2,
+    "win",
+    layout64.minCol,
+  );
+  const path4585 = gridFixedCrossToQuarterConnectorPath(
+    pts4585.from,
+    pts4585.to,
+    -1,
+    2,
+    layout64.minCol,
+    layout64.colWidth ?? FIXED_SWISS_COL_W,
+    0,
+  );
+  assert.ok(
+    !path4585.includes("V 3335 H 1266"),
+    "#45→#85: no horizontal bus at #85 Y across columns",
+  );
+  assert.ok(path4585.endsWith(`H ${pts4585.to.x}`), "#45→#85 enters #85");
+}
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 25, 21, MC64),
+  true,
+  "#57 → #85 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 26, 21, MC64),
+  true,
+  "#58 → #85 SVG",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 21, 5, MC64),
+  true,
+  "#85 → #109 SVG",
+);
+
+{
+  const expectedColOrder: Record<number, number[]> = {
+    0: Array.from({ length: 32 }, (_, i) => i + 1),
+    [-1]: Array.from({ length: 16 }, (_, i) => 33 + i),
+    1: Array.from({ length: 16 }, (_, i) => 49 + i),
+    [-2]: Array.from({ length: 16 }, (_, i) => 80 - i),
+    2: Array.from({ length: 8 }, (_, i) => 81 + i),
+    [-3]: Array.from({ length: 8 }, (_, i) => 96 - i),
+    [-4]: Array.from({ length: 8 }, (_, i) => 104 - i),
+    3: Array.from({ length: 8 }, (_, i) => 105 + i),
+    4: [113, 114, 115, 116],
+    5: [117, 118],
+    6: [119],
+  };
+  const byCol = new Map<number, { no: number; y: number }[]>();
+  for (const m of mkGridTs64()) {
+    const pos = layout64.positions.get(`r${m.round}s${m.slot}`);
+    if (!pos) continue;
+    const no = fixedSwissMatchNo(m.round, m.slot, MC64);
+    if (!byCol.has(pos.col)) byCol.set(pos.col, []);
+    byCol.get(pos.col)!.push({ no, y: pos.y });
+  }
+  for (const [col, expected] of Object.entries(expectedColOrder)) {
+    const nos = byCol
+      .get(Number(col))!
+      .sort((a, b) => a.y - b.y)
+      .map((x) => x.no);
+    assert.deepEqual(nos, expected, `column ${col} top→bottom order`);
+  }
+}
+assert.equal(
+  layout64.positions.get("r5s1")!.y,
+  layout64.positions.get("r3s33")!.y,
+  "#105 on same Y as #81",
+);
 
 console.log("fixed swiss layout tests passed");

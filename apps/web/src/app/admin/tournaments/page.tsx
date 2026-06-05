@@ -20,6 +20,8 @@ import {
 } from "@/hooks/use-bracket-format-options";
 import { FORMAT_OPTIONS } from "@/lib/bracket-formats/catalog";
 import { adminTabClass } from "@/lib/admin-ui";
+import { MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
+import { useTournamentDefaults } from "@/hooks/use-tournament-defaults";
 
 interface Club {
   id: string;
@@ -93,6 +95,8 @@ function matchesSearch(tournament: Tournament, query: string): boolean {
 
 export default function TournamentsPage() {
   const router = useRouter();
+  const { defaults: tournamentDefaults, ready: defaultsReady } =
+    useTournamentDefaults();
   const { options: formatOptions, loading: formatOptionsLoading } =
     useBracketFormatOptions();
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -268,6 +272,10 @@ export default function TournamentsPage() {
         clubId: newClubId,
         format: newFormat,
         startsAt: form.get("startsAt") || undefined,
+        ratingMax: tournamentDefaults.limitByRating
+          ? Number(form.get("ratingMax"))
+          : null,
+        handicapHalfStep: form.get("handicapHalfStep") === "on",
       }),
     });
     const data = await res.json();
@@ -354,6 +362,7 @@ export default function TournamentsPage() {
           После создания владельцу клуба в Telegram уйдёт запрос на публикацию.
         </p>
         <form
+          key={defaultsReady ? "defaults-ready" : "defaults-loading"}
           onSubmit={createTournament}
           className="grid max-w-3xl gap-3 sm:grid-cols-2"
         >
@@ -395,6 +404,42 @@ export default function TournamentsPage() {
             type="datetime-local"
             className="sm:col-span-2 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
           />
+          <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              name="handicapHalfStep"
+              defaultChecked={tournamentDefaults.handicapHalfStep}
+              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+            />
+            <span>
+              <span className="font-medium text-zinc-200">Учитывать рейтинг 0,5</span>
+              <span className="mt-1 block text-xs text-zinc-500">
+                С галкой — фора по шагу 0,5. Без галки — только целые шары по разнице рейтингов, без
+                дополнительного шара в нечётных партиях.
+              </span>
+            </span>
+          </label>
+          {tournamentDefaults.limitByRating && (
+            <label className="sm:col-span-2 block text-sm">
+              <span className="mb-1 block text-zinc-400">
+                Максимальный рейтинг участников (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
+              </span>
+              <input
+                name="ratingMax"
+                type="number"
+                step={RATING_STEP}
+                min={0}
+                max={MAX_PLAYER_RATING}
+                required
+                defaultValue={tournamentDefaults.ratingMax ?? 8}
+                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+              />
+              <span className="mt-1 block text-xs text-zinc-500">
+                Клубный рейтинг в приоритете; при отсутствии — общий. Выше лимита — без
+                уведомления и без записи.
+              </span>
+            </label>
+          )}
           <div className="sm:col-span-2 flex flex-wrap items-center gap-4">
             <button
               type="submit"
