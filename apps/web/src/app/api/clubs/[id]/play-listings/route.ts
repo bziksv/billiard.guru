@@ -32,6 +32,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const { id: clubId } = await params;
     const { player: actor, club } = await requireClubManageAccess(clubId);
 
+    const session = await getSession();
+    const authorId = actor?.id ?? session?.playerId;
+    if (!authorId) {
+      return NextResponse.json({ error: "Требуется профиль игрока" }, { status: 403 });
+    }
+
     const raw = await request.json();
     const data = playListingCreateSchema.parse({
       ...raw,
@@ -47,7 +53,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const listing = await prisma.playListing.create({
       data: {
-        authorId: actor.id,
+        authorId,
         cityId: club.cityId,
         clubId,
         publishedByClub: true,
@@ -68,7 +74,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       include: playListingListInclude,
     });
 
-    const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
     }
