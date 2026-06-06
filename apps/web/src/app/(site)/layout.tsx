@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { CookieConsentPopup } from "@/components/site/legal/cookie-consent";
 import { PreviewBannerSlot } from "@/components/site/preview-banner-slot";
 import { SiteDevBanner } from "@/components/site/site-dev-banner";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -18,6 +18,7 @@ export default function SiteLayout({
       </div>
       <div className="site-content-shell flex-1 bg-transparent">{children}</div>
       <SiteFooter />
+      <CookieConsentPopup />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { SiteCard } from "@/components/site/site-card";
 import { AsyncButton } from "@/components/ui/async-text-button";
 import { formatRating } from "@/lib/rating";
@@ -53,6 +54,7 @@ export function PlayListingDetailClient({
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [responding, setResponding] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const ratingRange = formatRatingRange(listing.ratingMin, listing.ratingMax);
   const gameFormat = formatGameFormat(listing.gameFormat);
@@ -61,6 +63,10 @@ export function PlayListingDetailClient({
 
   async function respond() {
     setError(null);
+    if (!consentAccepted) {
+      setError("Подтвердите согласие на обработку персональных данных");
+      return;
+    }
     setResponding(true);
     const res = await fetch(`/api/play-listings/${listing.id}/respond`, {
       method: "POST",
@@ -295,10 +301,15 @@ export function PlayListingDetailClient({
                 className="site-input w-full resize-y"
               />
               {error && <p className="text-sm text-red-400">{error}</p>}
+              <PersonalDataConsentCheckbox
+                checked={consentAccepted}
+                onChange={setConsentAccepted}
+                id="pokatat-respond-consent"
+              />
               <button
                 type="button"
                 onClick={respond}
-                disabled={responding}
+                disabled={responding || !consentAccepted}
                 className="site-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {responding ? "Отправка…" : "Откликнуться"}

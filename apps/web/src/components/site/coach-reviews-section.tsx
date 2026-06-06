@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { CoachReviewStarInput, CoachReviewStars } from "@/components/site/coach-review-stars";
+import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { SiteCard } from "@/components/site/site-card";
 import { coachReviewLabel, formatCoachReviewAvg } from "@/lib/coach-review-display";
 import { cn } from "@/lib/cn";
@@ -38,6 +39,7 @@ export function CoachReviewsSection({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -65,6 +67,10 @@ export function CoachReviewsSection({
   async function submit() {
     if (score < 1) {
       setError("Выберите оценку от 1 до 5 звёзд");
+      return;
+    }
+    if (!consentAccepted) {
+      setError("Подтвердите согласие на обработку персональных данных");
       return;
     }
     setSaving(true);
@@ -139,10 +145,16 @@ export function CoachReviewsSection({
                 </label>
                 {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
                 {saved && <p className="mt-2 text-sm text-emerald-600">Спасибо, оценка сохранена.</p>}
+                <PersonalDataConsentCheckbox
+                  checked={consentAccepted}
+                  onChange={setConsentAccepted}
+                  id={`coach-review-consent-${coachId}`}
+                  className="mt-4"
+                />
                 <button
                   type="button"
                   onClick={submit}
-                  disabled={saving || score < 1}
+                  disabled={saving || score < 1 || !consentAccepted}
                   className={cn("site-btn-primary mt-4 text-sm", saving && "opacity-60")}
                 >
                   {saving ? "Сохранение…" : data?.myReview ? "Обновить оценку" : "Отправить оценку"}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FooterCookieNotice } from "@/components/site/legal/footer-cookie-notice";
 import { SiteContainer } from "@/components/site/site-container";
 import { getCurrentPlayer } from "@/lib/auth";
 import { APP_NAME, TELEGRAM_BOT_USERNAME } from "@/lib/brand";
@@ -106,23 +107,12 @@ export async function SiteFooter() {
       </SiteContainer>
 
       <div className="site-footer-bottom">
-        <SiteContainer className="site-footer-bottom-inner">
-          <p className="site-footer-copy">
-            © {new Date().getFullYear()} {APP_NAME}
-          </p>
-          <div className="site-footer-bottom-links">
-            <Link href="/rules" className="site-footer-bottom-link">
-              Правила
-            </Link>
-            <Link href="/pokatat" className="site-footer-bottom-link site-footer-bottom-link-accent">
-              Покатать
-            </Link>
-            <Link
-              href={player ? "/cabinet" : "/login"}
-              className="site-footer-bottom-link"
-            >
-              {player ? t("nav.cabinet") : t("nav.login")}
-            </Link>
+        <SiteContainer className="site-footer-bottom-shell">
+          <FooterCookieNotice />
+          <div className="site-footer-bottom-inner">
+            <p className="site-footer-copy">
+              © {new Date().getFullYear()} {APP_NAME}
+            </p>
           </div>
         </SiteContainer>
       </div>

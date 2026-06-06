@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { EmptyState, SiteCard } from "@/components/site/site-card";
 import { IDEA_STATUS_LABELS } from "@/lib/validators";
 
@@ -38,6 +39,7 @@ export function IdeasPageClient({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
   const [votingId, setVotingId] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
@@ -55,6 +57,10 @@ export function IdeasPageClient({
   async function submitIdea() {
     setSubmitError(null);
     setSubmitMessage(null);
+    if (!consentAccepted) {
+      setSubmitError("Подтвердите согласие на обработку персональных данных");
+      return;
+    }
     setSubmitting(true);
     const res = await fetch("/api/ideas", {
       method: "POST",
@@ -213,9 +219,19 @@ export function IdeasPageClient({
               />
               {submitError && <p className="text-sm text-red-400">{submitError}</p>}
               {submitMessage && <p className="text-sm text-emerald-400">{submitMessage}</p>}
+              <PersonalDataConsentCheckbox
+                checked={consentAccepted}
+                onChange={setConsentAccepted}
+                id="ideas-consent"
+              />
               <button
                 type="button"
-                disabled={submitting || title.trim().length < 3 || body.trim().length < 10}
+                disabled={
+                  submitting ||
+                  !consentAccepted ||
+                  title.trim().length < 3 ||
+                  body.trim().length < 10
+                }
                 onClick={submitIdea}
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
               >

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { CitySelect } from "@/components/admin/city-select";
+import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { SiteContainer } from "@/components/site/site-container";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
@@ -31,6 +32,7 @@ function LoginForm() {
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [polling, setPolling] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   useEffect(() => {
     if (!challengeToken) return;
@@ -86,6 +88,10 @@ function LoginForm() {
       setError("Введите корректный телефон");
       return;
     }
+    if (!consentAccepted) {
+      setError("Подтвердите согласие на обработку персональных данных");
+      return;
+    }
     setLoading(true);
     setError(null);
     setInfo(null);
@@ -130,6 +136,10 @@ function LoginForm() {
     e.preventDefault();
     if (!phoneValid || !cityId || firstName.trim().length < 2 || lastName.trim().length < 2) {
       setError("Заполните фамилию, имя, город и телефон");
+      return;
+    }
+    if (!consentAccepted) {
+      setError("Подтвердите согласие на обработку персональных данных");
       return;
     }
     setLoading(true);
@@ -194,9 +204,14 @@ function LoginForm() {
             />
           </label>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          <PersonalDataConsentCheckbox
+            checked={consentAccepted}
+            onChange={setConsentAccepted}
+            id="login-phone-consent"
+          />
           <button
             type="submit"
-            disabled={loading || !phoneValid}
+            disabled={loading || !phoneValid || !consentAccepted}
             className="site-btn-primary w-full disabled:opacity-50"
           >
             {loading ? "Проверка…" : "Продолжить"}
@@ -237,9 +252,14 @@ function LoginForm() {
             required
           />
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          <PersonalDataConsentCheckbox
+            checked={consentAccepted}
+            onChange={setConsentAccepted}
+            id="login-register-consent"
+          />
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !consentAccepted}
             className="site-btn-primary w-full disabled:opacity-50"
           >
             {loading ? "Регистрация…" : "Зарегистрироваться"}

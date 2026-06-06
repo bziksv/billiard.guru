@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CitySelect } from "@/components/admin/city-select";
+import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { EmptyState, SiteCard } from "@/components/site/site-card";
 import { PlayListingCard } from "@/components/site/play-listing-card";
 import { SearchableSelect } from "@/components/ui/searchable-select";
@@ -65,6 +66,7 @@ export function PokatatPageClient({
   const [playersNeeded, setPlayersNeeded] = useState("1");
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const geoQuery = useMemo(() => {
     const q = new URLSearchParams(searchParams.toString());
@@ -138,6 +140,10 @@ export function PokatatPageClient({
 
   async function submitListing() {
     setSubmitError(null);
+    if (!consentAccepted) {
+      setSubmitError("Подтвердите согласие на обработку персональных данных");
+      return;
+    }
     setSubmitting(true);
 
     let playAt: string | undefined;
@@ -478,9 +484,17 @@ export function PokatatPageClient({
 
               {submitError && <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>}
 
+              <PersonalDataConsentCheckbox
+                checked={consentAccepted}
+                onChange={setConsentAccepted}
+                id="pokatat-consent"
+              />
+
               <button
                 type="submit"
-                disabled={submitting || title.trim().length < 3 || !cityId}
+                disabled={
+                  submitting || !consentAccepted || title.trim().length < 3 || !cityId
+                }
                 className="site-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting ? "Публикация…" : "Опубликовать"}

@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { GeoFilterBar } from "@/components/site/geo-filter";
+import { useSiteStickyTop } from "@/hooks/use-site-sticky-top";
 
 const LINKS = [
   { href: "#news", label: "Новости" },
@@ -21,6 +22,7 @@ function HomeStickyNavInner({
   initialCityId,
 }: HomeStickyNavProps) {
   const [active, setActive] = useState<string>("#news");
+  const stickyTop = useSiteStickyTop();
 
   useEffect(() => {
     const sections = LINKS.map((l) => document.querySelector(l.href)).filter(
@@ -46,7 +48,8 @@ function HomeStickyNavInner({
 
   return (
     <nav
-      className="home-sticky-nav-stuck sticky top-[6.5rem] z-30 border-b sm:top-[7.75rem] lg:top-16"
+      className="home-sticky-nav-stuck sticky top-[var(--site-sticky-top)] z-30 border-b"
+      style={stickyTop != null ? { top: stickyTop } : undefined}
       aria-label="Навигация по разделам главной"
     >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:px-6">
