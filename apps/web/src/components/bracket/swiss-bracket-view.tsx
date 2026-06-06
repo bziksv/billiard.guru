@@ -57,6 +57,7 @@ export function SwissBracketView({
   onMatchClick,
   onPlayerClick,
   handicapHalfStep = true,
+  demoPreview = false,
 }: {
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
@@ -65,6 +66,7 @@ export function SwissBracketView({
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   handicapHalfStep?: boolean;
+  demoPreview?: boolean;
 }) {
   const layout = fixedGrid
     ? buildFixedSwissBracketLayout(matches)
@@ -309,9 +311,12 @@ export function SwissBracketView({
       <BracketScrollCenter
         centerX={layout.centerX}
         contentHeight={fixedGrid ? layout.totalHeight : undefined}
+        contentScrollY={demoPreview ? "start" : "center"}
         className={
           fixedGrid
-            ? "bracket-canvas max-h-[min(90vh,1400px)] overflow-x-auto overflow-y-auto pb-6 pt-2"
+            ? demoPreview
+              ? "bracket-canvas max-h-[420px] overflow-x-auto overflow-y-auto pb-6 pt-2"
+              : "bracket-canvas max-h-[min(90vh,1400px)] overflow-x-auto overflow-y-auto pb-6 pt-2"
             : "bracket-canvas max-h-[75vh] overflow-x-auto overflow-y-auto pb-6 pt-2"
         }
       >

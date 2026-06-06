@@ -1037,7 +1037,7 @@ function BracketTab({
       {outdatedFixedSwiss32 && (
         <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
           Сетка на 32 устарела. Нажмите{" "}
-          <strong>«Сформировать заново»</strong>, чтобы получить эталон LLB (59 встреч,
+          <strong>«Сформировать заново»</strong>, чтобы получить актуальную сетку (59 встреч,
           10 колонок): 1/8 #41–#44, нижняя #48–#45, тур 4 #52–#49, 1/4 #53, финал #59.
         </p>
       )}

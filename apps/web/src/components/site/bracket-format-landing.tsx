@@ -3,12 +3,16 @@ import { BracketFormatDemoPreview } from "@/components/site/bracket-format-demo-
 import { GuideExampleBlock } from "@/components/site/guide-sections";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
-import { buildBracketFormatDemo } from "@/lib/bracket-formats/demo-bracket";
+import {
+  buildBracketFormatDemo,
+  isLargeBracketDemo,
+} from "@/lib/bracket-formats/demo-bracket";
 import type { PublicBracketFormat } from "@/lib/bracket-formats/public-formats";
 import {
   BRACKET_PLATFORM_FEATURES,
   bracketFormatDisplayLabel,
 } from "@/lib/bracket-formats/seo";
+import { TOURNAMENT_BRACKETS_SECTIONS } from "@/lib/tournament-brackets-guide";
 
 export function BracketFormatLanding({
   format,
@@ -19,6 +23,20 @@ export function BracketFormatLanding({
 }) {
   const { definition, seo, participantRules, guideSection } = format;
   const demoMatches = buildBracketFormatDemo(definition.code, definition.pairing);
+  const structureDiagram =
+    guideSection?.examples?.find((e) => e.diagram)?.diagram ??
+    TOURNAMENT_BRACKETS_SECTIONS.find(
+      (s) => s.format === definition.code || s.id === definition.guideSectionId?.replace(/-bronze$/, ""),
+    )?.examples?.find((e) => e.diagram)?.diagram ??
+    null;
+  const compactDemoMatches =
+    isLargeBracketDemo(demoMatches) && definition.pairing === "pair"
+      ? buildBracketFormatDemo("FIXED_PAIR_SWISS", "pair")
+      : isLargeBracketDemo(demoMatches)
+        ? buildBracketFormatDemo("FIXED_SWISS", "single")
+        : null;
+  const compactDemoFormat =
+    definition.pairing === "pair" ? "FIXED_PAIR_SWISS" : "FIXED_SWISS";
   const adminLabel = bracketFormatDisplayLabel(definition.code);
 
   return (
@@ -45,11 +63,15 @@ export function BracketFormatLanding({
 
         <SiteCard className="bracket-format-demo-card">
           <h2 className="site-section-title text-xl">Схема сетки</h2>
-          <p className="guide-body-text mt-2 text-sm leading-relaxed">
-            {definition.shortDescription}
-          </p>
+          <p className="guide-body-text mt-2 text-sm leading-relaxed">{seo.lead}</p>
           <div className="mt-5">
-            <BracketFormatDemoPreview format={definition.code} matches={demoMatches} />
+            <BracketFormatDemoPreview
+              format={definition.code}
+              matches={demoMatches}
+              structureDiagram={structureDiagram}
+              compactDemoMatches={compactDemoMatches}
+              compactDemoFormat={compactDemoFormat}
+            />
           </div>
         </SiteCard>
 

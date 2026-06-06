@@ -1,5 +1,5 @@
 ---
-description: Эталон сетки 64→32 (Fixed Swiss) — LLB 111 встреч; не ломать без явного запроса
+description: Эталон сетки 64→32 (Fixed Swiss) — 119 встреч; не ломать без явного запроса
 globs: apps/web/src/lib/fixed-swiss*.ts,apps/web/src/lib/swiss-bracket-layout.ts,apps/web/src/lib/bracket-service.ts,apps/web/src/lib/bracket-view.ts,apps/web/src/components/bracket/**,apps/web/scripts/test-fixed-swiss-layout.ts,docs/BRACKET_REFERENCE_64_32.md,docs/FIXED_SWISS_BRACKET_LINES_64_32.md
 alwaysApply: false
 ---
@@ -10,7 +10,7 @@ alwaysApply: false
 **Линии SVG:** `docs/FIXED_SWISS_BRACKET_LINES_64_32.md`  
 **UI-паттерны:** `docs/BRACKET_REFERENCE_32_16.md`
 
-Сетка **111 встреч, 10 колонок** (`FIXED_SWISS_64`) — эталон LLB для 64 участников.
+Сетка **119 встреч, 11 колонок** (`FIXED_SWISS_64`) — эталонная сетка для 64 участников.
 
 ## Не менять без явного запроса
 

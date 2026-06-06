@@ -1,5 +1,5 @@
 /**
- * Турнир «тест эксельки» — FIXED_SWISS_64, 64 участника, сетка по шаблону LLB (64-16 ×2gr.xls).
+ * Турнир «тест эксельки» — FIXED_SWISS_64, 64 участника, сетка по шаблону Excel (64-16 ×2gr.xls).
  *
  *   cd apps/web && npx tsx scripts/create-excel-test-tournament.ts
  *   cd apps/web && npx tsx scripts/create-excel-test-tournament.ts --club-id <id>

@@ -31,6 +31,7 @@ export type SiteLabelKey =
   | "geo.all"
   | "geo.country"
   | "geo.city"
+  | "geo.region"
   | "home.hero.title"
   | "home.hero.subtitle"
   | "home.local"
@@ -63,6 +64,7 @@ export const SITE_COPY: Record<SiteLabelKey, string> = {
   "geo.all": "Все регионы",
   "geo.country": "Страна",
   "geo.city": "Город",
+  "geo.region": "Регион",
   "home.hero.title": "Турниры и бильярдное сообщество",
   "home.hero.subtitle":
     "Публикуйте турниры и новости, находите клубы и игроков. Ищите партнёра для игры в разделе «Покатать».",

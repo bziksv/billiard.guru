@@ -536,7 +536,7 @@ export function fixedSwissTs32MatchNo(
   throw new Error(`Некорректный слот TS 32-16: тур ${round}, слот ${slot}`);
 }
 
-/** 1/8 + нижняя тур 4 → 1/4: по одному входу в #53–#56 (LLB). */
+/** 1/8 + нижняя тур 4 → 1/4: по одному входу в #53–#56. */
 export function fixedSwissTs32OlympicToQuarterTarget(
   r3Slot: number,
 ): { toSlot: number; toTeam: 1 | 2 } | null {
@@ -588,7 +588,7 @@ export function fixedSwissTs64OlympicToQuarterTarget(
 }
 
 /**
- * Глобальный номер 64→32 (эталон LLB, 111 встреч).
+ * Глобальный номер 64→32 (119 встреч).
  * Колонки: #1–32 · #33–48 ↓ · #49–64 ↑ · #80–65 ↓ · #81–88 ↑ · #96–89 ↓ · #104–97 ↓
  * · #105–#112 ↑ · #113–#116 (1/8) · #117–#118 полуфинал · #119 финал · бронза #120.
  */

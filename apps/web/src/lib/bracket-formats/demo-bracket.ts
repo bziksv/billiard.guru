@@ -273,6 +273,13 @@ function buildExcelRef64Demo(pairing: "single" | "pair"): BracketMatchView[] {
   return buildFixedSwissDemo("FIXED_SWISS_64", 64, pairing);
 }
 
+/** Сетки 32/64 (и больше) — на лендинге показываем схему колонок, не полную сетку */
+export const BRACKET_DEMO_STRUCTURE_THRESHOLD = 28;
+
+export function isLargeBracketDemo(matches: BracketMatchView[]): boolean {
+  return matches.length >= BRACKET_DEMO_STRUCTURE_THRESHOLD;
+}
+
 /** Демо-матчи для интерактивной схемы на SEO-лендинге */
 export function buildBracketFormatDemo(
   format: BracketFormatCode,

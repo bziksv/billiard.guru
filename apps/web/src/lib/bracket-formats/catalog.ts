@@ -58,7 +58,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     pairing: "single",
     layout: "swiss_fixed",
     shortDescription:
-      "64→32 из Excel 64-16 ×2gr.xls: разметка с листа «Сетка», посев 1-го тура из xls, переходы как в эталоне LLB.",
+      "64→32 из Excel: разметка с листа «Сетка», посев 1-го тура, фиксированные переходы как в эталоне 64→32.",
     docPaths: ["64-16 ×2gr.xls"],
     implementation: [
       "excel-bracket-64-reference.json — export-excel-bracket-64.py",
@@ -147,7 +147,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     layout: "swiss_fixed",
     isReference: true,
     shortDescription:
-      "59 встреч, 10 колонок — эталон LLB 32→16: #41–#44 1/8, #45–#48 тур 3, #49–#52 тур 4, 1/4 с #53.",
+      "59 встреч, 10 колонок — сетка 32→16: 1/8 (#41–#44), нижняя тур 3–4, 1/4 с #53.",
     guideSectionId: "swiss-fixed-32",
     docPaths: [
       "docs/BRACKET_REFERENCE_32_16.md",
@@ -183,7 +183,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     layout: "swiss_fixed",
     isReference: true,
     shortDescription:
-      "119 встреч — эталон LLB 64→32: #81–#88→#105–#112, #105–#112→#113–#116, финал #119.",
+      "119 встреч, 11 колонок — сетка 64→32: нижняя тур 1–4, 1/8, полуфинал и финал #119.",
     guideSectionId: "swiss-fixed-64",
     docPaths: [
       "docs/BRACKET_REFERENCE_64_32.md",

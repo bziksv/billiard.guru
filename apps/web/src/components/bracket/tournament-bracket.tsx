@@ -21,11 +21,14 @@ export function TournamentBracket({
   matches,
   standings = [],
   handicapHalfStep = true,
+  demoPreview = false,
 }: {
   format: string;
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
   handicapHalfStep?: boolean;
+  /** Лендинг / демо: без вертикального центрирования огромных сеток */
+  demoPreview?: boolean;
 }) {
   if (matches.length === 0) {
     return (
@@ -47,6 +50,7 @@ export function TournamentBracket({
         standings={standings}
         fixedGrid
         handicapHalfStep={handicapHalfStep}
+        demoPreview={demoPreview}
       />
     );
   }

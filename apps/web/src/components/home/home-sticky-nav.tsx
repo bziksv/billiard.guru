@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { GeoFilterBar } from "@/components/site/geo-filter";
 
 const LINKS = [
   { href: "#news", label: "Новости" },
@@ -10,18 +11,16 @@ const LINKS = [
   { href: "#clubs", label: "Клубы" },
 ] as const;
 
-export function HomeStickyNav() {
-  const [active, setActive] = useState<string>("#news");
-  const [stuck, setStuck] = useState(false);
+type HomeStickyNavProps = {
+  initialCountryId?: string;
+  initialCityId?: string;
+};
 
-  useEffect(() => {
-    const onScroll = () => {
-      setStuck(window.scrollY > 520);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+function HomeStickyNavInner({
+  initialCountryId,
+  initialCityId,
+}: HomeStickyNavProps) {
+  const [active, setActive] = useState<string>("#news");
 
   useEffect(() => {
     const sections = LINKS.map((l) => document.querySelector(l.href)).filter(
@@ -47,26 +46,40 @@ export function HomeStickyNav() {
 
   return (
     <nav
-      className={`sticky top-[6.5rem] z-30 hidden border-b transition-all duration-300 sm:top-[7.75rem] lg:top-16 lg:block ${
-        stuck ? "home-sticky-nav-stuck" : "border-transparent bg-transparent"
-      }`}
+      className="home-sticky-nav-stuck sticky top-[6.5rem] z-30 border-b sm:top-[7.75rem] lg:top-16"
       aria-label="Навигация по разделам главной"
     >
-      <div className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 py-2.5 scrollbar-none sm:px-6">
-        {LINKS.map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-sm transition ${
-              active === link.href
-                ? "bg-emerald-600 font-medium text-white shadow-md shadow-emerald-900/20"
-                : "home-card-body hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
-            }`}
-          >
-            {link.label}
-          </a>
-        ))}
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:px-6">
+        <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto scrollbar-none">
+          {LINKS.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition sm:px-4 ${
+                active === link.href
+                  ? "bg-emerald-600 font-medium text-white shadow-md shadow-emerald-900/20"
+                  : "home-card-body hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+              }`}
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+        <GeoFilterBar
+          basePath="/"
+          variant="inline"
+          initialCountryId={initialCountryId}
+          initialCityId={initialCityId}
+        />
       </div>
     </nav>
+  );
+}
+
+export function HomeStickyNav(props: HomeStickyNavProps) {
+  return (
+    <Suspense fallback={null}>
+      <HomeStickyNavInner {...props} />
+    </Suspense>
   );
 }

@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-import { GeoFilterBar } from "@/components/site/geo-filter";
 import { EmptyState } from "@/components/site/site-card";
 import { TournamentCard } from "@/components/site/tournament-card";
 import { HomeAnnouncements } from "@/components/home/home-announcements";
@@ -100,15 +98,10 @@ export default async function HomePage({
 
       <HomeTicker />
 
-      <div className="border-b border-[var(--border-subtle)] bg-[var(--surface-panel-muted)]">
-        <div className="mx-auto max-w-6xl px-6 py-5">
-          <Suspense fallback={<div className="h-20 rounded-2xl bg-[var(--bg-muted)]" />}>
-            <GeoFilterBar basePath="/" />
-          </Suspense>
-        </div>
-      </div>
-
-      <HomeStickyNav />
+      <HomeStickyNav
+        initialCountryId={geo.countryId}
+        initialCityId={geo.cityId}
+      />
 
       <HomeSection
         id="news"
