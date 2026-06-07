@@ -11,6 +11,10 @@ import {
   getFixedSwissLinksForMatchCount,
   type FixedSwissLink,
 } from "@/lib/fixed-swiss-grid";
+import {
+  incomingFixedSwissPhantomTeamSlot,
+  isVoidFixedSwissCrossMatch,
+} from "@/lib/fixed-swiss-cross-bye";
 import { assertBracketParticipantCount } from "@/lib/bracket-participant-rules";
 import { getResolvedParticipantRules } from "@/lib/bracket-formats/settings-server";
 import { logger } from "@/lib/logger";
@@ -437,6 +441,8 @@ export async function replayFixedSwissAdvances(db: Db, tournamentId: string) {
       }
     }
   }
+
+  await processByes(db, tournamentId, tournament.format);
 }
 
 async function advanceFixedSwissResult(
@@ -818,35 +824,12 @@ type DbMatchSlot = {
   team2Id: string | null;
 };
 
-function isRoundOneByeMatch(match: DbMatchSlot): boolean {
-  if (match.round !== 1) return false;
-  return Boolean(
-    (match.team1Id && !match.team2Id) || (!match.team1Id && match.team2Id),
-  );
-}
-
-/** Слот с ×: loss от автопрохода 1-го тура (как incomingAutopassPhantomSlot в UI). */
 function incomingAutopassPhantomTeamSlot(
   match: DbMatchSlot,
   allMatches: DbMatchSlot[],
   links: FixedSwissLink[],
 ): 1 | 2 | null {
-  for (const link of links) {
-    if (
-      link.kind !== "loss" ||
-      link.toRound !== match.round ||
-      link.toSlot !== match.slot
-    ) {
-      continue;
-    }
-    const source = allMatches.find(
-      (m) => m.round === link.fromRound && m.slot === link.fromSlot,
-    );
-    if (source && isRoundOneByeMatch(source)) {
-      return link.toTeam;
-    }
-  }
-  return null;
+  return incomingFixedSwissPhantomTeamSlot(match, allMatches, links);
 }
 
 /** Игрок один в ячейке, напротив × от bye 1-го тура — автопроход дальше. */
@@ -913,6 +896,22 @@ export async function processByes(db: Db, tournamentId: string, format: string) 
       : null;
 
     for (const match of matches) {
+      if (
+        usesFixedSwissGridEngine(format) &&
+        fixedLinks &&
+        match.round > 1 &&
+        isVoidFixedSwissCrossMatch(match, allSlots, fixedLinks)
+      ) {
+        await db.tournamentMatch.update({
+          where: { id: match.id },
+          data: { status: "FINISHED" },
+        });
+        const cached = byeCache.slotMap.get(slotMapKey(match.round, match.slot));
+        if (cached) cached.status = "FINISHED";
+        changed = true;
+        continue;
+      }
+
       const soloTeamId =
         match.team1Id && !match.team2Id
           ? match.team1Id

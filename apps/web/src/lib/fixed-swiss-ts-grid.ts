@@ -563,10 +563,10 @@ export function fixedSwissTs32OlympicToQuarterTarget(
     10: { toSlot: 2, toTeam: 1 },
     11: { toSlot: 3, toTeam: 1 },
     12: { toSlot: 4, toTeam: 1 },
-    13: { toSlot: 3, toTeam: 2 },
-    14: { toSlot: 4, toTeam: 2 },
-    15: { toSlot: 1, toTeam: 2 },
-    16: { toSlot: 2, toTeam: 2 },
+    13: { toSlot: 2, toTeam: 2 },
+    14: { toSlot: 1, toTeam: 2 },
+    15: { toSlot: 4, toTeam: 2 },
+    16: { toSlot: 3, toTeam: 2 },
   };
   return map[r3Slot] ?? null;
 }

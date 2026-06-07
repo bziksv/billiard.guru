@@ -25,6 +25,7 @@ export default function AdminBracketTournamentPage() {
   const [tournament, setTournament] = useState<AdminTournament | null>(null);
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
+  const [presentationOpen, setPresentationOpen] = useState(false);
 
   const reload = useCallback(async () => {
     const res = await fetch(`/api/tournaments/${id}`);
@@ -144,6 +145,13 @@ export default function AdminBracketTournamentPage() {
                 Сетка на сайте
               </Link>
             )}
+            <button
+              type="button"
+              onClick={() => setPresentationOpen(true)}
+              className="admin-btn-secondary"
+            >
+              На весь экран
+            </button>
           </div>
         </div>
       </div>
@@ -156,6 +164,9 @@ export default function AdminBracketTournamentPage() {
           bracketLoading={bracketLoading}
           embedded
           initialTab="bracket"
+          presentationOpen={presentationOpen}
+          onPresentationOpenChange={setPresentationOpen}
+          showTabBarFullscreenButton={false}
           onConfirmRegistration={noop}
           onRejectRegistration={noop}
           onCancelRegistration={noop}

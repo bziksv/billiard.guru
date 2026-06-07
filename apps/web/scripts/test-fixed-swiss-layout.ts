@@ -61,6 +61,10 @@ import {
 } from "../src/lib/fixed-swiss-grid";
 import { fixedSwissTs64StageByMatchNo } from "../src/lib/fixed-swiss-ts-grid";
 import {
+  isVoidFixedSwissCrossMatch,
+  isRoundOneByeSlot,
+} from "../src/lib/fixed-swiss-cross-bye";
+import {
   GRID_LABEL_OFFSET,
   GRID_PAD,
   incomingAutopassPhantomSlot,
@@ -616,26 +620,26 @@ assert.equal(fixedSwissTs32PlacementByMatchNo(57, false), "место 3–4");
   assert.equal(
     links32.find((l) => l.fromRound === 3 && l.fromSlot === 15 && l.kind === "win")
       ?.toSlot,
-    1,
-    "#50 → #53",
+    4,
+    "#50 → #56",
   );
   assert.equal(
     links32.find((l) => l.fromRound === 3 && l.fromSlot === 16 && l.kind === "win")
       ?.toSlot,
-    2,
-    "#49 → #54",
+    3,
+    "#49 → #55",
   );
   assert.equal(
     links32.find((l) => l.fromRound === 3 && l.fromSlot === 13 && l.kind === "win")
       ?.toSlot,
-    3,
-    "#52 → #55",
+    2,
+    "#52 → #54",
   );
   assert.equal(
     links32.find((l) => l.fromRound === 3 && l.fromSlot === 14 && l.kind === "win")
       ?.toSlot,
-    4,
-    "#51 → #56",
+    1,
+    "#51 → #53",
   );
   const win25 = links32.find(
     (l) => l.fromRound === 2 && l.fromSlot === 9 && l.kind === "win",
@@ -796,24 +800,24 @@ assert.equal(
   "upper → tour 4: only footer",
 );
 assert.equal(
-  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 14, 4, 59),
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 14, 1, 59),
   false,
-  "#51 → #56: only footer",
+  "#51 → #53: only footer",
 );
 assert.equal(
-  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 15, 1, 59),
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 15, 4, 59),
   false,
-  "#50 → #53: only footer",
+  "#50 → #56: only footer",
 );
 assert.equal(
-  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 16, 2, 59),
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 16, 3, 59),
   false,
-  "#49 → #54: only footer",
+  "#49 → #55: only footer",
 );
 assert.equal(
-  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 13, 3, 59),
+  shouldDrawFixedSwissWinEdge(-4, 3, 3, 5, "win", 13, 2, 59),
   false,
-  "#52 → #55: only footer",
+  "#52 → #54: only footer",
 );
 assert.equal(isFixedSwissForkEdge(3, 5, 59), false, "no 1/8→1/4 fork bus on 32");
 assert.equal(
@@ -1882,5 +1886,20 @@ assert.equal(
   layout64.positions.get("r3s33")!.y,
   "#105 on same Y as #81",
 );
+
+{
+  const links32 = buildFixedSwissTemplate(32).links;
+  const rows = [
+    { round: 1, slot: 3, team1Id: "a", team2Id: null, winnerTeamId: "a", status: "FINISHED" },
+    { round: 1, slot: 4, team1Id: "b", team2Id: null, winnerTeamId: "b", status: "FINISHED" },
+    { round: 2, slot: 2, team1Id: null, team2Id: null, winnerTeamId: null, status: "SCHEDULED" },
+  ];
+  assert.equal(isRoundOneByeSlot(rows[0]!), true);
+  assert.equal(
+    isVoidFixedSwissCrossMatch(rows[2]!, rows, links32),
+    true,
+    "R2 cross empty when both R1 feeders are bye",
+  );
+}
 
 console.log("fixed swiss layout tests passed");

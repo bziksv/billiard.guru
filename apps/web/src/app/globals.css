@@ -4815,12 +4815,42 @@ html.dark .bracket-col-header {
   border-radius: 0.375rem;
 }
 
+/* Fullscreen tournament overlay (portal) — follows html.light / html.dark */
+.bracket-presentation.admin-app {
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.bracket-presentation__header {
+  border-bottom: 1px solid var(--admin-border);
+  background-color: var(--admin-panel-bg);
+}
+
+.bracket-presentation__title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--admin-text);
+}
+
+.bracket-presentation__content {
+  background-color: var(--admin-bg);
+}
+
+.bracket-presentation .admin-tab-bar {
+  width: max-content;
+  min-width: min(100%, max-content);
+}
+
 .bracket-presentation .bracket-canvas--presentation {
   cursor: grab;
 }
 
 .bracket-presentation .bracket-canvas--presentation:active {
   cursor: grabbing;
+}
+
+html.light .bracket-presentation .bracket-canvas--presentation {
+  box-shadow: var(--card-shadow);
 }
 
 .bracket-empty-state {

@@ -204,6 +204,9 @@ export function TournamentManageView({
   onCancelMatchResult,
   onUpdated,
   onDelete,
+  presentationOpen: presentationOpenProp,
+  onPresentationOpenChange,
+  showTabBarFullscreenButton = true,
 }: {
   tournament: AdminTournament;
   clubOptions: { value: string; label: string }[];
@@ -214,6 +217,11 @@ export function TournamentManageView({
   viewMode?: TournamentManageViewMode;
   /** @deprecated используйте viewMode="bracket" */
   initialTab?: ManageTab;
+  /** Управление полноэкранным режимом снаружи (кнопка в шапке страницы). */
+  presentationOpen?: boolean;
+  onPresentationOpenChange?: (open: boolean) => void;
+  /** Показать «На весь экран» рядом с вкладками. Выключите, если кнопка вынесена в шапку. */
+  showTabBarFullscreenButton?: boolean;
   onConfirmRegistration: (id: string) => void | Promise<void>;
   onRejectRegistration: (id: string) => void | Promise<void>;
   onCancelRegistration: (id: string) => void | Promise<void>;
@@ -232,7 +240,14 @@ export function TournamentManageView({
   const [tab, setTab] = useState<ManageTab>(
     effectiveViewMode === "bracket" ? "bracket" : "participants",
   );
-  const [presentationOpen, setPresentationOpen] = useState(false);
+  const [presentationOpenInternal, setPresentationOpenInternal] = useState(false);
+  const presentationOpen = presentationOpenProp ?? presentationOpenInternal;
+  const setPresentationOpen = (open: boolean) => {
+    onPresentationOpenChange?.(open);
+    if (presentationOpenProp === undefined) {
+      setPresentationOpenInternal(open);
+    }
+  };
   const showParticipants = effectiveViewMode !== "bracket";
   const showBracketSection = effectiveViewMode !== "tournament";
   const showTabBar =
@@ -574,15 +589,17 @@ export function TournamentManageView({
               {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
             </h2>
           )}
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="admin-tab-bar min-w-0 flex-1">{manageTabButtons}</div>
-            <button
-              type="button"
-              onClick={() => setPresentationOpen(true)}
-              className="admin-btn shrink-0 px-4 py-2 text-sm"
-            >
-              На весь экран
-            </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="admin-tab-bar">{manageTabButtons}</div>
+            {showTabBarFullscreenButton && (
+              <button
+                type="button"
+                onClick={() => setPresentationOpen(true)}
+                className="admin-btn-secondary shrink-0 px-4 py-2 text-sm"
+              >
+                На весь экран
+              </button>
+            )}
           </div>
         </div>
       )}

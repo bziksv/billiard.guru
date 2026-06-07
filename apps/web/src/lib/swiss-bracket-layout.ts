@@ -401,19 +401,38 @@ export function gridColumnLabel(col: number, minRound = 1): string {
   return `Тур ${col + minRound}`;
 }
 
-/** × от bye 1-го тура показывается в матче назначения (слот toTeamSlot), как llb. */
+function isVoidCrossBracketView(match: BracketMatchView): boolean {
+  return (
+    match.round > 1 &&
+    !match.team1 &&
+    !match.team2 &&
+    !match.winnerTeamId &&
+    match.status === "FINISHED"
+  );
+}
+
+/** × от bye 1-го тура или пустого креста — в матче назначения (слот toTeamSlot). */
 export function incomingAutopassPhantomSlot(
   matchId: string,
   edges: SwissBracketEdge[],
   matchById: Map<string, BracketMatchView>,
 ): 1 | 2 | null {
   for (const edge of edges) {
-    if (edge.toId !== matchId || edge.kind !== "loss" || !edge.toTeamSlot) {
+    if (edge.toId !== matchId || !edge.toTeamSlot) continue;
+
+    if (edge.kind === "loss") {
+      const from = matchById.get(edge.fromId);
+      if (from && matchAutopassBye(from).isBye) {
+        return edge.toTeamSlot;
+      }
       continue;
     }
-    const from = matchById.get(edge.fromId);
-    if (from && matchAutopassBye(from).isBye) {
-      return edge.toTeamSlot;
+
+    if (edge.kind === "win") {
+      const from = matchById.get(edge.fromId);
+      if (from && isVoidCrossBracketView(from)) {
+        return edge.toTeamSlot;
+      }
     }
   }
   return null;
