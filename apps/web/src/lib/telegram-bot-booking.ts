@@ -191,6 +191,18 @@ async function findVerifiedPlayer(telegramId: string) {
   });
 }
 
+async function editBookingWizardMessage(
+  chatId: string,
+  messageId: number,
+  text: string,
+  keyboard?: { inline_keyboard: InlineButton[][] },
+) {
+  const opts = keyboard ? { replyMarkup: keyboard } : { replyMarkup: { inline_keyboard: [] } };
+  const captionOk = await editTelegramPhotoCaption(chatId, messageId, text, opts);
+  if (captionOk) return;
+  await editTelegramMessage(chatId, messageId, text, opts);
+}
+
 async function replyOrEdit(
   telegramId: string,
   text: string,
@@ -198,16 +210,12 @@ async function replyOrEdit(
   sourceMessage?: { chatId: string; messageId: number },
 ) {
   if (sourceMessage) {
-    const captionOk = await editTelegramPhotoCaption(
+    await editBookingWizardMessage(
       sourceMessage.chatId,
       sourceMessage.messageId,
       text,
-      { replyMarkup: keyboard },
+      keyboard,
     );
-    if (captionOk) return;
-    await editTelegramMessage(sourceMessage.chatId, sourceMessage.messageId, text, {
-      replyMarkup: keyboard,
-    });
   } else {
     await sendTelegramMessage(telegramId, text, { replyMarkup: keyboard });
   }
@@ -410,7 +418,16 @@ async function showTableOrConfirmStep(
   const unix = Math.floor(startsAt.getTime() / 1000);
 
   if (planTables.length === 0) {
-    return showConfirmStep(telegramId, club, format, startsAt, endsAt, null, sourceMessage);
+    return showConfirmStep(
+      telegramId,
+      club,
+      format,
+      startsAt,
+      endsAt,
+      null,
+      `bk4_${club.id}_${fmtCode(format)}_${unix}`,
+      sourceMessage,
+    );
   }
 
   const existing = await loadExistingForRange(club.id, startsAt, endsAt);
@@ -437,7 +454,16 @@ async function showTableOrConfirmStep(
   }
 
   if (free.length === 1) {
-    return showConfirmStep(telegramId, club, format, startsAt, endsAt, free[0]!.id, sourceMessage);
+    return showConfirmStep(
+      telegramId,
+      club,
+      format,
+      startsAt,
+      endsAt,
+      free[0]!.id,
+      `bk5_${club.id}_${fmtCode(format)}_${unix}_${durationMin}`,
+      sourceMessage,
+    );
   }
 
   const rows: InlineButton[][] = free.slice(0, 8).map((t, idx) => [
@@ -515,6 +541,7 @@ async function showConfirmStep(
   startsAt: Date,
   endsAt: Date,
   floorItemId: string | null,
+  backCallback: string,
   sourceMessage?: { chatId: string; messageId: number },
 ) {
   const floorPlan = parseFloorPlan(club.floorPlan);
@@ -547,8 +574,9 @@ async function showConfirmStep(
             text: "✅ Забронировать",
             callback_data: `bk7_${club.id}_${fmtCode(format)}_${unix}_${dur}_${tableIdx}`,
           },
-          { text: "Отмена", callback_data: "bkc" },
         ],
+        [{ text: "← Назад", callback_data: backCallback }],
+        [{ text: "Отмена", callback_data: "bkc" }],
       ],
     },
     sourceMessage,
@@ -638,10 +666,19 @@ export async function handleBookingCallback(
   try {
     if (data === "bkc") {
       await answerCallbackQuery(callbackQueryId, "Отменено");
+      const cancelledText = "❌ <b>Бронирование отменено</b>";
+      const keyboard = {
+        inline_keyboard: [[{ text: "📅 Забронировать снова", callback_data: "bk0" }]],
+      };
       if (sourceMessage) {
-        await editTelegramMessage(sourceMessage.chatId, sourceMessage.messageId, "Бронирование отменено.", {
-          replyMarkup: { inline_keyboard: [] },
-        });
+        await editBookingWizardMessage(
+          sourceMessage.chatId,
+          sourceMessage.messageId,
+          cancelledText,
+          keyboard,
+        );
+      } else {
+        await sendTelegramMessage(telegramId, cancelledText, { replyMarkup: keyboard });
       }
       return true;
     }
@@ -770,7 +807,16 @@ export async function handleBookingCallback(
         return true;
       }
       await answerCallbackQuery(callbackQueryId);
-      await showConfirmStep(telegramId, club, format, startsAt, endsAt, floorItemId, sourceMessage);
+      await showConfirmStep(
+        telegramId,
+        club,
+        format,
+        startsAt,
+        endsAt,
+        floorItemId,
+        `bk5_${club.id}_${fmtCode(format)}_${unixStr}_${durStr}`,
+        sourceMessage,
+      );
       return true;
     }
 

@@ -13,6 +13,9 @@ export const PLAYER_SUBSCRIPTION_NOTIFICATION_IDS = [
   "tournament-registration-self",
   "tournament-registration-confirmed",
   "tournament-registration-rejected",
+  "player-booking-confirmed",
+  "player-booking-rejected",
+  "player-booking-cancelled",
   "idea-author-approved",
   "idea-author-rejected",
   "idea-broadcast",
@@ -80,6 +83,7 @@ export function listPlayerNotificationPreferenceItems(
 export const PLAYER_PREFERENCE_CATEGORY_ORDER: NotificationCategory[] = [
   "auth",
   "tournaments",
+  "bookings",
   "ideas",
 ];
 

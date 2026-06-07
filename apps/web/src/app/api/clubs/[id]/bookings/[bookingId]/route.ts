@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { requireClubManageAccess } from "@/lib/club-manage";
+import {
+  notifyPlayerBookingCancelledByClub,
+  notifyPlayerBookingConfirmed,
+  notifyPlayerBookingRejected,
+} from "@/lib/player-booking-notify";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 import { bookingStatusSchema } from "@/lib/validators";
@@ -96,6 +101,16 @@ export async function PATCH(
         ? `Статус брони: ${status}`
         : "Обновлена заметка клуба",
     });
+
+    if (status && updated.playerId) {
+      if (status === "CONFIRMED") {
+        void notifyPlayerBookingConfirmed(bookingId);
+      } else if (status === "REJECTED") {
+        void notifyPlayerBookingRejected(bookingId);
+      } else if (status === "CANCELLED" && isClubManager && !isOwner) {
+        void notifyPlayerBookingCancelledByClub(bookingId);
+      }
+    }
 
     return NextResponse.json(updated);
   } catch (error) {

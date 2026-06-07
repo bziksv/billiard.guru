@@ -67,6 +67,29 @@ export const NOTIFICATION_DEFAULT_TEMPLATES: Partial<Record<NotificationId, stri
     "{{note}}\n\n" +
     "Подтвердите в разделе «Брони столов».",
 
+  "player-booking-confirmed":
+    "✅ <b>Бронь подтверждена</b>\n\n" +
+    "<b>{{clubName}}</b>\n" +
+    "🪑 {{table}}\n" +
+    "{{tableHint}}" +
+    "🕐 {{time}}\n\n" +
+    "Ждём вас в клубе!{{link}}",
+
+  "player-booking-rejected":
+    "❌ <b>Бронь отклонена</b>\n\n" +
+    "<b>{{clubName}}</b>\n" +
+    "🪑 {{table}}\n" +
+    "{{tableHint}}" +
+    "🕐 {{time}}\n\n" +
+    "Выберите другое время или свяжитесь с клубом.{{link}}",
+
+  "player-booking-cancelled":
+    "❌ <b>Бронь отменена клубом</b>\n\n" +
+    "<b>{{clubName}}</b>\n" +
+    "🪑 {{table}}\n" +
+    "{{tableHint}}" +
+    "🕐 {{time}}{{link}}",
+
   "idea-moderation-request":
     "💡 <b>Новая идея на модерации</b>\n\n" +
     "<b>{{title}}</b>\n\n" +
