@@ -600,16 +600,29 @@ export function LlbBracketMatch({
             type="button"
             data-bracket-interactive
             onClick={openResult}
-            className="bracket-match-meta bracket-match-meta--clickable line-clamp-2 min-h-0 shrink"
+            className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-left text-[9px] leading-[18px] text-[var(--bracket-meta-text)] transition-colors hover:bg-emerald-950/25"
+            style={{ height: 18, maxHeight: 18 }}
             title={`Фора: ${handicap}`}
           >
-            <span className="bracket-match-meta-label">Фора</span>
-            <span className="bracket-match-meta-value">{handicapShort}</span>
+            <span className="block truncate">
+              <span className="font-semibold uppercase tracking-wide opacity-85">
+                Фора{" "}
+              </span>
+              {handicapShort}
+            </span>
           </button>
         ) : (
-          <div className="bracket-match-meta line-clamp-2 min-h-0 shrink">
-            <span className="bracket-match-meta-label">Фора</span>
-            <span className="bracket-match-meta-value">{handicapShort}</span>
+          <div
+            className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-[9px] leading-[18px] text-[var(--bracket-meta-text)]"
+            style={{ height: 18, maxHeight: 18 }}
+            title={`Фора: ${handicap}`}
+          >
+            <span className="block truncate">
+              <span className="font-semibold uppercase tracking-wide opacity-85">
+                Фора{" "}
+              </span>
+              {handicapShort}
+            </span>
           </div>
         )
       )}
