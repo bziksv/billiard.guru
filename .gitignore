@@ -15,6 +15,9 @@ build/
 apps/web/public/uploads/*
 !apps/web/public/uploads/.gitkeep
 
+# database backups (admin panel)
+data/db-backups/
+
 # misc
 .DS_Store
 *.pem

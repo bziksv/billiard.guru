@@ -8,7 +8,11 @@ import { playerCanManageClub } from "@/lib/club-staff";
 import { prisma } from "@/lib/prisma";
 import { buildConfirmLink } from "@/lib/telegram";
 import { requireTournamentManageAccess, tournamentManageActorType } from "@/lib/tournament-manage";
-import { canCancelRegistration } from "@/lib/tournament-registration";
+import {
+  canCancelRegistration,
+  isTournamentRegistrationOpen,
+} from "@/lib/tournament-registration";
+import { reopenTournamentIfBracketEmpty } from "@/lib/tournament-registration-server";
 import {
   notifyTournamentRegisteredByClub,
   notifyTournamentRegistrationConfirmed,
@@ -26,10 +30,16 @@ export async function POST(request: NextRequest) {
 
     const { session } = await requireTournamentManageAccess(data.tournamentId);
 
+    await reopenTournamentIfBracketEmpty(data.tournamentId);
+
     const tournament = await prisma.tournament.findUnique({
       where: { id: data.tournamentId },
     });
-    if (!tournament || tournament.status !== "OPEN") {
+    const bracketFormed =
+      (await prisma.tournamentMatch.count({
+        where: { tournamentId: data.tournamentId },
+      })) > 0;
+    if (!tournament || !isTournamentRegistrationOpen(tournament.status, bracketFormed)) {
       return NextResponse.json(
         { error: "Регистрация на турнир недоступна" },
         { status: 400 },
@@ -160,6 +170,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Заявка не найдена" }, { status: 404 });
     }
 
+    await reopenTournamentIfBracketEmpty(existing.tournamentId);
+
     if (["CANCELLED", "REJECTED"].includes(existing.status) && status !== "CONFIRMED") {
       return NextResponse.json({ error: "Заявка уже закрыта" }, { status: 400 });
     }
@@ -202,9 +214,12 @@ export async function PATCH(request: NextRequest) {
       if (!isOrganizer) {
         return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
       }
-      if (existing.tournament.status !== "OPEN" && status === "CONFIRMED") {
+      if (
+        !isTournamentRegistrationOpen(existing.tournament.status, bracketFormed) &&
+        status === "CONFIRMED"
+      ) {
         return NextResponse.json(
-          { error: "Подтверждать новых участников можно только до начала турнира" },
+          { error: "Подтверждать новых участников можно только пока сетка не сформирована" },
           { status: 400 },
         );
       }

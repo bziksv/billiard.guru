@@ -9,6 +9,7 @@ import {
   renderNotificationTemplate,
 } from "@/lib/notifications/settings-server";
 import { formatStartsAt } from "@/lib/public-display";
+import { tournamentNotificationsSuppressed } from "@/lib/tournament-notifications-guard";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 
 function appUrl(path: string) {
@@ -111,6 +112,7 @@ export async function notifyTournamentRegisteredByClub(registrationId: string): 
   try {
     const reg = await loadRegistrationContext(registrationId);
     if (!reg?.player.telegramId || reg.source !== "CLUB") return;
+    if (tournamentNotificationsSuppressed(reg.tournament)) return;
 
     const sent = await sendToPlayer(
       "tournament-registration-by-club",
@@ -133,6 +135,7 @@ export async function notifyTournamentSelfRegistered(registrationId: string): Pr
   try {
     const reg = await loadRegistrationContext(registrationId);
     if (!reg?.player.telegramId || reg.source !== "SELF") return;
+    if (tournamentNotificationsSuppressed(reg.tournament)) return;
 
     const sent = await sendToPlayer(
       "tournament-registration-self",
@@ -177,6 +180,7 @@ export async function notifyTournamentRegistrationRejected(registrationId: strin
   try {
     const reg = await loadRegistrationContext(registrationId);
     if (!reg?.player.telegramId) return;
+    if (tournamentNotificationsSuppressed(reg.tournament)) return;
 
     const sent = await sendToPlayer(
       "tournament-registration-rejected",
@@ -210,6 +214,7 @@ export async function notifyTournamentTeamRegisteredByClub(teamId: string): Prom
   try {
     const team = await loadTeamContext(teamId);
     if (!team || team.source !== "CLUB") return;
+    if (tournamentNotificationsSuppressed(team.tournament)) return;
 
     let sent = 0;
     for (const p of [team.player1, team.player2]) {
@@ -241,6 +246,7 @@ export async function notifyTournamentTeamRegistrationConfirmed(teamId: string):
   try {
     const team = await loadTeamContext(teamId);
     if (!team) return;
+    if (tournamentNotificationsSuppressed(team.tournament)) return;
 
     let sent = 0;
     for (const p of [team.player1, team.player2]) {
@@ -272,6 +278,7 @@ export async function notifyTournamentTeamRegistrationRejected(teamId: string): 
   try {
     const team = await loadTeamContext(teamId);
     if (!team) return;
+    if (tournamentNotificationsSuppressed(team.tournament)) return;
 
     let sent = 0;
     for (const p of [team.player1, team.player2]) {

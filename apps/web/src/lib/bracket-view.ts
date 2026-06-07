@@ -127,15 +127,144 @@ export function olympicBracketHeight(
   return Math.max(treeH, bronzeBottom);
 }
 
-/** Подпись этапа для карточки (матч за 3–4 в финальном туре). */
+/** Этап олимпийской сетки (1/8, полуфинал, финал…). */
+export function olympicRoundStageLabel(round: number, maxRound: number): string | null {
+  if (maxRound <= 0) return null;
+  const fromFinal = maxRound - round;
+  if (fromFinal === 0) return "Финал";
+  if (fromFinal === 1) return "Полуфинал";
+  if (fromFinal === 2) return "1/4 финала";
+  if (fromFinal === 3) return "1/8 финала";
+  if (fromFinal === 4) return "1/16 финала";
+  if (fromFinal === 5) return "1/32 финала";
+  return `Тур ${round}`;
+}
+
+/** Диапазон мест для проигравшего в матче олимпийки (без матча за бронзу). */
+export function olympicLoserPlaceRange(
+  round: number,
+  maxRound: number,
+): { from: number; to: number } | null {
+  if (maxRound <= 0 || round >= maxRound) return null;
+  const from = 2 ** (maxRound - round) + 1;
+  const to = 2 ** (maxRound - round + 1);
+  return { from, to };
+}
+
+/** Подпись места для карточки олимпийской сетки (без «1/8 финала» — этап в заголовке колонки). */
 export function olympicMatchPlacementLabel(
   round: number,
   slot: number,
   maxRound: number,
   withBronzeMatch: boolean,
 ): string | null {
-  if (!withBronzeMatch) return null;
-  if (round === maxRound && slot === 2) return "матч за 3–4 место";
-  if (round === maxRound && slot === 1) return "место 1–2";
+  if (withBronzeMatch && round === maxRound && slot === 2) {
+    return "матч за 3–4 место";
+  }
+  if (round === maxRound && slot === 1) {
+    return "место 1–2";
+  }
+  const places = olympicLoserPlaceRange(round, maxRound);
+  if (places) {
+    return `место ${places.from}–${places.to}`;
+  }
   return null;
+}
+
+export type BracketCardFooterRow =
+  | { kind: "text"; text: string }
+  | { kind: "split"; left: string; right: string };
+
+/** Номер встречи, куда уходит победитель (следующий тур олимпийки). */
+export function olympicWinnerDestMatchNo(
+  match: Pick<BracketMatchView, "round" | "slot">,
+  matches: BracketMatchView[],
+  matchNumbers: Map<string, number>,
+  maxRound: number,
+): number | undefined {
+  if (match.round >= maxRound) return undefined;
+  const nextSlot = Math.ceil(match.slot / 2);
+  const dest = matches.find(
+    (m) => m.round === match.round + 1 && m.slot === nextSlot,
+  );
+  if (!dest) return undefined;
+  return matchNumbers.get(dest.id);
+}
+
+/** Номер встречи за бронзу для проигравшего полуфинала (OLYMPIC_1L_BRONZE). */
+export function olympicLoserDestMatchNo(
+  match: Pick<BracketMatchView, "round" | "slot">,
+  matches: BracketMatchView[],
+  matchNumbers: Map<string, number>,
+  maxRound: number,
+  withBronzeMatch: boolean,
+): number | undefined {
+  if (!withBronzeMatch || match.round !== maxRound - 1) return undefined;
+  const bronze = matches.find(
+    (m) => m.round === maxRound && m.slot === OLYMPIC_BRONZE_MATCH_SLOT,
+  );
+  if (!bronze) return undefined;
+  return matchNumbers.get(bronze.id);
+}
+
+/** Подвал карточки олимпийки: этап/места и «проигравший / победитель на #…». */
+export function olympicMatchFooterRows(
+  match: BracketMatchView,
+  matches: BracketMatchView[],
+  matchNumbers: Map<string, number>,
+  maxRound: number,
+  withBronzeMatch: boolean,
+): BracketCardFooterRow[] {
+  const placement = olympicMatchPlacementLabel(
+    match.round,
+    match.slot,
+    maxRound,
+    withBronzeMatch,
+  );
+  const { isBye: roundOneBye } = matchAutopassBye(match);
+  const winnerToNo = olympicWinnerDestMatchNo(
+    match,
+    matches,
+    matchNumbers,
+    maxRound,
+  );
+  const loserToNo = olympicLoserDestMatchNo(
+    match,
+    matches,
+    matchNumbers,
+    maxRound,
+    withBronzeMatch,
+  );
+
+  const winnerLine =
+    winnerToNo !== undefined
+      ? roundOneBye && match.round === 1
+        ? `автопроход на #${winnerToNo}`
+        : `победитель на #${winnerToNo}`
+      : null;
+  const loserLine =
+    loserToNo !== undefined ? `проигравший на #${loserToNo}` : null;
+
+  const footerRows: BracketCardFooterRow[] = [];
+
+  if (winnerLine && loserLine) {
+    if (placement) footerRows.push({ kind: "text", text: placement });
+    footerRows.push({ kind: "split", left: loserLine, right: winnerLine });
+  } else if (placement && winnerLine) {
+    footerRows.push({ kind: "split", left: placement, right: winnerLine });
+  } else if (placement && loserLine) {
+    footerRows.push({ kind: "split", left: loserLine, right: placement });
+  } else if (placement) {
+    footerRows.push({ kind: "text", text: placement });
+  } else if (winnerLine) {
+    footerRows.push({ kind: "split", left: "—", right: winnerLine });
+  } else if (loserLine) {
+    footerRows.push({ kind: "split", left: loserLine, right: "—" });
+  }
+
+  if (match.status === "WALKOVER") {
+    footerRows.push({ kind: "text", text: "тех. поражение" });
+  }
+
+  return footerRows;
 }

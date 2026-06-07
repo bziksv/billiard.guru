@@ -409,6 +409,7 @@ export const ModelName = {
   NotificationTypeConfig: 'NotificationTypeConfig',
   BracketFormatConfig: 'BracketFormatConfig',
   TournamentDefaultsConfig: 'TournamentDefaultsConfig',
+  DbBackupConfig: 'DbBackupConfig',
   TelegramDeliveryLog: 'TelegramDeliveryLog'
 } as const
 
@@ -425,7 +426,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "telegramDeliveryLog"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "dbBackupConfig" | "telegramDeliveryLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2079,6 +2080,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    DbBackupConfig: {
+      payload: Prisma.$DbBackupConfigPayload<ExtArgs>
+      fields: Prisma.DbBackupConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.DbBackupConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.DbBackupConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.DbBackupConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.DbBackupConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload>
+        }
+        findMany: {
+          args: Prisma.DbBackupConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload>[]
+        }
+        create: {
+          args: Prisma.DbBackupConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload>
+        }
+        createMany: {
+          args: Prisma.DbBackupConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.DbBackupConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload>
+        }
+        update: {
+          args: Prisma.DbBackupConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.DbBackupConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.DbBackupConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.DbBackupConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$DbBackupConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.DbBackupConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateDbBackupConfig>
+        }
+        groupBy: {
+          args: Prisma.DbBackupConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DbBackupConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.DbBackupConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.DbBackupConfigCountAggregateOutputType> | number
+        }
+      }
+    }
     TelegramDeliveryLog: {
       payload: Prisma.$TelegramDeliveryLogPayload<ExtArgs>
       fields: Prisma.TelegramDeliveryLogFieldRefs
@@ -2367,6 +2434,7 @@ export const TournamentScalarFieldEnum = {
   ratingMax: 'ratingMax',
   ratingSource: 'ratingSource',
   handicapHalfStep: 'handicapHalfStep',
+  suppressNotifications: 'suppressNotifications',
   startsAt: 'startsAt',
   clubApprovalToken: 'clubApprovalToken',
   publishedAt: 'publishedAt',
@@ -2553,6 +2621,7 @@ export type NotificationTypeConfigScalarFieldEnum = (typeof NotificationTypeConf
 
 export const BracketFormatConfigScalarFieldEnum = {
   formatCode: 'formatCode',
+  adminLabel: 'adminLabel',
   enabled: 'enabled',
   maintenanceMode: 'maintenanceMode',
   hiddenInAdmin: 'hiddenInAdmin',
@@ -2576,6 +2645,20 @@ export const TournamentDefaultsConfigScalarFieldEnum = {
 } as const
 
 export type TournamentDefaultsConfigScalarFieldEnum = (typeof TournamentDefaultsConfigScalarFieldEnum)[keyof typeof TournamentDefaultsConfigScalarFieldEnum]
+
+
+export const DbBackupConfigScalarFieldEnum = {
+  id: 'id',
+  autoEnabled: 'autoEnabled',
+  autoHour: 'autoHour',
+  autoMinute: 'autoMinute',
+  autoIntervalHours: 'autoIntervalHours',
+  retainCount: 'retainCount',
+  lastAutoBackupAt: 'lastAutoBackupAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DbBackupConfigScalarFieldEnum = (typeof DbBackupConfigScalarFieldEnum)[keyof typeof DbBackupConfigScalarFieldEnum]
 
 
 export const TelegramDeliveryLogScalarFieldEnum = {
@@ -2906,7 +2989,8 @@ export type NotificationTypeConfigOrderByRelevanceFieldEnum = (typeof Notificati
 
 
 export const BracketFormatConfigOrderByRelevanceFieldEnum = {
-  formatCode: 'formatCode'
+  formatCode: 'formatCode',
+  adminLabel: 'adminLabel'
 } as const
 
 export type BracketFormatConfigOrderByRelevanceFieldEnum = (typeof BracketFormatConfigOrderByRelevanceFieldEnum)[keyof typeof BracketFormatConfigOrderByRelevanceFieldEnum]
@@ -2917,6 +3001,13 @@ export const TournamentDefaultsConfigOrderByRelevanceFieldEnum = {
 } as const
 
 export type TournamentDefaultsConfigOrderByRelevanceFieldEnum = (typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum)[keyof typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum]
+
+
+export const DbBackupConfigOrderByRelevanceFieldEnum = {
+  id: 'id'
+} as const
+
+export type DbBackupConfigOrderByRelevanceFieldEnum = (typeof DbBackupConfigOrderByRelevanceFieldEnum)[keyof typeof DbBackupConfigOrderByRelevanceFieldEnum]
 
 
 export const TelegramDeliveryLogOrderByRelevanceFieldEnum = {
@@ -3231,6 +3322,7 @@ export type GlobalOmitConfig = {
   notificationTypeConfig?: Prisma.NotificationTypeConfigOmit
   bracketFormatConfig?: Prisma.BracketFormatConfigOmit
   tournamentDefaultsConfig?: Prisma.TournamentDefaultsConfigOmit
+  dbBackupConfig?: Prisma.DbBackupConfigOmit
   telegramDeliveryLog?: Prisma.TelegramDeliveryLogOmit
 }
 

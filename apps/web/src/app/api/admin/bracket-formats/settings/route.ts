@@ -19,6 +19,8 @@ const patchSchema = z
     participantMax: z.number().int().nullable().optional(),
     participantExact: z.number().int().nullable().optional(),
     resetParticipantLimits: z.boolean().optional(),
+    adminLabel: z.string().trim().min(1).max(500).nullable().optional(),
+    resetAdminLabel: z.boolean().optional(),
   })
   .refine(
     (b) =>
@@ -29,7 +31,9 @@ const patchSchema = z
       b.participantMin !== undefined ||
       b.participantMax !== undefined ||
       b.participantExact !== undefined ||
-      b.resetParticipantLimits === true,
+      b.resetParticipantLimits === true ||
+      b.adminLabel !== undefined ||
+      b.resetAdminLabel === true,
     { message: "Нет полей для сохранения" },
   );
 
@@ -76,12 +80,19 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: validationError }, { status: 400 });
     }
 
+    const labelPatch = body.resetAdminLabel
+      ? { adminLabel: null }
+      : body.adminLabel !== undefined
+        ? { adminLabel: body.adminLabel }
+        : {};
+
     await saveBracketFormatSettings(body.formatCode, {
       enabled: body.enabled,
       maintenanceMode: body.maintenanceMode,
       hiddenInAdmin: body.hiddenInAdmin,
       isReference: body.isReference,
       ...participantPatch,
+      ...labelPatch,
     });
     const settings = await getAllBracketFormatSettings();
     return NextResponse.json({ ok: true, settings });

@@ -40,6 +40,7 @@ export type BracketFormatConfigSumAggregateOutputType = {
 
 export type BracketFormatConfigMinAggregateOutputType = {
   formatCode: string | null
+  adminLabel: string | null
   enabled: boolean | null
   maintenanceMode: boolean | null
   hiddenInAdmin: boolean | null
@@ -52,6 +53,7 @@ export type BracketFormatConfigMinAggregateOutputType = {
 
 export type BracketFormatConfigMaxAggregateOutputType = {
   formatCode: string | null
+  adminLabel: string | null
   enabled: boolean | null
   maintenanceMode: boolean | null
   hiddenInAdmin: boolean | null
@@ -64,6 +66,7 @@ export type BracketFormatConfigMaxAggregateOutputType = {
 
 export type BracketFormatConfigCountAggregateOutputType = {
   formatCode: number
+  adminLabel: number
   enabled: number
   maintenanceMode: number
   hiddenInAdmin: number
@@ -90,6 +93,7 @@ export type BracketFormatConfigSumAggregateInputType = {
 
 export type BracketFormatConfigMinAggregateInputType = {
   formatCode?: true
+  adminLabel?: true
   enabled?: true
   maintenanceMode?: true
   hiddenInAdmin?: true
@@ -102,6 +106,7 @@ export type BracketFormatConfigMinAggregateInputType = {
 
 export type BracketFormatConfigMaxAggregateInputType = {
   formatCode?: true
+  adminLabel?: true
   enabled?: true
   maintenanceMode?: true
   hiddenInAdmin?: true
@@ -114,6 +119,7 @@ export type BracketFormatConfigMaxAggregateInputType = {
 
 export type BracketFormatConfigCountAggregateInputType = {
   formatCode?: true
+  adminLabel?: true
   enabled?: true
   maintenanceMode?: true
   hiddenInAdmin?: true
@@ -213,6 +219,7 @@ export type BracketFormatConfigGroupByArgs<ExtArgs extends runtime.Types.Extensi
 
 export type BracketFormatConfigGroupByOutputType = {
   formatCode: string
+  adminLabel: string | null
   enabled: boolean
   maintenanceMode: boolean
   hiddenInAdmin: boolean
@@ -248,6 +255,7 @@ export type BracketFormatConfigWhereInput = {
   OR?: Prisma.BracketFormatConfigWhereInput[]
   NOT?: Prisma.BracketFormatConfigWhereInput | Prisma.BracketFormatConfigWhereInput[]
   formatCode?: Prisma.StringFilter<"BracketFormatConfig"> | string
+  adminLabel?: Prisma.StringNullableFilter<"BracketFormatConfig"> | string | null
   enabled?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
   maintenanceMode?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
   hiddenInAdmin?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
@@ -260,6 +268,7 @@ export type BracketFormatConfigWhereInput = {
 
 export type BracketFormatConfigOrderByWithRelationInput = {
   formatCode?: Prisma.SortOrder
+  adminLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
   hiddenInAdmin?: Prisma.SortOrder
@@ -276,6 +285,7 @@ export type BracketFormatConfigWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.BracketFormatConfigWhereInput | Prisma.BracketFormatConfigWhereInput[]
   OR?: Prisma.BracketFormatConfigWhereInput[]
   NOT?: Prisma.BracketFormatConfigWhereInput | Prisma.BracketFormatConfigWhereInput[]
+  adminLabel?: Prisma.StringNullableFilter<"BracketFormatConfig"> | string | null
   enabled?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
   maintenanceMode?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
   hiddenInAdmin?: Prisma.BoolFilter<"BracketFormatConfig"> | boolean
@@ -288,6 +298,7 @@ export type BracketFormatConfigWhereUniqueInput = Prisma.AtLeast<{
 
 export type BracketFormatConfigOrderByWithAggregationInput = {
   formatCode?: Prisma.SortOrder
+  adminLabel?: Prisma.SortOrderInput | Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
   hiddenInAdmin?: Prisma.SortOrder
@@ -308,6 +319,7 @@ export type BracketFormatConfigScalarWhereWithAggregatesInput = {
   OR?: Prisma.BracketFormatConfigScalarWhereWithAggregatesInput[]
   NOT?: Prisma.BracketFormatConfigScalarWhereWithAggregatesInput | Prisma.BracketFormatConfigScalarWhereWithAggregatesInput[]
   formatCode?: Prisma.StringWithAggregatesFilter<"BracketFormatConfig"> | string
+  adminLabel?: Prisma.StringNullableWithAggregatesFilter<"BracketFormatConfig"> | string | null
   enabled?: Prisma.BoolWithAggregatesFilter<"BracketFormatConfig"> | boolean
   maintenanceMode?: Prisma.BoolWithAggregatesFilter<"BracketFormatConfig"> | boolean
   hiddenInAdmin?: Prisma.BoolWithAggregatesFilter<"BracketFormatConfig"> | boolean
@@ -320,6 +332,7 @@ export type BracketFormatConfigScalarWhereWithAggregatesInput = {
 
 export type BracketFormatConfigCreateInput = {
   formatCode: string
+  adminLabel?: string | null
   enabled?: boolean
   maintenanceMode?: boolean
   hiddenInAdmin?: boolean
@@ -332,6 +345,7 @@ export type BracketFormatConfigCreateInput = {
 
 export type BracketFormatConfigUncheckedCreateInput = {
   formatCode: string
+  adminLabel?: string | null
   enabled?: boolean
   maintenanceMode?: boolean
   hiddenInAdmin?: boolean
@@ -344,6 +358,7 @@ export type BracketFormatConfigUncheckedCreateInput = {
 
 export type BracketFormatConfigUpdateInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
+  adminLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -356,6 +371,7 @@ export type BracketFormatConfigUpdateInput = {
 
 export type BracketFormatConfigUncheckedUpdateInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
+  adminLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -368,6 +384,7 @@ export type BracketFormatConfigUncheckedUpdateInput = {
 
 export type BracketFormatConfigCreateManyInput = {
   formatCode: string
+  adminLabel?: string | null
   enabled?: boolean
   maintenanceMode?: boolean
   hiddenInAdmin?: boolean
@@ -380,6 +397,7 @@ export type BracketFormatConfigCreateManyInput = {
 
 export type BracketFormatConfigUpdateManyMutationInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
+  adminLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -392,6 +410,7 @@ export type BracketFormatConfigUpdateManyMutationInput = {
 
 export type BracketFormatConfigUncheckedUpdateManyInput = {
   formatCode?: Prisma.StringFieldUpdateOperationsInput | string
+  adminLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maintenanceMode?: Prisma.BoolFieldUpdateOperationsInput | boolean
   hiddenInAdmin?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -410,6 +429,7 @@ export type BracketFormatConfigOrderByRelevanceInput = {
 
 export type BracketFormatConfigCountOrderByAggregateInput = {
   formatCode?: Prisma.SortOrder
+  adminLabel?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
   hiddenInAdmin?: Prisma.SortOrder
@@ -428,6 +448,7 @@ export type BracketFormatConfigAvgOrderByAggregateInput = {
 
 export type BracketFormatConfigMaxOrderByAggregateInput = {
   formatCode?: Prisma.SortOrder
+  adminLabel?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
   hiddenInAdmin?: Prisma.SortOrder
@@ -440,6 +461,7 @@ export type BracketFormatConfigMaxOrderByAggregateInput = {
 
 export type BracketFormatConfigMinOrderByAggregateInput = {
   formatCode?: Prisma.SortOrder
+  adminLabel?: Prisma.SortOrder
   enabled?: Prisma.SortOrder
   maintenanceMode?: Prisma.SortOrder
   hiddenInAdmin?: Prisma.SortOrder
@@ -464,6 +486,7 @@ export type NullableBoolFieldUpdateOperationsInput = {
 
 export type BracketFormatConfigSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   formatCode?: boolean
+  adminLabel?: boolean
   enabled?: boolean
   maintenanceMode?: boolean
   hiddenInAdmin?: boolean
@@ -478,6 +501,7 @@ export type BracketFormatConfigSelect<ExtArgs extends runtime.Types.Extensions.I
 
 export type BracketFormatConfigSelectScalar = {
   formatCode?: boolean
+  adminLabel?: boolean
   enabled?: boolean
   maintenanceMode?: boolean
   hiddenInAdmin?: boolean
@@ -488,13 +512,17 @@ export type BracketFormatConfigSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BracketFormatConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"formatCode" | "enabled" | "maintenanceMode" | "hiddenInAdmin" | "participantMin" | "participantMax" | "participantExact" | "isReference" | "updatedAt", ExtArgs["result"]["bracketFormatConfig"]>
+export type BracketFormatConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"formatCode" | "adminLabel" | "enabled" | "maintenanceMode" | "hiddenInAdmin" | "participantMin" | "participantMax" | "participantExact" | "isReference" | "updatedAt", ExtArgs["result"]["bracketFormatConfig"]>
 
 export type $BracketFormatConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "BracketFormatConfig"
   objects: {}
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     formatCode: string
+    /**
+     * Переопределение подписи в списках (null — из каталога)
+     */
+    adminLabel: string | null
     enabled: boolean
     /**
      * Техобслуживание: тип виден в админке, но недоступен при создании турнира
@@ -885,6 +913,7 @@ export interface Prisma__BracketFormatConfigClient<T, Null = never, ExtArgs exte
  */
 export interface BracketFormatConfigFieldRefs {
   readonly formatCode: Prisma.FieldRef<"BracketFormatConfig", 'String'>
+  readonly adminLabel: Prisma.FieldRef<"BracketFormatConfig", 'String'>
   readonly enabled: Prisma.FieldRef<"BracketFormatConfig", 'Boolean'>
   readonly maintenanceMode: Prisma.FieldRef<"BracketFormatConfig", 'Boolean'>
   readonly hiddenInAdmin: Prisma.FieldRef<"BracketFormatConfig", 'Boolean'>

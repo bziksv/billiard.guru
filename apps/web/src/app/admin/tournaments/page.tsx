@@ -287,6 +287,7 @@ export default function TournamentsPage() {
           : null,
         ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
         handicapHalfStep: form.get("handicapHalfStep") === "on",
+        suppressNotifications: form.get("suppressNotifications") === "on",
       }),
     });
     const data = await res.json();
@@ -427,6 +428,20 @@ export default function TournamentsPage() {
               <span className="mt-1 block text-xs text-zinc-500">
                 С галкой — фора по шагу 0,5. Без галки — только целые шары по разнице рейтингов, без
                 дополнительного шара в нечётных партиях.
+              </span>
+            </span>
+          </label>
+          <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              name="suppressNotifications"
+              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+            />
+            <span>
+              <span className="font-medium text-zinc-200">Без уведомлений по турниру</span>
+              <span className="mt-1 block text-xs text-zinc-500">
+                Не слать Telegram владельцу клуба, игрокам поблизости и участникам (регистрация,
+                встречи). Для тестовых копий — регистрация откроется сразу.
               </span>
             </span>
           </label>

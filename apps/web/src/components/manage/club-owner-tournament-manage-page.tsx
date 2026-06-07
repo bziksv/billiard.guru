@@ -19,6 +19,7 @@ import {
   countConfirmedParticipants,
   type AdminTournament,
 } from "@/lib/tournament-admin";
+import { isTournamentRegistrationOpen } from "@/lib/tournament-registration";
 import { isPairFormat } from "@/lib/pair-tournament";
 import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
 import {
@@ -61,6 +62,7 @@ export function ClubOwnerTournamentManagePage({
   const [regMessage, setRegMessage] = useState<string | null>(null);
   const [regLoading, setRegLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [publishWithoutNotifications, setPublishWithoutNotifications] = useState(false);
 
   const reload = useCallback(async () => {
     const res = await fetch(`/api/tournaments/${tournamentId}`);
@@ -78,6 +80,7 @@ export function ClubOwnerTournamentManagePage({
       return;
     }
     setTournament(data);
+    setPublishWithoutNotifications(data.suppressNotifications === true);
   }, [clubId, router, tournamentId]);
 
   useEffect(() => {
@@ -90,6 +93,7 @@ export function ClubOwnerTournamentManagePage({
         return;
       }
       setTournament(t);
+      setPublishWithoutNotifications(t.suppressNotifications === true);
       setPlayers(Array.isArray(p) ? p : []);
       setLoading(false);
     });
@@ -206,7 +210,11 @@ export function ClubOwnerTournamentManagePage({
     setRegError(null);
     setRegMessage(null);
     try {
-      const res = await fetch(`/api/tournaments/${tournament.id}/publish`, { method: "POST" });
+      const res = await fetch(`/api/tournaments/${tournament.id}/publish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ suppressNotifications: publishWithoutNotifications }),
+      });
       const data = await res.json();
       if (!res.ok) {
         setRegError(data.error ?? "Не удалось опубликовать турнир");
@@ -502,11 +510,32 @@ export function ClubOwnerTournamentManagePage({
             />
             {tournament.status === "PENDING_CLUB_APPROVAL" && (
               <p className="mt-2 text-sm text-amber-400/90">
-                Ждёт публикации. Если кнопка в Telegram не сработала — нажмите «Опубликовать турнир».
+                Ждёт публикации. Если кнопка в Telegram не сработала — отметьте «Без уведомлений» при
+                необходимости и нажмите «Опубликовать турнир».
               </p>
             )}
+            {tournament.suppressNotifications && (
+              <p className="mt-2 text-sm text-zinc-500">Уведомления по турниру отключены.</p>
+            )}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col items-end gap-2">
+            {tournament.status === "PENDING_CLUB_APPROVAL" && (
+              <label className="flex cursor-pointer items-start gap-2 text-sm text-zinc-300">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+                  checked={publishWithoutNotifications}
+                  onChange={(e) => setPublishWithoutNotifications(e.target.checked)}
+                />
+                <span>
+                  Без уведомлений
+                  <span className="mt-0.5 block text-xs text-zinc-500">
+                    Не слать «Новый турнир рядом» и другие Telegram по этому турниру.
+                  </span>
+                </span>
+              </label>
+            )}
+            <div className="flex flex-wrap gap-2">
             {tournament.status === "PENDING_CLUB_APPROVAL" && (
               <button
                 type="button"
@@ -549,11 +578,15 @@ export function ClubOwnerTournamentManagePage({
             >
               На сайте
             </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {tournament.status === "OPEN" && (
+      {isTournamentRegistrationOpen(
+        tournament.status,
+        tournament.matches.length > 0,
+      ) && (
         <section className="admin-card p-6">
           <h2 className="mb-4 font-semibold">Регистрация участников</h2>
           {participantRules && (
@@ -626,11 +659,12 @@ export function ClubOwnerTournamentManagePage({
         </section>
       )}
 
-      <section className="admin-card p-6">
+      <section className="admin-card min-w-0 max-w-full overflow-hidden p-6">
         <TournamentManageView
           tournament={tournament}
           clubOptions={clubOptions}
           playerOptions={playerOptions}
+          clubPlayerRatings={clubPlayerRatings}
           bracketLoading={bracketLoading}
           embedded
           onConfirmRegistration={confirmRegistration}

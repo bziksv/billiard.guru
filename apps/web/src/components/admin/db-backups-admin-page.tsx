@@ -1,0 +1,449 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { AsyncButton } from "@/components/ui/async-text-button";
+import {
+  describeBackupSchedule,
+  formatBytes,
+  INTERVAL_HOUR_OPTIONS,
+  type DbBackupEntry,
+  type DbBackupSettings,
+} from "@/lib/db-backup-types";
+
+type ScheduleMode = "daily" | "interval";
+
+function formatDateTime(iso: string): string {
+  return new Date(iso).toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function kindLabel(kind: DbBackupEntry["kind"]): string {
+  return kind === "auto" ? "Авто" : "Вручную";
+}
+
+export function DbBackupsAdminPage() {
+  const [backups, setBackups] = useState<DbBackupEntry[]>([]);
+  const [settings, setSettings] = useState<DbBackupSettings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [restoreId, setRestoreId] = useState<string | null>(null);
+  const [savingSchedule, setSavingSchedule] = useState(false);
+
+  const [draftAutoEnabled, setDraftAutoEnabled] = useState(false);
+  const [draftScheduleMode, setDraftScheduleMode] = useState<ScheduleMode>("daily");
+  const [draftIntervalHours, setDraftIntervalHours] = useState(1);
+  const [draftHour, setDraftHour] = useState(3);
+  const [draftMinute, setDraftMinute] = useState(0);
+  const [draftRetain, setDraftRetain] = useState(14);
+
+  const load = useCallback(async () => {
+    setError(null);
+    const res = await fetch("/api/admin/db-backups");
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось загрузить данные");
+    }
+    setBackups(data.backups);
+    setSettings(data.settings);
+    setDraftAutoEnabled(data.settings.autoEnabled);
+    const interval = data.settings.autoIntervalHours ?? 0;
+    setDraftScheduleMode(interval > 0 ? "interval" : "daily");
+    setDraftIntervalHours(interval > 0 ? interval : 1);
+    setDraftHour(data.settings.autoHour);
+    setDraftMinute(data.settings.autoMinute);
+    setDraftRetain(data.settings.retainCount);
+  }, []);
+
+  useEffect(() => {
+    load()
+      .catch((e) => setError(e instanceof Error ? e.message : "Ошибка загрузки"))
+      .finally(() => setLoading(false));
+  }, [load]);
+
+  async function createBackup() {
+    setMessage(null);
+    setError(null);
+    const res = await fetch("/api/admin/db-backups", { method: "POST" });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось создать бэкап");
+    }
+    setBackups(data.backups);
+    setSettings(data.settings);
+    setMessage(`Создан бэкап ${data.backup.filename}`);
+  }
+
+  async function saveSchedule() {
+    setSavingSchedule(true);
+    setMessage(null);
+    setError(null);
+    try {
+      const res = await fetch("/api/admin/db-backups/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          autoEnabled: draftAutoEnabled,
+          autoIntervalHours:
+            draftScheduleMode === "interval" ? draftIntervalHours : 0,
+          autoHour: draftHour,
+          autoMinute: draftMinute,
+          retainCount: draftRetain,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "Не удалось сохранить настройки");
+      }
+      setSettings(data.settings);
+      setMessage("Настройки автобэкапа сохранены");
+    } finally {
+      setSavingSchedule(false);
+    }
+  }
+
+  async function deleteBackup(id: string) {
+    if (!window.confirm("Удалить этот бэкап?")) return;
+    setError(null);
+    const res = await fetch(`/api/admin/db-backups/${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось удалить");
+    }
+    setBackups(data.backups);
+    setMessage("Бэкап удалён");
+  }
+
+  async function restoreBackup(id: string) {
+    setError(null);
+    const res = await fetch(
+      `/api/admin/db-backups/${encodeURIComponent(id)}/restore`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: "RESTORE" }),
+      },
+    );
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось восстановить");
+    }
+    setRestoreId(null);
+    setMessage(data.message ?? "База восстановлена");
+  }
+
+  if (loading) {
+    return <p className="admin-muted p-6">Загрузка…</p>;
+  }
+
+  const toolsOk = settings?.mysqldumpAvailable && settings?.mysqlAvailable;
+
+  return (
+    <div className="space-y-6 p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="admin-page-title text-xl font-semibold">Бэкап базы данных</h1>
+          <p className="admin-muted mt-1 max-w-2xl text-sm">
+            Резервные копии MySQL: создание, скачивание, восстановление и расписание.
+          </p>
+        </div>
+        <AsyncButton
+          onClick={() =>
+            createBackup().catch((e) =>
+              setError(e instanceof Error ? e.message : "Не удалось создать бэкап"),
+            )
+          }
+          disabled={!settings?.mysqldumpAvailable}
+          className="admin-btn admin-btn--primary px-4 py-2 text-sm"
+          loadingLabel="Создание…"
+        >
+          Создать бэкап сейчас
+        </AsyncButton>
+      </div>
+
+      {error && (
+        <p className="rounded-lg border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+          {error}
+        </p>
+      )}
+      {message && (
+        <p className="rounded-lg border border-emerald-800/40 bg-emerald-950/25 px-4 py-3 text-sm text-emerald-300">
+          {message}
+        </p>
+      )}
+
+      <section className="admin-card p-5">
+        <h2 className="mb-4 text-sm font-semibold">Состояние</h2>
+        <dl className="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <div>
+            <dt className="admin-label-xs">Каталог бэкапов</dt>
+            <dd className="mt-1 font-mono text-xs leading-relaxed break-all">
+              {settings?.backupDir}
+            </dd>
+          </div>
+          <div>
+            <dt className="admin-label-xs">Инструменты</dt>
+            <dd className="mt-1">
+              mysqldump: {settings?.mysqldumpAvailable ? "✓" : "✗"} · mysql:{" "}
+              {settings?.mysqlAvailable ? "✓" : "✗"}
+            </dd>
+          </div>
+          <div>
+            <dt className="admin-label-xs">Расписание</dt>
+            <dd className="mt-1">
+              {settings
+                ? settings.autoEnabled
+                  ? describeBackupSchedule(settings)
+                  : "выключено"
+                : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt className="admin-label-xs">Последний автобэкап</dt>
+            <dd className="mt-1">
+              {settings?.lastAutoBackupAt
+                ? formatDateTime(settings.lastAutoBackupAt)
+                : "—"}
+            </dd>
+          </div>
+          <div>
+            <dt className="admin-label-xs">Всего копий</dt>
+            <dd className="mt-1">{backups.length}</dd>
+          </div>
+        </dl>
+        {!toolsOk && (
+          <p className="mt-4 text-sm text-amber-600 dark:text-amber-400/90">
+            На сервере нужны клиенты MySQL (<code className="text-xs">mysqldump</code> и{" "}
+            <code className="text-xs">mysql</code> в PATH). На Beget обычно доступны по SSH.
+          </p>
+        )}
+      </section>
+
+      <section className="admin-card p-5">
+        <h2 className="mb-2 text-sm font-semibold">Автоматический бэкап</h2>
+        <p className="admin-muted mb-4 text-sm">
+          Cron периодически вызывает{" "}
+          <code className="rounded bg-[var(--admin-inset-bg)] px-1 py-0.5 text-xs">
+            POST /api/admin/db-backups/cron
+          </code>{" "}
+          (см. <code className="text-xs">scripts/db-backup-cron.sh</code>). Для режима
+          «каждый час» поставьте cron раз в час — например{" "}
+          <code className="text-xs">0 * * * *</code>. При «раз в сутки» достаточно одного
+          вызова в день после заданного времени.
+        </p>
+
+        <label className="mb-4 flex cursor-pointer items-center gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            className="admin-checkbox h-4 w-4"
+            checked={draftAutoEnabled}
+            onChange={(e) => setDraftAutoEnabled(e.target.checked)}
+          />
+          <span>Включить автобэкап</span>
+        </label>
+
+        <div className="mb-4 flex flex-wrap gap-4">
+          <label>
+            <span className="admin-label-xs">Режим</span>
+            <select
+              value={draftScheduleMode}
+              onChange={(e) => setDraftScheduleMode(e.target.value as ScheduleMode)}
+              className="admin-input mt-1 block w-44 px-3 py-2 text-sm"
+            >
+              <option value="daily">Раз в сутки</option>
+              <option value="interval">Интервал</option>
+            </select>
+          </label>
+          {draftScheduleMode === "daily" ? (
+            <>
+              <label>
+                <span className="admin-label-xs">Час (0–23)</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={23}
+                  value={draftHour}
+                  onChange={(e) => setDraftHour(Number(e.target.value))}
+                  className="admin-input mt-1 block w-24 px-3 py-2 text-sm"
+                />
+              </label>
+              <label>
+                <span className="admin-label-xs">Минута (0–59)</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={59}
+                  value={draftMinute}
+                  onChange={(e) => setDraftMinute(Number(e.target.value))}
+                  className="admin-input mt-1 block w-24 px-3 py-2 text-sm"
+                />
+              </label>
+            </>
+          ) : (
+            <label>
+              <span className="admin-label-xs">Каждые</span>
+              <select
+                value={draftIntervalHours}
+                onChange={(e) => setDraftIntervalHours(Number(e.target.value))}
+                className="admin-input mt-1 block w-44 px-3 py-2 text-sm"
+              >
+                {INTERVAL_HOUR_OPTIONS.map((h) => (
+                  <option key={h} value={h}>
+                    {h === 1 ? "1 час" : h === 24 ? "24 часа (сутки)" : `${h} ч`}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+        </div>
+
+        <div className="flex flex-wrap items-end gap-4">
+          <label>
+            <span className="admin-label-xs">Хранить копий</span>
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={draftRetain}
+              onChange={(e) => setDraftRetain(Number(e.target.value))}
+              className="admin-input mt-1 block w-28 px-3 py-2 text-sm"
+            />
+          </label>
+          <AsyncButton
+            onClick={() =>
+              saveSchedule().catch((e) =>
+                setError(e instanceof Error ? e.message : "Ошибка сохранения"),
+              )
+            }
+            disabled={savingSchedule}
+            className="admin-btn admin-btn--primary px-4 py-2 text-sm"
+            loadingLabel="Сохранение…"
+          >
+            Сохранить расписание
+          </AsyncButton>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-3 text-sm font-semibold">Архив бэкапов</h2>
+        {backups.length === 0 ? (
+          <div className="admin-card px-5 py-10 text-center">
+            <p className="admin-muted text-sm">
+              Пока нет резервных копий. Создайте первую вручную или включите автобэкап.
+            </p>
+          </div>
+        ) : (
+          <div className="admin-table-wrap admin-table-wrap--scroll">
+            <table className="w-full min-w-[860px] text-left text-sm">
+              <thead className="admin-thead">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Дата</th>
+                  <th className="px-4 py-3 font-medium">Тип</th>
+                  <th className="px-4 py-3 font-medium">Файл</th>
+                  <th className="px-4 py-3 font-medium">Размер</th>
+                  <th className="px-4 py-3 font-medium">БД</th>
+                  <th className="px-4 py-3 text-right font-medium">Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {backups.map((b) => (
+                  <tr key={b.id} className="admin-table-row">
+                    <td className="whitespace-nowrap px-4 py-3">
+                      {formatDateTime(b.createdAt)}
+                    </td>
+                    <td className="px-4 py-3">{kindLabel(b.kind)}</td>
+                    <td
+                      className="max-w-[220px] truncate px-4 py-3 font-mono text-xs"
+                      title={b.filename}
+                    >
+                      {b.filename}
+                    </td>
+                    <td className="px-4 py-3 tabular-nums">
+                      <span className={b.sizeBytes === 0 ? "text-amber-600" : undefined}>
+                        {formatBytes(b.sizeBytes)}
+                      </span>
+                      {b.sizeBytes === 0 && (
+                        <span className="admin-muted ml-1 text-xs">пустой</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">{b.database}</td>
+                    <td className="whitespace-nowrap px-4 py-3">
+                      <div className="flex flex-nowrap justify-end gap-2">
+                        <a
+                          href={`/api/admin/db-backups/${encodeURIComponent(b.id)}/download`}
+                          className="admin-btn admin-btn--outline text-xs"
+                        >
+                          Скачать
+                        </a>
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--outline text-xs"
+                          onClick={() => setRestoreId(b.id)}
+                        >
+                          Восстановить
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-btn admin-btn--danger text-xs"
+                          onClick={() =>
+                            deleteBackup(b.id).catch((e) =>
+                              setError(e instanceof Error ? e.message : "Ошибка удаления"),
+                            )
+                          }
+                        >
+                          Удалить
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {restoreId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+          <div className="admin-card w-full max-w-md space-y-4 p-6">
+            <h3 className="text-lg font-semibold text-red-600 dark:text-red-300">
+              Восстановить базу?
+            </h3>
+            <p className="text-sm text-[var(--admin-text-secondary)]">
+              Текущие данные будут перезаписаны содержимым бэкапа{" "}
+              <span className="font-mono text-xs">{restoreId}</span>. Сайт может кратковременно
+              работать нестабильно.
+            </p>
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                className="admin-btn admin-btn--outline px-4 py-2 text-sm"
+                onClick={() => setRestoreId(null)}
+              >
+                Отмена
+              </button>
+              <AsyncButton
+                onClick={() =>
+                  restoreBackup(restoreId).catch((e) =>
+                    setError(e instanceof Error ? e.message : "Не удалось восстановить"),
+                  )
+                }
+                className="admin-btn admin-btn--danger px-4 py-2 text-sm"
+                loadingLabel="Восстановление…"
+              >
+                Да, восстановить
+              </AsyncButton>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

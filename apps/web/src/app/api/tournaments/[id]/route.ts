@@ -18,6 +18,7 @@ import {
   tournamentManageActorType,
 } from "@/lib/tournament-manage";
 import { assertTournamentFitsFormat } from "@/lib/tournament-participant-limit-server";
+import { reopenTournamentIfBracketEmpty } from "@/lib/tournament-registration-server";
 import { tournamentUpdateSchema } from "@/lib/validators";
 
 export async function GET(
@@ -27,6 +28,7 @@ export async function GET(
   try {
     const { id } = await params;
     await requireTournamentManageAccess(id);
+    await reopenTournamentIfBracketEmpty(id);
 
     const tournament = await prisma.tournament.findUnique({
       where: { id },
@@ -141,6 +143,9 @@ export async function PATCH(
           handicapHalfStep: data.handicapHalfStep,
         }),
         ...(data.ratingSource !== undefined && { ratingSource: data.ratingSource }),
+        ...(data.suppressNotifications !== undefined && {
+          suppressNotifications: data.suppressNotifications,
+        }),
       },
       include: tournamentAdminInclude,
     });

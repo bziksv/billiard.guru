@@ -1624,10 +1624,10 @@ export async function deleteBracket(db: Db, tournamentId: string) {
 
   await db.tournamentMatch.deleteMany({ where: { tournamentId } });
 
-  if (tournament.status === "FINISHED") {
+  if (tournament.status === "ACTIVE" || tournament.status === "FINISHED") {
     await db.tournament.update({
       where: { id: tournamentId },
-      data: { status: "ACTIVE" },
+      data: { status: "OPEN" },
     });
   }
 }

@@ -362,6 +362,8 @@ model Tournament {
   ratingSource        TournamentRatingSource   @default(CLUB) @map("rating_source")
   /// Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в нечётных)
   handicapHalfStep    Boolean          @default(true) @map("handicap_half_step")
+  /// Не слать Telegram по этому турниру (тестовые копии и отладка)
+  suppressNotifications Boolean        @default(false) @map("suppress_notifications")
   startsAt            DateTime?        @map("starts_at")
   clubApprovalToken   String?          @unique @map("club_approval_token")
   publishedAt         DateTime?        @map("published_at")
@@ -591,6 +593,8 @@ model NotificationTypeConfig {
 /// Вкл/выкл типа сетки (код = TournamentFormat, реестр BRACKET_FORMAT_CATALOG).
 model BracketFormatConfig {
   formatCode        String   @id @map("format_code")
+  /// Переопределение подписи в списках (null — из каталога)
+  adminLabel        String?  @map("admin_label") @db.VarChar(500)
   enabled           Boolean  @default(true)
   /// Техобслуживание: тип виден в админке, но недоступен при создании турнира
   maintenanceMode   Boolean  @default(false) @map("maintenance_mode")
@@ -617,6 +621,23 @@ model TournamentDefaultsConfig {
   updatedAt        DateTime                 @updatedAt @map("updated_at")
 
   @@map("tournament_defaults_config")
+}
+
+/// Настройки автобэкапа БД (одна строка, /admin/db-backups).
+model DbBackupConfig {
+  id               String    @id @default("default")
+  autoEnabled      Boolean   @default(false) @map("auto_enabled")
+  /// Час (0–23) по времени сервера — только при autoIntervalHours = 0
+  autoHour         Int       @default(3) @map("auto_hour")
+  autoMinute       Int       @default(0) @map("auto_minute")
+  /// 0 = раз в сутки; 1, 2, 6… = каждые N часов с момента последнего автобэкапа
+  autoIntervalHours Int      @default(0) @map("auto_interval_hours")
+  /// Сколько последних дампов хранить
+  retainCount      Int       @default(14) @map("retain_count")
+  lastAutoBackupAt DateTime? @map("last_auto_backup_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  @@map("db_backup_config")
 }
 
 /// Журнал отправок Telegram: каждая попытка (успех / ошибка / пропуск с причиной).

@@ -18,6 +18,7 @@ import {
 } from "@/lib/telegram";
 import { formatRating } from "@/lib/rating";
 import { filterPlayersByTournamentRatingMax } from "@/lib/tournament-rating-limit-server";
+import { tournamentNotificationsSuppressed } from "@/lib/tournament-notifications-guard";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 
 function appUrl(path = "") {
@@ -47,6 +48,7 @@ async function loadTournamentForApproval(tournamentId: string) {
 export async function requestClubTournamentApproval(tournamentId: string) {
   const tournament = await loadTournamentForApproval(tournamentId);
   if (!tournament) throw new Error("Турнир не найден");
+  if (tournamentNotificationsSuppressed(tournament)) return;
 
   const club = tournament.club;
   if (!club.isVerified || !club.telegramId) {
@@ -107,6 +109,10 @@ async function notifyNearbyPlayers(tournamentId: string) {
   const batchId = randomUUID();
   const tournament = await loadTournamentForApproval(tournamentId);
   if (!tournament) return;
+  if (tournamentNotificationsSuppressed(tournament)) {
+    logger.info({ tournamentId }, "Nearby player notifications skipped (suppressNotifications)");
+    return { batchId, sent: 0, failed: 0, skipped: 0 };
+  }
 
   const origin = tournament.club.city;
   const allCities = await prisma.city.findMany({
@@ -343,15 +349,21 @@ export async function approveTournamentByClub(
     entityId: tournament.id,
   });
 
-  try {
-    await notifyNearbyPlayers(tournament.id);
-  } catch (err) {
-    logger.error({ err, tournamentId: tournament.id }, "Nearby player notifications failed");
+  if (!tournamentNotificationsSuppressed(tournament)) {
+    try {
+      await notifyNearbyPlayers(tournament.id);
+    } catch (err) {
+      logger.error({ err, tournamentId: tournament.id }, "Nearby player notifications failed");
+    }
   }
+
+  const notifyHint = tournamentNotificationsSuppressed(tournament)
+    ? "Уведомления по этому турниру отключены."
+    : "Уведомления игрокам поблизости отправляются.";
 
   return {
     ok: true,
-    message: `✅ Турнир «${tournament.name}» опубликован на billiard.guru.\nУведомления игрокам поблизости отправляются.`,
+    message: `✅ Турнир «${tournament.name}» опубликован на billiard.guru.\n${notifyHint}`,
   };
 }
 
@@ -446,6 +458,7 @@ export async function handleTournamentApprovalCallback(
 export async function publishTournamentFromManage(
   tournamentId: string,
   playerId: string,
+  options?: { suppressNotifications?: boolean },
 ): Promise<{ ok: boolean; message: string }> {
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
@@ -465,12 +478,18 @@ export async function publishTournamentFromManage(
     return { ok: false, message: "Нет прав на публикацию этого турнира." };
   }
 
+  const suppressNotifications =
+    options?.suppressNotifications === true || tournament.suppressNotifications;
+
   await prisma.tournament.update({
     where: { id: tournament.id },
     data: {
       status: "OPEN",
       publishedAt: new Date(),
       clubApprovalToken: null,
+      ...(options?.suppressNotifications !== undefined && {
+        suppressNotifications: options.suppressNotifications,
+      }),
     },
   });
 
@@ -481,17 +500,24 @@ export async function publishTournamentFromManage(
     entityType: "tournament",
     entityId: tournament.id,
     clubId: tournament.clubId,
+    payload: { suppressNotifications },
   });
 
-  try {
-    await notifyNearbyPlayers(tournament.id);
-  } catch (err) {
-    logger.error({ err, tournamentId: tournament.id }, "Nearby player notifications failed");
+  if (!suppressNotifications) {
+    try {
+      await notifyNearbyPlayers(tournament.id);
+    } catch (err) {
+      logger.error({ err, tournamentId: tournament.id }, "Nearby player notifications failed");
+    }
   }
+
+  const notifyHint = suppressNotifications
+    ? "Уведомления по этому турниру отключены."
+    : "Уведомления игрокам поблизости отправляются.";
 
   return {
     ok: true,
-    message: `✅ Турнир «${tournament.name}» опубликован.`,
+    message: `✅ Турнир «${tournament.name}» опубликован.\n${notifyHint}`,
   };
 }
 

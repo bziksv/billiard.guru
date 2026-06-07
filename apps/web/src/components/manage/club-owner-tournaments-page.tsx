@@ -98,6 +98,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
             : null,
           ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
           handicapHalfStep: form.get("handicapHalfStep") === "on",
+          suppressNotifications: form.get("suppressNotifications") === "on",
         }),
       });
       const data = await res.json();
@@ -207,6 +208,20 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
                   Включено: фора по системе 0,5 (например 3,5 vs 0 — 3 шара в каждой партии и +1 в
                   нечётных). Если снять галку — только целая часть разницы (3,5 vs 0 — 3 шара в
                   каждой, без доп. шара в нечётных).
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                name="suppressNotifications"
+                className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-emerald-600"
+              />
+              <span>
+                <span className="font-medium text-zinc-200">Без уведомлений по турниру</span>
+                <span className="mt-1 block text-xs text-zinc-500">
+                  Не слать Telegram по этому турниру (запрос на публикацию, рассылка «турнир рядом»,
+                  регистрация, встречи). Для тестов — регистрация откроется сразу.
                 </span>
               </span>
             </label>

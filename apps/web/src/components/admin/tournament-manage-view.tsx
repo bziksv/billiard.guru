@@ -19,6 +19,7 @@ import type { BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap } from "@/lib/handicap";
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import {
+  applyTournamentRatingsToTeam,
   TOURNAMENT_RATING_SOURCE_OPTIONS,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
@@ -54,6 +55,7 @@ import {
 } from "@/lib/tournament-admin";
 import {
   canCancelRegistration,
+  isTournamentRegistrationOpen,
 } from "@/lib/tournament-registration";
 import {
   REGISTRATION_STATUS_LABELS,
@@ -302,11 +304,14 @@ export function TournamentManageView({
   presentationOpen: presentationOpenProp,
   onPresentationOpenChange,
   showTabBarFullscreenButton = true,
+  clubPlayerRatings,
 }: {
   tournament: AdminTournament;
   clubOptions: { value: string; label: string }[];
   playerOptions: { value: string; label: string }[];
   bracketLoading: boolean;
+  /** Клубные рейтинги для форы (источник CLUB). */
+  clubPlayerRatings?: Record<string, number>;
   embedded?: boolean;
   /** full — все вкладки (кабинет клуба); tournament — только участники; bracket — сетка и встречи */
   viewMode?: TournamentManageViewMode;
@@ -496,6 +501,7 @@ export function TournamentManageView({
   }, [t.matches]);
   const finalRound = rounds.at(-1)?.[0];
   const bracketLocked = t.matches.length > 0;
+  const registrationOpen = isTournamentRegistrationOpen(t.status, bracketLocked);
   const activeTeams = t.teams.filter((team) => team.status !== "CANCELLED");
   const inactiveTeams = t.teams.filter(
     (team) => team.status === "CANCELLED" || team.status === "REJECTED",
@@ -509,6 +515,8 @@ export function TournamentManageView({
     ? activeTeams.length
     : t.registrations.filter((r) => r.status !== "CANCELLED").length;
   const showSwissPoints = swiss && protocolRows.some((row) => row.points !== undefined);
+  const ratingSource = t.ratingSource ?? "CLUB";
+  const handicapHalfStep = t.handicapHalfStep !== false;
   const bracketMatches = useMemo<BracketMatchView[]>(
     () =>
       t.matches.map((m) => ({
@@ -521,10 +529,10 @@ export function TournamentManageView({
         team2Score: m.team2Score,
         startedAt: m.startedAt,
         finishedAt: m.finishedAt,
-        team1: m.team1,
-        team2: m.team2,
+        team1: applyTournamentRatingsToTeam(m.team1, ratingSource, clubPlayerRatings),
+        team2: applyTournamentRatingsToTeam(m.team2, ratingSource, clubPlayerRatings),
       })),
-    [t.matches],
+    [t.matches, ratingSource, clubPlayerRatings],
   );
   const currentMatches = useMemo(
     () => filterCurrentMatches(bracketMatches),
@@ -832,6 +840,7 @@ export function TournamentManageView({
           inactiveTeams={inactiveTeams}
           playerOptions={playerOptions}
           bracketLocked={bracketLocked}
+          registrationOpen={registrationOpen}
           canModifyRegistrations={canModifyRegistrations}
           onConfirmRegistration={onConfirmRegistration}
           onRejectRegistration={onRejectRegistration}
@@ -847,6 +856,11 @@ export function TournamentManageView({
           format={t.format}
           bracketMatches={bracketMatches}
           matchNumbers={bracketMatchNumbers}
+          confirmedCount={confirmedCount}
+          maxRound={maxRound}
+          currentRoundOpen={currentRoundOpen}
+          bracketLoading={bracketLoading}
+          onGenerateBracket={onGenerateBracket}
           showCardMatchNumber={bracketDisplay.showMatchNumber}
           showCardHandicap={bracketDisplay.showHandicap}
           showCardPlacement={bracketDisplay.showPlacement}
@@ -863,6 +877,7 @@ export function TournamentManageView({
         <MatchesScheduleTab
           variant="current"
           format={t.format}
+          handicapHalfStep={handicapHalfStep}
           allMatches={bracketMatches}
           matches={currentMatches}
           matchNumbers={bracketMatchNumbers}
@@ -875,7 +890,7 @@ export function TournamentManageView({
         <MatchesScheduleTab
           variant="upcoming"
           format={t.format}
-          handicapHalfStep={t.handicapHalfStep !== false}
+          handicapHalfStep={handicapHalfStep}
           allMatches={bracketMatches}
           matches={upcomingMatches}
           matchNumbers={bracketMatchNumbers}
@@ -888,6 +903,7 @@ export function TournamentManageView({
         <MatchesScheduleTab
           variant="completed"
           format={t.format}
+          handicapHalfStep={handicapHalfStep}
           allMatches={bracketMatches}
           matches={completedMatches}
           matchNumbers={bracketMatchNumbers}
@@ -926,6 +942,7 @@ export function TournamentManageView({
             inactiveTeams={inactiveTeams}
             playerOptions={playerOptions}
             bracketLocked={bracketLocked}
+            registrationOpen={registrationOpen}
             canModifyRegistrations={canModifyRegistrations}
             onConfirmRegistration={onConfirmRegistration}
             onRejectRegistration={onRejectRegistration}
@@ -941,6 +958,11 @@ export function TournamentManageView({
             format={t.format}
             bracketMatches={bracketMatches}
             matchNumbers={bracketMatchNumbers}
+            confirmedCount={confirmedCount}
+            maxRound={maxRound}
+            currentRoundOpen={currentRoundOpen}
+            bracketLoading={bracketLoading}
+            onGenerateBracket={onGenerateBracket}
             showCardMatchNumber={bracketDisplay.showMatchNumber}
             showCardHandicap={bracketDisplay.showHandicap}
             showCardPlacement={bracketDisplay.showPlacement}
@@ -956,6 +978,7 @@ export function TournamentManageView({
           <MatchesScheduleTab
             variant="current"
             format={t.format}
+            handicapHalfStep={handicapHalfStep}
             allMatches={bracketMatches}
             matches={currentMatches}
             matchNumbers={bracketMatchNumbers}
@@ -968,7 +991,7 @@ export function TournamentManageView({
           <MatchesScheduleTab
             variant="upcoming"
             format={t.format}
-            handicapHalfStep={t.handicapHalfStep !== false}
+            handicapHalfStep={handicapHalfStep}
             allMatches={bracketMatches}
             matches={upcomingMatches}
             matchNumbers={bracketMatchNumbers}
@@ -981,6 +1004,7 @@ export function TournamentManageView({
           <MatchesScheduleTab
             variant="completed"
             format={t.format}
+            handicapHalfStep={handicapHalfStep}
             allMatches={bracketMatches}
             matches={completedMatches}
             matchNumbers={bracketMatchNumbers}
@@ -1014,6 +1038,7 @@ function ParticipantsTab({
   inactiveTeams,
   playerOptions,
   bracketLocked,
+  registrationOpen,
   canModifyRegistrations,
   onConfirmRegistration,
   onRejectRegistration,
@@ -1030,6 +1055,7 @@ function ParticipantsTab({
   inactiveTeams: Team[];
   playerOptions: { value: string; label: string }[];
   bracketLocked: boolean;
+  registrationOpen: boolean;
   canModifyRegistrations: boolean;
   onConfirmRegistration: (id: string) => void | Promise<void>;
   onRejectRegistration: (id: string) => void | Promise<void>;
@@ -1162,7 +1188,7 @@ function ParticipantsTab({
                     label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
                   />
                   {canModifyRegistrations &&
-                    t.status === "OPEN" &&
+                    registrationOpen &&
                     (r.status === "CANCELLED" || r.status === "REJECTED") && (
                       <RegistrationActionButton
                         variant="primary"
@@ -1212,7 +1238,7 @@ function ParticipantsTab({
                     status={team.status}
                     label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
                   />
-                  {canModifyRegistrations && t.status === "OPEN" && !bracketLocked && (
+                  {canModifyRegistrations && registrationOpen && (
                     <RegistrationActionButton
                       variant="primary"
                       loadingLabel={
@@ -1237,6 +1263,79 @@ function ParticipantsTab({
       {pair && activeTeams.length === 0 && (
         <p className="tournament-hint">Команд пока нет.</p>
       )}
+    </div>
+  );
+}
+
+function BracketGenerateButton({
+  t,
+  format,
+  confirmedCount,
+  maxRound,
+  currentRoundOpen,
+  bracketLoading,
+  onGenerateBracket,
+}: {
+  t: AdminTournament;
+  format: string;
+  confirmedCount: number;
+  maxRound: number;
+  currentRoundOpen: boolean;
+  bracketLoading: boolean;
+  onGenerateBracket: () => void | Promise<void>;
+}) {
+  const dynamicSwiss = isDynamicSwissFormat(format);
+  const excelRef = isExcelRef64Format(format);
+  const fixedSwiss = isFixedSwissFormat(format);
+  const olympic = isOlympicFormat(format);
+  const oneShotGrid = olympic || fixedSwiss || excelRef;
+
+  if (!dynamicSwiss && !fixedSwiss && !olympic && !excelRef) {
+    return null;
+  }
+
+  const generateLabel = oneShotGrid
+    ? "Сформировать сетку"
+    : maxRound === 0
+      ? "Сформировать 1-й тур"
+      : `Сформировать тур ${maxRound + 1}`;
+
+  const participantRules: BracketParticipantRules =
+    t.participantRules ?? getDefaultBracketParticipantRules(t.format);
+  const participantCheck = validateBracketParticipantCount(
+    format,
+    confirmedCount,
+    participantRules,
+  );
+
+  const generateDisabled =
+    bracketLoading ||
+    confirmedCount < 2 ||
+    !participantCheck.ok ||
+    (dynamicSwiss && maxRound > 0 && currentRoundOpen);
+
+  return (
+    <div className="space-y-2">
+      {!participantCheck.ok && (
+        <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100">
+          {participantCheck.error}
+        </p>
+      )}
+      <button
+        type="button"
+        onClick={onGenerateBracket}
+        disabled={generateDisabled}
+        className="admin-btn admin-btn--primary px-4 py-2 text-sm disabled:opacity-50"
+      >
+        {bracketLoading ? "Формирование…" : generateLabel}
+      </button>
+      <p className="text-xs text-zinc-500">
+        Подтверждённых: {confirmedCount}
+        {confirmedCount < 2 && " (минимум 2)"}
+        {participantCheck.ok &&
+          participantRules.exact != null &&
+          ` (нужно ${participantRules.exact})`}
+      </p>
     </div>
   );
 }
@@ -1491,6 +1590,11 @@ function BracketTab({
   format,
   bracketMatches,
   matchNumbers,
+  confirmedCount,
+  maxRound,
+  currentRoundOpen,
+  bracketLoading,
+  onGenerateBracket,
   showCardMatchNumber = true,
   showCardHandicap = true,
   showCardPlacement = true,
@@ -1506,6 +1610,11 @@ function BracketTab({
   format: string;
   bracketMatches: BracketMatchView[];
   matchNumbers: Map<string, number>;
+  confirmedCount: number;
+  maxRound: number;
+  currentRoundOpen: boolean;
+  bracketLoading: boolean;
+  onGenerateBracket: () => void | Promise<void>;
   showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
@@ -1631,16 +1740,28 @@ function BracketTab({
     </>
   );
 
+  const emptyBracketPanel =
+    bracketMatches.length === 0 ? (
+      <div className="space-y-3 px-2">
+        <p className="tournament-hint text-sm">
+          Сетка ещё не сформирована. Подтвердите участников и нажмите кнопку ниже.
+        </p>
+        <BracketGenerateButton
+          t={t}
+          format={format}
+          confirmedCount={confirmedCount}
+          maxRound={maxRound}
+          currentRoundOpen={currentRoundOpen}
+          bracketLoading={bracketLoading}
+          onGenerateBracket={onGenerateBracket}
+        />
+      </div>
+    ) : null;
+
   if (inPresentation) {
     return (
       <div className="flex h-full min-h-0 flex-col">
-        {bracketMatches.length === 0 ? (
-          <p className="tournament-hint px-2 text-sm">
-            Сетка ещё не сформирована — откройте настройки турнира.
-          </p>
-        ) : (
-          renderBracketView(true)
-        )}
+        {emptyBracketPanel ?? renderBracketView(true)}
         {bracketModals}
       </div>
     );
@@ -1666,12 +1787,7 @@ function BracketTab({
         </p>
       )}
 
-      {bracketMatches.length === 0 ? (
-        <p className="tournament-hint text-sm">
-          Сетка ещё не сформирована. Подтвердите участников и сформируйте сетку в настройках
-          турнира.
-        </p>
-      ) : (
+      {emptyBracketPanel ?? (
         <div className="min-w-0 max-w-full">
           {renderBracketView(false)}
           {bracketModals}
@@ -1738,7 +1854,7 @@ function MatchesScheduleTab({
   const showScore = variant === "current" || variant === "completed";
   const showElapsed = variant === "current";
   const showDuration = variant === "completed";
-  const showHandicap = variant === "upcoming";
+  const showHandicap = true;
   const rowHint =
     variant === "completed"
       ? "Нажмите на строку, чтобы открыть карточку встречи, изменить данные или отменить результат."

@@ -6,11 +6,16 @@ import { useEffect, useMemo, useState } from "react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import type { BracketFormatDefinition } from "@/lib/bracket-formats/catalog";
+import { BracketFormatLabelEditor } from "@/components/admin/bracket-format-label-editor";
 import { BracketParticipantLimitEditor } from "@/components/admin/bracket-participant-limit-editor";
 import {
   resolveBracketParticipantRules,
   type BracketParticipantRules,
 } from "@/lib/bracket-participant-rules";
+import {
+  getBracketFormatCatalogLabel,
+  resolveBracketFormatAdminLabel,
+} from "@/lib/bracket-formats/resolve-label";
 import { TOURNAMENT_BRACKETS_SECTIONS } from "@/lib/tournament-brackets-guide";
 import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 import { cn } from "@/lib/cn";
@@ -43,6 +48,8 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
         participantMax: number | null;
         participantExact: number | null;
         participantRules: BracketParticipantRules;
+        catalogAdminLabel: string;
+        adminLabelOverride: string | null;
       })
     | null
   >(null);
@@ -50,6 +57,7 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [savingParticipants, setSavingParticipants] = useState(false);
+  const [savingLabel, setSavingLabel] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<TournamentRow | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -81,18 +89,25 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
     participantMax?: number | null;
     participantExact?: number | null;
     resetParticipantLimits?: boolean;
+    adminLabel?: string | null;
+    resetAdminLabel?: boolean;
   }) {
     if (!format) return;
     const prev = format;
-    if (
+    const isParticipant =
       patch.participantMin !== undefined ||
       patch.participantMax !== undefined ||
       patch.participantExact !== undefined ||
-      patch.resetParticipantLimits
-    ) {
+      patch.resetParticipantLimits;
+    const isLabel = patch.adminLabel !== undefined || patch.resetAdminLabel === true;
+
+    if (isParticipant) {
       setSavingParticipants(true);
+    } else if (isLabel) {
+      setSavingLabel(true);
     } else {
-      setFormat({ ...format, ...patch });
+      const { adminLabel: _l, resetAdminLabel: _r, ...togglePatch } = patch;
+      setFormat({ ...format, ...togglePatch });
     }
     const res = await fetch("/api/admin/bracket-formats/settings", {
       method: "PATCH",
@@ -104,10 +119,12 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
       setError(json.error ?? "Не удалось сохранить");
       setFormat(prev);
       setSavingParticipants(false);
+      setSavingLabel(false);
       return;
     }
     const s = json.settings?.[format.code];
     if (s) {
+      const catalogAdminLabel = format.catalogAdminLabel ?? getBracketFormatCatalogLabel(format.code);
       setFormat((f) =>
         f
           ? {
@@ -119,11 +136,15 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
               participantMax: s.participantMax,
               participantExact: s.participantExact,
               participantRules: resolveBracketParticipantRules(f.code, s),
+              catalogAdminLabel,
+              adminLabelOverride: s.adminLabel,
+              adminLabel: resolveBracketFormatAdminLabel(f.code, { adminLabel: s.adminLabel }),
             }
           : f,
       );
     }
     setSavingParticipants(false);
+    setSavingLabel(false);
   }
 
   function closeDeleteModal() {
@@ -333,6 +354,22 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="admin-card overflow-hidden p-0">
+        <div className="border-b border-[var(--admin-border)] px-5 py-4">
+          <h2 className="admin-label uppercase tracking-wide">Название</h2>
+          <p className="admin-muted mt-1 text-sm">
+            Подпись в форме создания турнира и в карточках типов сеток.
+          </p>
+        </div>
+        <BracketFormatLabelEditor
+          adminLabel={format.adminLabel}
+          catalogLabel={format.catalogAdminLabel}
+          saving={savingLabel}
+          onSave={(label) => patchSettings({ adminLabel: label })}
+          onReset={() => patchSettings({ resetAdminLabel: true })}
+        />
       </section>
 
       <section className="admin-card p-5">

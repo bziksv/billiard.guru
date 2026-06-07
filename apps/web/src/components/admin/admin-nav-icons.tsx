@@ -151,6 +151,17 @@ export function IconTariffs({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function IconDatabaseBackup({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <ellipse cx="12" cy="6" rx="8" ry="3" />
+      <path d="M4 6v4c0 1.7 3.6 3 8 3s8-1.3 8-3V6" />
+      <path d="M4 10v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4" />
+      <path d="M4 14v4c0 1.7 3.6 3 8 3s8-1.3 8-3v-4" />
+    </svg>
+  );
+}
+
 export function IconHandicap({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>

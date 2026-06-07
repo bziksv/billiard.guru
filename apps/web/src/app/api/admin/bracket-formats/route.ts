@@ -9,9 +9,37 @@ import { prisma } from "@/lib/prisma";
 import type { TournamentFormat } from "@/generated/prisma/enums";
 import { resolveBracketParticipantRules } from "@/lib/bracket-participant-rules";
 import {
+  getBracketFormatCatalogLabel,
+  resolveBracketFormatAdminLabel,
+} from "@/lib/bracket-formats/resolve-label";
+import {
+  DEFAULT_BRACKET_FORMAT_SETTINGS,
   getAllBracketFormatSettings,
   resolveBracketFormatIsReference,
 } from "@/lib/bracket-formats/settings-server";
+
+function formatRow(
+  f: (typeof BRACKET_FORMAT_CATALOG)[number],
+  s: typeof DEFAULT_BRACKET_FORMAT_SETTINGS,
+  countByFormat: Record<string, number>,
+) {
+  const catalogAdminLabel = getBracketFormatCatalogLabel(f.code);
+  return {
+    ...f,
+    adminLabel: resolveBracketFormatAdminLabel(f.code, s),
+    catalogAdminLabel,
+    adminLabelOverride: s.adminLabel,
+    tournamentCount: countByFormat[f.code] ?? 0,
+    enabled: s.enabled,
+    maintenanceMode: s.maintenanceMode,
+    hiddenInAdmin: s.hiddenInAdmin,
+    participantMin: s.participantMin,
+    participantMax: s.participantMax,
+    participantExact: s.participantExact,
+    isReference: resolveBracketFormatIsReference(f.code, s),
+    participantRules: resolveBracketParticipantRules(f.code, s),
+  };
+}
 
 export async function GET(request: Request) {
   try {
@@ -32,28 +60,13 @@ export async function GET(request: Request) {
       counts.map((c) => [c.format, c._count.format]),
     );
 
-    const formats = BRACKET_FORMAT_CATALOG.map((f) => {
-      const s = settingsMap[f.code] ?? {
-        enabled: true,
-        maintenanceMode: false,
-        hiddenInAdmin: false,
-        participantMin: null,
-        participantMax: null,
-        participantExact: null,
-      };
-      return {
-        ...f,
-        tournamentCount: countByFormat[f.code] ?? 0,
-        enabled: s.enabled,
-        maintenanceMode: s.maintenanceMode,
-        hiddenInAdmin: s.hiddenInAdmin,
-        participantMin: s.participantMin,
-        participantMax: s.participantMax,
-        participantExact: s.participantExact,
-        isReference: resolveBracketFormatIsReference(f.code, s),
-        participantRules: resolveBracketParticipantRules(f.code, s),
-      };
-    });
+    const formats = BRACKET_FORMAT_CATALOG.map((f) =>
+      formatRow(
+        f,
+        settingsMap[f.code] ?? DEFAULT_BRACKET_FORMAT_SETTINGS,
+        countByFormat,
+      ),
+    );
 
     if (formatCode && isBracketFormatCode(formatCode)) {
       const def = getBracketFormat(formatCode)!;
@@ -73,33 +86,9 @@ export async function GET(request: Request) {
           _count: { select: { matches: true } },
         },
       });
+      const s = settingsMap[formatCode] ?? DEFAULT_BRACKET_FORMAT_SETTINGS;
       return NextResponse.json({
-        format: {
-          ...def,
-          tournamentCount: countByFormat[formatCode] ?? 0,
-          enabled: settingsMap[formatCode]?.enabled ?? true,
-          maintenanceMode: settingsMap[formatCode]?.maintenanceMode ?? false,
-          hiddenInAdmin: settingsMap[formatCode]?.hiddenInAdmin ?? false,
-          participantMin: settingsMap[formatCode]?.participantMin ?? null,
-          participantMax: settingsMap[formatCode]?.participantMax ?? null,
-          participantExact: settingsMap[formatCode]?.participantExact ?? null,
-          isReference: resolveBracketFormatIsReference(
-            formatCode,
-            settingsMap[formatCode] ?? {
-              enabled: true,
-              maintenanceMode: false,
-              hiddenInAdmin: false,
-              participantMin: null,
-              participantMax: null,
-              participantExact: null,
-              isReference: null,
-            },
-          ),
-          participantRules: resolveBracketParticipantRules(
-            formatCode,
-            settingsMap[formatCode] ?? null,
-          ),
-        },
+        format: formatRow(def, s, countByFormat),
         tournaments: tournaments.map((t) => ({
           id: t.id,
           name: t.name,

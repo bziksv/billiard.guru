@@ -11,6 +11,7 @@ import {
   IconCollapse,
   IconExpand,
   IconBrackets,
+  IconDatabaseBackup,
   IconHandicap,
   IconIdeas,
   IconNotifications,
@@ -36,6 +37,7 @@ const NAV: {
   { href: "/admin/notifications", label: "Уведомления", icon: IconNotifications },
   { href: "/admin/ideas", label: "Идеи", icon: IconIdeas },
   { href: "/admin/handicap", label: "Фора и расчёт", icon: IconHandicap },
+  { href: "/admin/db-backups", label: "Бэкап БД", icon: IconDatabaseBackup },
   { href: "/admin/preview", label: "Просмотр как…", icon: IconCabinet },
 ];
 

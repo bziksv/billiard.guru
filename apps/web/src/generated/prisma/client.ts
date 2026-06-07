@@ -167,6 +167,11 @@ export type BracketFormatConfig = Prisma.BracketFormatConfigModel
  */
 export type TournamentDefaultsConfig = Prisma.TournamentDefaultsConfigModel
 /**
+ * Model DbBackupConfig
+ * Настройки автобэкапа БД (одна строка, /admin/db-backups).
+ */
+export type DbBackupConfig = Prisma.DbBackupConfigModel
+/**
  * Model TelegramDeliveryLog
  * Журнал отправок Telegram: каждая попытка (успех / ошибка / пропуск с причиной).
  */

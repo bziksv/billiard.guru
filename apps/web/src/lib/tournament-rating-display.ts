@@ -1,6 +1,7 @@
 import { formatRating } from "@/lib/rating";
 import type { PlayerSelectSource } from "@/lib/player-select-label";
 import { formatPlayerSelectLabel } from "@/lib/player-select-label";
+import type { TeamWithPlayers } from "@/lib/pair-tournament";
 
 export type TournamentRatingSource = "CLUB" | "SYSTEM";
 
@@ -34,6 +35,47 @@ export function effectiveTournamentPlayerRating(
 ): number {
   if (source === "SYSTEM") return systemRating;
   return clubRating ?? systemRating;
+}
+
+/** Рейтинг команды/участника для форы с учётом источника рейтинга турнира. */
+export function teamTournamentRating(
+  team: TeamWithPlayers,
+  ratingSource: TournamentRatingSource = "CLUB",
+  clubPlayerRatings?: Record<string, number>,
+): number {
+  const r1 = effectiveTournamentPlayerRating(
+    team.player1.rating,
+    clubPlayerRatings?.[team.player1.id],
+    ratingSource,
+  );
+  if (!team.player2) return r1;
+  const r2 = effectiveTournamentPlayerRating(
+    team.player2.rating,
+    clubPlayerRatings?.[team.player2.id],
+    ratingSource,
+  );
+  return r1 + r2;
+}
+
+export function applyTournamentRatingsToTeam<T extends TeamWithPlayers>(
+  team: T | null,
+  ratingSource: TournamentRatingSource = "CLUB",
+  clubPlayerRatings?: Record<string, number>,
+): T | null {
+  if (!team) return null;
+  const mapPlayer = <P extends TeamWithPlayers["player1"]>(player: P): P => ({
+    ...player,
+    rating: effectiveTournamentPlayerRating(
+      player.rating,
+      clubPlayerRatings?.[player.id],
+      ratingSource,
+    ),
+  });
+  return {
+    ...team,
+    player1: mapPlayer(team.player1),
+    player2: team.player2 ? mapPlayer(team.player2) : team.player2,
+  };
 }
 
 export function playerExceedsTournamentRatingMax(

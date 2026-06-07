@@ -224,6 +224,7 @@ export const tournamentSchema = z.object({
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional().default("CLUB"),
   handicapHalfStep: z.boolean().optional().default(true),
+  suppressNotifications: z.boolean().optional().default(false),
   status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
 });
 
@@ -261,8 +262,13 @@ export const tournamentUpdateSchema = z.object({
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional(),
   handicapHalfStep: z.boolean().optional(),
+  suppressNotifications: z.boolean().optional(),
   /** true — снять лимит рейтинга (ratingMax → null) */
   clearRatingLimit: z.boolean().optional(),
+});
+
+export const tournamentPublishSchema = z.object({
+  suppressNotifications: z.boolean().optional(),
 });
 
 export const tournamentRegistrationSchema = z.object({

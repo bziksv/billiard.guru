@@ -80,22 +80,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const suppressNotifications = data.suppressNotifications === true;
+
     const tournament = await prisma.tournament.create({
       data: {
         name: data.name,
         description: data.description || null,
         clubId: data.clubId,
         format: data.format,
-        status: "DRAFT",
+        status: suppressNotifications ? "OPEN" : "DRAFT",
         startsAt: data.startsAt ? new Date(data.startsAt) : null,
         ratingMax: data.ratingMax,
         ratingSource: data.ratingSource,
         handicapHalfStep: data.handicapHalfStep,
+        suppressNotifications,
+        publishedAt: suppressNotifications ? new Date() : null,
       },
       include: { club: { include: { city: true } } },
     });
 
-    await requestClubTournamentApproval(tournament.id);
+    if (!suppressNotifications) {
+      await requestClubTournamentApproval(tournament.id);
+    }
 
     const updated = await prisma.tournament.findUnique({
       where: { id: tournament.id },
@@ -111,19 +117,21 @@ export async function POST(request: NextRequest) {
       section: "tournaments",
       clubId: data.clubId,
       summary: `Турнир «${data.name}»`,
-      payload: { format: data.format, ratingMax: data.ratingMax, approvalSent: true },
+      payload: {
+        format: data.format,
+        ratingMax: data.ratingMax,
+        approvalSent: !suppressNotifications,
+        suppressNotifications,
+      },
     });
 
-    return NextResponse.json(
-      {
-        ...updated,
-        message:
-          actorType === "admin"
-            ? "Турнир создан. Владельцу клуба отправлен запрос на публикацию в Telegram."
-            : "Турнир создан. Подтвердите публикацию в Telegram, если пришёл запрос.",
-      },
-      { status: 201 },
-    );
+    const message = suppressNotifications
+      ? "Турнир создан без уведомлений. Регистрация открыта."
+      : actorType === "admin"
+        ? "Турнир создан. Владельцу клуба отправлен запрос на публикацию в Telegram."
+        : "Турнир создан. Подтвердите публикацию в Telegram, если пришёл запрос.";
+
+    return NextResponse.json({ ...updated, message }, { status: 201 });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

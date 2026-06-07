@@ -8,6 +8,7 @@ import { TournamentManageView } from "@/components/admin/tournament-manage-view"
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import { getBracketFormat } from "@/lib/bracket-formats/catalog";
 import { countConfirmedParticipants, type AdminTournament } from "@/lib/tournament-admin";
+import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
 import { useAdminTournamentBracketActions } from "@/lib/use-admin-tournament-bracket";
 import { bracketAdminStatusLabel } from "@/lib/tournament-bracket-admin";
 import {
@@ -67,6 +68,7 @@ export default function AdminBracketTournamentPage() {
     () => clubs.map((c) => ({ value: c.id, label: c.name })),
     [clubs],
   );
+  const clubPlayerRatings = useClubPlayerRatings(tournament?.clubId ?? "");
 
   const noop = useCallback(async () => {}, []);
 
@@ -166,6 +168,7 @@ export default function AdminBracketTournamentPage() {
           tournament={tournament}
           clubOptions={clubOptions}
           playerOptions={[]}
+          clubPlayerRatings={clubPlayerRatings}
           bracketLoading={bracketLoading}
           embedded
           initialTab="bracket"

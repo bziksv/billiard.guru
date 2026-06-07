@@ -4,7 +4,7 @@ import { useState } from "react";
 import {
   groupMatchesByRound,
   olympicBracketHeight,
-  olympicMatchPlacementLabel,
+  olympicMatchFooterRows,
   olympicMatchTop,
   olympicStackedCardHeight,
   OLYMPIC_BRACKET_UNIT,
@@ -222,15 +222,16 @@ export function OlympicBracketView({
                 matchNumber={
                   showCardMatchNumber ? matchNumbers?.get(match.id) : undefined
                 }
-                placementLabel={
-                  showCardPlacement
-                    ? olympicMatchPlacementLabel(
-                        match.round,
-                        match.slot,
+                footerRows={
+                  showCardPlacement && matchNumbers
+                    ? olympicMatchFooterRows(
+                        match,
+                        matches,
+                        matchNumbers,
                         maxRound,
                         withBronzeMatch,
                       )
-                    : null
+                    : undefined
                 }
                 onMatchClick={onMatchClick}
                 onPlayerClick={handlePlayerHighlight}

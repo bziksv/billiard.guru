@@ -444,21 +444,28 @@ export function LlbBracketMatch({
           : "—";
 
   const matchCount = matchNumbers.size;
-  const gridSize = inferFixedSwissGridSize(matchCount);
-  const matchesPerRound = gridSize / 2;
   const bracketMaxRound =
     matchById.size > 0
       ? Math.max(...Array.from(matchById.values()).map((m) => m.round))
       : 0;
-  const maxRound = isFixedSwissTsLegacy29MatchCount(matchCount)
-    ? bracketMaxRound || 6
-    : matchCount === 27 || matchCount === 28
-      ? bracketMaxRound ||
-        (isFixedSwissTsLegacy27SixRound(matchCount, 6) ? 6 : 5)
-      : isFixedSwiss168LegacyMatchCount(matchCount, bracketMaxRound)
-        ? bracketMaxRound || 5
-        : Math.log2(gridSize) + 1;
   const isFixedSwissGrid = isFixedSwiss168MatchCount(matchCount);
+  const roundOneCount = Array.from(matchById.values()).filter(
+    (m) => m.round === 1,
+  ).length;
+  const gridSize = isFixedSwissGrid
+    ? inferFixedSwissGridSize(matchCount)
+    : Math.max(4, (roundOneCount || 1) * 2);
+  const matchesPerRound = gridSize / 2;
+  const maxRound = isFixedSwissGrid
+    ? isFixedSwissTsLegacy29MatchCount(matchCount)
+      ? bracketMaxRound || 6
+      : matchCount === 27 || matchCount === 28
+        ? bracketMaxRound ||
+          (isFixedSwissTsLegacy27SixRound(matchCount, 6) ? 6 : 5)
+        : isFixedSwiss168LegacyMatchCount(matchCount, bracketMaxRound)
+          ? bracketMaxRound || 5
+          : Math.log2(gridSize) + 1
+    : bracketMaxRound || 1;
   const bracketCol = isFixedSwissGrid
     ? fixedSwissMatchColForCount(match.round, match.slot, matchCount, maxRound)
     : 0;

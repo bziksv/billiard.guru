@@ -9,8 +9,15 @@ import {
   type BracketFormatCode,
   isBracketFormatCode,
 } from "@/lib/bracket-formats/catalog";
+import {
+  getBracketFormatCatalogLabel,
+  resolveBracketFormatAdminLabel,
+  resolveBracketFormatLabelsMap,
+} from "@/lib/bracket-formats/resolve-label";
 
 export type BracketFormatAdminSettings = {
+  /** null — подпись из каталога */
+  adminLabel: string | null;
   enabled: boolean;
   maintenanceMode: boolean;
   hiddenInAdmin: boolean;
@@ -21,7 +28,8 @@ export type BracketFormatAdminSettings = {
   isReference: boolean | null;
 };
 
-const DEFAULT_SETTINGS: BracketFormatAdminSettings = {
+export const DEFAULT_BRACKET_FORMAT_SETTINGS: BracketFormatAdminSettings = {
+  adminLabel: null,
   enabled: true,
   maintenanceMode: false,
   hiddenInAdmin: false,
@@ -32,6 +40,7 @@ const DEFAULT_SETTINGS: BracketFormatAdminSettings = {
 };
 
 function rowToSettings(row: {
+  adminLabel: string | null;
   enabled: boolean;
   maintenanceMode: boolean;
   hiddenInAdmin: boolean;
@@ -41,6 +50,7 @@ function rowToSettings(row: {
   isReference: boolean | null;
 }): BracketFormatAdminSettings {
   return {
+    adminLabel: row.adminLabel,
     enabled: row.enabled,
     maintenanceMode: row.maintenanceMode,
     hiddenInAdmin: row.hiddenInAdmin,
@@ -50,6 +60,8 @@ function rowToSettings(row: {
     isReference: row.isReference,
   };
 }
+
+export { getBracketFormatCatalogLabel, resolveBracketFormatAdminLabel };
 
 /** Эталон: переопределение в БД или isReference из каталога */
 export function resolveBracketFormatIsReference(
@@ -83,14 +95,28 @@ export async function getResolvedParticipantRules(
   return resolveBracketParticipantRules(format, participantOverridesFromSettings(settings));
 }
 
+export async function getBracketFormatLabel(code: string): Promise<string> {
+  if (!isBracketFormatCode(code)) return getBracketFormatCatalogLabel(code);
+  const settings = await getBracketFormatSettings(code);
+  return resolveBracketFormatAdminLabel(code, settings);
+}
+
+export async function getAllBracketFormatLabels(): Promise<Record<string, string>> {
+  const settingsMap = await getAllBracketFormatSettings();
+  return resolveBracketFormatLabelsMap(
+    settingsMap,
+    DEFAULT_BRACKET_FORMAT_SETTINGS,
+  );
+}
+
 export async function getBracketFormatSettings(
   code: string,
 ): Promise<BracketFormatAdminSettings> {
-  if (!isBracketFormatCode(code)) return DEFAULT_SETTINGS;
+  if (!isBracketFormatCode(code)) return DEFAULT_BRACKET_FORMAT_SETTINGS;
   const row = await prisma.bracketFormatConfig.findUnique({
     where: { formatCode: code },
   });
-  return row ? rowToSettings(row) : DEFAULT_SETTINGS;
+  return row ? rowToSettings(row) : DEFAULT_BRACKET_FORMAT_SETTINGS;
 }
 
 export async function getAllBracketFormatSettings(): Promise<
@@ -99,7 +125,7 @@ export async function getAllBracketFormatSettings(): Promise<
   const rows = await prisma.bracketFormatConfig.findMany();
   const map: Record<string, BracketFormatAdminSettings> = {};
   for (const f of BRACKET_FORMAT_CATALOG) {
-    map[f.code] = { ...DEFAULT_SETTINGS };
+    map[f.code] = { ...DEFAULT_BRACKET_FORMAT_SETTINGS };
   }
   for (const row of rows) {
     map[row.formatCode] = rowToSettings(row);
@@ -113,6 +139,8 @@ export async function saveBracketFormatSettings(
 ): Promise<BracketFormatAdminSettings> {
   const current = await getBracketFormatSettings(formatCode);
   const next: BracketFormatAdminSettings = {
+    adminLabel:
+      patch.adminLabel !== undefined ? patch.adminLabel : current.adminLabel,
     enabled: patch.enabled ?? current.enabled,
     maintenanceMode: patch.maintenanceMode ?? current.maintenanceMode,
     hiddenInAdmin: patch.hiddenInAdmin ?? current.hiddenInAdmin,
@@ -135,6 +163,7 @@ export async function saveBracketFormatSettings(
     where: { formatCode },
     create: {
       formatCode,
+      adminLabel: next.adminLabel,
       enabled: next.enabled,
       maintenanceMode: next.maintenanceMode,
       hiddenInAdmin: next.hiddenInAdmin,
@@ -144,6 +173,7 @@ export async function saveBracketFormatSettings(
       isReference: next.isReference,
     },
     update: {
+      adminLabel: next.adminLabel,
       enabled: next.enabled,
       maintenanceMode: next.maintenanceMode,
       hiddenInAdmin: next.hiddenInAdmin,
@@ -173,11 +203,14 @@ export type BracketFormatUiOption = {
 export async function getBracketFormatOptionsForForms(): Promise<BracketFormatUiOption[]> {
   const settingsMap = await getAllBracketFormatSettings();
   return BRACKET_FORMAT_CATALOG.filter((f) => {
-    const s = settingsMap[f.code] ?? DEFAULT_SETTINGS;
+    const s = settingsMap[f.code] ?? DEFAULT_BRACKET_FORMAT_SETTINGS;
     return isBracketFormatSelectable(s);
   }).map((f) => ({
     value: f.code,
-    label: f.adminLabel,
+    label: resolveBracketFormatAdminLabel(
+      f.code,
+      settingsMap[f.code] ?? DEFAULT_BRACKET_FORMAT_SETTINGS,
+    ),
     disabled: false,
   }));
 }

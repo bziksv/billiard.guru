@@ -76,6 +76,7 @@ export const ModelName = {
   NotificationTypeConfig: 'NotificationTypeConfig',
   BracketFormatConfig: 'BracketFormatConfig',
   TournamentDefaultsConfig: 'TournamentDefaultsConfig',
+  DbBackupConfig: 'DbBackupConfig',
   TelegramDeliveryLog: 'TelegramDeliveryLog'
 } as const
 
@@ -278,6 +279,7 @@ export const TournamentScalarFieldEnum = {
   ratingMax: 'ratingMax',
   ratingSource: 'ratingSource',
   handicapHalfStep: 'handicapHalfStep',
+  suppressNotifications: 'suppressNotifications',
   startsAt: 'startsAt',
   clubApprovalToken: 'clubApprovalToken',
   publishedAt: 'publishedAt',
@@ -464,6 +466,7 @@ export type NotificationTypeConfigScalarFieldEnum = (typeof NotificationTypeConf
 
 export const BracketFormatConfigScalarFieldEnum = {
   formatCode: 'formatCode',
+  adminLabel: 'adminLabel',
   enabled: 'enabled',
   maintenanceMode: 'maintenanceMode',
   hiddenInAdmin: 'hiddenInAdmin',
@@ -487,6 +490,20 @@ export const TournamentDefaultsConfigScalarFieldEnum = {
 } as const
 
 export type TournamentDefaultsConfigScalarFieldEnum = (typeof TournamentDefaultsConfigScalarFieldEnum)[keyof typeof TournamentDefaultsConfigScalarFieldEnum]
+
+
+export const DbBackupConfigScalarFieldEnum = {
+  id: 'id',
+  autoEnabled: 'autoEnabled',
+  autoHour: 'autoHour',
+  autoMinute: 'autoMinute',
+  autoIntervalHours: 'autoIntervalHours',
+  retainCount: 'retainCount',
+  lastAutoBackupAt: 'lastAutoBackupAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DbBackupConfigScalarFieldEnum = (typeof DbBackupConfigScalarFieldEnum)[keyof typeof DbBackupConfigScalarFieldEnum]
 
 
 export const TelegramDeliveryLogScalarFieldEnum = {
@@ -817,7 +834,8 @@ export type NotificationTypeConfigOrderByRelevanceFieldEnum = (typeof Notificati
 
 
 export const BracketFormatConfigOrderByRelevanceFieldEnum = {
-  formatCode: 'formatCode'
+  formatCode: 'formatCode',
+  adminLabel: 'adminLabel'
 } as const
 
 export type BracketFormatConfigOrderByRelevanceFieldEnum = (typeof BracketFormatConfigOrderByRelevanceFieldEnum)[keyof typeof BracketFormatConfigOrderByRelevanceFieldEnum]
@@ -828,6 +846,13 @@ export const TournamentDefaultsConfigOrderByRelevanceFieldEnum = {
 } as const
 
 export type TournamentDefaultsConfigOrderByRelevanceFieldEnum = (typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum)[keyof typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum]
+
+
+export const DbBackupConfigOrderByRelevanceFieldEnum = {
+  id: 'id'
+} as const
+
+export type DbBackupConfigOrderByRelevanceFieldEnum = (typeof DbBackupConfigOrderByRelevanceFieldEnum)[keyof typeof DbBackupConfigOrderByRelevanceFieldEnum]
 
 
 export const TelegramDeliveryLogOrderByRelevanceFieldEnum = {

@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { BracketFormatLabelEditor } from "@/components/admin/bracket-format-label-editor";
 import { BracketParticipantLimitEditor } from "@/components/admin/bracket-participant-limit-editor";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { ConfirmModal } from "@/components/bracket/confirm-modal";
 import type { BracketFormatDefinition } from "@/lib/bracket-formats/catalog";
 import { BRACKET_FORMAT_CATALOG } from "@/lib/bracket-formats/catalog";
+import {
+  getBracketFormatCatalogLabel,
+  resolveBracketFormatAdminLabel,
+} from "@/lib/bracket-formats/resolve-label";
 import {
   getDefaultBracketParticipantRules,
   resolveBracketParticipantRules,
@@ -26,6 +31,8 @@ type FormatRow = BracketFormatDefinition & {
   participantMax: number | null;
   participantExact: number | null;
   participantRules: BracketParticipantRules;
+  catalogAdminLabel: string;
+  adminLabelOverride: string | null;
 };
 
 interface ActiveTournament {
@@ -50,6 +57,7 @@ export function BracketsAdminPage() {
   const [formats, setFormats] = useState<FormatRow[]>(() =>
     BRACKET_FORMAT_CATALOG.map((f) => {
       const defaults = getDefaultBracketParticipantRules(f.code);
+      const catalogAdminLabel = getBracketFormatCatalogLabel(f.code);
       return {
         ...f,
         tournamentCount: 0,
@@ -60,6 +68,9 @@ export function BracketsAdminPage() {
         participantMax: null,
         participantExact: null,
         participantRules: defaults,
+        catalogAdminLabel,
+        adminLabelOverride: null,
+        adminLabel: catalogAdminLabel,
       };
     }),
   );
@@ -71,6 +82,7 @@ export function BracketsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [toggleError, setToggleError] = useState<string | null>(null);
   const [savingParticipantCode, setSavingParticipantCode] = useState<string | null>(null);
+  const [savingLabelCode, setSavingLabelCode] = useState<string | null>(null);
   const [showHiddenFormats, setShowHiddenFormats] = useState(false);
   const [hideFormatTarget, setHideFormatTarget] = useState<FormatRow | null>(null);
   const [hideFormatLoading, setHideFormatLoading] = useState(false);
@@ -138,6 +150,7 @@ export function BracketsAdminPage() {
         participantMax: number | null;
         participantExact: number | null;
         isReference: boolean | null;
+        adminLabel: string | null;
       }
     >,
   ) {
@@ -147,6 +160,7 @@ export function BracketsAdminPage() {
         if (!s) return f;
         const catalogRef =
           BRACKET_FORMAT_CATALOG.find((c) => c.code === f.code)?.isReference ?? false;
+        const catalogAdminLabel = f.catalogAdminLabel ?? getBracketFormatCatalogLabel(f.code);
         return {
           ...f,
           enabled: s.enabled,
@@ -157,6 +171,9 @@ export function BracketsAdminPage() {
           participantExact: s.participantExact,
           isReference: s.isReference ?? catalogRef,
           participantRules: resolveBracketParticipantRules(f.code, s),
+          catalogAdminLabel,
+          adminLabelOverride: s.adminLabel,
+          adminLabel: resolveBracketFormatAdminLabel(f.code, { adminLabel: s.adminLabel }),
         };
       }),
     );
@@ -173,6 +190,8 @@ export function BracketsAdminPage() {
       participantMax?: number | null;
       participantExact?: number | null;
       resetParticipantLimits?: boolean;
+      adminLabel?: string | null;
+      resetAdminLabel?: boolean;
     },
   ) {
     setToggleError(null);
@@ -180,9 +199,13 @@ export function BracketsAdminPage() {
       patch.participantMin !== undefined ||
       patch.participantMax !== undefined ||
       patch.participantExact !== undefined;
+    const isLabel =
+      patch.adminLabel !== undefined || patch.resetAdminLabel === true;
 
     if (isParticipant) {
       setSavingParticipantCode(formatCode);
+    } else if (isLabel) {
+      setSavingLabelCode(formatCode);
     } else {
       setFormats((prev) =>
         prev.map((f) =>
@@ -215,10 +238,12 @@ export function BracketsAdminPage() {
       setToggleError(json.error ?? "Не удалось сохранить");
       await load();
       setSavingParticipantCode(null);
+      setSavingLabelCode(null);
       return;
     }
     if (json.settings) applySettingsFromResponse(json.settings);
     setSavingParticipantCode(null);
+    setSavingLabelCode(null);
   }
 
   if (loading) {
@@ -371,6 +396,13 @@ export function BracketsAdminPage() {
                   Подробнее о формате →
                 </p>
               </Link>
+              <BracketFormatLabelEditor
+                adminLabel={f.adminLabel}
+                catalogLabel={f.catalogAdminLabel}
+                saving={savingLabelCode === f.code}
+                onSave={(label) => patchFormatSettings(f.code, { adminLabel: label })}
+                onReset={() => patchFormatSettings(f.code, { resetAdminLabel: true })}
+              />
               <BracketParticipantLimitEditor
                 formatCode={f.code}
                 participantMin={f.participantMin}
