@@ -4,12 +4,19 @@ import { FormEvent, useState } from "react";
 import { CitySelect } from "@/components/admin/city-select";
 import { PhoneInput } from "@/components/ui/phone-input";
 
-export function ManagePlayerRegisterForm() {
+export function ManagePlayerRegisterForm({
+  clubId,
+  onRegistered,
+}: {
+  clubId: string;
+  onRegistered?: () => void;
+}) {
   const [cityId, setCityId] = useState("");
   const [countryName, setCountryName] = useState("Россия");
   const [phone, setPhone] = useState("");
   const [phoneValid, setPhoneValid] = useState(false);
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,11 +28,16 @@ export function ManagePlayerRegisterForm() {
     }
     setLoading(true);
     setError(null);
+    setSuccessMessage(null);
+    setConfirmLink(null);
     const form = new FormData(e.currentTarget);
     form.set("cityId", cityId);
     form.set("phone", phone);
 
-    const res = await fetch("/api/players", { method: "POST", body: form });
+    const res = await fetch(`/api/clubs/${clubId}/players/register`, {
+      method: "POST",
+      body: form,
+    });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
@@ -33,6 +45,15 @@ export function ManagePlayerRegisterForm() {
       return;
     }
     setConfirmLink(data.confirmLink);
+    setSuccessMessage(
+      data.message ??
+        "Игрок зарегистрирован и добавлен в список игроков клуба.",
+    );
+    onRegistered?.();
+    e.currentTarget.reset();
+    setCityId("");
+    setPhone("");
+    setPhoneValid(false);
   }
 
   return (
@@ -61,7 +82,9 @@ export function ManagePlayerRegisterForm() {
         <Field label="Email (необязательно)" name="email" type="email" />
         <Field label="Дата рождения (необязательно)" name="birthDate" type="date" />
         <div>
-          <label className="mb-1 block text-sm text-zinc-400">Начальный рейтинг (шаг 0,5)</label>
+          <label className="mb-1 block text-sm text-zinc-400">
+            Начальный рейтинг (шаг 0,5) — общий и в клубе
+          </label>
           <input
             name="rating"
             type="number"
@@ -84,14 +107,22 @@ export function ManagePlayerRegisterForm() {
           {loading ? "Сохранение…" : "Зарегистрировать"}
         </button>
       </form>
-      {confirmLink && (
-        <div className="mt-6 rounded-lg border border-emerald-800/50 bg-emerald-950/30 p-4">
-          <p className="text-sm">
-            Игрок должен подтвердить регистрацию через Telegram (телефон + Telegram):
-          </p>
-          <a href={confirmLink} className="mt-2 block break-all text-sm text-emerald-400 underline">
-            {confirmLink}
-          </a>
+      {successMessage && (
+        <div className="mt-6 rounded-lg border border-emerald-800/50 bg-emerald-950/30 p-4 space-y-2">
+          <p className="text-sm text-emerald-300">{successMessage}</p>
+          {confirmLink && (
+            <>
+              <p className="text-sm text-zinc-400">
+                Подтверждение в Telegram:
+              </p>
+              <a
+                href={confirmLink}
+                className="block break-all text-sm text-emerald-400 underline"
+              >
+                {confirmLink}
+              </a>
+            </>
+          )}
         </div>
       )}
     </div>

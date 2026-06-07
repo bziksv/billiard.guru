@@ -389,6 +389,13 @@ export type EnumTournamentStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumTournamentStatusFilter<$PrismaModel> | $Enums.TournamentStatus
 }
 
+export type EnumTournamentRatingSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.TournamentRatingSource | Prisma.EnumTournamentRatingSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TournamentRatingSource[]
+  notIn?: $Enums.TournamentRatingSource[]
+  not?: Prisma.NestedEnumTournamentRatingSourceFilter<$PrismaModel> | $Enums.TournamentRatingSource
+}
+
 export type EnumTournamentFormatWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.TournamentFormat | Prisma.EnumTournamentFormatFieldRefInput<$PrismaModel>
   in?: $Enums.TournamentFormat[]
@@ -407,6 +414,16 @@ export type EnumTournamentStatusWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTournamentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTournamentStatusFilter<$PrismaModel>
+}
+
+export type EnumTournamentRatingSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TournamentRatingSource | Prisma.EnumTournamentRatingSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TournamentRatingSource[]
+  notIn?: $Enums.TournamentRatingSource[]
+  not?: Prisma.NestedEnumTournamentRatingSourceWithAggregatesFilter<$PrismaModel> | $Enums.TournamentRatingSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTournamentRatingSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTournamentRatingSourceFilter<$PrismaModel>
 }
 
 export type EnumRegistrationSourceFilter<$PrismaModel = never> = {
@@ -952,6 +969,13 @@ export type NestedEnumTournamentStatusFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumTournamentStatusFilter<$PrismaModel> | $Enums.TournamentStatus
 }
 
+export type NestedEnumTournamentRatingSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.TournamentRatingSource | Prisma.EnumTournamentRatingSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TournamentRatingSource[]
+  notIn?: $Enums.TournamentRatingSource[]
+  not?: Prisma.NestedEnumTournamentRatingSourceFilter<$PrismaModel> | $Enums.TournamentRatingSource
+}
+
 export type NestedEnumTournamentFormatWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.TournamentFormat | Prisma.EnumTournamentFormatFieldRefInput<$PrismaModel>
   in?: $Enums.TournamentFormat[]
@@ -970,6 +994,16 @@ export type NestedEnumTournamentStatusWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumTournamentStatusFilter<$PrismaModel>
   _max?: Prisma.NestedEnumTournamentStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumTournamentRatingSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.TournamentRatingSource | Prisma.EnumTournamentRatingSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.TournamentRatingSource[]
+  notIn?: $Enums.TournamentRatingSource[]
+  not?: Prisma.NestedEnumTournamentRatingSourceWithAggregatesFilter<$PrismaModel> | $Enums.TournamentRatingSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumTournamentRatingSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumTournamentRatingSourceFilter<$PrismaModel>
 }
 
 export type NestedEnumRegistrationSourceFilter<$PrismaModel = never> = {

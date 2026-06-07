@@ -121,6 +121,7 @@ export default async function TournamentPage({
       player.id,
       tournament.clubId,
       player.rating,
+      tournament.ratingSource ?? "CLUB",
     );
     if (playerRatingExceedsTournamentMax(effectiveRating, tournament.ratingMax)) {
       registrationBlockedByRating = `Ваш рейтинг ${formatRating(effectiveRating)} — ${tournamentRatingLimitMessage(tournament.ratingMax).toLowerCase()}`;

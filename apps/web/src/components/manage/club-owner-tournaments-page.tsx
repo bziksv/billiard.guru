@@ -12,7 +12,13 @@ import {
   useBracketFormatOptions,
 } from "@/hooks/use-bracket-format-options";
 import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { useTournamentDefaults } from "@/hooks/use-tournament-defaults";
+import {
+  TOURNAMENT_RATING_SOURCE_OPTIONS,
+  tournamentRatingSourceHint,
+  type TournamentRatingSource,
+} from "@/lib/tournament-rating-display";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 const CURRENT_STATUSES = new Set([
@@ -30,6 +36,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   const [tournaments, setTournaments] = useState<AdminTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [newFormat, setNewFormat] = useState("OLYMPIC");
+  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [tab, setTab] = useState<"create" | "current" | "finished">("current");
@@ -42,6 +49,10 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   useEffect(() => {
     reloadTournaments().finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (defaultsReady) setRatingSource(tournamentDefaults.ratingSource);
+  }, [defaultsReady, tournamentDefaults.ratingSource]);
 
   useEffect(() => {
     const current = formatOptions.find((o) => o.value === newFormat);
@@ -85,6 +96,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
           ratingMax: tournamentDefaults.limitByRating
             ? Number(form.get("ratingMax"))
             : null,
+          ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
           handicapHalfStep: form.get("handicapHalfStep") === "on",
         }),
       });
@@ -199,27 +211,35 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               </span>
             </label>
             {tournamentDefaults.limitByRating && (
-              <label className="block text-sm">
-                <span className="mb-1 block text-zinc-400">
-                  Максимальный рейтинг участников (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
-                </span>
-                <input
-                  name="ratingMax"
-                  type="number"
-                  step={RATING_STEP}
-                  min={0}
-                  max={MAX_PLAYER_RATING}
-                  required
-                  defaultValue={
-                    tournamentDefaults.ratingMax ?? 8
-                  }
-                  className="site-input w-full"
+              <>
+                <SearchableSelect
+                  label="Источник рейтинга для лимита"
+                  options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+                  value={ratingSource}
+                  onChange={(v) => setRatingSource(v as TournamentRatingSource)}
+                  placeholder="Источник рейтинга"
+                  searchPlaceholder="Рейтинг…"
                 />
-                <span className="mt-1 block text-xs text-zinc-500">
-                  Сначала учитывается рейтинг в клубе, иначе общий. Игроки с рейтингом выше не
-                  получат уведомление и не смогут записаться.
-                </span>
-              </label>
+                <label className="block text-sm">
+                  <span className="mb-1 block text-zinc-400">
+                    Максимальный рейтинг участников (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
+                  </span>
+                  <input
+                    name="ratingMax"
+                    type="number"
+                    step={RATING_STEP}
+                    min={0}
+                    max={MAX_PLAYER_RATING}
+                    required
+                    defaultValue={tournamentDefaults.ratingMax ?? 8}
+                    className="site-input w-full"
+                  />
+                  <span className="mt-1 block text-xs text-zinc-500">
+                    {tournamentRatingSourceHint(ratingSource)} Игроки с рейтингом выше не
+                    получат уведомление и не смогут записаться.
+                  </span>
+                </label>
+              </>
             )}
             <div className="flex flex-wrap items-center gap-4">
               <button

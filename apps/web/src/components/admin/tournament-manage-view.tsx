@@ -18,6 +18,10 @@ import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap } from "@/lib/handicap";
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
+import {
+  TOURNAMENT_RATING_SOURCE_OPTIONS,
+  type TournamentRatingSource,
+} from "@/lib/tournament-rating-display";
 import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
 import {
   isDynamicSwissFormat,
@@ -180,6 +184,9 @@ export function TournamentManageView({
   const [editRatingMax, setEditRatingMax] = useState(
     t.ratingMax != null ? String(t.ratingMax) : "8",
   );
+  const [editRatingSource, setEditRatingSource] = useState<TournamentRatingSource>(
+    t.ratingSource ?? "CLUB",
+  );
   const [editError, setEditError] = useState<string | null>(null);
   const [editSaving, setEditSaving] = useState(false);
 
@@ -197,7 +204,7 @@ export function TournamentManageView({
     const parsedMax = parseFloat(editRatingMax);
     const ratingPayload = editLimitByRating
       ? Number.isFinite(parsedMax)
-        ? { ratingMax: parsedMax }
+        ? { ratingMax: parsedMax, ratingSource: editRatingSource }
         : {}
       : { clearRatingLimit: true };
     const res = await fetch(`/api/tournaments/${t.id}`, {
@@ -429,20 +436,30 @@ export function TournamentManageView({
             <span className="font-medium text-zinc-200">Лимит рейтинга участников</span>
           </label>
           {editLimitByRating && (
-            <label className="block text-sm">
-              <span className="mb-1 block text-zinc-400">
-                Максимальный рейтинг (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
-              </span>
-              <input
-                type="number"
-                step={RATING_STEP}
-                min={0}
-                max={MAX_PLAYER_RATING}
-                value={editRatingMax}
-                onChange={(e) => setEditRatingMax(e.target.value)}
-                className="w-full max-w-xs rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            <>
+              <SearchableSelect
+                label="Источник рейтинга для лимита"
+                options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+                value={editRatingSource}
+                onChange={(v) => setEditRatingSource(v as TournamentRatingSource)}
+                placeholder="Источник рейтинга"
+                searchPlaceholder="Рейтинг…"
               />
-            </label>
+              <label className="block text-sm">
+                <span className="mb-1 block text-zinc-400">
+                  Максимальный рейтинг (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
+                </span>
+                <input
+                  type="number"
+                  step={RATING_STEP}
+                  min={0}
+                  max={MAX_PLAYER_RATING}
+                  value={editRatingMax}
+                  onChange={(e) => setEditRatingMax(e.target.value)}
+                  className="w-full max-w-xs rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+                />
+              </label>
+            </>
           )}
           {editError && <p className="text-sm text-red-400">{editError}</p>}
           <button

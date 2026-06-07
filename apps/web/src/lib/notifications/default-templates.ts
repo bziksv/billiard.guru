@@ -108,6 +108,11 @@ export const NOTIFICATION_DEFAULT_TEMPLATES: Partial<Record<NotificationId, stri
     "🔐 <b>billiard.guru</b>\n\n" +
     "Вы входите в личный кабинет.\n" +
     "Если это не вы — нажмите «Отмена».",
+
+  "club-confirm-resend":
+    "🏢 <b>Подтвердите клуб на billiard.guru</b>\n\n" +
+    "«<b>{{clubName}}</b>»\n\n" +
+    "Нажмите кнопку ниже, чтобы подтвердить право владения.",
 };
 
 export function getNotificationDefaultTemplate(id: string): string | undefined {

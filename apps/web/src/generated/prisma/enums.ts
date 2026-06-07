@@ -63,6 +63,14 @@ export const TournamentStatus = {
 export type TournamentStatus = (typeof TournamentStatus)[keyof typeof TournamentStatus]
 
 
+export const TournamentRatingSource = {
+  CLUB: 'CLUB',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type TournamentRatingSource = (typeof TournamentRatingSource)[keyof typeof TournamentRatingSource]
+
+
 export const MatchStatus = {
   SCHEDULED: 'SCHEDULED',
   FINISHED: 'FINISHED',

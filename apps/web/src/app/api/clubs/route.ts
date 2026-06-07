@@ -1,11 +1,13 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
+import { getSession } from "@/lib/auth";
+import { tryAutoSendClubConfirmTelegram } from "@/lib/club-confirm-server";
 import { resolveClubCoordinates } from "@/lib/club-geocode";
 import { createRequestLogger } from "@/lib/logger";
 import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
-import { buildConfirmLink, sendTelegramMessage } from "@/lib/telegram";
+import { buildConfirmLink } from "@/lib/telegram";
 import { normalizePhoneForCity } from "@/lib/phone-server";
 import {
   clubTableCountsTotal,
@@ -101,10 +103,24 @@ export async function POST(request: NextRequest) {
     });
 
     const confirmLink = buildConfirmLink(confirmToken);
-    log.info({ clubId: club.id }, "Club registered");
+    const session = await getSession();
+    const telegram = await tryAutoSendClubConfirmTelegram(club.id, {
+      actorType: session?.role === "SUPERADMIN" ? "admin" : "system",
+      actorId: session?.playerId ?? club.id,
+      action: "club.confirm.telegram_auto",
+    });
+    log.info({ clubId: club.id, telegramSent: telegram.sent }, "Club registered");
 
     return NextResponse.json(
-      { ...club, confirmLink, message: "Подтвердите регистрацию через Telegram" },
+      {
+        ...club,
+        confirmLink,
+        telegramSent: telegram.sent,
+        telegramSentReason: telegram.reason ?? null,
+        message: telegram.sent
+          ? "Клуб создан. Подтверждение отправлено в Telegram владельцу."
+          : "Подтвердите регистрацию через Telegram",
+      },
       { status: 201 },
     );
   } catch (error) {

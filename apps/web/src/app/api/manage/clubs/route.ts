@@ -7,6 +7,7 @@ import { listClubsOwnedByPlayer } from "@/lib/impersonate";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { normalizePhoneForCity } from "@/lib/phone-server";
+import { tryAutoSendClubConfirmTelegram } from "@/lib/club-confirm-server";
 import { buildConfirmLink } from "@/lib/telegram";
 import { clubOwnerCreateSchema } from "@/lib/validators";
 
@@ -66,13 +67,25 @@ export async function POST(request: NextRequest) {
     });
 
     const confirmLink = buildConfirmLink(confirmToken);
-    log.info({ clubId: club.id, playerId: player.id }, "Owner club created");
+    const telegram = await tryAutoSendClubConfirmTelegram(club.id, {
+      actorType: "player",
+      actorId: player.id,
+      action: "club.confirm.telegram_auto",
+    });
+    log.info(
+      { clubId: club.id, playerId: player.id, telegramSent: telegram.sent },
+      "Owner club created",
+    );
 
     return NextResponse.json(
       {
         ...club,
         confirmLink,
-        message: "Подтвердите клуб через Telegram",
+        telegramSent: telegram.sent,
+        telegramSentReason: telegram.reason ?? null,
+        message: telegram.sent
+          ? "Клуб создан. Подтверждение отправлено в Telegram."
+          : "Подтвердите клуб через Telegram",
       },
       { status: 201 },
     );

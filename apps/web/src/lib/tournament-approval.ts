@@ -70,7 +70,7 @@ export async function requestClubTournamentApproval(tournamentId: string) {
     : "";
   const ratingBlock =
     tournament.ratingMax != null
-      ? `\nРейтинг участников: до ${formatRating(tournament.ratingMax)} (сначала клубный, иначе общий).`
+      ? `\nРейтинг участников: до ${formatRating(tournament.ratingMax)} (${tournament.ratingSource === "SYSTEM" ? "общий рейтинг" : "сначала клубный, иначе общий"}).`
       : "";
 
   await sendTelegramMessage(
@@ -128,6 +128,7 @@ async function notifyNearbyPlayers(tournamentId: string) {
       players,
       tournament.clubId,
       tournament.ratingMax,
+      tournament.ratingSource ?? "CLUB",
     );
   const ratingEligibleIds = new Set(ratingEligiblePlayers.map((p) => p.id));
 

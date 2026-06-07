@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import type { TournamentRatingSource } from "@/lib/tournament-rating-display";
 import {
   FALLBACK_TOURNAMENT_DEFAULTS,
   type TournamentDefaults,
@@ -18,6 +19,7 @@ export async function getTournamentDefaults(): Promise<TournamentDefaults> {
     handicapHalfStep: row.handicapHalfStep,
     limitByRating: row.limitByRating,
     ratingMax: row.limitByRating ? row.ratingMax : null,
+    ratingSource: row.ratingSource as TournamentRatingSource,
   };
 }
 
@@ -32,11 +34,13 @@ export async function saveTournamentDefaults(
       handicapHalfStep: data.handicapHalfStep,
       limitByRating: data.limitByRating,
       ratingMax,
+      ratingSource: data.ratingSource,
     },
     update: {
       handicapHalfStep: data.handicapHalfStep,
       limitByRating: data.limitByRating,
       ratingMax,
+      ratingSource: data.ratingSource,
     },
   });
 }

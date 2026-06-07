@@ -159,6 +159,24 @@ function buildFixedSwissTs32Template(withBronze = false): FixedSwissTemplate {
     });
   }
 
+  // 1/8 проигравшие → нижняя тур 4 (пара к 1/4: #41→#50 … #44→#51), по аналогии с 16→8.
+  const eighthLossToLowerTour4: Array<{ from: number; to: number }> = [
+    { from: 9, to: 15 },
+    { from: 10, to: 16 },
+    { from: 11, to: 13 },
+    { from: 12, to: 14 },
+  ];
+  for (const { from, to } of eighthLossToLowerTour4) {
+    links.push({
+      fromRound: 3,
+      fromSlot: from,
+      kind: "loss",
+      toRound: 3,
+      toSlot: to,
+      toTeam: 1,
+    });
+  }
+
   links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 3, toSlot: 13, toTeam: 1 });
   links.push({ fromRound: 4, fromSlot: 2, kind: "win", toRound: 3, toSlot: 14, toTeam: 1 });
   links.push({ fromRound: 4, fromSlot: 3, kind: "win", toRound: 6, toSlot: 2, toTeam: 2 });

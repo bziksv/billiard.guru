@@ -276,6 +276,7 @@ export const TournamentScalarFieldEnum = {
   format: 'format',
   status: 'status',
   ratingMax: 'ratingMax',
+  ratingSource: 'ratingSource',
   handicapHalfStep: 'handicapHalfStep',
   startsAt: 'startsAt',
   clubApprovalToken: 'clubApprovalToken',
@@ -481,6 +482,7 @@ export const TournamentDefaultsConfigScalarFieldEnum = {
   handicapHalfStep: 'handicapHalfStep',
   limitByRating: 'limitByRating',
   ratingMax: 'ratingMax',
+  ratingSource: 'ratingSource',
   updatedAt: 'updatedAt'
 } as const
 

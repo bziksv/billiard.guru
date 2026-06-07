@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
 import { FALLBACK_TOURNAMENT_DEFAULTS } from "@/lib/tournament-defaults";
+import {
+  TOURNAMENT_RATING_SOURCE_OPTIONS,
+  tournamentRatingSourceHint,
+  type TournamentRatingSource,
+} from "@/lib/tournament-rating-display";
 
 type HandicapResult = {
   ratingA: number;
@@ -25,6 +31,7 @@ export default function HandicapPage() {
   const [handicapHalfStep, setHandicapHalfStep] = useState(true);
   const [limitByRating, setLimitByRating] = useState(true);
   const [ratingMax, setRatingMax] = useState("8");
+  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [defaultsLoading, setDefaultsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -40,6 +47,7 @@ export default function HandicapPage() {
           handicapHalfStep: boolean;
           limitByRating: boolean;
           ratingMax: number | null;
+          ratingSource?: TournamentRatingSource;
         }) => {
           if (cancelled) return;
           setHandicapHalfStep(data.handicapHalfStep);
@@ -47,6 +55,7 @@ export default function HandicapPage() {
           if (data.limitByRating && data.ratingMax != null) {
             setRatingMax(String(data.ratingMax));
           }
+          setRatingSource(data.ratingSource ?? "CLUB");
         },
       )
       .finally(() => {
@@ -74,6 +83,7 @@ export default function HandicapPage() {
           handicapHalfStep,
           limitByRating,
           ratingMax: limitByRating ? parsedRatingMax : null,
+          ratingSource,
         }),
       });
       const data = await res.json();
@@ -158,21 +168,31 @@ export default function HandicapPage() {
             </label>
 
             {limitByRating && (
-              <div>
-                <label className="admin-label">Максимальный рейтинг ({ratingHint})</label>
-                <input
-                  type="number"
-                  step={RATING_STEP}
-                  min={0}
-                  max={MAX_PLAYER_RATING}
-                  value={ratingMax}
-                  onChange={(e) => setRatingMax(e.target.value)}
-                  className="admin-input w-full max-w-xs px-3 py-2"
+              <div className="space-y-4">
+                <SearchableSelect
+                  label="Источник рейтинга для лимита"
+                  options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+                  value={ratingSource}
+                  onChange={(v) => setRatingSource(v as TournamentRatingSource)}
+                  placeholder="Источник рейтинга"
+                  searchPlaceholder="Рейтинг…"
                 />
-                <p className="admin-muted mt-1 text-xs">
-                  Сначала клубный рейтинг, иначе общий. Выше лимита — без записи и без уведомления
-                  «турнир рядом».
-                </p>
+                <div>
+                  <label className="admin-label">Максимальный рейтинг ({ratingHint})</label>
+                  <input
+                    type="number"
+                    step={RATING_STEP}
+                    min={0}
+                    max={MAX_PLAYER_RATING}
+                    value={ratingMax}
+                    onChange={(e) => setRatingMax(e.target.value)}
+                    className="admin-input w-full max-w-xs px-3 py-2"
+                  />
+                  <p className="admin-muted mt-1 text-xs">
+                    {tournamentRatingSourceHint(ratingSource)} Выше лимита — без записи и без
+                    уведомления «турнир рядом».
+                  </p>
+                </div>
               </div>
             )}
 

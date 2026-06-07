@@ -1,4 +1,8 @@
-import { formatTournamentRatingRulesSummary } from "@/lib/tournament-rating-display";
+import {
+  formatTournamentRatingRulesSummary,
+  tournamentRatingSourceHint,
+  type TournamentRatingSource,
+} from "@/lib/tournament-rating-display";
 
 export function TournamentRatingRulesSummary({
   tournament,
@@ -7,17 +11,18 @@ export function TournamentRatingRulesSummary({
   tournament: {
     ratingMax?: number | null;
     handicapHalfStep?: boolean;
+    ratingSource?: TournamentRatingSource;
   };
   className?: string;
 }) {
+  const source = tournament.ratingSource ?? "CLUB";
   return (
     <p className={className}>
       <span className="text-zinc-400">Условия: </span>
       {formatTournamentRatingRulesSummary(tournament)}
-      <span className="text-zinc-600">
-        {" "}
-        (для записи сначала клубный рейтинг, иначе общий)
-      </span>
+      {tournament.ratingMax != null && (
+        <span className="text-zinc-600"> ({tournamentRatingSourceHint(source)})</span>
+      )}
     </p>
   );
 }

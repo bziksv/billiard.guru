@@ -22,6 +22,11 @@ import { FORMAT_OPTIONS } from "@/lib/bracket-formats/catalog";
 import { adminTabClass } from "@/lib/admin-ui";
 import { MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
 import { useTournamentDefaults } from "@/hooks/use-tournament-defaults";
+import {
+  TOURNAMENT_RATING_SOURCE_OPTIONS,
+  tournamentRatingSourceHint,
+  type TournamentRatingSource,
+} from "@/lib/tournament-rating-display";
 
 interface Club {
   id: string;
@@ -103,6 +108,7 @@ export default function TournamentsPage() {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [newClubId, setNewClubId] = useState("");
   const [newFormat, setNewFormat] = useState("OLYMPIC");
+  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [startingId, setStartingId] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -116,6 +122,10 @@ export default function TournamentsPage() {
   const [finishedSearch, setFinishedSearch] = useState("");
   const [filtersReady, setFiltersReady] = useState(false);
   const [tab, setTab] = useState<"create" | "current" | "finished">("current");
+
+  useEffect(() => {
+    if (defaultsReady) setRatingSource(tournamentDefaults.ratingSource);
+  }, [defaultsReady, tournamentDefaults.ratingSource]);
 
   useEffect(() => {
     const current = formatOptions.find((o) => o.value === newFormat);
@@ -275,6 +285,7 @@ export default function TournamentsPage() {
         ratingMax: tournamentDefaults.limitByRating
           ? Number(form.get("ratingMax"))
           : null,
+        ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
         handicapHalfStep: form.get("handicapHalfStep") === "on",
       }),
     });
@@ -420,25 +431,37 @@ export default function TournamentsPage() {
             </span>
           </label>
           {tournamentDefaults.limitByRating && (
-            <label className="sm:col-span-2 block text-sm">
-              <span className="mb-1 block text-zinc-400">
-                Максимальный рейтинг участников (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
-              </span>
-              <input
-                name="ratingMax"
-                type="number"
-                step={RATING_STEP}
-                min={0}
-                max={MAX_PLAYER_RATING}
-                required
-                defaultValue={tournamentDefaults.ratingMax ?? 8}
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-              />
-              <span className="mt-1 block text-xs text-zinc-500">
-                Клубный рейтинг в приоритете; при отсутствии — общий. Выше лимита — без
-                уведомления и без записи.
-              </span>
-            </label>
+            <>
+              <div className="sm:col-span-2">
+                <SearchableSelect
+                  label="Источник рейтинга для лимита"
+                  options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+                  value={ratingSource}
+                  onChange={(v) => setRatingSource(v as TournamentRatingSource)}
+                  placeholder="Источник рейтинга"
+                  searchPlaceholder="Рейтинг…"
+                />
+              </div>
+              <label className="sm:col-span-2 block text-sm">
+                <span className="mb-1 block text-zinc-400">
+                  Максимальный рейтинг участников (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
+                </span>
+                <input
+                  name="ratingMax"
+                  type="number"
+                  step={RATING_STEP}
+                  min={0}
+                  max={MAX_PLAYER_RATING}
+                  required
+                  defaultValue={tournamentDefaults.ratingMax ?? 8}
+                  className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+                />
+                <span className="mt-1 block text-xs text-zinc-500">
+                  {tournamentRatingSourceHint(ratingSource)} Выше лимита — без уведомления и без
+                  записи.
+                </span>
+              </label>
+            </>
           )}
           <div className="sm:col-span-2 flex flex-wrap items-center gap-4">
             <button

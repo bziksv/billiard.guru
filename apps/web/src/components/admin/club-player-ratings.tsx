@@ -35,11 +35,13 @@ export function ClubPlayerRatingsPanel({
   clubId,
   clubName,
   variant = "admin",
+  refreshKey = 0,
   onLoaded,
 }: {
   clubId: string;
   clubName: string;
   variant?: "admin" | "manage";
+  refreshKey?: number;
   onLoaded?: () => void;
 }) {
   const [rows, setRows] = useState<ClubPlayerRatingRow[]>([]);
@@ -74,7 +76,7 @@ export function ClubPlayerRatingsPanel({
     return () => {
       active = false;
     };
-  }, [clubId]);
+  }, [clubId, refreshKey, onLoaded]);
 
   const indexedPlayerIds = useMemo(
     () => new Set(rows.map((r) => r.player.id)),

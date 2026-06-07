@@ -5,13 +5,17 @@ import {
   getTournamentDefaults,
   saveTournamentDefaults,
 } from "@/lib/tournament-defaults-server";
-import { tournamentRatingMaxSchema } from "@/lib/validators";
+import {
+  tournamentRatingMaxSchema,
+  tournamentRatingSourceSchema,
+} from "@/lib/validators";
 
 const patchSchema = z
   .object({
     handicapHalfStep: z.boolean(),
     limitByRating: z.boolean(),
     ratingMax: tournamentRatingMaxSchema.nullable().optional(),
+    ratingSource: tournamentRatingSourceSchema.optional(),
   })
   .refine((d) => !d.limitByRating || d.ratingMax != null, {
     message: "Укажите максимальный рейтинг",
@@ -38,6 +42,7 @@ export async function PATCH(request: NextRequest) {
       handicapHalfStep: body.handicapHalfStep,
       limitByRating: body.limitByRating,
       ratingMax: body.limitByRating ? (body.ratingMax ?? null) : null,
+      ratingSource: body.ratingSource ?? "CLUB",
     });
     const defaults = await getTournamentDefaults();
     return NextResponse.json({ ok: true, ...defaults });

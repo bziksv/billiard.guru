@@ -4,6 +4,7 @@ import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { ClubPhotosEditor } from "@/components/club/club-photos-editor";
 import { clubEditablePhotoUrls } from "@/lib/club-photos";
+import { ClubConfirmPanel } from "@/components/admin/club-confirm-panel";
 import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import { ClubBookingsPanel } from "@/components/admin/club-bookings-panel";
 import { ClubTableCountsFields } from "@/components/admin/club-table-counts-fields";
@@ -252,6 +253,8 @@ export function ClubEditView({
 
       <div className="flex items-start gap-6 lg:gap-10">
         <div className="min-w-0 max-w-2xl flex-1 space-y-8">
+          <ClubConfirmPanel clubId={clubId} variant={variant} />
+
           <form
             id="club-edit-form"
             onSubmit={saveClub}

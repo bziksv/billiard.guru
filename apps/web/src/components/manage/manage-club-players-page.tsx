@@ -14,7 +14,11 @@ export function ManageClubPlayersPage({
   clubName: string;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
   const handleLoaded = useCallback(() => setLoaded(true), []);
+  const handlePlayerRegistered = useCallback(() => {
+    setRefreshKey((k) => k + 1);
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -37,6 +41,7 @@ export function ManageClubPlayersPage({
         clubId={clubId}
         clubName={clubName}
         variant="manage"
+        refreshKey={refreshKey}
         onLoaded={handleLoaded}
       />
 
@@ -47,9 +52,12 @@ export function ManageClubPlayersPage({
         >
           <h2 className="text-lg font-semibold">Регистрация нового игрока</h2>
           <p className="text-sm text-zinc-500">
-            После регистрации добавьте игрока в рейтинг клуба в блоке выше.
+            Новый игрок сразу попадёт в список игроков клуба с указанным рейтингом.
           </p>
-          <ManagePlayerRegisterForm />
+          <ManagePlayerRegisterForm
+            clubId={clubId}
+            onRegistered={handlePlayerRegistered}
+          />
         </section>
       )}
     </div>

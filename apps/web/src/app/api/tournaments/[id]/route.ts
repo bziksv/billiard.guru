@@ -114,6 +114,7 @@ export async function PATCH(
         ...(data.handicapHalfStep !== undefined && {
           handicapHalfStep: data.handicapHalfStep,
         }),
+        ...(data.ratingSource !== undefined && { ratingSource: data.ratingSource }),
       },
       include: tournamentAdminInclude,
     });

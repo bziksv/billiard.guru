@@ -101,9 +101,13 @@ export default function AdminTournamentManagePage() {
     () =>
       players.map((p) => ({
         value: p.id,
-        label: formatTournamentPlayerSelectLabel(p, clubPlayerRatings[p.id]),
+        label: formatTournamentPlayerSelectLabel(
+          p,
+          clubPlayerRatings[p.id],
+          tournament?.ratingSource ?? "CLUB",
+        ),
       })),
-    [players, clubPlayerRatings],
+    [players, clubPlayerRatings, tournament?.ratingSource],
   );
 
   const isPair = tournament ? isPairFormat(tournament.format) : false;
@@ -128,12 +132,14 @@ export default function AdminTournamentManagePage() {
         player.rating,
         ratingMax,
         clubPlayerRatings[player.id],
+        tournament?.ratingSource ?? "CLUB",
       );
     });
   }, [
     playerOptions,
     registeredPlayerIds,
     tournament?.ratingMax,
+    tournament?.ratingSource,
     players,
     clubPlayerRatings,
   ]);
@@ -148,10 +154,11 @@ export default function AdminTournamentManagePage() {
           player.rating,
           tournament.ratingMax,
           clubPlayerRatings[id],
+          tournament.ratingSource ?? "CLUB",
         );
       }),
     );
-  }, [tournament?.ratingMax, clubPlayerRatings, players]);
+  }, [tournament?.ratingMax, tournament?.ratingSource, clubPlayerRatings, players]);
 
   const activeParticipantCount = useMemo(
     () => (tournament ? countActiveTournamentSlots(tournament) : 0),

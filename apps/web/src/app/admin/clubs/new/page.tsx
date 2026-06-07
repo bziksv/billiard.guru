@@ -16,6 +16,8 @@ export default function NewClubPage() {
   const [phoneValid, setPhoneValid] = useState(false);
   const [tableCounts, setTableCounts] = useState<ClubTableCounts>({});
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
+  const [telegramSent, setTelegramSent] = useState<boolean | null>(null);
+  const [telegramSentReason, setTelegramSentReason] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -52,6 +54,8 @@ export default function NewClubPage() {
       return;
     }
     setConfirmLink(data.confirmLink);
+    setTelegramSent(data.telegramSent ?? null);
+    setTelegramSentReason(data.telegramSentReason ?? null);
   }
 
   return (
@@ -100,11 +104,23 @@ export default function NewClubPage() {
         </button>
       </form>
       {confirmLink && (
-        <div className="mt-6 rounded-lg border border-emerald-800 bg-emerald-950/50 p-4">
-          <p className="text-sm text-emerald-300">
-            Подтвердите регистрацию через Telegram:
-          </p>
-          <a href={confirmLink} className="mt-2 block break-all text-emerald-400 underline">
+        <div className="mt-6 rounded-lg border border-emerald-800 bg-emerald-950/50 p-4 space-y-2">
+          {telegramSent ? (
+            <p className="text-sm text-emerald-300">
+              Подтверждение отправлено в Telegram владельцу. Если сообщения нет —
+              откройте ссылку ниже.
+            </p>
+          ) : (
+            <p className="text-sm text-emerald-300">
+              Подтвердите регистрацию через Telegram:
+              {telegramSentReason ? (
+                <span className="mt-1 block text-amber-300/90">
+                  Автоотправка не удалась: {telegramSentReason}
+                </span>
+              ) : null}
+            </p>
+          )}
+          <a href={confirmLink} className="block break-all text-emerald-400 underline">
             {confirmLink}
           </a>
         </div>

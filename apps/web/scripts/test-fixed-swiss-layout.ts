@@ -607,6 +607,12 @@ assert.equal(fixedSwissTs32PlacementByMatchNo(57, false), "место 3–4");
   );
   assert.equal(win41?.toRound, 5, "#41 winner → 1/4");
   assert.equal(win41?.toSlot, 1, "#41 → #53 team1");
+  const loss41 = links32.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 9 && l.kind === "loss",
+  );
+  assert.equal(loss41?.toRound, 3, "#41 loser → lower tour 4");
+  assert.equal(loss41?.toSlot, 15, "#41 loser → #50");
+  assert.equal(loss41?.toTeam, 1);
   assert.equal(
     links32.find((l) => l.fromRound === 3 && l.fromSlot === 15 && l.kind === "win")
       ?.toSlot,

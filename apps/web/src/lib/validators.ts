@@ -26,6 +26,8 @@ export const tournamentRatingMaxSchema = z.coerce
   .max(MAX_PLAYER_RATING, `Максимум ${MAX_PLAYER_RATING}`)
   .pipe(ratingStepSchema);
 
+export const tournamentRatingSourceSchema = z.enum(["CLUB", "SYSTEM"]);
+
 export const phoneSchema = z
   .string()
   .regex(/^\+[0-9]{10,15}$/, "Некорректный формат телефона");
@@ -220,6 +222,7 @@ export const tournamentSchema = z.object({
   ]),
   startsAt: z.string().optional(),
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
+  ratingSource: tournamentRatingSourceSchema.optional().default("CLUB"),
   handicapHalfStep: z.boolean().optional().default(true),
   status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
 });
@@ -256,6 +259,7 @@ export const tournamentUpdateSchema = z.object({
     .enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"])
     .optional(),
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
+  ratingSource: tournamentRatingSourceSchema.optional(),
   handicapHalfStep: z.boolean().optional(),
   /** true — снять лимит рейтинга (ratingMax → null) */
   clearRatingLimit: z.boolean().optional(),

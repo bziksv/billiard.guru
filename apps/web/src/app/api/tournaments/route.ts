@@ -89,6 +89,7 @@ export async function POST(request: NextRequest) {
         status: "DRAFT",
         startsAt: data.startsAt ? new Date(data.startsAt) : null,
         ratingMax: data.ratingMax,
+        ratingSource: data.ratingSource,
         handicapHalfStep: data.handicapHalfStep,
       },
       include: { club: { include: { city: true } } },

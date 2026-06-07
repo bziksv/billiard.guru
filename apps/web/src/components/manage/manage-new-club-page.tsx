@@ -17,6 +17,8 @@ export function ManageNewClubPage({ ownerPhone }: ManageNewClubPageProps) {
   const [displayPhone, setDisplayPhone] = useState("");
   const [displayPhoneValid, setDisplayPhoneValid] = useState(true);
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
+  const [telegramSent, setTelegramSent] = useState<boolean | null>(null);
+  const [telegramSentReason, setTelegramSentReason] = useState<string | null>(null);
   const [createdClubId, setCreatedClubId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,6 +55,8 @@ export function ManageNewClubPage({ ownerPhone }: ManageNewClubPageProps) {
       return;
     }
     setConfirmLink(data.confirmLink ?? null);
+    setTelegramSent(data.telegramSent ?? null);
+    setTelegramSentReason(data.telegramSentReason ?? null);
     setCreatedClubId(data.id ?? null);
   }
 
@@ -62,8 +66,14 @@ export function ManageNewClubPage({ ownerPhone }: ManageNewClubPageProps) {
         <h1 className="text-2xl font-bold">Клуб создан</h1>
         <div className="rounded-lg border border-emerald-800 bg-emerald-950/40 p-4">
           <p className="text-sm text-emerald-300">
-            Подтвердите новый клуб через Telegram — откройте ссылку в боте с того же аккаунта,
-            что привязан к вашему профилю.
+            {telegramSent
+              ? "Подтверждение отправлено в Telegram. Если сообщения нет — откройте ссылку ниже."
+              : "Подтвердите новый клуб через Telegram — откройте ссылку в боте с того же аккаунта, что привязан к вашему профилю."}
+            {!telegramSent && telegramSentReason ? (
+              <span className="mt-1 block text-amber-300/90">
+                Автоотправка не удалась: {telegramSentReason}
+              </span>
+            ) : null}
           </p>
           <a
             href={confirmLink}

@@ -476,10 +476,29 @@ export const NOTIFICATION_CATALOG = [
     channel: "telegram",
     recipient: "Владелец клуба",
     trigger: "POST /api/clubs или /api/manage/clubs",
-    implementation: "telegram.ts → buildConfirmLink()",
+    implementation:
+      "telegram.ts → buildConfirmLink(); при наличии telegramId владельца — club-confirm-resend",
     hasButtons: false,
-    chainsTo: ["registration-success-club"],
+    chainsTo: ["club-confirm-resend", "registration-success-club"],
     examplePreview: "confirm_<uuid> в боте",
+  },
+  {
+    id: "club-confirm-resend",
+    title: "Повторная ссылка подтверждения клуба",
+    description:
+      "Админ на /admin/clubs/[id] — кнопка «Отправить в Telegram» владельцу по телефону клуба.",
+    category: "clubs",
+    kind: "outbound",
+    channel: "telegram",
+    recipient: "Владелец клуба (игрок с тем же телефоном)",
+    trigger:
+      "POST /api/clubs/[id]/confirm { action: send_telegram } — /admin/clubs/[id] или /manage/clubs/[id]",
+    implementation: "club-confirm-server.ts → dispatchNotification()",
+    hasButtons: true,
+    auditAction: "club.confirm.telegram_sent",
+    triggeredBy: ["registration-deeplink-club"],
+    chainsTo: ["registration-success-club"],
+    examplePreview: "🏢 Подтвердите клуб… кнопка «✅ Подтвердить клуб»",
   },
   {
     id: "registration-success-player",

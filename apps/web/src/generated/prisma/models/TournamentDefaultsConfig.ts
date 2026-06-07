@@ -39,6 +39,7 @@ export type TournamentDefaultsConfigMinAggregateOutputType = {
   handicapHalfStep: boolean | null
   limitByRating: boolean | null
   ratingMax: number | null
+  ratingSource: $Enums.TournamentRatingSource | null
   updatedAt: Date | null
 }
 
@@ -47,6 +48,7 @@ export type TournamentDefaultsConfigMaxAggregateOutputType = {
   handicapHalfStep: boolean | null
   limitByRating: boolean | null
   ratingMax: number | null
+  ratingSource: $Enums.TournamentRatingSource | null
   updatedAt: Date | null
 }
 
@@ -55,6 +57,7 @@ export type TournamentDefaultsConfigCountAggregateOutputType = {
   handicapHalfStep: number
   limitByRating: number
   ratingMax: number
+  ratingSource: number
   updatedAt: number
   _all: number
 }
@@ -73,6 +76,7 @@ export type TournamentDefaultsConfigMinAggregateInputType = {
   handicapHalfStep?: true
   limitByRating?: true
   ratingMax?: true
+  ratingSource?: true
   updatedAt?: true
 }
 
@@ -81,6 +85,7 @@ export type TournamentDefaultsConfigMaxAggregateInputType = {
   handicapHalfStep?: true
   limitByRating?: true
   ratingMax?: true
+  ratingSource?: true
   updatedAt?: true
 }
 
@@ -89,6 +94,7 @@ export type TournamentDefaultsConfigCountAggregateInputType = {
   handicapHalfStep?: true
   limitByRating?: true
   ratingMax?: true
+  ratingSource?: true
   updatedAt?: true
   _all?: true
 }
@@ -184,6 +190,7 @@ export type TournamentDefaultsConfigGroupByOutputType = {
   handicapHalfStep: boolean
   limitByRating: boolean
   ratingMax: number | null
+  ratingSource: $Enums.TournamentRatingSource
   updatedAt: Date
   _count: TournamentDefaultsConfigCountAggregateOutputType | null
   _avg: TournamentDefaultsConfigAvgAggregateOutputType | null
@@ -215,6 +222,7 @@ export type TournamentDefaultsConfigWhereInput = {
   handicapHalfStep?: Prisma.BoolFilter<"TournamentDefaultsConfig"> | boolean
   limitByRating?: Prisma.BoolFilter<"TournamentDefaultsConfig"> | boolean
   ratingMax?: Prisma.FloatNullableFilter<"TournamentDefaultsConfig"> | number | null
+  ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"TournamentDefaultsConfig"> | $Enums.TournamentRatingSource
   updatedAt?: Prisma.DateTimeFilter<"TournamentDefaultsConfig"> | Date | string
 }
 
@@ -223,6 +231,7 @@ export type TournamentDefaultsConfigOrderByWithRelationInput = {
   handicapHalfStep?: Prisma.SortOrder
   limitByRating?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  ratingSource?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _relevance?: Prisma.TournamentDefaultsConfigOrderByRelevanceInput
 }
@@ -235,6 +244,7 @@ export type TournamentDefaultsConfigWhereUniqueInput = Prisma.AtLeast<{
   handicapHalfStep?: Prisma.BoolFilter<"TournamentDefaultsConfig"> | boolean
   limitByRating?: Prisma.BoolFilter<"TournamentDefaultsConfig"> | boolean
   ratingMax?: Prisma.FloatNullableFilter<"TournamentDefaultsConfig"> | number | null
+  ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"TournamentDefaultsConfig"> | $Enums.TournamentRatingSource
   updatedAt?: Prisma.DateTimeFilter<"TournamentDefaultsConfig"> | Date | string
 }, "id">
 
@@ -243,6 +253,7 @@ export type TournamentDefaultsConfigOrderByWithAggregationInput = {
   handicapHalfStep?: Prisma.SortOrder
   limitByRating?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
+  ratingSource?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.TournamentDefaultsConfigCountOrderByAggregateInput
   _avg?: Prisma.TournamentDefaultsConfigAvgOrderByAggregateInput
@@ -259,6 +270,7 @@ export type TournamentDefaultsConfigScalarWhereWithAggregatesInput = {
   handicapHalfStep?: Prisma.BoolWithAggregatesFilter<"TournamentDefaultsConfig"> | boolean
   limitByRating?: Prisma.BoolWithAggregatesFilter<"TournamentDefaultsConfig"> | boolean
   ratingMax?: Prisma.FloatNullableWithAggregatesFilter<"TournamentDefaultsConfig"> | number | null
+  ratingSource?: Prisma.EnumTournamentRatingSourceWithAggregatesFilter<"TournamentDefaultsConfig"> | $Enums.TournamentRatingSource
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TournamentDefaultsConfig"> | Date | string
 }
 
@@ -267,6 +279,7 @@ export type TournamentDefaultsConfigCreateInput = {
   handicapHalfStep?: boolean
   limitByRating?: boolean
   ratingMax?: number | null
+  ratingSource?: $Enums.TournamentRatingSource
   updatedAt?: Date | string
 }
 
@@ -275,6 +288,7 @@ export type TournamentDefaultsConfigUncheckedCreateInput = {
   handicapHalfStep?: boolean
   limitByRating?: boolean
   ratingMax?: number | null
+  ratingSource?: $Enums.TournamentRatingSource
   updatedAt?: Date | string
 }
 
@@ -283,6 +297,7 @@ export type TournamentDefaultsConfigUpdateInput = {
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   limitByRating?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -291,6 +306,7 @@ export type TournamentDefaultsConfigUncheckedUpdateInput = {
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   limitByRating?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -299,6 +315,7 @@ export type TournamentDefaultsConfigCreateManyInput = {
   handicapHalfStep?: boolean
   limitByRating?: boolean
   ratingMax?: number | null
+  ratingSource?: $Enums.TournamentRatingSource
   updatedAt?: Date | string
 }
 
@@ -307,6 +324,7 @@ export type TournamentDefaultsConfigUpdateManyMutationInput = {
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   limitByRating?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -315,6 +333,7 @@ export type TournamentDefaultsConfigUncheckedUpdateManyInput = {
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   limitByRating?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -329,6 +348,7 @@ export type TournamentDefaultsConfigCountOrderByAggregateInput = {
   handicapHalfStep?: Prisma.SortOrder
   limitByRating?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
+  ratingSource?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -341,6 +361,7 @@ export type TournamentDefaultsConfigMaxOrderByAggregateInput = {
   handicapHalfStep?: Prisma.SortOrder
   limitByRating?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
+  ratingSource?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -349,6 +370,7 @@ export type TournamentDefaultsConfigMinOrderByAggregateInput = {
   handicapHalfStep?: Prisma.SortOrder
   limitByRating?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
+  ratingSource?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
@@ -363,6 +385,7 @@ export type TournamentDefaultsConfigSelect<ExtArgs extends runtime.Types.Extensi
   handicapHalfStep?: boolean
   limitByRating?: boolean
   ratingMax?: boolean
+  ratingSource?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["tournamentDefaultsConfig"]>
 
@@ -373,10 +396,11 @@ export type TournamentDefaultsConfigSelectScalar = {
   handicapHalfStep?: boolean
   limitByRating?: boolean
   ratingMax?: boolean
+  ratingSource?: boolean
   updatedAt?: boolean
 }
 
-export type TournamentDefaultsConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "handicapHalfStep" | "limitByRating" | "ratingMax" | "updatedAt", ExtArgs["result"]["tournamentDefaultsConfig"]>
+export type TournamentDefaultsConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "handicapHalfStep" | "limitByRating" | "ratingMax" | "ratingSource" | "updatedAt", ExtArgs["result"]["tournamentDefaultsConfig"]>
 
 export type $TournamentDefaultsConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TournamentDefaultsConfig"
@@ -386,6 +410,7 @@ export type $TournamentDefaultsConfigPayload<ExtArgs extends runtime.Types.Exten
     handicapHalfStep: boolean
     limitByRating: boolean
     ratingMax: number | null
+    ratingSource: $Enums.TournamentRatingSource
     updatedAt: Date
   }, ExtArgs["result"]["tournamentDefaultsConfig"]>
   composites: {}
@@ -760,6 +785,7 @@ export interface TournamentDefaultsConfigFieldRefs {
   readonly handicapHalfStep: Prisma.FieldRef<"TournamentDefaultsConfig", 'Boolean'>
   readonly limitByRating: Prisma.FieldRef<"TournamentDefaultsConfig", 'Boolean'>
   readonly ratingMax: Prisma.FieldRef<"TournamentDefaultsConfig", 'Float'>
+  readonly ratingSource: Prisma.FieldRef<"TournamentDefaultsConfig", 'TournamentRatingSource'>
   readonly updatedAt: Prisma.FieldRef<"TournamentDefaultsConfig", 'DateTime'>
 }
     
