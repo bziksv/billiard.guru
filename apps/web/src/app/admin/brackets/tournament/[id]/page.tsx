@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { TournamentManageView } from "@/components/admin/tournament-manage-view";
+import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import { getBracketFormat } from "@/lib/bracket-formats/catalog";
 import { countConfirmedParticipants, type AdminTournament } from "@/lib/tournament-admin";
 import { useAdminTournamentBracketActions } from "@/lib/use-admin-tournament-bracket";
@@ -102,7 +103,7 @@ export default function AdminBracketTournamentPage() {
   const formatDef = getBracketFormat(tournament.format);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <div>
         <Link
           href={
@@ -130,6 +131,10 @@ export default function AdminBracketTournamentPage() {
               {" · "}
               {confirmed} подтверждённых · {bracketAdminStatusLabel(tournament)}
             </p>
+            <TournamentRatingRulesSummary
+              tournament={tournament}
+              className="mt-1 text-sm text-zinc-500"
+            />
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href={`/admin/tournaments/${tournament.id}`} className="admin-btn-secondary">
@@ -156,7 +161,7 @@ export default function AdminBracketTournamentPage() {
         </div>
       </div>
 
-      <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+      <section className="rounded-xl border border-zinc-800 bg-zinc-950 px-6 pb-6 pt-4">
         <TournamentManageView
           tournament={tournament}
           clubOptions={clubOptions}

@@ -283,40 +283,6 @@ export function SwissBracketView({
         </section>
       )}
 
-      {!presentation && (
-        <div className="flex flex-wrap items-center gap-4 text-[11px] text-zinc-500">
-          {onMatchClick && (
-            <>
-              <span>Имя — карточка · счёт, # или «результат» — встреча</span>
-              <span className="text-zinc-600">|</span>
-            </>
-          )}
-          {fixedGrid ? (
-            <>
-              <span>проигравшие ←</span>
-              <span className="text-emerald-600/80">Старт</span>
-              <span>победители →</span>
-              <span className="text-zinc-600">|</span>
-              <span>Номера переходов (#) заданы заранее</span>
-            </>
-          ) : (
-            <>
-              <span>Колонки — туры слева направо</span>
-              <span className="flex items-center gap-2">
-                <span className="inline-block h-px w-8 bg-emerald-400/80" />
-                победитель
-              </span>
-              <span className="flex items-center gap-2">
-                <span className="inline-block h-px w-8 bg-zinc-500/60" />
-                проигравший
-              </span>
-            </>
-          )}
-          <span className="text-zinc-600">|</span>
-          <span>Зажмите фон и тащите сетку</span>
-        </div>
-      )}
-
       <BracketScrollCenter
         centerX={layout.centerX}
         contentHeight={fixedGrid ? layout.totalHeight : undefined}

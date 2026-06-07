@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { TournamentManageView } from "@/components/admin/tournament-manage-view";
 import type { MatchResultPayload } from "@/components/bracket/match-result-modal";
 import { TournamentParticipantLimitNotice } from "@/components/tournament/tournament-participant-limit-notice";
+import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import { SearchableMultiSelect, SearchableSelect } from "@/components/ui/searchable-select";
 import { getDefaultBracketParticipantRules } from "@/lib/bracket-participant-rules";
 import {
@@ -484,6 +485,10 @@ export default function AdminTournamentManagePage() {
               {" · "}
               {confirmed} подтверждённых
             </p>
+            <TournamentRatingRulesSummary
+              tournament={tournament}
+              className="mt-1 text-sm text-zinc-500"
+            />
           </div>
           <div className="flex flex-wrap gap-2">
             {canStart && (

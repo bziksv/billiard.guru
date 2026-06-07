@@ -63,6 +63,12 @@ export function formatMatchDateTime(iso: string | null | undefined): string {
   });
 }
 
+function formatHmFromTotalMinutes(totalMinutes: number): string {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
 /** Сколько идёт встреча: «01:23» (часы:минуты с начала). */
 export function formatMatchElapsedHm(
   startedAt: string | null | undefined,
@@ -72,9 +78,20 @@ export function formatMatchElapsedHm(
   const startMs = new Date(startedAt).getTime();
   if (Number.isNaN(startMs)) return null;
   const totalMinutes = Math.floor(Math.max(0, now.getTime() - startMs) / 60_000);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  return formatHmFromTotalMinutes(totalMinutes);
+}
+
+/** Длительность завершённой встречи: «01:23» (от начала до окончания). */
+export function formatMatchDurationHm(
+  startedAt: string | null | undefined,
+  finishedAt: string | null | undefined,
+): string | null {
+  if (!startedAt || !finishedAt) return null;
+  const startMs = new Date(startedAt).getTime();
+  const endMs = new Date(finishedAt).getTime();
+  if (Number.isNaN(startMs) || Number.isNaN(endMs)) return null;
+  const totalMinutes = Math.floor(Math.max(0, endMs - startMs) / 60_000);
+  return formatHmFromTotalMinutes(totalMinutes);
 }
 
 export function buildBracketMatchNumbers(
