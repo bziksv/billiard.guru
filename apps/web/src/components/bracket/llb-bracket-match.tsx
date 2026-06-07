@@ -1,7 +1,12 @@
 "use client";
 
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
-import { teamLabel, teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
+import {
+  bracketPlayerLabel,
+  bracketTeamLabel,
+} from "@/lib/bracket-display";
+import { teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
+import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import {
   isActiveBracketMatch,
@@ -16,7 +21,7 @@ import {
   gridFooterHeight,
   GRID_META_H,
   GRID_ROW_H,
-  incomingAutopassPhantomSlot,
+  isIncomingAutopassPhantomForTeam,
   type SwissBracketEdge,
 } from "@/lib/swiss-bracket-layout";
 import {
@@ -39,7 +44,6 @@ import {
   isFixedSwissTsMatchCount,
   fixedSwissMatchNo,
 } from "@/lib/fixed-swiss-grid";
-import { cn } from "@/lib/cn";
 
 function ScoreBox({
   value,
@@ -66,7 +70,8 @@ function playerRowClass(isWinner?: boolean, isLoser?: boolean, empty?: boolean) 
     "flex w-full items-center gap-1.5 border-b border-[var(--bracket-row-border)] px-2 last:border-b-0",
     isWinner && "bg-[var(--bracket-row-winner-bg)] text-[var(--bracket-row-winner-text)]",
     isLoser && "text-[var(--bracket-row-loser-text)]",
-    empty && "bracket-match-row bracket-match-row--empty !items-center !px-2 !py-0 text-[12px]",
+    empty &&
+      "bracket-match-row bracket-match-row--empty !items-center !justify-center !px-2 !py-0 text-[12px]",
     !isWinner && !isLoser && !empty && "bg-[var(--bracket-card-bg)] text-[var(--bracket-row-text)]",
   );
 }
@@ -80,6 +85,7 @@ function TeamRow({
   empty,
   onPlayerClick,
   onMatchClick,
+  playerHighlighted,
 }: {
   label: string;
   rating?: number;
@@ -89,8 +95,33 @@ function TeamRow({
   empty?: boolean;
   onPlayerClick?: () => void;
   onMatchClick?: () => void;
+  playerHighlighted?: boolean;
 }) {
   const rowClass = playerRowClass(isWinner, isLoser, empty);
+
+  if (empty) {
+    const content = (
+      <span className="w-full text-center text-[12px] leading-none">{label}</span>
+    );
+    if (onMatchClick) {
+      return (
+        <button
+          type="button"
+          data-bracket-interactive
+          onClick={onMatchClick}
+          className={rowClass}
+          style={{ height: GRID_ROW_H }}
+        >
+          {content}
+        </button>
+      );
+    }
+    return (
+      <div className={rowClass} style={{ height: GRID_ROW_H }}>
+        {content}
+      </div>
+    );
+  }
 
   return (
     <div className={rowClass} style={{ height: GRID_ROW_H }}>
@@ -102,7 +133,11 @@ function TeamRow({
             e.stopPropagation();
             onPlayerClick();
           }}
-          className="bracket-player-link min-w-0 flex-1 truncate text-left text-[12px] font-medium leading-none"
+          className={cn(
+            "bracket-player-link min-w-0 flex-1 truncate text-left text-[12px] font-medium leading-none",
+            playerHighlighted && "bracket-player-link--selected",
+          )}
+          title="Подсветить встречи игрока"
         >
           {label}
         </button>
@@ -149,6 +184,7 @@ function PairTeamRow({
   isLoser,
   onPlayerClick,
   onMatchClick,
+  highlightedPlayerId,
 }: {
   team: TeamWithPlayers;
   score: string;
@@ -156,6 +192,7 @@ function PairTeamRow({
   isLoser?: boolean;
   onPlayerClick?: (playerId: string) => void;
   onMatchClick?: () => void;
+  highlightedPlayerId?: string | null;
 }) {
   const rowClass = playerRowClass(isWinner, isLoser);
 
@@ -172,9 +209,11 @@ function PairTeamRow({
         className={cn(
           "min-w-0 flex-1 truncate text-left text-[12px] leading-none",
           onPlayerClick && "bracket-player-link",
+          highlightedPlayerId === team.player1.id && "bracket-player-link--selected",
         )}
+        title={onPlayerClick ? "Подсветить встречи игрока" : undefined}
       >
-        {team.player1.lastName} {team.player1.firstName}
+        {bracketPlayerLabel(team.player1)}
       </button>
       <span className="shrink-0 text-[10px] text-[var(--bracket-meta-text)]">/</span>
       <button
@@ -188,11 +227,13 @@ function PairTeamRow({
         className={cn(
           "min-w-0 flex-1 truncate text-left text-[12px] leading-none",
           onPlayerClick && team.player2 && "bracket-player-link",
+          team.player2 &&
+            highlightedPlayerId === team.player2.id &&
+            "bracket-player-link--selected",
         )}
+        title={onPlayerClick && team.player2 ? "Подсветить встречи игрока" : undefined}
       >
-        {team.player2
-          ? `${team.player2.lastName} ${team.player2.firstName}`
-          : "—"}
+        {team.player2 ? bracketPlayerLabel(team.player2) : "—"}
       </button>
       <span className="bracket-match-rating shrink-0 font-mono text-[10px] tabular-nums">
         {teamRating(team)}
@@ -270,6 +311,9 @@ export function LlbBracketMatch({
   onMatchClick,
   onPlayerClick,
   handicapHalfStep = true,
+  showCardHandicap = true,
+  showCardPlacement = true,
+  highlightedPlayerId = null,
 }: {
   match: BracketMatchView;
   matchNumber: number;
@@ -279,6 +323,9 @@ export function LlbBracketMatch({
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamWithPlayers["player1"]) => void;
   handicapHalfStep?: boolean;
+  showCardHandicap?: boolean;
+  showCardPlacement?: boolean;
+  highlightedPlayerId?: string | null;
 }) {
   const finished = isMatchResolved(match.status, match.winnerTeamId);
   const active = isActiveBracketMatch(match);
@@ -286,8 +333,15 @@ export function LlbBracketMatch({
   const team1Wins = winnerId === match.team1?.id;
   const team2Wins = winnerId === match.team2?.id;
   const { isBye: roundOneBye, phantomRow } = matchAutopassBye(match);
-  const incomingPhantom = incomingAutopassPhantomSlot(
+  const incomingPhantom1 = isIncomingAutopassPhantomForTeam(
     match.id,
+    1,
+    edges,
+    matchById,
+  );
+  const incomingPhantom2 = isIncomingAutopassPhantomForTeam(
+    match.id,
+    2,
     edges,
     matchById,
   );
@@ -365,8 +419,6 @@ export function LlbBracketMatch({
         )
       : null;
   const showHandicap = handicap && handicap !== "Без форы";
-  const byeFinished = roundOneBye && finished && !!winnerId;
-
   const showScores = resultReady || finished;
   const team1ScoreDisplay =
     !showScores
@@ -408,7 +460,7 @@ export function LlbBracketMatch({
   const bracketCol = isFixedSwissGrid
     ? fixedSwissMatchColForCount(match.round, match.slot, matchCount, maxRound)
     : 0;
-  const placement = fixedSwissPlacementLabel(
+  const placementLabel = fixedSwissPlacementLabel(
     match.round,
     match.slot,
     maxRound,
@@ -416,14 +468,15 @@ export function LlbBracketMatch({
     matchCount,
     matchNumber,
   );
+  const placement = showCardPlacement ? placementLabel : null;
   const winnerLine =
-    winnerToNo !== undefined
+    showCardPlacement && winnerToNo !== undefined
       ? winnerKind === "bye"
         ? `автопроход на #${winnerToNo}`
         : `победитель на #${winnerToNo}`
       : null;
   const loserLine =
-    loserToNo !== undefined
+    showCardPlacement && loserToNo !== undefined
       ? roundOneBye && phantomRow
         ? `× на #${loserToNo}`
         : `проигравший на #${loserToNo}`
@@ -435,26 +488,28 @@ export function LlbBracketMatch({
 
   const footerRows: FooterRow[] = [];
 
-  if (winnerLine && loserLine) {
-    if (placement) {
+  if (showCardPlacement) {
+    if (winnerLine && loserLine) {
+      if (placement) {
+        footerRows.push({ kind: "text", text: placement });
+      }
+      const dest = fixedSwissDestSplit(bracketCol, loserLine, winnerLine);
+      footerRows.push({ kind: "split", left: dest.left, right: dest.right });
+    } else if (placement && winnerLine) {
+      const dest = fixedSwissDestSplit(bracketCol, placement, winnerLine);
+      footerRows.push({ kind: "split", left: dest.left, right: dest.right });
+    } else if (placement && loserLine) {
+      const dest = fixedSwissDestSplit(bracketCol, loserLine, placement);
+      footerRows.push({ kind: "split", left: dest.left, right: dest.right });
+    } else if (placement) {
       footerRows.push({ kind: "text", text: placement });
+    } else if (winnerLine) {
+      const dest = fixedSwissDestSplit(bracketCol, null, winnerLine);
+      footerRows.push({ kind: "split", left: dest.left, right: dest.right });
+    } else if (loserLine) {
+      const dest = fixedSwissDestSplit(bracketCol, loserLine, null);
+      footerRows.push({ kind: "split", left: dest.left, right: dest.right });
     }
-    const dest = fixedSwissDestSplit(bracketCol, loserLine, winnerLine);
-    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-  } else if (placement && winnerLine) {
-    const dest = fixedSwissDestSplit(bracketCol, placement, winnerLine);
-    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-  } else if (placement && loserLine) {
-    const dest = fixedSwissDestSplit(bracketCol, loserLine, placement);
-    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-  } else if (placement) {
-    footerRows.push({ kind: "text", text: placement });
-  } else if (winnerLine) {
-    const dest = fixedSwissDestSplit(bracketCol, null, winnerLine);
-    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-  } else if (loserLine) {
-    const dest = fixedSwissDestSplit(bracketCol, loserLine, null);
-    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
   }
   if (match.status === "WALKOVER") {
     footerRows.push({ kind: "text", text: "тех. поражение" });
@@ -464,47 +519,19 @@ export function LlbBracketMatch({
   const footerHeight = isFixedSwissGrid
     ? footerRows.length * footerRowH
     : gridFooterHeight(Math.max(footerRows.length, 1));
+  const showHandicapRow = showCardHandicap && showHandicap && handicapShort;
   const cardHeight = isFixedSwissGrid
-    ? fixedSwissMatchCardHeight(Boolean(showHandicap && handicapShort), footerRows.length)
+    ? fixedSwissMatchCardHeight(Boolean(showHandicapRow), footerRows.length)
     : FIXED_SWISS_CARD_H;
 
   function handlePlayerClick(playerId: string, preview: TeamWithPlayers["player1"]) {
     onPlayerClick?.(playerId, preview);
   }
 
-  function renderByeSlotRow() {
-    const row = (
-      <div
-        className={cn(
-          "bracket-match-bye flex w-full items-center justify-center border-b border-[var(--bracket-row-border)]",
-          byeFinished && "bracket-match-bye--done",
-        )}
-        style={{ height: GRID_ROW_H }}
-      >
-        {byeFinished ? "Автопроход ✓" : "Автопроход"}
-      </div>
-    );
-    if (openResult) {
-      return (
-        <button
-          type="button"
-          data-bracket-interactive
-          onClick={openResult}
-          className="w-full text-center"
-        >
-          {row}
-        </button>
-      );
-    }
-    return row;
-  }
-
   return (
     <div
       className={cn(
         "llb-bracket-match flex flex-col overflow-hidden rounded-xl border border-[var(--bracket-card-border)] bg-[var(--bracket-card-bg)] shadow-[var(--bracket-card-shadow)]",
-        roundOneBye && "llb-bracket-match--round1-bye",
-        byeFinished && "llb-bracket-match--round1-bye-done",
         finished && winnerId && "bracket-match-card--finished",
         active && "bracket-match-card--active",
         openResult && "bracket-match-card--interactive",
@@ -527,7 +554,7 @@ export function LlbBracketMatch({
           <>
             <span className="tabular-nums">Тур {match.round}</span>
             <span className="bracket-round-label font-semibold tabular-nums">
-              #{matchNumber}
+              №{matchNumber}
             </span>
             <span className="tabular-nums text-[var(--bracket-meta-text)]">
               сл.{match.slot}
@@ -535,7 +562,7 @@ export function LlbBracketMatch({
           </>
         ) : (
           <span className="bracket-round-label font-semibold tabular-nums">
-            #{matchNumber}
+            №{matchNumber}
           </span>
         )}
       </MatchArea>
@@ -558,15 +585,16 @@ export function LlbBracketMatch({
                   )
               : undefined
           }
+          highlightedPlayerId={highlightedPlayerId}
         />
       ) : roundOneBye && phantomRow === 1 && !match.team1 ? (
-        renderByeSlotRow()
+        <TeamRow label="×" score="—" empty onMatchClick={openResult} />
       ) : (
         <TeamRow
           label={
             match.team1
-              ? teamLabel(match.team1)
-              : incomingPhantom === 1
+              ? bracketTeamLabel(match.team1)
+              : incomingPhantom1
                 ? "×"
                 : "ожидание"
           }
@@ -574,12 +602,16 @@ export function LlbBracketMatch({
           score={team1ScoreDisplay}
           isWinner={team1Wins}
           isLoser={finished && !!winnerId && !team1Wins && !!match.team1}
-          empty={incomingPhantom === 1 && !roundOneBye}
+          empty={incomingPhantom1 && !roundOneBye}
           onMatchClick={openResult}
           onPlayerClick={
             match.team1 && onPlayerClick
               ? () => handlePlayerClick(match.team1!.player1.id, match.team1!.player1)
               : undefined
+          }
+          playerHighlighted={
+            highlightedPlayerId != null &&
+            match.team1?.player1.id === highlightedPlayerId
           }
         />
       )}
@@ -602,10 +634,11 @@ export function LlbBracketMatch({
                   )
               : undefined
           }
+          highlightedPlayerId={highlightedPlayerId}
         />
       ) : match.team2 ? (
         <TeamRow
-          label={teamLabel(match.team2)}
+          label={bracketTeamLabel(match.team2)}
           rating={teamRating(match.team2)}
           score={team2ScoreDisplay}
           isWinner={team2Wins}
@@ -616,23 +649,27 @@ export function LlbBracketMatch({
               ? () => handlePlayerClick(match.team2!.player1.id, match.team2!.player1)
               : undefined
           }
+          playerHighlighted={
+            highlightedPlayerId != null &&
+            match.team2.player1.id === highlightedPlayerId
+          }
         />
       ) : roundOneBye && phantomRow === 2 && !match.team2 ? (
-        renderByeSlotRow()
+        <TeamRow label="×" score="—" empty onMatchClick={openResult} />
       ) : (
         <TeamRow
           label={
-            incomingPhantom === 2
+            incomingPhantom2
               ? "×"
               : "ожидание"
           }
           score="—"
-          empty={incomingPhantom === 2 && !roundOneBye}
+          empty={incomingPhantom2 && !roundOneBye}
           onMatchClick={openResult}
         />
       )}
 
-      {showHandicap && handicapShort && (
+      {showHandicapRow && (
         openResult ? (
           <button
             type="button"
@@ -703,17 +740,7 @@ export function LlbBracketMatch({
             ),
           )}
         </MatchArea>
-      ) : (
-        openResult && (
-          <MatchArea
-            onMatchClick={openResult}
-            className="flex shrink-0 items-center justify-center overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-[9px] leading-[18px] text-[var(--bracket-meta-text)]"
-            style={{ height: footerHeight, maxHeight: footerHeight }}
-          >
-            результат встречи →
-          </MatchArea>
-        )
-      )}
+      ) : null}
     </div>
   );
 }

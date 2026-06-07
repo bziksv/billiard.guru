@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import {
   type BracketMatchView,
   matchAutopassBye,
@@ -7,7 +8,9 @@ import {
 } from "@/lib/bracket-view";
 import { LlbBracketMatch } from "@/components/bracket/llb-bracket-match";
 import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center";
+import { bracketMatchHasPlayer } from "@/lib/bracket-display";
 import { teamLabel } from "@/lib/pair-tournament";
+import { cn } from "@/lib/cn";
 import type { TeamPlayer } from "@/lib/pair-tournament";
 import {
   buildFixedSwissBracketLayout,
@@ -60,7 +63,11 @@ export function SwissBracketView({
   fixedGrid = false,
   onMatchClick,
   onPlayerClick,
+  highlightedPlayerId: highlightedPlayerIdProp,
+  onPlayerHighlight,
   handicapHalfStep = true,
+  showCardHandicap = true,
+  showCardPlacement = true,
   demoPreview = false,
   presentation = false,
 }: {
@@ -70,14 +77,43 @@ export function SwissBracketView({
   fixedGrid?: boolean;
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
+  highlightedPlayerId?: string | null;
+  onPlayerHighlight?: (playerId: string) => void;
   handicapHalfStep?: boolean;
+  showCardHandicap?: boolean;
+  showCardPlacement?: boolean;
   demoPreview?: boolean;
   /** Полноэкранный режим: без подсказок, сетка на всю высоту. */
   presentation?: boolean;
 }) {
-  const layout = fixedGrid
-    ? buildFixedSwissBracketLayout(matches)
-    : buildSwissBracketLayout(matches);
+  const [localHighlightedPlayerId, setLocalHighlightedPlayerId] = useState<
+    string | null
+  >(null);
+  const highlightedPlayerId =
+    highlightedPlayerIdProp !== undefined
+      ? highlightedPlayerIdProp
+      : localHighlightedPlayerId;
+
+  function handlePlayerHighlight(playerId: string, preview?: TeamPlayer) {
+    if (onPlayerHighlight) {
+      onPlayerHighlight(playerId);
+    } else {
+      setLocalHighlightedPlayerId((prev) =>
+        prev === playerId ? null : playerId,
+      );
+    }
+    onPlayerClick?.(playerId, preview);
+  }
+  const layout = useMemo(
+    () =>
+      fixedGrid
+        ? buildFixedSwissBracketLayout(matches, {
+            showCardHandicap,
+            showCardPlacement,
+          })
+        : buildSwissBracketLayout(matches),
+    [fixedGrid, matches, showCardHandicap, showCardPlacement],
+  );
   const matchById = new Map(matches.map((m) => [m.id, m]));
   const fixedMaxRound =
     matches.length > 0 ? Math.max(...matches.map((m) => m.round)) : 0;
@@ -525,10 +561,21 @@ export function SwissBracketView({
             const matchNumber = layout.matchNumbers.get(match.id);
             if (!pos || matchNumber === undefined) return null;
 
+            const filterActive = highlightedPlayerId != null;
+            const playerInMatch =
+              filterActive &&
+              bracketMatchHasPlayer(match, highlightedPlayerId);
+            const dimmed = filterActive && !playerInMatch;
+            const focused = filterActive && playerInMatch;
+
             return (
               <div
                 key={match.id}
-                className="absolute z-10"
+                className={cn(
+                  "absolute z-10",
+                  dimmed && "bracket-match-anchor--dimmed",
+                  focused && "bracket-match-anchor--focused",
+                )}
                 style={{
                   left: cardLeft(pos.col),
                   top: pos.y + GRID_PAD + GRID_LABEL_OFFSET,
@@ -541,8 +588,11 @@ export function SwissBracketView({
                   matchNumbers={layout.matchNumbers}
                   matchById={matchById}
                   onMatchClick={onMatchClick}
-                  onPlayerClick={onPlayerClick}
+                  onPlayerClick={handlePlayerHighlight}
                   handicapHalfStep={handicapHalfStep}
+                  showCardHandicap={showCardHandicap}
+                  showCardPlacement={showCardPlacement}
+                  highlightedPlayerId={highlightedPlayerId}
                 />
               </div>
             );

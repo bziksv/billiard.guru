@@ -4688,10 +4688,6 @@ html.light {
   box-shadow: var(--bracket-card-shadow);
 }
 
-html.light .bracket-match-card.llb-bracket-match--round1-bye .llb-bracket-match__meta {
-  background-color: rgb(236 253 245);
-}
-
 .bracket-match-card--compact {
   min-height: 6.5rem;
 }
@@ -4816,6 +4812,33 @@ html.light .bracket-match-card.llb-bracket-match--round1-bye .llb-bracket-match_
   text-decoration-color: currentColor;
 }
 
+.bracket-player-link--selected {
+  color: var(--bracket-round-label);
+  font-weight: 600;
+  text-decoration-color: currentColor;
+}
+
+.bracket-match-anchor--dimmed {
+  opacity: 0.08;
+  filter: saturate(0) grayscale(0.85) brightness(0.7);
+  transition: opacity 0.2s ease, filter 0.2s ease;
+  pointer-events: none;
+}
+
+.bracket-match-anchor--focused {
+  opacity: 1;
+  filter: none;
+  z-index: 15;
+  transition: opacity 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bracket-match-anchor--focused .llb-bracket-match,
+.bracket-match-anchor--focused .bracket-match-card {
+  box-shadow:
+    var(--bracket-card-shadow),
+    0 0 0 2px var(--bracket-card-border-active);
+}
+
 .bracket-match-row--winner .bracket-player-link:hover {
   color: var(--bracket-row-winner-text);
   opacity: 0.9;
@@ -4830,29 +4853,6 @@ html.light .bracket-match-card.llb-bracket-match--round1-bye .llb-bracket-match_
 
 .bracket-match-bye--done {
   color: var(--bracket-bye-done-text);
-}
-
-/* Fixed Swiss: карточка 1-го тура с автопроходом — как bracket-match-card */
-html.light .llb-bracket-match--round1-bye {
-  background-color: rgb(236 253 245);
-  border-color: rgb(134 239 172);
-}
-
-html.light .llb-bracket-match--round1-bye .llb-bracket-match__meta {
-  background-color: rgb(236 253 245);
-}
-
-html.light .llb-bracket-match--round1-bye-done {
-  border-color: var(--bracket-card-border-finished);
-}
-
-html.dark .llb-bracket-match--round1-bye {
-  background-color: rgb(6 78 59 / 0.22);
-  border-color: rgb(6 78 59 / 0.55);
-}
-
-html.dark .llb-bracket-match--round1-bye .llb-bracket-match__meta {
-  background-color: rgb(6 78 59 / 0.22);
 }
 
 .bracket-match-meta {

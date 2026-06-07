@@ -49,36 +49,52 @@ export function isVoidFixedSwissCrossMatch(
   return true;
 }
 
-/** Слот с ×: loss от bye 1-го тура или win из пустого креста. */
+function isPhantomFeederSlot(
+  source: FixedSwissSlotRow,
+  allMatches: FixedSwissSlotRow[],
+  links: FixedSwissLink[],
+): boolean {
+  if (isRoundOneByeSlot(source)) return true;
+  return (
+    source.status === "FINISHED" &&
+    isVoidFixedSwissCrossMatch(source, allMatches, links)
+  );
+}
+
+/** Слот с ×: loss/win от bye 1-го тура или пустого креста. */
+export function isIncomingFixedSwissPhantomForTeam(
+  match: FixedSwissSlotRow,
+  teamSlot: 1 | 2,
+  allMatches: FixedSwissSlotRow[],
+  links: FixedSwissLink[],
+): boolean {
+  for (const link of links) {
+    if (
+      link.toRound !== match.round ||
+      link.toSlot !== match.slot ||
+      link.toTeam !== teamSlot
+    ) {
+      continue;
+    }
+
+    const source = allMatches.find(
+      (m) => m.round === link.fromRound && m.slot === link.fromSlot,
+    );
+    if (source && isPhantomFeederSlot(source, allMatches, links)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function incomingFixedSwissPhantomTeamSlot(
   match: FixedSwissSlotRow,
   allMatches: FixedSwissSlotRow[],
   links: FixedSwissLink[],
 ): 1 | 2 | null {
-  for (const link of links) {
-    if (link.toRound !== match.round || link.toSlot !== match.slot) continue;
-
-    if (link.kind === "loss") {
-      const source = allMatches.find(
-        (m) => m.round === link.fromRound && m.slot === link.fromSlot,
-      );
-      if (source && isRoundOneByeSlot(source)) {
-        return link.toTeam;
-      }
-      continue;
-    }
-
-    if (link.kind === "win") {
-      const source = allMatches.find(
-        (m) => m.round === link.fromRound && m.slot === link.fromSlot,
-      );
-      if (
-        source &&
-        source.status === "FINISHED" &&
-        isVoidFixedSwissCrossMatch(source, allMatches, links)
-      ) {
-        return link.toTeam;
-      }
+  for (const teamSlot of [1, 2] as const) {
+    if (isIncomingFixedSwissPhantomForTeam(match, teamSlot, allMatches, links)) {
+      return teamSlot;
     }
   }
   return null;

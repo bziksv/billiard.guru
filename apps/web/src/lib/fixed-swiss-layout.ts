@@ -98,17 +98,48 @@ function matchHasHandicap(match: BracketMatchView): boolean {
   return Boolean(short);
 }
 
+export type FixedSwissDisplayOpts = {
+  showCardHandicap?: boolean;
+  showCardPlacement?: boolean;
+};
+
 function estimateFixedSwissFooterRowCount(
   match: BracketMatchView,
   edges: SwissBracketEdge[],
+  opts?: {
+    matchCount?: number;
+    matchNumber?: number;
+    maxRound?: number;
+    matchesPerRound?: number;
+    showCardPlacement?: boolean;
+  },
 ): number {
-  const hasWin = edges.some(
-    (e) => e.fromId === match.id && (e.kind === "win" || e.kind === "bye"),
-  );
-  const hasLoss = edges.some((e) => e.fromId === match.id && e.kind === "loss");
   let rows = 0;
-  if (hasWin && hasLoss) rows = 1;
-  else if (hasWin || hasLoss) rows = 1;
+  if (opts?.showCardPlacement !== false) {
+    const hasWin = edges.some(
+      (e) => e.fromId === match.id && (e.kind === "win" || e.kind === "bye"),
+    );
+    const hasLoss = edges.some(
+      (e) => e.fromId === match.id && e.kind === "loss",
+    );
+    const placement =
+      opts?.matchCount != null && opts?.maxRound != null
+        ? fixedSwissPlacementLabel(
+            match.round,
+            match.slot,
+            opts.maxRound,
+            opts.matchesPerRound ?? inferFixedSwissGridSize(opts.matchCount) / 2,
+            opts.matchCount,
+            opts.matchNumber,
+          )
+        : null;
+
+    if (placement && hasWin && hasLoss) {
+      rows = 2;
+    } else if (placement || hasWin || hasLoss) {
+      rows = 1;
+    }
+  }
   if (match.status === "WALKOVER") rows += 1;
   return rows;
 }
@@ -117,10 +148,26 @@ function estimateFixedSwissFooterRowCount(
 export function estimateFixedSwissCardHeight(
   match: BracketMatchView,
   edges: SwissBracketEdge[],
+  opts?: {
+    matchCount?: number;
+    matchNumber?: number;
+    maxRound?: number;
+    showCardHandicap?: boolean;
+    showCardPlacement?: boolean;
+  },
 ): number {
+  const matchesPerRound =
+    opts?.matchCount != null
+      ? inferFixedSwissGridSize(opts.matchCount) / 2
+      : undefined;
+  const hasHandicap =
+    opts?.showCardHandicap !== false && matchHasHandicap(match);
   return fixedSwissMatchCardHeight(
-    matchHasHandicap(match),
-    estimateFixedSwissFooterRowCount(match, edges),
+    hasHandicap,
+    estimateFixedSwissFooterRowCount(match, edges, {
+      ...opts,
+      matchesPerRound,
+    }),
   );
 }
 
@@ -865,7 +912,10 @@ function buildTsPositions28Bronze(
   if (!finPos) return positions;
   positions.set(bronze.id, {
     col: finPos.col,
-    y: finPos.y + cardH + FIXED_SWISS_BRONZE_BELOW_GAP,
+    y:
+      finPos.y +
+      layoutMatchCardHeight(fin.id, cardH) +
+      FIXED_SWISS_BRONZE_BELOW_GAP,
   });
   return positions;
 }
@@ -1040,7 +1090,10 @@ function buildTsPositions32Bronze(
   if (!finPos) return positions;
   positions.set(bronze.id, {
     col: finPos.col,
-    y: finPos.y + cardH + FIXED_SWISS_BRONZE_BELOW_GAP,
+    y:
+      finPos.y +
+      layoutMatchCardHeight(fin.id, cardH) +
+      FIXED_SWISS_BRONZE_BELOW_GAP,
   });
   return positions;
 }
@@ -1347,7 +1400,10 @@ function buildTsPositions64Bronze(
   if (!finPos) return positions;
   positions.set(bronze.id, {
     col: finPos.col,
-    y: finPos.y + cardH + FIXED_SWISS_BRONZE_BELOW_GAP,
+    y:
+      finPos.y +
+      layoutMatchCardHeight(fin.id, cardH) +
+      FIXED_SWISS_BRONZE_BELOW_GAP,
   });
   return positions;
 }
@@ -1500,6 +1556,7 @@ function buildClassicPositions(
 
 export function buildFixedSwissBracketLayout(
   matches: BracketMatchView[],
+  display?: FixedSwissDisplayOpts,
 ): SwissBracketLayout {
   const rounds = groupMatchesByRound(matches);
   const matchCount = matches.length;
@@ -1531,11 +1588,23 @@ export function buildFixedSwissBracketLayout(
     matchCount,
     maxRoundEarly,
   );
-  const cardH = FIXED_SWISS_CARD_H;
   const cardHeights = new Map<string, number>();
   for (const m of matches) {
-    cardHeights.set(m.id, estimateFixedSwissCardHeight(m, edges));
+    cardHeights.set(
+      m.id,
+      estimateFixedSwissCardHeight(m, edges, {
+        matchCount,
+        matchNumber: matchNumbers.get(m.id),
+        maxRound: maxRoundEarly,
+        showCardHandicap: display?.showCardHandicap,
+        showCardPlacement: display?.showCardPlacement,
+      }),
+    );
   }
+  const cardH =
+    cardHeights.size > 0
+      ? Math.min(...cardHeights.values())
+      : FIXED_SWISS_CARD_H;
   layoutCardHeights = cardHeights;
   layoutRound1SlotY = buildFixedSwissRound1SlotY(matches, cardHeights, gridSize);
 

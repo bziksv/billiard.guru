@@ -413,28 +413,41 @@ function isVoidCrossBracketView(match: BracketMatchView): boolean {
   );
 }
 
+/** Источник ×: bye 1-го тура или пустой крест. */
+function isPhantomFeederMatch(match: BracketMatchView): boolean {
+  if (matchAutopassBye(match).isBye) return true;
+  return isVoidCrossBracketView(match);
+}
+
+/** × в конкретной строке (1 — верх, 2 — низ) матча назначения. */
+export function isIncomingAutopassPhantomForTeam(
+  matchId: string,
+  teamSlot: 1 | 2,
+  edges: SwissBracketEdge[],
+  matchById: Map<string, BracketMatchView>,
+): boolean {
+  for (const edge of edges) {
+    if (edge.toId !== matchId || edge.toTeamSlot !== teamSlot) continue;
+
+    const from = matchById.get(edge.fromId);
+    if (!from) continue;
+
+    if (edge.kind === "loss" || edge.kind === "win") {
+      if (isPhantomFeederMatch(from)) return true;
+    }
+  }
+  return false;
+}
+
 /** × от bye 1-го тура или пустого креста — в матче назначения (слот toTeamSlot). */
 export function incomingAutopassPhantomSlot(
   matchId: string,
   edges: SwissBracketEdge[],
   matchById: Map<string, BracketMatchView>,
 ): 1 | 2 | null {
-  for (const edge of edges) {
-    if (edge.toId !== matchId || !edge.toTeamSlot) continue;
-
-    if (edge.kind === "loss") {
-      const from = matchById.get(edge.fromId);
-      if (from && matchAutopassBye(from).isBye) {
-        return edge.toTeamSlot;
-      }
-      continue;
-    }
-
-    if (edge.kind === "win") {
-      const from = matchById.get(edge.fromId);
-      if (from && isVoidCrossBracketView(from)) {
-        return edge.toTeamSlot;
-      }
+  for (const teamSlot of [1, 2] as const) {
+    if (isIncomingAutopassPhantomForTeam(matchId, teamSlot, edges, matchById)) {
+      return teamSlot;
     }
   }
   return null;

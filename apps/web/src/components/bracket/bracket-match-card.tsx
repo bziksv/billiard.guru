@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
-import { teamLabel, teamRating, type TeamPlayer } from "@/lib/pair-tournament";
+import { bracketTeamLabel } from "@/lib/bracket-display";
+import { teamRating, type TeamPlayer } from "@/lib/pair-tournament";
 import {
   isActiveBracketMatch,
   isMatchReadyForResult,
@@ -57,6 +58,7 @@ function TeamLine({
   showScore,
   onPlayerClick,
   onMatchClick,
+  highlightedPlayerId,
 }: {
   team: BracketMatchView["team1"];
   isWinner: boolean;
@@ -65,6 +67,7 @@ function TeamLine({
   showScore?: boolean;
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   onMatchClick?: () => void;
+  highlightedPlayerId?: string | null;
 }) {
   if (!team) {
     return <div className="bracket-match-row bracket-match-row--empty">—</div>;
@@ -91,13 +94,19 @@ function TeamLine({
               e.stopPropagation();
               onPlayerClick(team.player1.id, team.player1);
             }}
-            className="bracket-player-link block max-w-full truncate text-left text-sm font-medium"
-            title="Профиль игрока"
+            className={cn(
+              "bracket-player-link block max-w-full truncate text-left text-sm font-medium",
+              highlightedPlayerId === team.player1.id &&
+                "bracket-player-link--selected",
+            )}
+            title="Подсветить встречи игрока"
           >
-            {teamLabel(team)}
+            {bracketTeamLabel(team)}
           </button>
         ) : (
-          <span className="block truncate text-sm font-medium">{teamLabel(team)}</span>
+          <span className="block truncate text-sm font-medium">
+            {bracketTeamLabel(team)}
+          </span>
         )}
         <span className="bracket-match-rating mt-0.5 block font-mono text-[10px] leading-none tabular-nums">
           ур. {teamRating(team)}
@@ -125,6 +134,8 @@ export function BracketMatchCard({
   onPlayerClick,
   showMatchScore = false,
   handicapHalfStep = true,
+  showCardHandicap = true,
+  highlightedPlayerId = null,
 }: {
   match: BracketMatchView;
   /** Как в эталоне LlbBracketMatch — только #{номер} в шапке */
@@ -138,6 +149,8 @@ export function BracketMatchCard({
   showMatchScore?: boolean;
   /** Учитывать шаг рейтинга 0,5 в форе (из настроек турнира). */
   handicapHalfStep?: boolean;
+  showCardHandicap?: boolean;
+  highlightedPlayerId?: string | null;
 }) {
   const finished = isMatchResolved(match.status, match.winnerTeamId);
   const active = isActiveBracketMatch(match);
@@ -151,7 +164,6 @@ export function BracketMatchCard({
         ? 2
         : null;
   const roundOneBye = soloSide !== null && match.round === 1;
-  const byeFinished = roundOneBye && finished && !!winnerId;
   const showScore =
     showMatchScore &&
     finished &&
@@ -191,8 +203,6 @@ export function BracketMatchCard({
         finished && winnerId && "bracket-match-card--finished",
         active && "bracket-match-card--active",
         interactiveAdmin && onMatchClick && "bracket-match-card--interactive",
-        roundOneBye && "llb-bracket-match--round1-bye",
-        roundOneBye && byeFinished && "llb-bracket-match--round1-bye-done",
         className,
       )}
       style={style}
@@ -208,7 +218,7 @@ export function BracketMatchCard({
             title="Результат встречи"
           >
             <span className="bracket-round-label font-semibold tabular-nums">
-              #{matchNumber}
+              №{matchNumber}
             </span>
           </button>
         ) : (
@@ -217,7 +227,7 @@ export function BracketMatchCard({
             style={{ height: GRID_META_H }}
           >
             <span className="bracket-round-label font-semibold tabular-nums">
-              #{matchNumber}
+              №{matchNumber}
             </span>
           </div>
         ))}
@@ -229,6 +239,7 @@ export function BracketMatchCard({
         showScore={showScore}
         onPlayerClick={onPlayerClick}
         onMatchClick={openMatch}
+        highlightedPlayerId={highlightedPlayerId}
       />
       {match.team2 ? (
         <TeamLine
@@ -239,39 +250,27 @@ export function BracketMatchCard({
           showScore={showScore}
           onPlayerClick={onPlayerClick}
           onMatchClick={openMatch}
+          highlightedPlayerId={highlightedPlayerId}
         />
       ) : openMatch ? (
         <button
           type="button"
           data-bracket-interactive
           onClick={openMatch}
-          className={cn(
-            roundOneBye ? "bracket-match-bye" : "bracket-match-row bracket-match-row--empty",
-            roundOneBye && byeFinished && "bracket-match-bye--done",
-            "w-full text-left",
-          )}
+          className="bracket-match-row bracket-match-row--empty flex w-full items-center justify-center text-[12px]"
+          style={{ height: 28 }}
         >
-          {roundOneBye
-            ? byeFinished
-              ? "Автопроход ✓"
-              : "Автопроход"
-            : "Ожидание"}
+          {roundOneBye ? "×" : "Ожидание"}
         </button>
       ) : (
         <div
-          className={cn(
-            roundOneBye ? "bracket-match-bye" : "bracket-match-row bracket-match-row--empty",
-            roundOneBye && byeFinished && "bracket-match-bye--done",
-          )}
+          className="bracket-match-row bracket-match-row--empty flex items-center justify-center text-[12px]"
+          style={{ height: 28 }}
         >
-          {roundOneBye
-            ? byeFinished
-              ? "Автопроход ✓"
-              : "Автопроход"
-            : "Ожидание"}
+          {roundOneBye ? "×" : "Ожидание"}
         </div>
       )}
-      {handicap && handicap !== "Без форы" && handicapShort && (
+      {showCardHandicap && handicap && handicap !== "Без форы" && handicapShort && (
         openMatch ? (
           <button
             type="button"

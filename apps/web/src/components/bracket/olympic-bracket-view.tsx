@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   groupMatchesByRound,
   olympicBracketHeight,
@@ -12,7 +15,9 @@ import {
 import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
 import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center";
 import { GRID_CARD_W } from "@/lib/swiss-bracket-layout";
+import { bracketMatchHasPlayer } from "@/lib/bracket-display";
 import type { TeamPlayer } from "@/lib/pair-tournament";
+import { cn } from "@/lib/cn";
 import {
   bracketCanvasClassName,
   bracketViewRootClassName,
@@ -68,21 +73,48 @@ export function OlympicBracketView({
   matchNumbers,
   onMatchClick,
   onPlayerClick,
+  highlightedPlayerId: highlightedPlayerIdProp,
+  onPlayerHighlight,
   showMatchScore = false,
   withBronzeMatch = false,
   handicapHalfStep = true,
+  showCardHandicap = true,
+  showCardPlacement = true,
   presentation = false,
 }: {
   matches: BracketMatchView[];
   matchNumbers?: Map<string, number>;
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
+  highlightedPlayerId?: string | null;
+  onPlayerHighlight?: (playerId: string) => void;
   showMatchScore?: boolean;
   /** Матч за 3–4 в финальном туре (слот 2). */
   withBronzeMatch?: boolean;
   handicapHalfStep?: boolean;
+  showCardHandicap?: boolean;
+  showCardPlacement?: boolean;
   presentation?: boolean;
 }) {
+  const [localHighlightedPlayerId, setLocalHighlightedPlayerId] = useState<
+    string | null
+  >(null);
+  const highlightedPlayerId =
+    highlightedPlayerIdProp !== undefined
+      ? highlightedPlayerIdProp
+      : localHighlightedPlayerId;
+
+  function handlePlayerHighlight(playerId: string, preview?: TeamPlayer) {
+    if (onPlayerHighlight) {
+      onPlayerHighlight(playerId);
+    } else {
+      setLocalHighlightedPlayerId((prev) =>
+        prev === playerId ? null : playerId,
+      );
+    }
+    onPlayerClick?.(playerId, preview);
+  }
+
   const rounds = groupMatchesByRound(matches);
   if (rounds.length === 0) return null;
 
@@ -154,10 +186,22 @@ export function OlympicBracketView({
         ))}
 
         {rounds.map(({ round, matches: roundMatches }) =>
-          roundMatches.map((match) => (
+          roundMatches.map((match) => {
+            const filterActive = highlightedPlayerId != null;
+            const playerInMatch =
+              filterActive &&
+              bracketMatchHasPlayer(match, highlightedPlayerId);
+            const dimmed = filterActive && !playerInMatch;
+            const focused = filterActive && playerInMatch;
+
+            return (
             <div
               key={match.id}
-              className="absolute z-10"
+              className={cn(
+                "absolute z-10",
+                dimmed && "bracket-match-anchor--dimmed",
+                focused && "bracket-match-anchor--focused",
+              )}
               style={{
                 left: (round - 1) * COL_W + CARD_LEFT,
                 top:
@@ -174,19 +218,26 @@ export function OlympicBracketView({
               <BracketMatchCard
                 match={match}
                 matchNumber={matchNumbers?.get(match.id)}
-                placementLabel={olympicMatchPlacementLabel(
-                  match.round,
-                  match.slot,
-                  maxRound,
-                  withBronzeMatch,
-                )}
+                placementLabel={
+                  showCardPlacement
+                    ? olympicMatchPlacementLabel(
+                        match.round,
+                        match.slot,
+                        maxRound,
+                        withBronzeMatch,
+                      )
+                    : null
+                }
                 onMatchClick={onMatchClick}
-                onPlayerClick={onPlayerClick}
+                onPlayerClick={handlePlayerHighlight}
                 showMatchScore={showMatchScore}
                 handicapHalfStep={handicapHalfStep}
+                showCardHandicap={showCardHandicap}
+                highlightedPlayerId={highlightedPlayerId}
               />
             </div>
-          )),
+            );
+          }),
         )}
       </div>
     </BracketScrollCenter>

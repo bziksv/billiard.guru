@@ -9,10 +9,9 @@ import {
   type MatchResultPayload,
 } from "@/components/bracket/match-result-modal";
 import { ConfirmModal } from "@/components/bracket/confirm-modal";
-import { PlayerCardModal } from "@/components/bracket/player-card-modal";
 import { OlympicBracketView } from "@/components/bracket/olympic-bracket-view";
+import { bracketPlayerLabelById } from "@/lib/bracket-display";
 import { SwissBracketView } from "@/components/bracket/swiss-bracket-view";
-import type { TeamPlayer } from "@/lib/pair-tournament";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { AsyncButton } from "@/components/ui/async-text-button";
 import { cn } from "@/lib/cn";
@@ -87,6 +86,70 @@ type ManageTab =
   | "upcoming-matches"
   | "completed-matches"
   | "protocol";
+
+type BracketCardDisplayPrefs = {
+  showHandicap: boolean;
+  showPlacement: boolean;
+};
+
+function bracketDisplayStorageKey(tournamentId: string) {
+  return `setka:bracket-display:${tournamentId}`;
+}
+
+function readBracketDisplayPrefs(tournamentId: string): BracketCardDisplayPrefs {
+  if (typeof window === "undefined") {
+    return { showHandicap: true, showPlacement: true };
+  }
+  try {
+    const raw = localStorage.getItem(bracketDisplayStorageKey(tournamentId));
+    if (!raw) return { showHandicap: true, showPlacement: true };
+    const parsed = JSON.parse(raw) as Partial<BracketCardDisplayPrefs>;
+    return {
+      showHandicap: parsed.showHandicap !== false,
+      showPlacement: parsed.showPlacement !== false,
+    };
+  } catch {
+    return { showHandicap: true, showPlacement: true };
+  }
+}
+
+function BracketCardDisplayToggles({
+  showHandicap,
+  showPlacement,
+  onShowHandicapChange,
+  onShowPlacementChange,
+}: {
+  showHandicap: boolean;
+  showPlacement: boolean;
+  onShowHandicapChange: (value: boolean) => void;
+  onShowPlacementChange: (value: boolean) => void;
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-3 border-l border-[var(--admin-border)] pl-3 text-xs text-[var(--admin-text-muted)]">
+      <label className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap">
+        <input
+          type="checkbox"
+          className="admin-checkbox"
+          checked={showHandicap}
+          onChange={(e) => onShowHandicapChange(e.target.checked)}
+        />
+        Фора
+      </label>
+      <label
+        className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap"
+        title="Подвал карточки: места и переходы (победитель/проигравший на #…)"
+      >
+        <input
+          type="checkbox"
+          className="admin-checkbox"
+          checked={showPlacement}
+          onChange={(e) => onShowPlacementChange(e.target.checked)}
+        />
+        Места
+      </label>
+    </div>
+  );
+}
 
 function ManageTabButtons({
   tab,
@@ -254,6 +317,12 @@ export function TournamentManageView({
     defaultManageTab(t, effectiveViewMode),
   );
   const prevMatchCountRef = useRef(t.matches.length);
+  const [bracketDisplay, setBracketDisplay] = useState<BracketCardDisplayPrefs>(() =>
+    readBracketDisplayPrefs(t.id),
+  );
+  const [highlightedBracketPlayerId, setHighlightedBracketPlayerId] = useState<
+    string | null
+  >(null);
   const [presentationOpenInternal, setPresentationOpenInternal] = useState(false);
   const presentationOpen = presentationOpenProp ?? presentationOpenInternal;
   const setPresentationOpen = (open: boolean) => {
@@ -278,6 +347,33 @@ export function TournamentManageView({
       setTab("bracket");
     }
   }, [t.matches.length, showBracketSection, tab]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      bracketDisplayStorageKey(t.id),
+      JSON.stringify(bracketDisplay),
+    );
+  }, [t.id, bracketDisplay]);
+
+  const toggleBracketPlayerHighlight = (playerId: string) => {
+    setHighlightedBracketPlayerId((prev) =>
+      prev === playerId ? null : playerId,
+    );
+  };
+
+  const bracketDisplayToggles =
+    t.matches.length > 0 ? (
+      <BracketCardDisplayToggles
+        showHandicap={bracketDisplay.showHandicap}
+        showPlacement={bracketDisplay.showPlacement}
+        onShowHandicapChange={(showHandicap) =>
+          setBracketDisplay((prefs) => ({ ...prefs, showHandicap }))
+        }
+        onShowPlacementChange={(showPlacement) =>
+          setBracketDisplay((prefs) => ({ ...prefs, showPlacement }))
+        }
+      />
+    ) : null;
 
   const showTabBar =
     showBracketSection &&
@@ -424,6 +520,24 @@ export function TournamentManageView({
     [bracketMatches, t.format],
   );
 
+  const bracketPlayerHighlightFilter =
+    highlightedBracketPlayerId && tab === "bracket" ? (
+      <div className="flex shrink-0 items-center gap-2 rounded-md border border-emerald-300 bg-emerald-50 px-2 py-1 text-xs text-emerald-900">
+        <span>
+          Встречи:{" "}
+          {bracketPlayerLabelById(bracketMatches, highlightedBracketPlayerId) ??
+            "…"}
+        </span>
+        <button
+          type="button"
+          onClick={() => setHighlightedBracketPlayerId(null)}
+          className="rounded border border-emerald-400/60 px-1.5 py-0.5 font-medium hover:bg-emerald-100"
+        >
+          Сбросить
+        </button>
+      </div>
+    ) : null;
+
   const manageTabButtons = (
     <ManageTabButtons
       tab={tab}
@@ -481,7 +595,11 @@ export function TournamentManageView({
           <div className="flex items-center gap-2">
             {showTabBar && !editing ? (
               <div className="min-w-0 flex-1 overflow-x-auto">
-                <div className="admin-tab-bar w-max">{manageTabButtons}</div>
+                <div className="flex w-max items-center gap-3">
+                  <div className="admin-tab-bar">{manageTabButtons}</div>
+                  {bracketDisplayToggles}
+                  {bracketPlayerHighlightFilter}
+                </div>
               </div>
             ) : (
               <div className="min-w-0 flex-1" />
@@ -660,7 +778,11 @@ export function TournamentManageView({
           )}
           <div className="flex items-center gap-2">
             <div className="min-w-0 flex-1 overflow-x-auto">
-              <div className="admin-tab-bar w-max">{manageTabButtons}</div>
+              <div className="flex w-max items-center gap-3">
+                <div className="admin-tab-bar">{manageTabButtons}</div>
+                {bracketDisplayToggles}
+                {bracketPlayerHighlightFilter}
+              </div>
             </div>
             {showTabBarFullscreenButton && (
               <button
@@ -703,6 +825,10 @@ export function TournamentManageView({
           format={t.format}
           bracketMatches={bracketMatches}
           matchNumbers={bracketMatchNumbers}
+          showCardHandicap={bracketDisplay.showHandicap}
+          showCardPlacement={bracketDisplay.showPlacement}
+          highlightedPlayerId={highlightedBracketPlayerId}
+          onPlayerHighlight={toggleBracketPlayerHighlight}
           actionNotice={bracketActionNotice}
           onDismissActionNotice={() => setBracketActionNotice(null)}
           onSaveMatchResult={onSaveMatchResult}
@@ -761,7 +887,13 @@ export function TournamentManageView({
         open={presentationOpen}
         title={t.name}
         onClose={() => setPresentationOpen(false)}
-        tabs={<div className="admin-tab-bar">{manageTabButtons}</div>}
+        tabs={
+          <div className="flex items-center gap-3">
+            <div className="admin-tab-bar">{manageTabButtons}</div>
+            {bracketDisplayToggles}
+            {bracketPlayerHighlightFilter}
+          </div>
+        }
         contentClassName={
           presentationContentIsBracket ? "flex flex-col" : "overflow-auto"
         }
@@ -792,6 +924,10 @@ export function TournamentManageView({
             format={t.format}
             bracketMatches={bracketMatches}
             matchNumbers={bracketMatchNumbers}
+            showCardHandicap={bracketDisplay.showHandicap}
+            showCardPlacement={bracketDisplay.showPlacement}
+            highlightedPlayerId={highlightedBracketPlayerId}
+            onPlayerHighlight={toggleBracketPlayerHighlight}
             inPresentation
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
@@ -1337,6 +1473,10 @@ function BracketTab({
   format,
   bracketMatches,
   matchNumbers,
+  showCardHandicap = true,
+  showCardPlacement = true,
+  highlightedPlayerId = null,
+  onPlayerHighlight,
   inPresentation = false,
   actionNotice,
   onDismissActionNotice,
@@ -1347,6 +1487,10 @@ function BracketTab({
   format: string;
   bracketMatches: BracketMatchView[];
   matchNumbers: Map<string, number>;
+  showCardHandicap?: boolean;
+  showCardPlacement?: boolean;
+  highlightedPlayerId?: string | null;
+  onPlayerHighlight?: (playerId: string) => void;
   inPresentation?: boolean;
   actionNotice?: string | null;
   onDismissActionNotice?: () => void;
@@ -1359,10 +1503,6 @@ function BracketTab({
   const olympic = isOlympicFormat(format);
   const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
   const [matchSaving, setMatchSaving] = useState(false);
-  const [playerModal, setPlayerModal] = useState<{
-    id: string;
-    preview?: TeamPlayer;
-  } | null>(null);
 
   const excelLiveByNo = useMemo(
     () => (excelRef ? mapBracketMatchesByExcelNo(bracketMatches) : undefined),
@@ -1420,8 +1560,11 @@ function BracketTab({
           matchNumbers={matchNumbers}
           withBronzeMatch={isOlympicBronzeFormat(format)}
           handicapHalfStep={t.handicapHalfStep !== false}
+          showCardHandicap={showCardHandicap}
+          showCardPlacement={showCardPlacement}
           onMatchClick={setModalMatch}
-          onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
+          highlightedPlayerId={highlightedPlayerId}
+          onPlayerHighlight={onPlayerHighlight}
           showMatchScore
           presentation={presentation}
         />
@@ -1442,8 +1585,11 @@ function BracketTab({
         showStandings={false}
         fixedGrid={fixedSwiss}
         handicapHalfStep={t.handicapHalfStep !== false}
+        showCardHandicap={showCardHandicap}
+        showCardPlacement={showCardPlacement}
         onMatchClick={setModalMatch}
-        onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
+        highlightedPlayerId={highlightedPlayerId}
+        onPlayerHighlight={onPlayerHighlight}
         presentation={presentation}
       />
     );
@@ -1459,12 +1605,6 @@ function BracketTab({
         onClose={() => setModalMatch(null)}
         onSave={handleSaveMatchResult}
         onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
-      />
-      <PlayerCardModal
-        playerId={playerModal?.id ?? null}
-        preview={playerModal?.preview}
-        open={playerModal !== null}
-        onClose={() => setPlayerModal(null)}
       />
     </>
   );

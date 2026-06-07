@@ -23,6 +23,7 @@ import {
   FIXED_SWISS_BRACKET_UNIT,
   FIXED_SWISS_CARD_H,
   FIXED_SWISS_COL_W,
+  fixedSwissMatchCardHeight,
   shouldDrawFixedSwissLossEdge,
   shouldDrawFixedSwissWinEdge,
   isFixedSwissRound12Edge,
@@ -68,6 +69,7 @@ import {
   GRID_LABEL_OFFSET,
   GRID_PAD,
   incomingAutopassPhantomSlot,
+  isIncomingAutopassPhantomForTeam,
   teamDividerY,
   teamRowCenterYBySlot,
 } from "../src/lib/swiss-bracket-layout";
@@ -928,16 +930,77 @@ assertProtocolPlace(17, "loser", 60, { place: 25, placeTo: 32 });
   assert.equal(semiLoss?.toSlot, 2, "#57 loser → #60");
 }
 const layout32Bronze = buildFixedSwissBracketLayout(mkGridTs32Bronze());
+const compactH = fixedSwissMatchCardHeight(false, 0);
+{
+  const layoutCompact = buildFixedSwissBracketLayout(mkGridTs32Bronze(), {
+    showCardHandicap: false,
+    showCardPlacement: false,
+  });
+  const full = layout32Bronze.positions.get("r1s1")!;
+  const compact1 = layoutCompact.positions.get("r1s1")!;
+  const compact2 = layoutCompact.positions.get("r1s2")!;
+  assert.ok(
+    layoutCompact.cardHeights?.get("r1s1") === compactH,
+    "compact card height without footer/handicap",
+  );
+  assert.equal(
+    compact2.y - compact1.y,
+    compactH + 4,
+    "round 1 slots stack by compact card height",
+  );
+  assert.ok(
+    compact2.y - full.y < (layout32Bronze.positions.get("r1s2")!.y - full.y) - 1,
+    "compact layout tighter than full",
+  );
+}
 {
   const fin = layout32Bronze.positions.get("r7s1")!;
   const bronze = layout32Bronze.positions.get("r7s2")!;
+  const finH = layout32Bronze.cardHeights?.get("r7s1") ?? FIXED_SWISS_CARD_H;
+  const bronzeH = layout32Bronze.cardHeights?.get("r7s2") ?? FIXED_SWISS_CARD_H;
   assert.equal(fin.col, 5, "final in «Финал» column");
   assert.equal(bronze.col, 5, "bronze in same column as final");
   assert.equal(
     bronze.y,
-    fin.y + FIXED_SWISS_CARD_H + 12,
-    "#60 directly under #59",
+    fin.y + finH + 12,
+    "#60 directly under #59 (actual final card height)",
   );
+  assert.ok(
+    bronze.y >= fin.y + finH + 12 - 0.01,
+    "#60 does not overlap #59",
+  );
+  assert.ok(
+    fin.y + finH + 12 <= bronze.y + 0.01,
+    "gap between #59 and #60",
+  );
+  assert.ok(
+    bronze.y >= fin.y + finH - 0.01,
+    "bronze starts below final bottom edge",
+  );
+}
+{
+  const player = (id: string, rating: number) => ({
+    id,
+    player1: { id: `${id}-p`, firstName: "A", lastName: "B", rating },
+    player2: null,
+  });
+  const finalWithHandicap: BracketMatchView = {
+    ...mkMatch(7, 1),
+    team1: player("t1", 1.5),
+    team2: player("t2", 3),
+  };
+  const gridFinal = mkGridTs32Bronze().map((m) =>
+    m.id === "r7s1" ? finalWithHandicap : m,
+  );
+  const layoutFinal = buildFixedSwissBracketLayout(gridFinal);
+  const fin = layoutFinal.positions.get("r7s1")!;
+  const bronze = layoutFinal.positions.get("r7s2")!;
+  const finH = layoutFinal.cardHeights?.get("r7s1") ?? FIXED_SWISS_CARD_H;
+  assert.ok(
+    finH > FIXED_SWISS_CARD_H,
+    "final with handicap is taller than compact base",
+  );
+  assert.equal(bronze.y, fin.y + finH + 12, "bronze offset uses tall final height");
 }
 assert.equal(layout32Bronze.matchNumbers.get("r7s2"), 60);
 
@@ -1685,7 +1748,8 @@ const layout64Bronze = buildFixedSwissBracketLayout(mkGridTs64Bronze());
   const bronze = layout64Bronze.positions.get("r7s2")!;
   assert.equal(bronze.col, 6, "bronze in «Финал» column");
   assert.equal(layout64Bronze.matchNumbers.get("r7s2"), 120);
-  assert.equal(bronze.y, fin.y + FIXED_SWISS_CARD_H + 12, "#120 under #119");
+  const finH64 = layout64Bronze.cardHeights?.get("r7s1") ?? FIXED_SWISS_CARD_H;
+  assert.equal(bronze.y, fin.y + finH64 + 12, "#120 under #119");
 }
 assert.equal(
   shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 33, 1, MC64),
@@ -1957,6 +2021,55 @@ assert.equal(
     isVoidFixedSwissCrossMatch(rows[2]!, rows, links32),
     true,
     "R2 cross empty when both R1 feeders are bye",
+  );
+}
+
+{
+  const soloTeam = {
+    id: "t-solo",
+    player1: { id: "p-solo", firstName: "A", lastName: "B", rating: 5 },
+    player2: null,
+  };
+  const byeR1s3: BracketMatchView = {
+    ...mkMatch(1, 3),
+    team1: soloTeam,
+    team2: null,
+    winnerTeamId: soloTeam.id,
+    status: "FINISHED",
+  };
+  const byeR1s4: BracketMatchView = {
+    ...mkMatch(1, 4),
+    team1: { ...soloTeam, id: "t-solo-2" },
+    team2: null,
+    winnerTeamId: "t-solo-2",
+    status: "FINISHED",
+  };
+  const voidCrossR2s2: BracketMatchView = {
+    ...mkMatch(2, 2),
+    status: "FINISHED",
+  };
+  const grid32 = mkGridTs32Bronze().map((m) => {
+    if (m.id === "r1s3") return byeR1s3;
+    if (m.id === "r1s4") return byeR1s4;
+    if (m.id === "r2s2") return voidCrossR2s2;
+    return m;
+  });
+  const layout32 = buildFixedSwissBracketLayout(grid32);
+  const byId32 = new Map(grid32.map((m) => [m.id, m]));
+  assert.equal(
+    fixedSwissMatchNo(2, 2, 60),
+    18,
+    "#18 is lower R2 slot 2 in 32→16 bronze",
+  );
+  assert.equal(
+    isIncomingAutopassPhantomForTeam("r2s2", 1, layout32.edges, byId32),
+    true,
+    "#18 row 1: × from R1 bye",
+  );
+  assert.equal(
+    isIncomingAutopassPhantomForTeam("r2s2", 2, layout32.edges, byId32),
+    true,
+    "#18 row 2: × from R1 bye",
   );
 }
 
