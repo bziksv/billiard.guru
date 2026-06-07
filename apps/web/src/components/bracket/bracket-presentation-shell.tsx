@@ -43,28 +43,28 @@ export function BracketPresentationShell({
       aria-modal="true"
       aria-label={title ? `Сетка: ${title}` : "Сетка на весь экран"}
     >
-      <header className="bracket-presentation__header flex shrink-0 flex-col gap-2">
-        <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-          <span className="bracket-presentation__title truncate">
+      <header className="bracket-presentation__header flex shrink-0 items-center gap-2 px-3 py-2 sm:gap-3 sm:px-4">
+        <span className="bracket-presentation__title hidden min-w-0 max-w-[min(28vw,14rem)] shrink-0 truncate sm:inline">
+          {title ?? "Турнирная сетка"}
+        </span>
+        {tabs ? (
+          <div className="min-w-0 flex-1 overflow-x-auto">{tabs}</div>
+        ) : (
+          <span className="bracket-presentation__title min-w-0 flex-1 truncate sm:hidden">
             {title ?? "Турнирная сетка"}
           </span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="admin-btn admin-btn--outline shrink-0 px-3 py-1.5 text-sm"
-          >
-            Выйти · Esc
-          </button>
-        </div>
-        {tabs ? (
-          <div className="bracket-presentation__tabs overflow-x-auto px-4 pb-2.5">
-            {tabs}
-          </div>
-        ) : null}
+        )}
+        <button
+          type="button"
+          onClick={onClose}
+          className="admin-btn admin-btn--outline shrink-0 px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm"
+        >
+          Выйти · Esc
+        </button>
       </header>
       <div
         className={cn(
-          "bracket-presentation__content min-h-0 flex-1 overflow-hidden p-2 sm:p-3",
+          "bracket-presentation__content min-h-0 flex-1 overflow-hidden p-1.5 sm:p-2",
           contentClassName,
         )}
       >

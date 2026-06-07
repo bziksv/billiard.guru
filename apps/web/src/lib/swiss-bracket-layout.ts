@@ -47,9 +47,9 @@ export const GRID_FOOTER_H = 22;
 /** Высота одной строки подвала (место / переходы). */
 export const GRID_FOOTER_LINE_H = 12;
 export const GRID_GAP_Y = 20;
-export const GRID_PAD = 24;
+export const GRID_PAD = 16;
 /** Отступ под заголовки колонок — как OLYMPIC_LABEL_OFFSET в bracket-view */
-export const GRID_LABEL_OFFSET = 18;
+export const GRID_LABEL_OFFSET = 10;
 
 export function gridCardInset() {
   return (GRID_COL_W - GRID_CARD_W) / 2;

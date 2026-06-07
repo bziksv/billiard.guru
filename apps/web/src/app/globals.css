@@ -4802,10 +4802,10 @@ html.dark .llb-bracket-match--round1-bye .llb-bracket-match__meta {
 }
 
 .bracket-col-header {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.125rem;
   border-radius: 0.25rem;
   background-color: rgb(254 215 170 / 0.45);
-  padding: 0.35rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   color: rgb(69 26 3 / 0.85);
 }
 
@@ -4851,8 +4851,27 @@ html.dark .bracket-col-header {
 }
 
 .bracket-presentation .admin-tab-bar {
+  display: inline-flex;
   width: max-content;
-  min-width: min(100%, max-content);
+  max-width: 100%;
+  flex-wrap: nowrap;
+  gap: 0.125rem;
+  border-radius: 0.5rem;
+  padding: 0.125rem;
+}
+
+.bracket-presentation .admin-tab {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .bracket-presentation .admin-tab {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8125rem;
+  }
 }
 
 .bracket-presentation .bracket-canvas--presentation {

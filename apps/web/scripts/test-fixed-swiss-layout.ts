@@ -572,7 +572,7 @@ for (const [col, items] of byCol) {
 assert.ok(FIXED_SWISS_BRACKET_UNIT >= cardH);
 assert.equal(
   fixedSwissBracketHeight(mpr, cardH),
-  mpr * FIXED_SWISS_BRACKET_UNIT - (FIXED_SWISS_BRACKET_UNIT - cardH) / 2,
+  (mpr - 1) * FIXED_SWISS_BRACKET_UNIT + 6 + cardH,
 );
 
 // --- 32→16 (59 встреч): нижняя тур 3–4, олимпийка с 1/8 в R3 ---

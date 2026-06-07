@@ -69,7 +69,14 @@ export function fixedSwissMatchCardHeight(
     footerRowCount * FIXED_SWISS_COMPACT_ROW_H
   );
 }
-export const FIXED_SWISS_BRACKET_UNIT = 184;
+/** Вертикальный шаг между встречами 1-го тура (≈ высота карточки + 14px). */
+export const FIXED_SWISS_BRACKET_UNIT = 148;
+/** Верхний отступ карточки 1-го тура в ячейке сетки (px). */
+const FIXED_SWISS_ROUND1_Y_INSET = 6;
+
+function fixedSwissRound1SlotY(slot: number, unit = FIXED_SWISS_BRACKET_UNIT): number {
+  return (slot - 1) * unit + FIXED_SWISS_ROUND1_Y_INSET;
+}
 
 /** Зазор между финалом (#27) и матчем за 3–4 (#28) в колонке «Финал». */
 const FIXED_SWISS_BRONZE_BELOW_GAP = 12;
@@ -231,7 +238,7 @@ export function fixedSwissMatchTop(
   const half = matchesPerRound / 2;
 
   if (round === 1) {
-    return (slot - 1) * unit + (unit - cardH) / 2;
+    return fixedSwissRound1SlotY(slot, unit);
   }
 
   const [s1, s2] = parentSlots(round, slot, half);
@@ -306,7 +313,7 @@ export function fixedSwissBracketHeight(
   cardH: number = FIXED_SWISS_CARD_H,
 ): number {
   const unit = FIXED_SWISS_BRACKET_UNIT;
-  return matchesPerRound * unit - (unit - cardH) / 2;
+  return (matchesPerRound - 1) * unit + FIXED_SWISS_ROUND1_Y_INSET + cardH;
 }
 
 function teamIdInSlot(match: BracketMatchView, slot: 1 | 2): string | undefined {
@@ -437,7 +444,7 @@ function build168Positions(
   const unit = FIXED_SWISS_BRACKET_UNIT;
 
   for (let slot = 1; slot <= 8; slot++) {
-    const y = (slot - 1) * unit + (unit - cardH) / 2;
+    const y = fixedSwissRound1SlotY(slot, unit);
     slotY.set(`1:${slot}`, y);
     const m = byRoundSlot.get(`1:${slot}`);
     if (m) positions.set(m.id, { col: 0, y });
@@ -542,7 +549,7 @@ function buildTsPositions27SixRound(
   const unit = FIXED_SWISS_BRACKET_UNIT;
 
   for (let slot = 1; slot <= 8; slot++) {
-    const y = (slot - 1) * unit + (unit - cardH) / 2;
+    const y = fixedSwissRound1SlotY(slot, unit);
     slotY.set(`1:${slot}`, y);
     const m = byRoundSlot.get(`1:${slot}`);
     if (m) positions.set(m.id, { col: 0, y });
@@ -639,7 +646,7 @@ function buildTsPositionsScaled(
   const unit = FIXED_SWISS_BRACKET_UNIT;
 
   for (let slot = 1; slot <= half2; slot++) {
-    const y = (slot - 1) * unit + (unit - cardH) / 2;
+    const y = fixedSwissRound1SlotY(slot, unit);
     slotY.set(`1:${slot}`, y);
     const m = byRoundSlot.get(`1:${slot}`);
     if (m) positions.set(m.id, { col: 0, y });
@@ -799,7 +806,7 @@ function buildTsPositions32(
   const unit = FIXED_SWISS_BRACKET_UNIT;
 
   for (let slot = 1; slot <= 16; slot++) {
-    const y = (slot - 1) * unit + (unit - cardH) / 2;
+    const y = fixedSwissRound1SlotY(slot, unit);
     slotY.set(`1:${slot}`, y);
     const m = byRoundSlot.get(`1:${slot}`);
     if (m) positions.set(m.id, { col: 0, y });
@@ -975,7 +982,7 @@ function buildTsPositions64(
   const unit = FIXED_SWISS_BRACKET_UNIT;
 
   for (let slot = 1; slot <= 32; slot++) {
-    const y = (slot - 1) * unit + (unit - cardH) / 2;
+    const y = fixedSwissRound1SlotY(slot, unit);
     slotY.set(`1:${slot}`, y);
     const m = byRoundSlot.get(`1:${slot}`);
     if (m) positions.set(m.id, { col: 0, y });
@@ -1280,7 +1287,7 @@ function buildTsPositionsLegacy29(
   const unit = FIXED_SWISS_BRACKET_UNIT;
 
   for (let slot = 1; slot <= 8; slot++) {
-    const y = (slot - 1) * unit + (unit - cardH) / 2;
+    const y = fixedSwissRound1SlotY(slot, unit);
     slotY.set(`1:${slot}`, y);
     const m = byRoundSlot.get(`1:${slot}`);
     if (m) positions.set(m.id, { col: 0, y });
