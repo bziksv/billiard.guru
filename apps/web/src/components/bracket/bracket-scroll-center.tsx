@@ -49,29 +49,32 @@ export function BracketScrollCenter({
     if (!el) return;
 
     function applyAutoScroll() {
-      const content = el.firstElementChild as HTMLElement | null;
-      const contentWidth = content?.scrollWidth ?? content?.offsetWidth ?? 0;
-      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+      const node = ref.current;
+      if (!node) return;
 
-      if (el.scrollLeft > maxScroll) {
-        el.scrollLeft = maxScroll;
+      const content = node.firstElementChild as HTMLElement | null;
+      const contentWidth = content?.scrollWidth ?? content?.offsetWidth ?? 0;
+      const maxScroll = Math.max(0, node.scrollWidth - node.clientWidth);
+
+      if (node.scrollLeft > maxScroll) {
+        node.scrollLeft = maxScroll;
       }
 
       if (userAdjustedRef.current) return;
 
-      if (contentWidth > el.clientWidth + 1) {
-        el.scrollLeft = Math.min(
+      if (contentWidth > node.clientWidth + 1) {
+        node.scrollLeft = Math.min(
           maxScroll,
-          Math.max(0, centerX - el.clientWidth / 2),
+          Math.max(0, centerX - node.clientWidth / 2),
         );
       } else {
-        el.scrollLeft = 0;
+        node.scrollLeft = 0;
       }
-      if (contentHeight != null && contentHeight > el.clientHeight) {
-        el.scrollTop =
+      if (contentHeight != null && contentHeight > node.clientHeight) {
+        node.scrollTop =
           contentScrollY === "start"
             ? 0
-            : Math.max(0, (contentHeight - el.clientHeight) / 2);
+            : Math.max(0, (contentHeight - node.clientHeight) / 2);
       }
     }
 
