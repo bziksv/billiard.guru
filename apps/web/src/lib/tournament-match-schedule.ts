@@ -1,4 +1,6 @@
 import type { BracketMatchView } from "@/lib/bracket-view";
+import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
+import { formatRating } from "@/lib/rating";
 import {
   fixedSwissMatchNo,
   inferFixedSwissGridSize,
@@ -21,6 +23,7 @@ import {
   isFixedSwissFormat,
   isOlympicFormat,
   teamLabel,
+  teamRating,
   usesFixedSwissGridEngine,
 } from "@/lib/pair-tournament";
 
@@ -91,6 +94,34 @@ export function matchParticipantsLabel(match: BracketMatchView): string {
   const left = match.team1 ? teamLabel(match.team1) : "—";
   const right = match.team2 ? teamLabel(match.team2) : "—";
   return `${left} — ${right}`;
+}
+
+/** Рейтинги сторон: «3.5 — 2» (сильнее — слабее по порядку в паре). */
+export function matchRatingsLabel(match: BracketMatchView): string {
+  if (!match.team1 || !match.team2) return "—";
+  return `${formatRating(teamRating(match.team1))} — ${formatRating(teamRating(match.team2))}`;
+}
+
+/** Короткая подпись форы для списка встреч. */
+export function matchHandicapShortLabel(
+  match: BracketMatchView,
+  handicapHalfStep = true,
+): string {
+  if (!match.team1 || !match.team2) return "—";
+  const high = Math.max(teamRating(match.team1), teamRating(match.team2));
+  const low = Math.min(teamRating(match.team1), teamRating(match.team2));
+  return describeHandicapShort(high, low, { halfStep: handicapHalfStep });
+}
+
+/** Полная расшифровка форы (для title). */
+export function matchHandicapFullLabel(
+  match: BracketMatchView,
+  handicapHalfStep = true,
+): string | null {
+  if (!match.team1 || !match.team2) return null;
+  const high = Math.max(teamRating(match.team1), teamRating(match.team2));
+  const low = Math.min(teamRating(match.team1), teamRating(match.team2));
+  return describeHandicap(high, low, { halfStep: handicapHalfStep });
 }
 
 /** Колонка сетки / этап — как подписи на визуальной сетке. */

@@ -149,12 +149,15 @@ export const NOTIFICATION_CATALOG = [
     implementation: "match-start-notification.ts → notifyMatchStartScheduled()",
     hasButtons: true,
     auditAction: "tournament.match.start.notify",
-    examplePreview: "🎱 Встреча назначена… Соперник, начало, кнопка «Открыть турнир»",
+    examplePreview:
+      "🎱 Встреча назначена… Соперник, рейтинг, фора, начало, кнопка «Открыть турнир»",
     manageable: true,
     templatePlaceholders: [
       "tournamentName",
       "matchNo",
       "opponent",
+      "ratings",
+      "handicap",
       "startsAt",
       "clubName",
       "link",

@@ -25,6 +25,8 @@ export const NOTIFICATION_DEFAULT_TEMPLATES: Partial<Record<NotificationId, stri
     "Турнир: <b>{{tournamentName}}</b>\n" +
     "{{matchNo}}" +
     "Соперник: {{opponent}}\n" +
+    "{{ratings}}" +
+    "{{handicap}}" +
     "Начало: <b>{{startsAt}}</b>\n" +
     "Клуб: {{clubName}}",
 

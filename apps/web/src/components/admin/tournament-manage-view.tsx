@@ -65,7 +65,10 @@ import {
   filterCurrentMatches,
   filterUpcomingMatches,
   formatMatchDateTime,
+  matchHandicapFullLabel,
+  matchHandicapShortLabel,
   matchParticipantsLabel,
+  matchRatingsLabel,
   matchStageLabel,
   matchScoreLabel,
 } from "@/lib/tournament-match-schedule";
@@ -593,6 +596,7 @@ export function TournamentManageView({
         <MatchesScheduleTab
           variant="upcoming"
           format={t.format}
+          handicapHalfStep={t.handicapHalfStep !== false}
           allMatches={bracketMatches}
           matches={upcomingMatches}
           matchNumbers={bracketMatchNumbers}
@@ -1223,6 +1227,7 @@ function BracketTab({
 function MatchesScheduleTab({
   variant,
   format,
+  handicapHalfStep = true,
   allMatches,
   matches,
   matchNumbers,
@@ -1231,6 +1236,7 @@ function MatchesScheduleTab({
 }: {
   variant: "current" | "upcoming" | "completed";
   format: string;
+  handicapHalfStep?: boolean;
   allMatches: BracketMatchView[];
   matches: BracketMatchView[];
   matchNumbers: Map<string, number>;
@@ -1266,6 +1272,7 @@ function MatchesScheduleTab({
         ? "Нет готовых встреч — дождитесь соперников или сформируйте следующий тур."
         : "Пока нет завершённых встреч.";
   const showScore = variant === "current" || variant === "completed";
+  const showHandicap = variant === "upcoming";
   const rowHint =
     variant === "completed"
       ? "Нажмите на строку, чтобы открыть карточку встречи, изменить данные или отменить результат."
@@ -1277,12 +1284,23 @@ function MatchesScheduleTab({
         <p className="tournament-hint text-sm">{emptyHint}</p>
       ) : (
         <div className="admin-table-wrap overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table
+            className={cn(
+              "w-full text-left text-sm",
+              showHandicap ? "min-w-[920px]" : "min-w-[720px]",
+            )}
+          >
             <thead className="admin-thead">
               <tr>
                 <th className="px-4 py-3 font-medium">#</th>
                 <th className="px-4 py-3 font-medium">Этап</th>
                 <th className="px-4 py-3 font-medium">Встреча</th>
+                {showHandicap && (
+                  <th className="px-4 py-3 font-medium">Рейтинг</th>
+                )}
+                {showHandicap && (
+                  <th className="px-4 py-3 font-medium">Фора</th>
+                )}
                 {showScore && (
                   <th className="px-4 py-3 font-medium">Счёт</th>
                 )}
@@ -1311,6 +1329,19 @@ function MatchesScheduleTab({
                     <td className="px-4 py-3 font-medium">
                       {matchParticipantsLabel(match)}
                     </td>
+                    {showHandicap && (
+                      <td className="px-4 py-3 font-mono text-xs tabular-nums tournament-participant-meta">
+                        {matchRatingsLabel(match)}
+                      </td>
+                    )}
+                    {showHandicap && (
+                      <td
+                        className="px-4 py-3 text-xs tournament-participant-meta"
+                        title={matchHandicapFullLabel(match, handicapHalfStep) ?? undefined}
+                      >
+                        {matchHandicapShortLabel(match, handicapHalfStep)}
+                      </td>
+                    )}
                     {showScore && (
                       <td className="px-4 py-3 font-mono">
                         {matchScoreLabel(match)}
