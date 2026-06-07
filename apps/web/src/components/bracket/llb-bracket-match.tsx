@@ -3,7 +3,11 @@
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
 import { teamLabel, teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
 import type { BracketMatchView } from "@/lib/bracket-view";
-import { isMatchReadyForResult, matchAutopassBye } from "@/lib/bracket-view";
+import {
+  isActiveBracketMatch,
+  isMatchReadyForResult,
+  matchAutopassBye,
+} from "@/lib/bracket-view";
 import { isMatchResolved } from "@/lib/match-result";
 import {
   getMatchDestinations,
@@ -271,6 +275,7 @@ export function LlbBracketMatch({
   handicapHalfStep?: boolean;
 }) {
   const finished = isMatchResolved(match.status, match.winnerTeamId);
+  const active = isActiveBracketMatch(match);
   const winnerId = match.winnerTeamId;
   const team1Wins = winnerId === match.team1?.id;
   const team2Wins = winnerId === match.team2?.id;
@@ -470,6 +475,7 @@ export function LlbBracketMatch({
         roundOneBye && "llb-bracket-match--round1-bye",
         byeFinished && "llb-bracket-match--round1-bye-done",
         finished && winnerId && "bracket-match-card--finished",
+        active && "bracket-match-card--active",
         openResult && "bracket-match-card--interactive",
       )}
       style={{

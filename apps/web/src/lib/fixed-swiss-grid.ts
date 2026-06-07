@@ -678,24 +678,50 @@ export function fixedSwissMatchNo(
   throw new Error(`Нет нумерации TS для ${matchCount} встреч`);
 }
 
+/** Итоговое место в протоколе: точное или диапазон (как на карточках сетки). */
+export type FixedSwissProtocolPlaceResult = {
+  place: number;
+  placeTo?: number;
+};
+
+function protocolExact(place: number): FixedSwissProtocolPlaceResult {
+  return { place };
+}
+
+function protocolRange(place: number, placeTo: number): FixedSwissProtocolPlaceResult {
+  return place === placeTo ? { place } : { place, placeTo };
+}
+
 /** Итоговое место участника по номеру встречи (#13–#27 и варианты legacy). */
 export function fixedSwissProtocolPlace(
   matchNo: number,
   role: "winner" | "loser",
   matchCount: number,
   maxRound?: number,
-): number | null {
+): FixedSwissProtocolPlaceResult | null {
   if (role === "winner") {
-    if (isFixedSwissTsLegacy29MatchCount(matchCount) && matchNo === 29) return 1;
-    if (isFixedSwissTsLegacy27SixRound(matchCount, maxRound) && matchNo === 27) {
-      return 1;
+    if (isFixedSwissTsLegacy29MatchCount(matchCount) && matchNo === 29) {
+      return protocolExact(1);
     }
-    if (isFixedSwissTs64BronzeMatchCount(matchCount) && matchNo === 120) return 3;
-    if (isFixedSwissTs64MatchCount(matchCount) && matchNo === 119) return 1;
-    if (isFixedSwissTs32BronzeMatchCount(matchCount) && matchNo === 60) return 3;
-    if (isFixedSwissTs32MatchCount(matchCount) && matchNo === 59) return 1;
-    if (isFixedSwissTsBronzeMatchCount(matchCount) && matchNo === 28) return 3;
-    if (matchNo === 27) return 1;
+    if (isFixedSwissTsLegacy27SixRound(matchCount, maxRound) && matchNo === 27) {
+      return protocolExact(1);
+    }
+    if (isFixedSwissTs64BronzeMatchCount(matchCount) && matchNo === 120) {
+      return protocolExact(3);
+    }
+    if (isFixedSwissTs64MatchCount(matchCount) && matchNo === 119) {
+      return protocolExact(1);
+    }
+    if (isFixedSwissTs32BronzeMatchCount(matchCount) && matchNo === 60) {
+      return protocolExact(3);
+    }
+    if (isFixedSwissTs32MatchCount(matchCount) && matchNo === 59) {
+      return protocolExact(1);
+    }
+    if (isFixedSwissTsBronzeMatchCount(matchCount) && matchNo === 28) {
+      return protocolExact(3);
+    }
+    if (matchNo === 27) return protocolExact(1);
     return null;
   }
 
@@ -729,26 +755,23 @@ export function fixedSwissProtocolPlace(
   }
 
   if (isFixedSwissTsLegacy29MatchCount(matchCount)) {
-    if (matchNo === 29) return 2;
-    if (matchNo === 27) return 3;
-    if (matchNo === 28) return 4;
-    if (matchNo === 25) return 5;
-    if (matchNo === 26) return 6;
-    if (matchNo === 23) return 7;
-    if (matchNo === 24) return 8;
-    if (matchNo >= 17 && matchNo <= 20) return 9 + (matchNo - 17);
-    if (matchNo >= 13 && matchNo <= 16) return 13 + (matchNo - 13);
+    if (matchNo === 29) return protocolExact(2);
+    if (matchNo === 27) return protocolExact(3);
+    if (matchNo === 28) return protocolExact(4);
+    if (matchNo === 25 || matchNo === 26) return protocolRange(5, 6);
+    if (matchNo === 23 || matchNo === 24) return protocolRange(7, 8);
+    if (matchNo >= 17 && matchNo <= 20) return protocolRange(9, 12);
+    if (matchNo >= 13 && matchNo <= 16) return protocolRange(13, 16);
     return null;
   }
 
   if (isFixedSwissTsLegacy27SixRound(matchCount, maxRound)) {
-    if (matchNo === 27) return 2;
-    if (matchNo === 25) return 3;
-    if (matchNo === 26) return 4;
-    if (matchNo === 23) return 5;
-    if (matchNo === 24) return 6;
-    if (matchNo >= 17 && matchNo <= 20) return 9 + (matchNo - 17);
-    if (matchNo >= 13 && matchNo <= 16) return 13 + (matchNo - 13);
+    if (matchNo === 27) return protocolExact(2);
+    if (matchNo === 25) return protocolExact(3);
+    if (matchNo === 26) return protocolExact(4);
+    if (matchNo === 23 || matchNo === 24) return protocolRange(5, 6);
+    if (matchNo >= 17 && matchNo <= 20) return protocolRange(9, 12);
+    if (matchNo >= 13 && matchNo <= 16) return protocolRange(13, 16);
     return null;
   }
 
@@ -759,24 +782,24 @@ function fixedSwissProtocolPlace64(
   matchNo: number,
   role: "winner" | "loser",
   withBronze: boolean,
-): number | null {
+): FixedSwissProtocolPlaceResult | null {
   if (role === "winner") {
-    if (withBronze && matchNo === 120) return 3;
-    if (matchNo === 119) return 1;
+    if (withBronze && matchNo === 120) return protocolExact(3);
+    if (matchNo === 119) return protocolExact(1);
     return null;
   }
 
-  if (withBronze && matchNo === 119) return 2;
-  if (withBronze && matchNo === 120) return 4;
-  if (!withBronze && matchNo === 119) return 2;
-  if (!withBronze && matchNo === 117) return 3;
-  if (!withBronze && matchNo === 118) return 4;
+  if (withBronze && matchNo === 119) return protocolExact(2);
+  if (withBronze && matchNo === 120) return protocolExact(4);
+  if (!withBronze && matchNo === 119) return protocolExact(2);
+  if (!withBronze && matchNo === 117) return protocolExact(3);
+  if (!withBronze && matchNo === 118) return protocolExact(4);
 
-  if (matchNo >= 105 && matchNo <= 108) return matchNo - 100;
-  if (matchNo >= 97 && matchNo <= 104) return matchNo - 88;
-  if (matchNo >= 89 && matchNo <= 96) return matchNo - 72;
-  if (matchNo >= 65 && matchNo <= 80) return matchNo - 32;
-  if (matchNo >= 33 && matchNo <= 48) return matchNo + 16;
+  if (matchNo >= 105 && matchNo <= 108) return protocolRange(5, 8);
+  if (matchNo >= 97 && matchNo <= 104) return protocolRange(9, 16);
+  if (matchNo >= 89 && matchNo <= 96) return protocolRange(17, 24);
+  if (matchNo >= 65 && matchNo <= 80) return protocolRange(33, 48);
+  if (matchNo >= 33 && matchNo <= 48) return protocolRange(49, 64);
   return null;
 }
 
@@ -784,24 +807,24 @@ function fixedSwissProtocolPlace32(
   matchNo: number,
   role: "winner" | "loser",
   withBronze: boolean,
-): number | null {
+): FixedSwissProtocolPlaceResult | null {
   if (role === "winner") {
-    if (withBronze && matchNo === 60) return 3;
-    if (matchNo === 59) return 1;
+    if (withBronze && matchNo === 60) return protocolExact(3);
+    if (matchNo === 59) return protocolExact(1);
     return null;
   }
 
-  if (withBronze && matchNo === 59) return 2;
-  if (withBronze && matchNo === 60) return 4;
-  if (!withBronze && matchNo === 59) return 2;
-  if (!withBronze && matchNo === 57) return 3;
-  if (!withBronze && matchNo === 58) return 4;
+  if (withBronze && matchNo === 59) return protocolExact(2);
+  if (withBronze && matchNo === 60) return protocolExact(4);
+  if (!withBronze && matchNo === 59) return protocolExact(2);
+  if (!withBronze && matchNo === 57) return protocolExact(3);
+  if (!withBronze && matchNo === 58) return protocolExact(4);
 
-  if (matchNo >= 53 && matchNo <= 56) return matchNo - 48;
-  if (matchNo >= 49 && matchNo <= 52) return matchNo - 40;
-  if (matchNo >= 45 && matchNo <= 48) return matchNo - 32;
-  if (matchNo >= 33 && matchNo <= 40) return matchNo - 16;
-  if (matchNo >= 17 && matchNo <= 24) return matchNo + 8;
+  if (matchNo >= 53 && matchNo <= 56) return protocolRange(5, 8);
+  if (matchNo >= 49 && matchNo <= 52) return protocolRange(9, 12);
+  if (matchNo >= 45 && matchNo <= 48) return protocolRange(13, 16);
+  if (matchNo >= 33 && matchNo <= 40) return protocolRange(17, 24);
+  if (matchNo >= 17 && matchNo <= 24) return protocolRange(25, 32);
   return null;
 }
 
@@ -810,47 +833,46 @@ function fixedSwissProtocolPlaceForHalf2(
   role: "winner" | "loser",
   half2: number,
   withBronze: boolean,
-): number | null {
+): FixedSwissProtocolPlaceResult | null {
   const half1 = half2 / 2;
   const finalNo = tsTotalMatchCount(half2, false);
   const bronzeNo = withBronze ? finalNo + 1 : null;
 
   if (role === "winner") {
-    if (withBronze && bronzeNo !== null && matchNo === bronzeNo) return 3;
-    if (matchNo === finalNo) return 1;
+    if (withBronze && bronzeNo !== null && matchNo === bronzeNo) return protocolExact(3);
+    if (matchNo === finalNo) return protocolExact(1);
     return null;
   }
 
-  if (withBronze && matchNo === finalNo) return 2;
-  if (withBronze && bronzeNo !== null && matchNo === bronzeNo) return 4;
+  if (withBronze && matchNo === finalNo) return protocolExact(2);
+  if (withBronze && bronzeNo !== null && matchNo === bronzeNo) return protocolExact(4);
   if (withBronze && (matchNo === finalNo - 2 || matchNo === finalNo - 1)) {
     return null;
   }
 
-  if (!withBronze && matchNo === finalNo) return 2;
-  if (!withBronze && matchNo === finalNo - 2) return 3;
-  if (!withBronze && matchNo === finalNo - 1) return 4;
+  if (!withBronze && matchNo === finalNo) return protocolExact(2);
+  if (!withBronze && matchNo === finalNo - 2) return protocolExact(3);
+  if (!withBronze && matchNo === finalNo - 1) return protocolExact(4);
 
   const olympicStart = 2 * half2 + half1 + 1;
   if (matchNo >= olympicStart && matchNo <= olympicStart + half1 - 1) {
-    return half1 + 1 + (matchNo - olympicStart);
+    return protocolRange(half1 + 1, 2 * half1);
   }
 
   const postStart = 3 * half2 + 1;
   if (matchNo >= postStart && matchNo <= postStart + half1 / 2 - 1) {
-    return half1 / 2 + 1 + (matchNo - postStart);
+    return protocolExact(half1 / 2 + 1 + (matchNo - postStart));
   }
 
   const crossStart = 2 * half2 + 1;
   if (matchNo >= crossStart && matchNo <= crossStart + half1 - 1) {
-    return half2 + 1 + (matchNo - crossStart);
+    return protocolRange(half2 + 1, half2 + half1);
   }
 
   const lowerStart = half2 >= 16 ? half2 + 1 : half2 + half1 + 1;
   if (matchNo >= lowerStart && matchNo <= lowerStart + half1 - 1) {
-    return half2 >= 16
-      ? half2 + half1 + 1 + (matchNo - lowerStart)
-      : lowerStart + (matchNo - lowerStart);
+    const from = half2 >= 16 ? half2 + half1 + 1 : lowerStart;
+    return protocolRange(from, from + half1 - 1);
   }
 
   return null;

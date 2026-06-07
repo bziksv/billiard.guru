@@ -137,11 +137,24 @@ assert.equal(fixedSwissTsMatchNo(5, 1), 27);
 assert.equal(fixedSwissTsBronzeMatchNo(5, 1), 27);
 assert.equal(fixedSwissTsBronzeMatchNo(5, 2), 28);
 
-assert.equal(fixedSwissProtocolPlace(27, "winner", 28), 1);
-assert.equal(fixedSwissProtocolPlace(27, "loser", 28), 2);
-assert.equal(fixedSwissProtocolPlace(28, "winner", 28), 3);
-assert.equal(fixedSwissProtocolPlace(28, "loser", 28), 4);
-assert.equal(fixedSwissProtocolPlace(25, "loser", 28), null);
+function assertProtocolPlace(
+  matchNo: number,
+  role: "winner" | "loser",
+  matchCount: number,
+  expected: { place: number; placeTo?: number } | null,
+  maxRound?: number,
+) {
+  assert.deepEqual(
+    fixedSwissProtocolPlace(matchNo, role, matchCount, maxRound),
+    expected,
+  );
+}
+
+assertProtocolPlace(27, "winner", 28, { place: 1 });
+assertProtocolPlace(27, "loser", 28, { place: 2 });
+assertProtocolPlace(28, "winner", 28, { place: 3 });
+assertProtocolPlace(28, "loser", 28, { place: 4 });
+assertProtocolPlace(25, "loser", 28, null);
 assert.equal(fixedSwissTs28PlacementByMatchNo(28), "матч за 3–4 место");
 assert.equal(fixedSwissTs28PlacementByMatchNo(25), "полуфинал");
 
@@ -220,14 +233,14 @@ assert.equal(
 );
 assert.equal(fixedSwissPlacementLabel(3, 5, 5, 8, 27, 21), "место 5–8");
 
-assert.equal(fixedSwissProtocolPlace(27, "winner", 27, 5), 1);
-assert.equal(fixedSwissProtocolPlace(27, "loser", 27, 5), 2);
-assert.equal(fixedSwissProtocolPlace(25, "loser", 27, 5), 3);
-assert.equal(fixedSwissProtocolPlace(26, "loser", 27, 5), 4);
-assert.equal(fixedSwissProtocolPlace(21, "loser", 27, 5), 5);
-assert.equal(fixedSwissProtocolPlace(17, "loser", 27, 5), 9);
-assert.equal(fixedSwissProtocolPlace(13, "loser", 27, 5), 13);
-assert.equal(fixedSwissProtocolPlace(12, "loser", 27, 5), null);
+assertProtocolPlace(27, "winner", 27, { place: 1 }, 5);
+assertProtocolPlace(27, "loser", 27, { place: 2 }, 5);
+assertProtocolPlace(25, "loser", 27, { place: 3 }, 5);
+assertProtocolPlace(26, "loser", 27, { place: 4 }, 5);
+assertProtocolPlace(21, "loser", 27, { place: 5, placeTo: 8 }, 5);
+assertProtocolPlace(17, "loser", 27, { place: 9, placeTo: 12 }, 5);
+assertProtocolPlace(13, "loser", 27, { place: 13, placeTo: 16 }, 5);
+assertProtocolPlace(12, "loser", 27, null, 5);
 
 assert.equal(layoutTs.positions.get("r2s1")!.col, -1);
 assert.equal(layoutTs.positions.get("r2s5")!.col, 1);
@@ -895,8 +908,13 @@ assert.equal(fixedSwissMatchNo(7, 1, 60), 59, "final #59");
 assert.equal(fixedSwissMatchNo(7, 2, 60), 60, "bronze #60");
 assert.equal(fixedSwissTs32PlacementByMatchNo(60, true), "матч за 3–4 место");
 assert.equal(fixedSwissTs32PlacementByMatchNo(57, true), "полуфинал");
-assert.equal(fixedSwissProtocolPlace(60, "winner", 60), 3);
-assert.equal(fixedSwissProtocolPlace(60, "loser", 60), 4);
+assertProtocolPlace(60, "winner", 60, { place: 3 });
+assertProtocolPlace(60, "loser", 60, { place: 4 });
+assertProtocolPlace(53, "loser", 60, { place: 5, placeTo: 8 });
+assertProtocolPlace(49, "loser", 60, { place: 9, placeTo: 12 });
+assertProtocolPlace(45, "loser", 60, { place: 13, placeTo: 16 });
+assertProtocolPlace(33, "loser", 60, { place: 17, placeTo: 24 });
+assertProtocolPlace(17, "loser", 60, { place: 25, placeTo: 32 });
 {
   const links60 = buildFixedSwissTemplate(32, "FIXED_SWISS_32_BRONZE").links;
   const semiLoss = links60.find(
@@ -1184,8 +1202,10 @@ assert.equal(fixedSwissTs64PlacementByMatchNo(113, false), "место 5–8");
 assert.equal(fixedSwissTs64PlacementByMatchNo(117, false), "место 3–4");
 assert.equal(fixedSwissTs64PlacementByMatchNo(118, false), "место 3–4");
 assert.equal(fixedSwissTs64PlacementByMatchNo(117, true), "полуфинал");
-assert.equal(fixedSwissProtocolPlace(119, "winner", MC64), 1);
-assert.equal(fixedSwissProtocolPlace(120, "winner", 116), 3);
+assertProtocolPlace(119, "winner", MC64, { place: 1 });
+assertProtocolPlace(120, "winner", 116, { place: 3 });
+assertProtocolPlace(105, "loser", MC64, { place: 5, placeTo: 8 });
+assertProtocolPlace(97, "loser", MC64, { place: 9, placeTo: 16 });
 const layout64 = buildFixedSwissBracketLayout(mkGridTs64());
 assert.equal(
   layout64.positions.get("r3s9")!.y,

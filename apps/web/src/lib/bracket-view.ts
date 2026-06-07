@@ -1,3 +1,4 @@
+import { isMatchResolved } from "@/lib/match-result";
 import type { TeamWithPlayers } from "@/lib/pair-tournament";
 
 export type BracketTeamView = TeamWithPlayers & { id: string };
@@ -44,6 +45,12 @@ export function isMatchReadyForResult(match: BracketMatchView): boolean {
   const { isBye: roundOneBye } = matchAutopassBye(match);
   if (roundOneBye) return true;
   return !!(match.team1 && match.team2);
+}
+
+/** Встреча ещё идёт: можно играть, результат не зафиксирован. */
+export function isActiveBracketMatch(match: BracketMatchView): boolean {
+  if (isMatchResolved(match.status, match.winnerTeamId)) return false;
+  return isMatchReadyForResult(match);
 }
 
 export function groupMatchesByRound(matches: BracketMatchView[]) {

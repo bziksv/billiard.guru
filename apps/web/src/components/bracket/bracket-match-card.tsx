@@ -1,7 +1,11 @@
 import type { CSSProperties } from "react";
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
 import { teamLabel, teamRating, type TeamPlayer } from "@/lib/pair-tournament";
-import { isMatchReadyForResult, type BracketMatchView } from "@/lib/bracket-view";
+import {
+  isActiveBracketMatch,
+  isMatchReadyForResult,
+  type BracketMatchView,
+} from "@/lib/bracket-view";
 import { isMatchResolved } from "@/lib/match-result";
 import { GRID_META_H } from "@/lib/swiss-bracket-layout";
 import { cn } from "@/lib/cn";
@@ -136,6 +140,7 @@ export function BracketMatchCard({
   handicapHalfStep?: boolean;
 }) {
   const finished = isMatchResolved(match.status, match.winnerTeamId);
+  const active = isActiveBracketMatch(match);
   const winnerId = match.winnerTeamId;
   const team1Wins = winnerId === match.team1?.id;
   const team2Wins = winnerId === match.team2?.id;
@@ -184,6 +189,7 @@ export function BracketMatchCard({
         "bracket-match-card",
         (!handicap || handicap === "Без форы") && !matchNumber && "bracket-match-card--compact",
         finished && winnerId && "bracket-match-card--finished",
+        active && "bracket-match-card--active",
         interactiveAdmin && onMatchClick && "bracket-match-card--interactive",
         roundOneBye && "llb-bracket-match--round1-bye",
         roundOneBye && byeFinished && "llb-bracket-match--round1-bye-done",

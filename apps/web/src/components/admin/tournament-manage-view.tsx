@@ -49,6 +49,7 @@ import { useBracketFormatOptions } from "@/hooks/use-bracket-format-options";
 import {
   STATUS_OPTIONS,
   computeTournamentStandings,
+  formatTournamentStandingPlace,
   type AdminTournament,
 } from "@/lib/tournament-admin";
 import {
@@ -1647,7 +1648,7 @@ function ProtocolTab({
               {rows.map((row) => (
                 <tr key={`${row.place ?? "x"}-${row.label}`} className="admin-table-row border-t border-[var(--admin-border)]">
                   <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">
-                    {row.place ?? "—"}
+                    {formatTournamentStandingPlace(row)}
                   </td>
                   <td className="px-4 py-3 font-medium">{row.label}</td>
                   <td className="px-4 py-3 tournament-participant-meta">{row.city}</td>

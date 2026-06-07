@@ -4534,6 +4534,9 @@ html.dark {
   --bracket-card-bg: #09090b;
   --bracket-card-border: rgb(63 63 70 / 0.85);
   --bracket-card-border-finished: rgb(6 78 59 / 0.65);
+  --bracket-card-border-active: rgb(245 158 11 / 0.55);
+  --bracket-card-border-active-glow: rgb(245 158 11 / 0.18);
+  --bracket-card-bg-active: rgb(245 158 11 / 0.06);
   --bracket-card-border-hover: rgb(4 120 87 / 0.75);
   --bracket-card-shadow: 0 10px 15px rgb(0 0 0 / 0.2);
   --bracket-row-border: rgb(39 39 42 / 0.85);
@@ -4557,6 +4560,9 @@ html.light {
   --bracket-card-bg: #ffffff;
   --bracket-card-border: #d4d4d8;
   --bracket-card-border-finished: #34d399;
+  --bracket-card-border-active: rgb(245 158 11 / 0.75);
+  --bracket-card-border-active-glow: rgb(251 191 36 / 0.35);
+  --bracket-card-bg-active: rgb(255 251 235 / 0.85);
   --bracket-card-border-hover: #10b981;
   --bracket-card-shadow: 0 1px 3px rgb(0 0 0 / 0.08), 0 1px 2px rgb(0 0 0 / 0.04);
   --bracket-row-border: #e4e4e7;
@@ -4599,6 +4605,14 @@ html.light .bracket-match-card.llb-bracket-match--round1-bye .llb-bracket-match_
 
 .bracket-match-card--finished {
   border-color: var(--bracket-card-border-finished);
+}
+
+.bracket-match-card--active {
+  border-color: var(--bracket-card-border-active);
+  background-color: var(--bracket-card-bg-active);
+  box-shadow:
+    var(--bracket-card-shadow),
+    0 0 0 1px var(--bracket-card-border-active-glow);
 }
 
 .bracket-match-card--interactive {

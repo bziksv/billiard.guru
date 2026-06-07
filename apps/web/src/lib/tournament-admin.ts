@@ -118,11 +118,22 @@ export function canStartTournament(t: AdminTournament): boolean {
 
 export interface TournamentStandingRow {
   place: number | null;
+  /** Верхняя граница диапазона мест (если отличается от place). */
+  placeTo?: number | null;
   label: string;
   city: string;
   rating: number;
   points?: number;
   note?: string;
+}
+
+/** Подпись места в протоколе: «5» или «9–12». */
+export function formatTournamentStandingPlace(row: TournamentStandingRow): string {
+  if (row.place == null) return "—";
+  if (row.placeTo != null && row.placeTo !== row.place) {
+    return `${row.place}–${row.placeTo}`;
+  }
+  return String(row.place);
 }
 
 /** Город для протокола: из профиля игрока или город клуба турнира. */
@@ -154,10 +165,12 @@ function standingFromTeam(
   team: AdminTournamentTeam,
   place: number | null,
   note?: string,
+  placeTo?: number | null,
 ): TournamentStandingRow {
   const full = teamForProtocol(t, team);
   return {
     place,
+    placeTo: placeTo ?? null,
     label: teamLabel(full as TeamWithPlayers),
     city: protocolTeamCity(t, full),
     rating: teamRating(full as TeamWithPlayers),
@@ -170,9 +183,11 @@ function standingFromRegistration(
   r: AdminTournamentParticipant,
   place: number | null,
   note?: string,
+  placeTo?: number | null,
 ): TournamentStandingRow {
   return {
     place,
+    placeTo: placeTo ?? null,
     label: `${r.player.lastName} ${r.player.firstName}`,
     city: protocolPlayerCity(t, r.player),
     rating: r.player.rating,
@@ -273,7 +288,7 @@ function computeFixedSwissStandings(t: AdminTournament): TournamentStandingRow[]
     return prelimTeamsByRating(t, "предварительно по рейтингу");
   }
 
-  const placed = new Map<string, number>();
+  const placed = new Map<string, { place: number; placeTo?: number }>();
 
   for (const m of t.matches) {
     if (!isFinishedMatch(m) || !m.winnerTeam || !m.team1 || !m.team2) continue;
@@ -301,9 +316,11 @@ function computeFixedSwissStandings(t: AdminTournament): TournamentStandingRow[]
   const standings: TournamentStandingRow[] = [];
 
   for (const team of confirmed) {
-    const place = placed.get(team.id);
-    if (place !== undefined) {
-      standings.push(standingFromTeam(t, team, place));
+    const result = placed.get(team.id);
+    if (result !== undefined) {
+      standings.push(
+        standingFromTeam(t, team, result.place, undefined, result.placeTo ?? null),
+      );
     }
   }
 
