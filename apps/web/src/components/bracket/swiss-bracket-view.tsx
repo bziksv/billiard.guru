@@ -66,6 +66,7 @@ export function SwissBracketView({
   highlightedPlayerId: highlightedPlayerIdProp,
   onPlayerHighlight,
   handicapHalfStep = true,
+  showCardMatchNumber = true,
   showCardHandicap = true,
   showCardPlacement = true,
   demoPreview = false,
@@ -80,6 +81,7 @@ export function SwissBracketView({
   highlightedPlayerId?: string | null;
   onPlayerHighlight?: (playerId: string) => void;
   handicapHalfStep?: boolean;
+  showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   demoPreview?: boolean;
@@ -108,11 +110,12 @@ export function SwissBracketView({
     () =>
       fixedGrid
         ? buildFixedSwissBracketLayout(matches, {
+            showCardMatchNumber,
             showCardHandicap,
             showCardPlacement,
           })
         : buildSwissBracketLayout(matches),
-    [fixedGrid, matches, showCardHandicap, showCardPlacement],
+    [fixedGrid, matches, showCardMatchNumber, showCardHandicap, showCardPlacement],
   );
   const matchById = new Map(matches.map((m) => [m.id, m]));
   const fixedMaxRound =
@@ -149,6 +152,7 @@ export function SwissBracketView({
       toTeamSlot,
       kind,
       layout.minCol,
+      layout.cardDisplay,
     ).from.y;
   };
 
@@ -420,6 +424,7 @@ export function SwissBracketView({
                   edge.toTeamSlot,
                   edge.kind,
                   layout.minCol,
+                  layout.cardDisplay,
                 );
                 if (
                   useFixed168 &&
@@ -590,6 +595,7 @@ export function SwissBracketView({
                   onMatchClick={onMatchClick}
                   onPlayerClick={handlePlayerHighlight}
                   handicapHalfStep={handicapHalfStep}
+                  showCardMatchNumber={showCardMatchNumber}
                   showCardHandicap={showCardHandicap}
                   showCardPlacement={showCardPlacement}
                   highlightedPlayerId={highlightedPlayerId}

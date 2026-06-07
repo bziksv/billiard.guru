@@ -65,7 +65,7 @@ export function ThemeToggle({
   const baseClass =
     variant === "admin"
       ? cn(
-          "admin-nav-muted flex items-center rounded-lg text-sm transition-colors",
+          "admin-nav-muted flex w-full items-center rounded-lg text-sm transition-colors",
           collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2",
         )
       : "site-btn-ghost inline-flex h-9 w-9 items-center justify-center p-0";

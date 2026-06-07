@@ -37,11 +37,14 @@ export function calculateHandicap(
     };
   }
 
-  const diff = Math.max(0, higherRating - lowerRating);
-  const fullBalls = Math.floor(diff);
+  // Без шага 0,5: для форы берём целую часть каждого рейтинга (1,5 → 1, 3,5 → 3).
+  const diff = Math.max(
+    0,
+    Math.floor(higherRating) - Math.floor(lowerRating),
+  );
   return {
     ratingDiff: diff,
-    ballsEveryGame: fullBalls,
+    ballsEveryGame: diff,
     extraBallOnOddGames: false,
   };
 }

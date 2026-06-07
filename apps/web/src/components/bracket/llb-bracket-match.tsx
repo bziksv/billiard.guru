@@ -311,6 +311,7 @@ export function LlbBracketMatch({
   onMatchClick,
   onPlayerClick,
   handicapHalfStep = true,
+  showCardMatchNumber = true,
   showCardHandicap = true,
   showCardPlacement = true,
   highlightedPlayerId = null,
@@ -323,6 +324,7 @@ export function LlbBracketMatch({
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamWithPlayers["player1"]) => void;
   handicapHalfStep?: boolean;
+  showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   highlightedPlayerId?: string | null;
@@ -520,9 +522,12 @@ export function LlbBracketMatch({
     ? footerRows.length * footerRowH
     : gridFooterHeight(Math.max(footerRows.length, 1));
   const showHandicapRow = showCardHandicap && showHandicap && handicapShort;
-  const cardHeight = isFixedSwissGrid
-    ? fixedSwissMatchCardHeight(Boolean(showHandicapRow), footerRows.length)
-    : FIXED_SWISS_CARD_H;
+  const showMatchNumberRow = showCardMatchNumber;
+  const cardHeight = fixedSwissMatchCardHeight(
+    Boolean(showHandicapRow),
+    footerRows.length,
+    showMatchNumberRow,
+  );
 
   function handlePlayerClick(playerId: string, preview: TeamWithPlayers["player1"]) {
     onPlayerClick?.(playerId, preview);
@@ -542,30 +547,32 @@ export function LlbBracketMatch({
         maxHeight: cardHeight,
       }}
     >
-      <MatchArea
-        onMatchClick={openResult}
-        className={cn(
-          "llb-bracket-match__meta flex items-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px] text-[var(--bracket-meta-text)]",
-          isFixedSwissGrid ? "justify-center" : "justify-between",
-        )}
-        style={{ height: GRID_META_H }}
-      >
-        {!isFixedSwissGrid ? (
-          <>
-            <span className="tabular-nums">Тур {match.round}</span>
+      {showMatchNumberRow && (
+        <MatchArea
+          onMatchClick={openResult}
+          className={cn(
+            "llb-bracket-match__meta flex items-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px] text-[var(--bracket-meta-text)]",
+            isFixedSwissGrid ? "justify-center" : "justify-between",
+          )}
+          style={{ height: GRID_META_H }}
+        >
+          {!isFixedSwissGrid ? (
+            <>
+              <span className="tabular-nums">Тур {match.round}</span>
+              <span className="bracket-round-label font-semibold tabular-nums">
+                №{matchNumber}
+              </span>
+              <span className="tabular-nums text-[var(--bracket-meta-text)]">
+                сл.{match.slot}
+              </span>
+            </>
+          ) : (
             <span className="bracket-round-label font-semibold tabular-nums">
               №{matchNumber}
             </span>
-            <span className="tabular-nums text-[var(--bracket-meta-text)]">
-              сл.{match.slot}
-            </span>
-          </>
-        ) : (
-          <span className="bracket-round-label font-semibold tabular-nums">
-            №{matchNumber}
-          </span>
-        )}
-      </MatchArea>
+          )}
+        </MatchArea>
+      )}
 
       {match.team1?.player2 ? (
         <PairTeamRow

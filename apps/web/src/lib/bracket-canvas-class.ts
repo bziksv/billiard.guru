@@ -21,7 +21,9 @@ export function bracketCanvasClassName(options: {
 
 export function bracketViewRootClassName(presentation?: boolean): string {
   return cn(
-    presentation ? "flex h-full min-h-0 flex-col" : "space-y-3",
+    presentation
+      ? "flex h-full min-h-0 w-full max-w-full flex-col overflow-hidden"
+      : "w-full min-w-0 max-w-full space-y-3 overflow-hidden",
   );
 }
 

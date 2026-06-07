@@ -90,7 +90,7 @@ export function formatTournamentRatingRulesSummary(tournament: {
   parts.push(
     tournament.handicapHalfStep !== false
       ? "фора с учётом шага 0,5"
-      : "фора без шага 0,5 (только целая часть разницы)",
+      : "фора без шага 0,5 (рейтинг вниз до целого)",
   );
   return parts.join(" · ");
 }

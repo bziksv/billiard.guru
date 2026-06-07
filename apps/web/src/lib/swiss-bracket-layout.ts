@@ -39,6 +39,12 @@ export type SwissBracketLayout = {
   cardHeight?: number;
   /** Фикс. швейцарка: оценка высоты каждой карточки для раскладки. */
   cardHeights?: Map<string, number>;
+  /** Фикс. швейцарка: галочки «Встреча / Фора / Места» для линий и карточек. */
+  cardDisplay?: {
+    showCardMatchNumber?: boolean;
+    showCardHandicap?: boolean;
+    showCardPlacement?: boolean;
+  };
 };
 
 export const GRID_COL_W = 280;

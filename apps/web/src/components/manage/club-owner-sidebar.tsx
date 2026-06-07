@@ -67,7 +67,7 @@ function NavLink({
       href={href}
       title={collapsed ? (badge ? `${label} · ${badge}` : label) : undefined}
       className={cn(
-        "admin-nav-item",
+        "admin-nav-item w-full",
         collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2",
         active && "admin-nav-item--active",
       )}
@@ -180,7 +180,12 @@ export function ClubOwnerSidebar({
         )}
       </div>
 
-      <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2">
+      <nav
+        className={cn(
+          "flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2",
+          collapsed && "scrollbar-none",
+        )}
+      >
         {nav.map((item) => (
           <NavLink
             key={item.href}
@@ -194,13 +199,15 @@ export function ClubOwnerSidebar({
         ))}
       </nav>
 
-      <div className="admin-sidebar-footer admin-divider mt-auto shrink-0 space-y-1 border-t p-2">
+      <div className="admin-sidebar-footer admin-divider mt-auto flex shrink-0 flex-col gap-0.5 border-t p-2">
         <NavLink
-          href="/cabinet"
+          href="/manage/cabinet"
           label="Личный кабинет"
           icon={IconCabinet}
           collapsed={collapsed}
-          active={pathname.startsWith("/cabinet")}
+          active={
+            pathname.startsWith("/manage/cabinet") || pathname.startsWith("/cabinet")
+          }
         />
 
         <LogoutButton collapsed={collapsed} />

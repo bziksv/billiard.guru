@@ -29,6 +29,7 @@ export function BracketScrollCenter({
   contentScrollY?: "center" | "start";
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const userAdjustedRef = useRef(false);
   const panRef = useRef({
     active: false,
     moved: false,
@@ -40,15 +41,50 @@ export function BracketScrollCenter({
   });
 
   useEffect(() => {
+    userAdjustedRef.current = false;
+  }, [centerX]);
+
+  useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.scrollLeft = Math.max(0, centerX - el.clientWidth / 2);
-    if (contentHeight != null && contentHeight > el.clientHeight) {
-      el.scrollTop =
-        contentScrollY === "start"
-          ? 0
-          : Math.max(0, (contentHeight - el.clientHeight) / 2);
+
+    function applyAutoScroll() {
+      const content = el.firstElementChild as HTMLElement | null;
+      const contentWidth = content?.scrollWidth ?? content?.offsetWidth ?? 0;
+      const maxScroll = Math.max(0, el.scrollWidth - el.clientWidth);
+
+      if (el.scrollLeft > maxScroll) {
+        el.scrollLeft = maxScroll;
+      }
+
+      if (userAdjustedRef.current) return;
+
+      if (contentWidth > el.clientWidth + 1) {
+        el.scrollLeft = Math.min(
+          maxScroll,
+          Math.max(0, centerX - el.clientWidth / 2),
+        );
+      } else {
+        el.scrollLeft = 0;
+      }
+      if (contentHeight != null && contentHeight > el.clientHeight) {
+        el.scrollTop =
+          contentScrollY === "start"
+            ? 0
+            : Math.max(0, (contentHeight - el.clientHeight) / 2);
+      }
     }
+
+    applyAutoScroll();
+
+    const ro = new ResizeObserver(() => {
+      requestAnimationFrame(applyAutoScroll);
+    });
+    ro.observe(el);
+    const content = el.firstElementChild;
+    if (content) ro.observe(content);
+
+    return () => ro.disconnect();
   }, [centerX, contentHeight, contentScrollY]);
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
@@ -80,6 +116,7 @@ export function BracketScrollCenter({
     if (!pan.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return;
 
     pan.moved = true;
+    userAdjustedRef.current = true;
     el.scrollLeft = pan.scrollLeft - dx;
     el.scrollTop = pan.scrollTop - dy;
   }
@@ -109,7 +146,7 @@ export function BracketScrollCenter({
     <div
       ref={ref}
       className={cn(
-        "cursor-grab touch-pan-x touch-pan-y select-none active:cursor-grabbing",
+        "w-full max-w-full min-w-0 cursor-grab touch-pan-x touch-pan-y select-none active:cursor-grabbing",
         className,
       )}
       onPointerDownCapture={onPointerDown}
@@ -117,7 +154,7 @@ export function BracketScrollCenter({
       onPointerUpCapture={endPan}
       onPointerCancelCapture={endPan}
     >
-      {children}
+      <div className="mx-auto w-max text-left">{children}</div>
     </div>
   );
 }

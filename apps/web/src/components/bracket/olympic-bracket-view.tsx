@@ -78,6 +78,7 @@ export function OlympicBracketView({
   showMatchScore = false,
   withBronzeMatch = false,
   handicapHalfStep = true,
+  showCardMatchNumber = true,
   showCardHandicap = true,
   showCardPlacement = true,
   presentation = false,
@@ -92,6 +93,7 @@ export function OlympicBracketView({
   /** Матч за 3–4 в финальном туре (слот 2). */
   withBronzeMatch?: boolean;
   handicapHalfStep?: boolean;
+  showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   presentation?: boolean;
@@ -217,7 +219,9 @@ export function OlympicBracketView({
             >
               <BracketMatchCard
                 match={match}
-                matchNumber={matchNumbers?.get(match.id)}
+                matchNumber={
+                  showCardMatchNumber ? matchNumbers?.get(match.id) : undefined
+                }
                 placementLabel={
                   showCardPlacement
                     ? olympicMatchPlacementLabel(

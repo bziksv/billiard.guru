@@ -626,7 +626,7 @@ export default function AdminTournamentManagePage() {
         </section>
       )}
 
-      <section className="rounded-xl border border-zinc-800 bg-zinc-950 p-6">
+      <section className="min-w-0 max-w-full overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-6">
         <TournamentManageView
           tournament={tournament}
           clubOptions={clubOptions}

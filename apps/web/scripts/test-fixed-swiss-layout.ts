@@ -68,6 +68,7 @@ import {
 import {
   GRID_LABEL_OFFSET,
   GRID_PAD,
+  GRID_ROW_H,
   incomingAutopassPhantomSlot,
   isIncomingAutopassPhantomForTeam,
   teamDividerY,
@@ -298,7 +299,15 @@ assert.equal(
   const fromPos = layoutTs.positions.get("r1s1")!;
   const toPos = layoutTs.positions.get("r2s5")!;
   const fromTop = fromPos.y + GRID_PAD + GRID_LABEL_OFFSET;
-  const pts = gridFixedEdgePoints(fromPos, toPos, 1, 1, "win", layoutTs.minCol);
+  const pts = gridFixedEdgePoints(
+    fromPos,
+    toPos,
+    1,
+    1,
+    "win",
+    layoutTs.minCol,
+    layoutTs.cardDisplay,
+  );
   assert.equal(pts.from.y, teamDividerY(fromTop), "line exits at player divider");
   assert.notEqual(
     pts.from.y,
@@ -931,6 +940,7 @@ assertProtocolPlace(17, "loser", 60, { place: 25, placeTo: 32 });
 }
 const layout32Bronze = buildFixedSwissBracketLayout(mkGridTs32Bronze());
 const compactH = fixedSwissMatchCardHeight(false, 0);
+const compactNoMetaH = fixedSwissMatchCardHeight(false, 0, false);
 {
   const layoutCompact = buildFixedSwissBracketLayout(mkGridTs32Bronze(), {
     showCardHandicap: false,
@@ -951,6 +961,57 @@ const compactH = fixedSwissMatchCardHeight(false, 0);
   assert.ok(
     compact2.y - full.y < (layout32Bronze.positions.get("r1s2")!.y - full.y) - 1,
     "compact layout tighter than full",
+  );
+}
+{
+  const layoutNoMeta = buildFixedSwissBracketLayout(mkGridTs32Bronze(), {
+    showCardMatchNumber: false,
+    showCardHandicap: false,
+    showCardPlacement: false,
+  });
+  const noMeta1 = layoutNoMeta.positions.get("r1s1")!;
+  const noMeta2 = layoutNoMeta.positions.get("r1s2")!;
+  assert.ok(
+    layoutNoMeta.cardHeights?.get("r1s1") === compactNoMetaH,
+    "card height without match number row",
+  );
+  assert.equal(
+    noMeta2.y - noMeta1.y,
+    compactNoMetaH + 4,
+    "round 1 slots stack by height without meta row",
+  );
+  assert.ok(
+    compactNoMetaH < compactH,
+    "hiding match number shrinks card",
+  );
+}
+{
+  const layoutNoMeta = buildFixedSwissBracketLayout(mkGridTs32Bronze(), {
+    showCardMatchNumber: false,
+    showCardHandicap: false,
+    showCardPlacement: false,
+  });
+  const fromPos = layoutNoMeta.positions.get("r1s1")!;
+  const toPos = layoutNoMeta.positions.get("r2s1")!;
+  const fromTop = fromPos.y + GRID_PAD + GRID_LABEL_OFFSET;
+  const pts = gridFixedEdgePoints(
+    fromPos,
+    toPos,
+    1,
+    1,
+    "win",
+    layoutNoMeta.minCol,
+    layoutNoMeta.cardDisplay,
+  );
+  assert.equal(
+    pts.from.y,
+    fromTop + GRID_ROW_H,
+    "compact layout: line exits at divider without meta row",
+  );
+  assert.notEqual(
+    pts.from.y,
+    teamDividerY(fromTop),
+    "compact layout: not offset by hidden meta row",
   );
 }
 {

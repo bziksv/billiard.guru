@@ -62,7 +62,7 @@ function NavLink({
       href={href}
       title={collapsed ? label : undefined}
       className={cn(
-        "admin-nav-item",
+        "admin-nav-item w-full",
         collapsed ? "justify-center px-2 py-2.5" : "px-3 py-2",
         active && "admin-nav-item--active",
       )}
@@ -118,7 +118,12 @@ export function AdminSidebar({ userName }: { userName?: string }) {
         )}
       </div>
 
-      <nav className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2">
+      <nav
+        className={cn(
+          "flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto p-2",
+          collapsed && "scrollbar-none",
+        )}
+      >
         {NAV.map((item) => (
           <NavLink
             key={item.href}
@@ -129,7 +134,7 @@ export function AdminSidebar({ userName }: { userName?: string }) {
         ))}
       </nav>
 
-      <div className="admin-sidebar-footer admin-divider mt-auto shrink-0 space-y-1 border-t p-2">
+      <div className="admin-sidebar-footer admin-divider mt-auto flex shrink-0 flex-col gap-0.5 border-t p-2">
         {userName && !collapsed && (
           <div className="px-3 py-2 text-sm">
             <p className="truncate admin-text-secondary">{userName}</p>
@@ -138,11 +143,13 @@ export function AdminSidebar({ userName }: { userName?: string }) {
         )}
 
         <NavLink
-          href="/cabinet"
+          href="/admin/cabinet"
           label="Личный кабинет"
           icon={IconCabinet}
           collapsed={collapsed}
-          active={pathname.startsWith("/cabinet")}
+          active={
+            pathname.startsWith("/admin/cabinet") || pathname.startsWith("/cabinet")
+          }
         />
 
         <LogoutButton collapsed={collapsed} />
@@ -158,7 +165,11 @@ export function AdminSidebar({ userName }: { userName?: string }) {
             collapsed ? "justify-center px-2 py-2.5" : "gap-3 px-3 py-2",
           )}
         >
-          {collapsed ? <IconExpand /> : <IconCollapse />}
+          {collapsed ? (
+            <IconExpand className="h-5 w-5 shrink-0" />
+          ) : (
+            <IconCollapse className="h-5 w-5 shrink-0" />
+          )}
           {!collapsed && <span>Свернуть меню</span>}
         </button>
       </div>

@@ -57,9 +57,10 @@ export const FIXED_SWISS_COMPACT_ROW_H = 18;
 export function fixedSwissMatchCardHeight(
   hasHandicap: boolean,
   footerRowCount: number,
+  hasMatchNumber = true,
 ): number {
   return (
-    GRID_META_H +
+    (hasMatchNumber ? GRID_META_H : 0) +
     GRID_ROW_H * 2 +
     (hasHandicap ? FIXED_SWISS_COMPACT_ROW_H : 0) +
     footerRowCount * FIXED_SWISS_COMPACT_ROW_H
@@ -78,6 +79,19 @@ const FIXED_SWISS_ROUND1_GAP = 4;
 
 let layoutCardHeights: Map<string, number> | undefined;
 let layoutRound1SlotY: Map<number, number> | undefined;
+
+export function fixedSwissCardMetaH(
+  display?: FixedSwissDisplayOpts,
+): number {
+  return display?.showCardMatchNumber !== false ? GRID_META_H : 0;
+}
+
+export function fixedSwissTeamDividerY(
+  cardTop: number,
+  display?: FixedSwissDisplayOpts,
+): number {
+  return cardTop + fixedSwissCardMetaH(display) + GRID_ROW_H;
+}
 
 function fixedSwissRound1SlotY(slot: number, unit = FIXED_SWISS_BRACKET_UNIT): number {
   if (layoutRound1SlotY?.has(slot)) return layoutRound1SlotY.get(slot)!;
@@ -99,6 +113,7 @@ function matchHasHandicap(match: BracketMatchView): boolean {
 }
 
 export type FixedSwissDisplayOpts = {
+  showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
 };
@@ -152,6 +167,7 @@ export function estimateFixedSwissCardHeight(
     matchCount?: number;
     matchNumber?: number;
     maxRound?: number;
+    showCardMatchNumber?: boolean;
     showCardHandicap?: boolean;
     showCardPlacement?: boolean;
   },
@@ -162,12 +178,14 @@ export function estimateFixedSwissCardHeight(
       : undefined;
   const hasHandicap =
     opts?.showCardHandicap !== false && matchHasHandicap(match);
+  const hasMatchNumber = opts?.showCardMatchNumber !== false;
   return fixedSwissMatchCardHeight(
     hasHandicap,
     estimateFixedSwissFooterRowCount(match, edges, {
       ...opts,
       matchesPerRound,
     }),
+    hasMatchNumber,
   );
 }
 
@@ -347,10 +365,41 @@ function centerBetweenParents(
   y1: number,
   y2: number,
   cardH: number,
+  h1 = cardH,
+  h2 = cardH,
+  hc = cardH,
 ): number {
-  const c1 = y1 + cardH / 2;
-  const c2 = y2 + cardH / 2;
-  return (c1 + c2) / 2 - cardH / 2;
+  return (y1 + h1 / 2 + y2 + h2 / 2) / 2 - hc / 2;
+}
+
+function matchLayoutCardH(
+  match: BracketMatchView | undefined,
+  fallback: number,
+): number {
+  return match ? layoutMatchCardHeight(match.id, fallback) : fallback;
+}
+
+function centerBetweenSlots(
+  parentRound: number,
+  parentSlotA: number,
+  parentSlotB: number,
+  childRound: number,
+  childSlot: number,
+  slotY: Map<string, number>,
+  byRoundSlot: Map<string, BracketMatchView>,
+  fallbackCardH: number,
+): number {
+  const parentA = byRoundSlot.get(`${parentRound}:${parentSlotA}`);
+  const parentB = byRoundSlot.get(`${parentRound}:${parentSlotB}`);
+  const child = byRoundSlot.get(`${childRound}:${childSlot}`);
+  return centerBetweenParents(
+    yAt(parentRound, parentSlotA, slotY),
+    yAt(parentRound, parentSlotB, slotY),
+    fallbackCardH,
+    matchLayoutCardH(parentA, fallbackCardH),
+    matchLayoutCardH(parentB, fallbackCardH),
+    matchLayoutCardH(child, fallbackCardH),
+  );
 }
 
 export function fixedSwissMatchTop(
@@ -780,9 +829,14 @@ function buildTsPositionsScaled(
   }
 
   for (let slot = 1; slot <= half1; slot++) {
-    const y = centerBetweenParents(
-      yAt(1, 2 * slot - 1, slotY),
-      yAt(1, 2 * slot, slotY),
+    const y = centerBetweenSlots(
+      1,
+      2 * slot - 1,
+      2 * slot,
+      2,
+      slot,
+      slotY,
+      byRoundSlot,
       cardH,
     );
     slotY.set(`2:${slot}`, y);
@@ -806,9 +860,14 @@ function buildTsPositionsScaled(
       const parentA = half1 + 2 * k - 1;
       const parentB = half1 + 2 * k;
       const olympicSlot = half1 + k;
-      const olympicY = centerBetweenParents(
-        yAt(2, parentA, slotY),
-        yAt(2, parentB, slotY),
+      const olympicY = centerBetweenSlots(
+        2,
+        parentA,
+        parentB,
+        3,
+        olympicSlot,
+        slotY,
+        byRoundSlot,
         cardH,
       );
       slotY.set(`3:${olympicSlot}`, olympicY);
@@ -819,9 +878,14 @@ function buildTsPositionsScaled(
       const parentA = 2 * k - 1;
       const parentB = 2 * k;
       const olympicSlot = half1 + half1 / 2 + k;
-      const olympicY = centerBetweenParents(
-        yAt(3, parentA, slotY),
-        yAt(3, parentB, slotY),
+      const olympicY = centerBetweenSlots(
+        3,
+        parentA,
+        parentB,
+        3,
+        olympicSlot,
+        slotY,
+        byRoundSlot,
         cardH,
       );
       slotY.set(`3:${olympicSlot}`, olympicY);
@@ -859,14 +923,24 @@ function buildTsPositionsScaled(
       const parentB = 2 * slot + half1;
       const y =
         round === 4
-          ? centerBetweenParents(
-              yAt(3, parentA, slotY),
-              yAt(3, parentB, slotY),
+          ? centerBetweenSlots(
+              3,
+              parentA,
+              parentB,
+              round,
+              slot,
+              slotY,
+              byRoundSlot,
               cardH,
             )
-          : centerBetweenParents(
-              yAt(round - 1, 2 * slot - 1, slotY),
-              yAt(round - 1, 2 * slot, slotY),
+          : centerBetweenSlots(
+              round - 1,
+              2 * slot - 1,
+              2 * slot,
+              round,
+              slot,
+              slotY,
+              byRoundSlot,
               cardH,
             );
       slotY.set(`${round}:${slot}`, y);
@@ -876,9 +950,14 @@ function buildTsPositionsScaled(
     col++;
   }
 
-  const finalY = centerBetweenParents(
-    yAt(maxRound - 1, 1, slotY),
-    yAt(maxRound - 1, 2, slotY),
+  const finalY = centerBetweenSlots(
+    maxRound - 1,
+    1,
+    2,
+    maxRound,
+    1,
+    slotY,
+    byRoundSlot,
     cardH,
   );
   const fin = byRoundSlot.get(`${maxRound}:1`);
@@ -1596,6 +1675,7 @@ export function buildFixedSwissBracketLayout(
         matchCount,
         matchNumber: matchNumbers.get(m.id),
         maxRound: maxRoundEarly,
+        showCardMatchNumber: display?.showCardMatchNumber,
         showCardHandicap: display?.showCardHandicap,
         showCardPlacement: display?.showCardPlacement,
       }),
@@ -1673,6 +1753,7 @@ export function buildFixedSwissBracketLayout(
     cardWidth: FIXED_SWISS_CARD_W,
     cardHeight: cardH,
     cardHeights,
+    cardDisplay: display,
   };
 }
 
@@ -1683,8 +1764,11 @@ export function gridFixedColumnLabel(col: number): string {
 }
 
 /** Y выхода линии с карточки (эталон: разделитель строк игроков). */
-export function fixedSwissEdgeFromY(cardTop: number): number {
-  return teamDividerY(cardTop);
+export function fixedSwissEdgeFromY(
+  cardTop: number,
+  display?: FixedSwissDisplayOpts,
+): number {
+  return fixedSwissTeamDividerY(cardTop, display);
 }
 
 /**
@@ -1695,9 +1779,10 @@ export function fixedSwissEdgeToY(
   toCardTop: number,
   _toTeamSlot: 1 | 2,
   kind: SwissEdgeKind,
+  display?: FixedSwissDisplayOpts,
 ): number {
-  if (kind === "loss") return teamDividerY(toCardTop);
-  return teamDividerY(toCardTop);
+  if (kind === "loss") return fixedSwissTeamDividerY(toCardTop, display);
+  return fixedSwissTeamDividerY(toCardTop, display);
 }
 
 export function gridFixedEdgePoints(
@@ -1707,11 +1792,12 @@ export function gridFixedEdgePoints(
   toTeamSlot: 1 | 2,
   kind: SwissEdgeKind,
   minCol: number,
+  display?: FixedSwissDisplayOpts,
 ) {
   const fromTop = fromPos.y + GRID_PAD + GRID_LABEL_OFFSET;
   const toTop = toPos.y + GRID_PAD + GRID_LABEL_OFFSET;
-  const y = fixedSwissEdgeFromY(fromTop);
-  const entryY = fixedSwissEdgeToY(fromTop, toTop, toTeamSlot, kind);
+  const y = fixedSwissEdgeFromY(fromTop, display);
+  const entryY = fixedSwissEdgeToY(fromTop, toTop, toTeamSlot, kind, display);
   const fromLeft = fixedGridCardLeft(fromPos.col, minCol);
   const toLeft = fixedGridCardLeft(toPos.col, minCol);
   const exitsLeft = kind === "loss";

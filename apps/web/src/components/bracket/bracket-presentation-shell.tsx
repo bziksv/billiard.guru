@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { AdminHorizontalScroll } from "@/components/admin/admin-horizontal-scroll";
 import { cn } from "@/lib/cn";
 
 export function BracketPresentationShell({
@@ -48,7 +49,7 @@ export function BracketPresentationShell({
           {title ?? "Турнирная сетка"}
         </span>
         {tabs ? (
-          <div className="min-w-0 flex-1 overflow-x-auto">{tabs}</div>
+          <AdminHorizontalScroll className="min-w-0 flex-1">{tabs}</AdminHorizontalScroll>
         ) : (
           <span className="bracket-presentation__title min-w-0 flex-1 truncate sm:hidden">
             {title ?? "Турнирная сетка"}
