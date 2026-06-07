@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import {
   AdminFilterSelect,
   AdminTableSearchField,
   AdminTableToolbar,
-  VERIFIED_STATUS_FILTER_OPTIONS,
+  AdminVerifiedFilterChips,
   matchesVerifiedFilter,
+  parseVerifiedStatusFilter,
   type VerifiedStatusFilter,
 } from "@/components/admin/admin-table-toolbar";
 import {
@@ -54,7 +56,7 @@ type SortKey =
 
 const VERIFIED_OPTIONS = [
   { value: "1", label: "Подтверждён" },
-  { value: "0", label: "Ожидает" },
+  { value: "0", label: "Не подтверждён" },
 ];
 
 const ROLE_OPTIONS = [
@@ -67,10 +69,14 @@ function playerName(p: Player) {
 }
 
 export function PlayersAdminTable() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<VerifiedStatusFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<VerifiedStatusFilter>(() =>
+    parseVerifiedStatusFilter(searchParams.get("status")),
+  );
   const [cityFilter, setCityFilter] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
@@ -95,6 +101,35 @@ export function PlayersAdminTable() {
   useEffect(() => {
     reload();
   }, []);
+
+  useEffect(() => {
+    setStatusFilter(parseVerifiedStatusFilter(searchParams.get("status")));
+  }, [searchParams]);
+
+  const setVerifiedFilter = useCallback(
+    (value: VerifiedStatusFilter) => {
+      setStatusFilter(value);
+      const params = new URLSearchParams(searchParams.toString());
+      if (value === "all") {
+        params.delete("status");
+      } else {
+        params.set("status", value);
+      }
+      const query = params.toString();
+      router.replace(query ? `/admin/players?${query}` : "/admin/players");
+    },
+    [router, searchParams],
+  );
+
+  const verifiedCounts = useMemo(() => {
+    let verified = 0;
+    let pending = 0;
+    for (const p of players) {
+      if (p.isVerified) verified += 1;
+      else pending += 1;
+    }
+    return { all: players.length, verified, pending };
+  }, [players]);
 
   const cityOptions = useMemo(() => {
     const names = new Set(players.map((p) => p.city.nameRu));
@@ -214,11 +249,10 @@ export function PlayersAdminTable() {
           onChange={setSearch}
           placeholder="ФИО, телефон, Telegram…"
         />
-        <AdminFilterSelect
-          label="Статус"
-          options={[...VERIFIED_STATUS_FILTER_OPTIONS]}
+        <AdminVerifiedFilterChips
           value={statusFilter}
-          onChange={(v) => setStatusFilter(v as VerifiedStatusFilter)}
+          onChange={setVerifiedFilter}
+          counts={verifiedCounts}
         />
         <AdminFilterSelect
           label="Город"
@@ -339,7 +373,7 @@ export function PlayersAdminTable() {
                     <td className="px-4 py-3">
                       <StatusBadge
                         status={player.isVerified ? "CONFIRMED" : "PENDING"}
-                        label={player.isVerified ? "Подтверждён" : "Ожидает"}
+                        label={player.isVerified ? "Подтверждён" : "Не подтверждён"}
                       />
                     </td>
                     <td className="px-4 py-3">

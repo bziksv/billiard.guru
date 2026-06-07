@@ -2,6 +2,12 @@
 
 import { useMemo } from "react";
 import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center";
+import {
+  bracketCanvasClassName,
+  bracketShellClassName,
+  bracketViewRootClassName,
+} from "@/lib/bracket-canvas-class";
+import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { isMatchResolved } from "@/lib/match-result";
 import excelRef from "@/lib/excel-bracket-64-reference.json";
@@ -17,7 +23,6 @@ import {
   GRID_PAD,
   GRID_ROW_H,
 } from "@/lib/swiss-bracket-layout";
-import { cn } from "@/lib/cn";
 
 function ExcelMatchCard({
   refMatch,
@@ -129,19 +134,23 @@ function linkPath(
 export function ExcelBracketView({
   liveByMatchNo,
   onMatchClick,
+  presentation = false,
 }: {
   liveByMatchNo?: Map<number, BracketMatchView>;
   onMatchClick?: (match: BracketMatchView) => void;
+  presentation?: boolean;
 } = {}) {
   const refMatches = excelRef.matches as ExcelMatchRef[];
   const layout = useMemo(() => buildExcelBracketLayout(refMatches), [refMatches]);
 
   return (
-    <div className="bracket-shell rounded-xl border border-[var(--admin-border)] bg-[var(--bracket-canvas-bg)]">
+    <div className={bracketViewRootClassName(presentation)}>
+    <div className={cn(bracketShellClassName(presentation), presentation && "min-h-0 flex-1")}>
       <BracketScrollCenter
         centerX={layout.centerX}
         contentHeight={layout.totalHeight}
-        className="bracket-canvas max-h-[min(90vh,1400px)] overflow-x-auto overflow-y-auto pb-6 pt-2"
+        contentScrollY={presentation ? "start" : "center"}
+        className={bracketCanvasClassName({ presentation })}
       >
         <div
           className="relative"
@@ -206,6 +215,7 @@ export function ExcelBracketView({
           })}
         </div>
       </BracketScrollCenter>
+    </div>
     </div>
   );
 }

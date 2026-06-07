@@ -13,6 +13,10 @@ import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
 import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center";
 import { GRID_CARD_W } from "@/lib/swiss-bracket-layout";
 import type { TeamPlayer } from "@/lib/pair-tournament";
+import {
+  bracketCanvasClassName,
+  bracketViewRootClassName,
+} from "@/lib/bracket-canvas-class";
 
 const UNIT = OLYMPIC_BRACKET_UNIT;
 const CARD_H = OLYMPIC_CARD_H;
@@ -67,6 +71,7 @@ export function OlympicBracketView({
   showMatchScore = false,
   withBronzeMatch = false,
   handicapHalfStep = true,
+  presentation = false,
 }: {
   matches: BracketMatchView[];
   matchNumbers?: Map<string, number>;
@@ -76,6 +81,7 @@ export function OlympicBracketView({
   /** Матч за 3–4 в финальном туре (слот 2). */
   withBronzeMatch?: boolean;
   handicapHalfStep?: boolean;
+  presentation?: boolean;
 }) {
   const rounds = groupMatchesByRound(matches);
   if (rounds.length === 0) return null;
@@ -87,10 +93,12 @@ export function OlympicBracketView({
   const centerX = canvasWidth / 2;
 
   return (
+    <div className={bracketViewRootClassName(presentation)}>
     <BracketScrollCenter
       centerX={centerX}
       contentHeight={canvasHeight}
-      className="bracket-canvas max-h-[min(90vh,1400px)] overflow-x-auto overflow-y-auto pb-6 pt-2"
+      contentScrollY={presentation ? "start" : "center"}
+      className={bracketCanvasClassName({ presentation })}
     >
       <div
         className="relative min-w-max"
@@ -182,5 +190,6 @@ export function OlympicBracketView({
         )}
       </div>
     </BracketScrollCenter>
+    </div>
   );
 }

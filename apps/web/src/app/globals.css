@@ -4809,6 +4809,20 @@ html.dark .bracket-col-header {
   background-color: var(--bracket-canvas-bg);
 }
 
+.bracket-canvas--presentation {
+  max-height: none;
+  flex: 1 1 auto;
+  border-radius: 0.375rem;
+}
+
+.bracket-presentation .bracket-canvas--presentation {
+  cursor: grab;
+}
+
+.bracket-presentation .bracket-canvas--presentation:active {
+  cursor: grabbing;
+}
+
 .bracket-empty-state {
   border-radius: 0.75rem;
   border: 1px solid var(--bracket-canvas-border);

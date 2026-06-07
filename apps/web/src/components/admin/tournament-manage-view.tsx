@@ -38,6 +38,7 @@ import {
 } from "@/lib/pair-tournament";
 import { mapBracketMatchesByExcelNo } from "@/lib/excel-bracket-match-map";
 import { ExcelBracketView } from "@/components/bracket/excel-bracket-view";
+import { BracketPresentationShell } from "@/components/bracket/bracket-presentation-shell";
 import { isOutdatedFixedSwiss27Bracket, isOutdatedFixedSwiss32Bracket } from "@/lib/fixed-swiss-grid";
 import {
   getDefaultBracketParticipantRules,
@@ -82,6 +83,77 @@ type ManageTab =
   | "upcoming-matches"
   | "completed-matches"
   | "protocol";
+
+function ManageTabButtons({
+  tab,
+  onTabChange,
+  viewMode,
+  participantCount,
+  currentCount,
+  upcomingCount,
+  completedCount,
+}: {
+  tab: ManageTab;
+  onTabChange: (tab: ManageTab) => void;
+  viewMode: TournamentManageViewMode;
+  participantCount: number;
+  currentCount: number;
+  upcomingCount: number;
+  completedCount: number;
+}) {
+  return (
+    <>
+      {viewMode === "full" && (
+        <button
+          type="button"
+          onClick={() => onTabChange("participants")}
+          className={adminTabClass(tab === "participants")}
+        >
+          Участники
+          {participantCount > 0 ? ` (${participantCount})` : ""}
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => onTabChange("bracket")}
+        className={adminTabClass(tab === "bracket")}
+      >
+        Сетка
+      </button>
+      <button
+        type="button"
+        onClick={() => onTabChange("current-matches")}
+        className={adminTabClass(tab === "current-matches")}
+      >
+        Текущие встречи
+        {currentCount > 0 ? ` (${currentCount})` : ""}
+      </button>
+      <button
+        type="button"
+        onClick={() => onTabChange("upcoming-matches")}
+        className={adminTabClass(tab === "upcoming-matches")}
+      >
+        Предстоящие встречи
+        {upcomingCount > 0 ? ` (${upcomingCount})` : ""}
+      </button>
+      <button
+        type="button"
+        onClick={() => onTabChange("completed-matches")}
+        className={adminTabClass(tab === "completed-matches")}
+      >
+        Завершённые встречи
+        {completedCount > 0 ? ` (${completedCount})` : ""}
+      </button>
+      <button
+        type="button"
+        onClick={() => onTabChange("protocol")}
+        className={adminTabClass(tab === "protocol")}
+      >
+        Итоговый протокол
+      </button>
+    </>
+  );
+}
 
 function RegistrationActionButton({
   variant,
@@ -160,6 +232,7 @@ export function TournamentManageView({
   const [tab, setTab] = useState<ManageTab>(
     effectiveViewMode === "bracket" ? "bracket" : "participants",
   );
+  const [presentationOpen, setPresentationOpen] = useState(false);
   const showParticipants = effectiveViewMode !== "bracket";
   const showBracketSection = effectiveViewMode !== "tournament";
   const showTabBar =
@@ -301,6 +374,20 @@ export function TournamentManageView({
     () => buildBracketMatchNumbers(bracketMatches, t.format),
     [bracketMatches, t.format],
   );
+
+  const manageTabButtons = (
+    <ManageTabButtons
+      tab={tab}
+      onTabChange={setTab}
+      viewMode={effectiveViewMode}
+      participantCount={participantCount}
+      currentCount={currentMatches.length}
+      upcomingCount={upcomingMatches.length}
+      completedCount={completedMatches.length}
+    />
+  );
+
+  const presentationContentIsBracket = tab === "bracket";
 
   return (
     <div
@@ -487,60 +574,22 @@ export function TournamentManageView({
               {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
             </h2>
           )}
-          <div className="admin-tab-bar">
-          {effectiveViewMode === "full" && (
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="admin-tab-bar min-w-0 flex-1">{manageTabButtons}</div>
             <button
               type="button"
-              onClick={() => setTab("participants")}
-              className={adminTabClass(tab === "participants")}
+              onClick={() => setPresentationOpen(true)}
+              className="admin-btn shrink-0 px-4 py-2 text-sm"
             >
-              Участники
-              {participantCount > 0 ? ` (${participantCount})` : ""}
+              На весь экран
             </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setTab("bracket")}
-            className={adminTabClass(tab === "bracket")}
-          >
-            Сетка
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("current-matches")}
-            className={adminTabClass(tab === "current-matches")}
-          >
-            Текущие встречи
-            {currentMatches.length > 0 ? ` (${currentMatches.length})` : ""}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("upcoming-matches")}
-            className={adminTabClass(tab === "upcoming-matches")}
-          >
-            Предстоящие встречи
-            {upcomingMatches.length > 0 ? ` (${upcomingMatches.length})` : ""}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("completed-matches")}
-            className={adminTabClass(tab === "completed-matches")}
-          >
-            Завершённые встречи
-            {completedMatches.length > 0 ? ` (${completedMatches.length})` : ""}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("protocol")}
-            className={adminTabClass(tab === "protocol")}
-          >
-            Итоговый протокол
-          </button>
           </div>
         </div>
       )}
 
-      {showParticipants && (effectiveViewMode === "tournament" || !embedded || tab === "participants") && (
+      {!presentationOpen &&
+        showParticipants &&
+        (effectiveViewMode === "tournament" || !embedded || tab === "participants") && (
         <ParticipantsTab
           t={t}
           pair={pair}
@@ -560,7 +609,7 @@ export function TournamentManageView({
         />
       )}
 
-      {bracketTabOpen("bracket") && (
+      {!presentationOpen && bracketTabOpen("bracket") && (
         <BracketTab
           t={t}
           format={t.format}
@@ -580,7 +629,7 @@ export function TournamentManageView({
         />
       )}
 
-      {bracketTabOpen("current-matches") && (
+      {!presentationOpen && bracketTabOpen("current-matches") && (
         <MatchesScheduleTab
           variant="current"
           format={t.format}
@@ -592,7 +641,7 @@ export function TournamentManageView({
         />
       )}
 
-      {bracketTabOpen("upcoming-matches") && (
+      {!presentationOpen && bracketTabOpen("upcoming-matches") && (
         <MatchesScheduleTab
           variant="upcoming"
           format={t.format}
@@ -605,7 +654,7 @@ export function TournamentManageView({
         />
       )}
 
-      {bracketTabOpen("completed-matches") && (
+      {!presentationOpen && bracketTabOpen("completed-matches") && (
         <MatchesScheduleTab
           variant="completed"
           format={t.format}
@@ -617,7 +666,7 @@ export function TournamentManageView({
         />
       )}
 
-      {bracketTabOpen("protocol") && (
+      {!presentationOpen && bracketTabOpen("protocol") && (
         <ProtocolTab
           t={t}
           swiss={swiss}
@@ -626,6 +675,105 @@ export function TournamentManageView({
           hasMatches={t.matches.length > 0}
         />
       )}
+
+      <BracketPresentationShell
+        open={presentationOpen}
+        title={t.name}
+        onClose={() => setPresentationOpen(false)}
+        tabs={<div className="admin-tab-bar">{manageTabButtons}</div>}
+        contentClassName={
+          presentationContentIsBracket ? "flex flex-col" : "overflow-auto"
+        }
+      >
+        {showParticipants && tab === "participants" && (
+          <ParticipantsTab
+            t={t}
+            pair={pair}
+            pendingRegistrations={pendingRegistrations}
+            confirmedRegistrations={confirmedRegistrations}
+            otherRegistrations={otherRegistrations}
+            activeTeams={activeTeams}
+            inactiveTeams={inactiveTeams}
+            playerOptions={playerOptions}
+            bracketLocked={bracketLocked}
+            canModifyRegistrations={canModifyRegistrations}
+            onConfirmRegistration={onConfirmRegistration}
+            onRejectRegistration={onRejectRegistration}
+            onCancelRegistration={onCancelRegistration}
+            onConfirmTeam={onConfirmTeam}
+            onUpdated={onUpdated}
+          />
+        )}
+
+        {showBracketSection && tab === "bracket" && (
+          <BracketTab
+            t={t}
+            format={t.format}
+            confirmedCount={confirmedCount}
+            confirmedTeams={confirmedTeams}
+            maxRound={maxRound}
+            currentRoundOpen={currentRoundOpen}
+            bracketLoading={bracketLoading}
+            bracketMatches={bracketMatches}
+            matchNumbers={bracketMatchNumbers}
+            inPresentation
+            onGenerateBracket={onGenerateBracket}
+            onResetAllMatches={onResetAllMatches}
+            onRegenerateBracket={onRegenerateBracket}
+            onDeleteBracket={onDeleteBracket}
+            onSaveMatchResult={onSaveMatchResult}
+            onCancelMatchResult={onCancelMatchResult}
+          />
+        )}
+
+        {showBracketSection && tab === "current-matches" && (
+          <MatchesScheduleTab
+            variant="current"
+            format={t.format}
+            allMatches={bracketMatches}
+            matches={currentMatches}
+            matchNumbers={bracketMatchNumbers}
+            onSaveMatchResult={onSaveMatchResult}
+            onCancelMatchResult={onCancelMatchResult}
+          />
+        )}
+
+        {showBracketSection && tab === "upcoming-matches" && (
+          <MatchesScheduleTab
+            variant="upcoming"
+            format={t.format}
+            handicapHalfStep={t.handicapHalfStep !== false}
+            allMatches={bracketMatches}
+            matches={upcomingMatches}
+            matchNumbers={bracketMatchNumbers}
+            onSaveMatchResult={onSaveMatchResult}
+            onCancelMatchResult={onCancelMatchResult}
+          />
+        )}
+
+        {showBracketSection && tab === "completed-matches" && (
+          <MatchesScheduleTab
+            variant="completed"
+            format={t.format}
+            allMatches={bracketMatches}
+            matches={completedMatches}
+            matchNumbers={bracketMatchNumbers}
+            onSaveMatchResult={onSaveMatchResult}
+            onCancelMatchResult={onCancelMatchResult}
+          />
+        )}
+
+        {showBracketSection && tab === "protocol" && (
+          <ProtocolTab
+            t={t}
+            swiss={swiss}
+            rows={protocolRows}
+            showSwissPoints={showSwissPoints}
+            hasMatches={t.matches.length > 0}
+          />
+        )}
+      </BracketPresentationShell>
+
     </div>
   );
 }
@@ -887,6 +1035,7 @@ function BracketTab({
   bracketLoading,
   bracketMatches,
   matchNumbers,
+  inPresentation = false,
   onGenerateBracket,
   onResetAllMatches,
   onRegenerateBracket,
@@ -903,6 +1052,7 @@ function BracketTab({
   bracketLoading: boolean;
   bracketMatches: BracketMatchView[];
   matchNumbers: Map<string, number>;
+  inPresentation?: boolean;
   onGenerateBracket: () => void | Promise<void>;
   onResetAllMatches?: () => void | Promise<void>;
   onRegenerateBracket?: () => void | Promise<void>;
@@ -1046,6 +1196,117 @@ function BracketTab({
     bracketMatches.length > 0 &&
     isOutdatedFixedSwiss32Bracket(bracketMatches.length);
 
+  function renderBracketView(presentation: boolean) {
+    if (olympic) {
+      return (
+        <OlympicBracketView
+          matches={bracketMatches}
+          matchNumbers={matchNumbers}
+          withBronzeMatch={isOlympicBronzeFormat(format)}
+          handicapHalfStep={t.handicapHalfStep !== false}
+          onMatchClick={setModalMatch}
+          onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
+          showMatchScore
+          presentation={presentation}
+        />
+      );
+    }
+    if (excelRef) {
+      return (
+        <ExcelBracketView
+          liveByMatchNo={excelLiveByNo}
+          onMatchClick={setModalMatch}
+          presentation={presentation}
+        />
+      );
+    }
+    return (
+      <SwissBracketView
+        matches={bracketMatches}
+        showStandings={false}
+        fixedGrid={fixedSwiss}
+        handicapHalfStep={t.handicapHalfStep !== false}
+        onMatchClick={setModalMatch}
+        onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
+        presentation={presentation}
+      />
+    );
+  }
+
+  const bracketModals = (
+    <>
+      <MatchResultModal
+        match={modalMatch}
+        matchNumber={modalMatch ? matchNumbers.get(modalMatch.id) : undefined}
+        open={modalMatch !== null}
+        saving={matchSaving}
+        onClose={() => setModalMatch(null)}
+        onSave={handleSaveMatchResult}
+        onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
+      />
+      <PlayerCardModal
+        playerId={playerModal?.id ?? null}
+        preview={playerModal?.preview}
+        open={playerModal !== null}
+        onClose={() => setPlayerModal(null)}
+      />
+      {!inPresentation && (
+        <>
+          <ConfirmModal
+            open={confirmAction === "reset-all"}
+            title="Отменить все встречи?"
+            description="Результаты всех завершённых встреч будут сброшены. Сетка останется — игроки вернутся к стартовым позициям первого тура. Автопроходы (×) применятся снова автоматически."
+            confirmLabel="Да, отменить все"
+            variant="danger"
+            loading={confirmLoading}
+            error={confirmError}
+            onConfirm={handleBracketConfirm}
+            onClose={closeConfirm}
+          />
+          <ConfirmModal
+            open={confirmAction === "regenerate"}
+            title="Сформировать сетку заново?"
+            description="Текущая сетка будет удалена и создана заново по списку подтверждённых участников. Все результаты и расстановка будут потеряны."
+            confirmLabel="Да, пересоздать"
+            variant="danger"
+            loading={confirmLoading}
+            error={confirmError}
+            onConfirm={handleBracketConfirm}
+            onClose={closeConfirm}
+          />
+          <ConfirmModal
+            open={confirmAction === "delete-bracket"}
+            title="Снести сетку? Турнир останется"
+            description="Будут удалены только встречи. Турнир, участники и регистрации сохранятся — сетку можно собрать с нуля."
+            confirmLabel="Да, снести сетку"
+            variant="danger"
+            loading={confirmLoading}
+            error={confirmError}
+            onConfirm={handleBracketConfirm}
+            onClose={closeConfirm}
+          />
+        </>
+      )}
+    </>
+  );
+
+  if (inPresentation) {
+    return (
+      <div className="flex h-full min-h-0 flex-col">
+        {bracketMatches.length === 0 ? (
+          <p className="tournament-hint px-2 text-sm">
+            {oneShotGrid
+              ? "Сетка ещё не сформирована."
+              : "Сетка ещё не сформирована — сформируйте первый тур в обычном режиме."}
+          </p>
+        ) : (
+          renderBracketView(true)
+        )}
+        {bracketModals}
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {outdatedFixedSwiss16 && (
@@ -1145,79 +1406,8 @@ function BracketTab({
             Зажмите фон сетки и тащите. Имя — карточка игрока, счёт / # / «Фора» — результат
             встречи.
           </p>
-          {olympic ? (
-            <OlympicBracketView
-              matches={bracketMatches}
-              matchNumbers={matchNumbers}
-              withBronzeMatch={isOlympicBronzeFormat(format)}
-              handicapHalfStep={t.handicapHalfStep !== false}
-              onMatchClick={setModalMatch}
-              onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
-              showMatchScore
-            />
-          ) : excelRef ? (
-            <ExcelBracketView
-              liveByMatchNo={excelLiveByNo}
-              onMatchClick={setModalMatch}
-            />
-          ) : (
-            <SwissBracketView
-              matches={bracketMatches}
-              showStandings={false}
-              fixedGrid={fixedSwiss}
-              handicapHalfStep={t.handicapHalfStep !== false}
-              onMatchClick={setModalMatch}
-              onPlayerClick={(id, preview) => setPlayerModal({ id, preview })}
-            />
-          )}
-          <MatchResultModal
-            match={modalMatch}
-            matchNumber={modalMatch ? matchNumbers.get(modalMatch.id) : undefined}
-            open={modalMatch !== null}
-            saving={matchSaving}
-            onClose={() => setModalMatch(null)}
-            onSave={handleSaveMatchResult}
-            onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
-          />
-          <PlayerCardModal
-            playerId={playerModal?.id ?? null}
-            preview={playerModal?.preview}
-            open={playerModal !== null}
-            onClose={() => setPlayerModal(null)}
-          />
-          <ConfirmModal
-            open={confirmAction === "reset-all"}
-            title="Отменить все встречи?"
-            description="Результаты всех завершённых встреч будут сброшены. Сетка останется — игроки вернутся к стартовым позициям первого тура. Автопроходы (×) применятся снова автоматически."
-            confirmLabel="Да, отменить все"
-            variant="danger"
-            loading={confirmLoading}
-            error={confirmError}
-            onConfirm={handleBracketConfirm}
-            onClose={closeConfirm}
-          />
-          <ConfirmModal
-            open={confirmAction === "regenerate"}
-            title="Сформировать сетку заново?"
-            description="Текущая сетка будет удалена и создана заново по списку подтверждённых участников. Все результаты и расстановка будут потеряны."
-            confirmLabel="Да, пересоздать"
-            variant="danger"
-            loading={confirmLoading}
-            error={confirmError}
-            onConfirm={handleBracketConfirm}
-            onClose={closeConfirm}
-          />
-          <ConfirmModal
-            open={confirmAction === "delete-bracket"}
-            title="Снести сетку? Турнир останется"
-            description="Будут удалены только встречи. Турнир, участники и регистрации сохранятся — сетку можно собрать с нуля."
-            confirmLabel="Да, снести сетку"
-            variant="danger"
-            loading={confirmLoading}
-            error={confirmError}
-            onConfirm={handleBracketConfirm}
-            onClose={closeConfirm}
-          />
+          {renderBracketView(false)}
+          {bracketModals}
         </>
       )}
     </div>

@@ -48,6 +48,10 @@ import {
   gridEdgePoints,
   gridEdgeStroke,
 } from "@/lib/swiss-bracket-layout";
+import {
+  bracketCanvasClassName,
+  bracketViewRootClassName,
+} from "@/lib/bracket-canvas-class";
 
 export function SwissBracketView({
   matches,
@@ -58,6 +62,7 @@ export function SwissBracketView({
   onPlayerClick,
   handicapHalfStep = true,
   demoPreview = false,
+  presentation = false,
 }: {
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
@@ -67,6 +72,8 @@ export function SwissBracketView({
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   handicapHalfStep?: boolean;
   demoPreview?: boolean;
+  /** Полноэкранный режим: без подсказок, сетка на всю высоту. */
+  presentation?: boolean;
 }) {
   const layout = fixedGrid
     ? buildFixedSwissBracketLayout(matches)
@@ -251,8 +258,8 @@ export function SwissBracketView({
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      {showStandings && standings.length > 0 && (
+    <div className={bracketViewRootClassName(presentation)}>
+      {showStandings && !presentation && standings.length > 0 && (
         <section>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
             Таблица
@@ -276,49 +283,45 @@ export function SwissBracketView({
         </section>
       )}
 
-      <div className="flex flex-wrap items-center gap-4 text-[11px] text-zinc-500">
-        {onMatchClick && (
-          <>
-            <span>Имя — карточка · счёт, # или «результат» — встреча</span>
-            <span className="text-zinc-600">|</span>
-          </>
-        )}
-        {fixedGrid ? (
-          <>
-            <span>проигравшие ←</span>
-            <span className="text-emerald-600/80">Старт</span>
-            <span>победители →</span>
-            <span className="text-zinc-600">|</span>
-            <span>Номера переходов (#) заданы заранее</span>
-          </>
-        ) : (
-          <>
-            <span>Колонки — туры слева направо</span>
-            <span className="flex items-center gap-2">
-              <span className="inline-block h-px w-8 bg-emerald-400/80" />
-              победитель
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="inline-block h-px w-8 bg-zinc-500/60" />
-              проигравший
-            </span>
-          </>
-        )}
-        <span className="text-zinc-600">|</span>
-        <span>Зажмите фон и тащите сетку</span>
-      </div>
+      {!presentation && (
+        <div className="flex flex-wrap items-center gap-4 text-[11px] text-zinc-500">
+          {onMatchClick && (
+            <>
+              <span>Имя — карточка · счёт, # или «результат» — встреча</span>
+              <span className="text-zinc-600">|</span>
+            </>
+          )}
+          {fixedGrid ? (
+            <>
+              <span>проигравшие ←</span>
+              <span className="text-emerald-600/80">Старт</span>
+              <span>победители →</span>
+              <span className="text-zinc-600">|</span>
+              <span>Номера переходов (#) заданы заранее</span>
+            </>
+          ) : (
+            <>
+              <span>Колонки — туры слева направо</span>
+              <span className="flex items-center gap-2">
+                <span className="inline-block h-px w-8 bg-emerald-400/80" />
+                победитель
+              </span>
+              <span className="flex items-center gap-2">
+                <span className="inline-block h-px w-8 bg-zinc-500/60" />
+                проигравший
+              </span>
+            </>
+          )}
+          <span className="text-zinc-600">|</span>
+          <span>Зажмите фон и тащите сетку</span>
+        </div>
+      )}
 
       <BracketScrollCenter
         centerX={layout.centerX}
         contentHeight={fixedGrid ? layout.totalHeight : undefined}
-        contentScrollY={demoPreview ? "start" : "center"}
-        className={
-          fixedGrid
-            ? demoPreview
-              ? "bracket-canvas max-h-[420px] overflow-x-auto overflow-y-auto pb-6 pt-2"
-              : "bracket-canvas max-h-[min(90vh,1400px)] overflow-x-auto overflow-y-auto pb-6 pt-2"
-            : "bracket-canvas max-h-[75vh] overflow-x-auto overflow-y-auto pb-6 pt-2"
-        }
+        contentScrollY={demoPreview || presentation ? "start" : "center"}
+        className={bracketCanvasClassName({ presentation, fixedGrid, demoPreview })}
       >
         <div
           className="relative min-w-max"
