@@ -177,10 +177,11 @@ function buildFixedSwissTs32Template(withBronze = false): FixedSwissTemplate {
     });
   }
 
-  links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 3, toSlot: 13, toTeam: 1 });
-  links.push({ fromRound: 4, fromSlot: 2, kind: "win", toRound: 3, toSlot: 14, toTeam: 1 });
-  links.push({ fromRound: 4, fromSlot: 3, kind: "win", toRound: 3, toSlot: 15, toTeam: 1 });
-  links.push({ fromRound: 4, fromSlot: 4, kind: "win", toRound: 3, toSlot: 16, toTeam: 1 });
+  // Нижняя тур 3 → тур 4: team2 (team1 занят проигравшим 1/8).
+  links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 3, toSlot: 13, toTeam: 2 });
+  links.push({ fromRound: 4, fromSlot: 2, kind: "win", toRound: 3, toSlot: 14, toTeam: 2 });
+  links.push({ fromRound: 4, fromSlot: 3, kind: "win", toRound: 3, toSlot: 15, toTeam: 2 });
+  links.push({ fromRound: 4, fromSlot: 4, kind: "win", toRound: 3, toSlot: 16, toTeam: 2 });
 
   for (let slot = 1; slot <= 4; slot++) {
     links.push({

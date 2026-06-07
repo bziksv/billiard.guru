@@ -668,12 +668,16 @@ assert.equal(fixedSwissTs32PlacementByMatchNo(57, false), "место 3–4");
   );
   assert.equal(cross1?.toRound, 4, "cross → lower tour 3");
   assert.equal(cross1?.toSlot, 1);
-  assert.equal(
-    links32.find((l) => l.fromRound === 4 && l.fromSlot === 1 && l.kind === "win")
-      ?.toSlot,
-    13,
-    "#48 winner → #52",
+  const win48 = links32.find(
+    (l) => l.fromRound === 4 && l.fromSlot === 1 && l.kind === "win",
   );
+  assert.equal(win48?.toSlot, 13, "#48 winner → #52");
+  assert.equal(win48?.toTeam, 2, "#48 → #52 team2");
+  const win47 = links32.find(
+    (l) => l.fromRound === 4 && l.fromSlot === 2 && l.kind === "win",
+  );
+  assert.equal(win47?.toSlot, 14, "#47 winner → #51");
+  assert.equal(win47?.toTeam, 2, "#47 → #51 team2");
   assert.equal(
     links32.find((l) => l.fromRound === 4 && l.fromSlot === 3 && l.kind === "win")
       ?.toSlot,
@@ -686,6 +690,11 @@ assert.equal(fixedSwissTs32PlacementByMatchNo(57, false), "место 3–4");
     16,
     "#45 winner → #49",
   );
+  const loss42 = links32.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 10 && l.kind === "loss",
+  );
+  assert.equal(loss42?.toSlot, 16, "#42 loser → #49");
+  assert.equal(loss42?.toTeam, 1, "#42 loser → #49 team1");
 }
 
 const layout32 = buildFixedSwissBracketLayout(mkGridTs32());
