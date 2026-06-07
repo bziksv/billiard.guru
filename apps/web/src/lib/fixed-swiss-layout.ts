@@ -2135,6 +2135,12 @@ export function isFixedSwissLowerTour3To4WinEdge(
   if (fromRound !== 4 || toRound !== 3) return false;
   const half1 = half1ForLargeGrid(matchCount);
   const lowerTour4Start = half1 + half1 / 2 + 1;
+  if (isFixedSwissTs32CurrentGrid(matchCount)) {
+    for (let slot = 1; slot <= half1 / 2; slot++) {
+      if (fromSlot === slot && toSlot === lowerTour4Start + slot - 1) return true;
+    }
+    return false;
+  }
   for (let slot = 1; slot <= half1 / 4; slot++) {
     if (fromSlot === slot && toSlot === lowerTour4Start + slot - 1) return true;
   }
@@ -2174,8 +2180,6 @@ export function isFixedSwissLowerToSemiWinEdge(
   if (fromRound !== 4 || toRound !== 6) return false;
   const half1 = half1ForLargeGrid(matchCount);
   if (isFixedSwissTs32CurrentGrid(matchCount)) {
-    if (fromSlot === 3 && toSlot === 2) return true;
-    if (fromSlot === 4 && toSlot === 1) return true;
     return false;
   }
   if (fromSlot === half1 / 2 + 1 && toSlot === 1) return true;

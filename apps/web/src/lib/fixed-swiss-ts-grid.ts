@@ -179,8 +179,8 @@ function buildFixedSwissTs32Template(withBronze = false): FixedSwissTemplate {
 
   links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 3, toSlot: 13, toTeam: 1 });
   links.push({ fromRound: 4, fromSlot: 2, kind: "win", toRound: 3, toSlot: 14, toTeam: 1 });
-  links.push({ fromRound: 4, fromSlot: 3, kind: "win", toRound: 6, toSlot: 2, toTeam: 2 });
-  links.push({ fromRound: 4, fromSlot: 4, kind: "win", toRound: 6, toSlot: 1, toTeam: 2 });
+  links.push({ fromRound: 4, fromSlot: 3, kind: "win", toRound: 3, toSlot: 15, toTeam: 1 });
+  links.push({ fromRound: 4, fromSlot: 4, kind: "win", toRound: 3, toSlot: 16, toTeam: 1 });
 
   for (let slot = 1; slot <= 4; slot++) {
     links.push({

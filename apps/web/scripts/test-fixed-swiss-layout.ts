@@ -674,6 +674,18 @@ assert.equal(fixedSwissTs32PlacementByMatchNo(57, false), "место 3–4");
     13,
     "#48 winner → #52",
   );
+  assert.equal(
+    links32.find((l) => l.fromRound === 4 && l.fromSlot === 3 && l.kind === "win")
+      ?.toSlot,
+    15,
+    "#46 winner → #50",
+  );
+  assert.equal(
+    links32.find((l) => l.fromRound === 4 && l.fromSlot === 4 && l.kind === "win")
+      ?.toSlot,
+    16,
+    "#45 winner → #49",
+  );
 }
 
 const layout32 = buildFixedSwissBracketLayout(mkGridTs32());
@@ -780,6 +792,16 @@ assert.equal(
   "#47 → #51 short adjacent",
 );
 assert.equal(
+  shouldDrawFixedSwissWinEdge(-3, -4, 4, 3, "win", 3, 15, 59),
+  true,
+  "#46 → #50 short adjacent",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-3, -4, 4, 3, "win", 4, 16, 59),
+  true,
+  "#45 → #49 short adjacent",
+);
+assert.equal(
   shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 9, 1, 59),
   true,
   "#41 → #53 short adjacent",
@@ -820,11 +842,6 @@ assert.equal(
   "#52 → #54: only footer",
 );
 assert.equal(isFixedSwissForkEdge(3, 5, 59), false, "no 1/8→1/4 fork bus on 32");
-assert.equal(
-  shouldDrawFixedSwissWinEdge(-3, -4, 4, 3, "win", 3, 15, 59),
-  false,
-  "no #46 → tour4 SVG",
-);
 assert.equal(
   layout32.positions.get("r4s3")!.y,
   (layout32.positions.get("r3s5")!.y + layout32.positions.get("r3s6")!.y) / 2,
