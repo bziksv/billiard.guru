@@ -21,8 +21,11 @@ import {
 } from "@/lib/swiss-bracket-layout";
 import {
   FIXED_SWISS_CARD_H,
+  FIXED_SWISS_CARD_W,
   FIXED_SWISS_COMPACT_ROW_H,
+  fixedSwissDestSplit,
   fixedSwissMatchCardHeight,
+  fixedSwissMatchColForCount,
   fixedSwissPlacementLabel,
 } from "@/lib/fixed-swiss-layout";
 import {
@@ -402,6 +405,9 @@ export function LlbBracketMatch({
         ? bracketMaxRound || 5
         : Math.log2(gridSize) + 1;
   const isFixedSwissGrid = isFixedSwiss168MatchCount(matchCount);
+  const bracketCol = isFixedSwissGrid
+    ? fixedSwissMatchColForCount(match.round, match.slot, matchCount, maxRound)
+    : 0;
   const placement = fixedSwissPlacementLabel(
     match.round,
     match.slot,
@@ -433,17 +439,22 @@ export function LlbBracketMatch({
     if (placement) {
       footerRows.push({ kind: "text", text: placement });
     }
-    footerRows.push({ kind: "split", left: winnerLine, right: loserLine });
+    const dest = fixedSwissDestSplit(bracketCol, loserLine, winnerLine);
+    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
   } else if (placement && winnerLine) {
-    footerRows.push({ kind: "text", text: `${placement} · ${winnerLine}` });
+    const dest = fixedSwissDestSplit(bracketCol, placement, winnerLine);
+    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
   } else if (placement && loserLine) {
-    footerRows.push({ kind: "text", text: `${placement} · ${loserLine}` });
+    const dest = fixedSwissDestSplit(bracketCol, loserLine, placement);
+    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
   } else if (placement) {
     footerRows.push({ kind: "text", text: placement });
   } else if (winnerLine) {
-    footerRows.push({ kind: "text", text: winnerLine });
+    const dest = fixedSwissDestSplit(bracketCol, null, winnerLine);
+    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
   } else if (loserLine) {
-    footerRows.push({ kind: "text", text: loserLine });
+    const dest = fixedSwissDestSplit(bracketCol, loserLine, null);
+    footerRows.push({ kind: "split", left: dest.left, right: dest.right });
   }
   if (match.status === "WALKOVER") {
     footerRows.push({ kind: "text", text: "тех. поражение" });
@@ -499,7 +510,7 @@ export function LlbBracketMatch({
         openResult && "bracket-match-card--interactive",
       )}
       style={{
-        width: GRID_CARD_W,
+        width: isFixedSwissGrid ? FIXED_SWISS_CARD_W : GRID_CARD_W,
         height: cardHeight,
         maxHeight: cardHeight,
       }}
@@ -657,7 +668,7 @@ export function LlbBracketMatch({
       {footerRows.length > 0 ? (
         <MatchArea
           onMatchClick={openResult}
-          className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] text-[9px] text-[var(--bracket-meta-text)]"
+          className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] text-[8.5px] leading-[18px] text-[var(--bracket-meta-text)]"
           style={{ height: footerHeight, maxHeight: footerHeight }}
         >
           {footerRows.map((row) =>
@@ -668,13 +679,13 @@ export function LlbBracketMatch({
                 style={{ height: footerRowH, maxHeight: footerRowH }}
               >
                 <span
-                  className="truncate px-2 text-left"
+                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-left"
                   title={row.left}
                 >
                   {row.left}
                 </span>
                 <span
-                  className="truncate border-l border-[var(--bracket-row-border)] px-2 text-left"
+                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-l border-[var(--bracket-row-border)] px-1 text-left"
                   title={row.right}
                 >
                   {row.right}

@@ -28,8 +28,9 @@ import {
   tsMaxRound,
   tsPostR3SlotCount,
 } from "@/lib/fixed-swiss-ts-grid";
+import { describeHandicapShort } from "@/lib/handicap";
+import { teamRating } from "@/lib/pair-tournament";
 import {
-  GRID_CARD_W,
   GRID_LABEL_OFFSET,
   GRID_META_H,
   GRID_PAD,
@@ -45,17 +46,12 @@ import {
 /** Эталон layout/UI 16→8 — docs/BRACKET_REFERENCE_16_8.md */
 export const BRACKET_REFERENCE_VARIANT = "fixed-swiss-16-8-27" as const;
 
-export const FIXED_SWISS_COL_W = 248;
-export const FIXED_SWISS_CARD_W = GRID_CARD_W;
+export const FIXED_SWISS_COL_W = 228;
+export const FIXED_SWISS_CARD_W = 208;
 /** Зазор между gutter и левым краем карточки — линия не «наезжает» на блок. */
 const FIXED_SWISS_LINE_ENTRY_GAP = 12;
 /** Высота строки «Фора» / подвала на карточке (px). */
 export const FIXED_SWISS_COMPACT_ROW_H = 18;
-/** Макс. высота для раскладки: мета + 2 строки + фора + 2 строки подвала. */
-export const FIXED_SWISS_CARD_H =
-  GRID_META_H +
-  GRID_ROW_H * 2 +
-  FIXED_SWISS_COMPACT_ROW_H * 3;
 
 /** Высота карточки по фактическому содержимому (для отрисовки). */
 export function fixedSwissMatchCardHeight(
@@ -69,13 +65,83 @@ export function fixedSwissMatchCardHeight(
     footerRowCount * FIXED_SWISS_COMPACT_ROW_H
   );
 }
-/** Вертикальный шаг между встречами 1-го тура (≈ высота карточки + 14px). */
-export const FIXED_SWISS_BRACKET_UNIT = 148;
+
+/** Базовая высота в формулах раскладки: мета + 2 строки + 1 строка подвала. */
+export const FIXED_SWISS_CARD_H =
+  GRID_META_H + GRID_ROW_H * 2 + FIXED_SWISS_COMPACT_ROW_H;
+
+/** Вертикальный шаг (fallback, если нет покомпонентной раскладки 1-го тура). */
+export const FIXED_SWISS_BRACKET_UNIT = FIXED_SWISS_CARD_H + 8;
 /** Верхний отступ карточки 1-го тура в ячейке сетки (px). */
-const FIXED_SWISS_ROUND1_Y_INSET = 6;
+const FIXED_SWISS_ROUND1_Y_INSET = 4;
+const FIXED_SWISS_ROUND1_GAP = 4;
+
+let layoutCardHeights: Map<string, number> | undefined;
+let layoutRound1SlotY: Map<number, number> | undefined;
 
 function fixedSwissRound1SlotY(slot: number, unit = FIXED_SWISS_BRACKET_UNIT): number {
+  if (layoutRound1SlotY?.has(slot)) return layoutRound1SlotY.get(slot)!;
   return (slot - 1) * unit + FIXED_SWISS_ROUND1_Y_INSET;
+}
+
+function layoutMatchCardHeight(matchId: string, fallback = FIXED_SWISS_CARD_H): number {
+  return layoutCardHeights?.get(matchId) ?? fallback;
+}
+
+function matchHasHandicap(match: BracketMatchView): boolean {
+  if (!match.team1 || !match.team2) return false;
+  const short = describeHandicapShort(
+    Math.max(teamRating(match.team1), teamRating(match.team2)),
+    Math.min(teamRating(match.team1), teamRating(match.team2)),
+    { halfStep: true },
+  );
+  return Boolean(short);
+}
+
+function estimateFixedSwissFooterRowCount(
+  match: BracketMatchView,
+  edges: SwissBracketEdge[],
+): number {
+  const hasWin = edges.some(
+    (e) => e.fromId === match.id && (e.kind === "win" || e.kind === "bye"),
+  );
+  const hasLoss = edges.some((e) => e.fromId === match.id && e.kind === "loss");
+  let rows = 0;
+  if (hasWin && hasLoss) rows = 1;
+  else if (hasWin || hasLoss) rows = 1;
+  if (match.status === "WALKOVER") rows += 1;
+  return rows;
+}
+
+/** Оценка высоты карточки для раскладки (с фактической форой и подвалом). */
+export function estimateFixedSwissCardHeight(
+  match: BracketMatchView,
+  edges: SwissBracketEdge[],
+): number {
+  return fixedSwissMatchCardHeight(
+    matchHasHandicap(match),
+    estimateFixedSwissFooterRowCount(match, edges),
+  );
+}
+
+function buildFixedSwissRound1SlotY(
+  matches: BracketMatchView[],
+  cardHeights: Map<string, number>,
+  maxSlot: number,
+): Map<number, number> {
+  const bySlot = new Map<number, BracketMatchView>();
+  for (const m of matches) {
+    if (m.round === 1) bySlot.set(m.slot, m);
+  }
+  const map = new Map<number, number>();
+  let y = FIXED_SWISS_ROUND1_Y_INSET;
+  for (let slot = 1; slot <= maxSlot; slot++) {
+    map.set(slot, y);
+    const m = bySlot.get(slot);
+    const h = m ? (cardHeights.get(m.id) ?? FIXED_SWISS_CARD_H) : FIXED_SWISS_CARD_H;
+    y += h + FIXED_SWISS_ROUND1_GAP;
+  }
+  return map;
 }
 
 /** Зазор между финалом (#27) и матчем за 3–4 (#28) в колонке «Финал». */
@@ -176,6 +242,20 @@ export function fixedSwissTsLegacy29MatchCol(round: number, slot: number): numbe
   if (round === 4) return -4;
   if (round === 5) return 3;
   return 4;
+}
+
+/** Подвал карточки: верхняя ветка и 1-й тур — слева проигравший, справа победитель; нижняя — наоборот. */
+export function fixedSwissDestSplit(
+  bracketCol: number,
+  loserLine: string | null,
+  winnerLine: string | null,
+): { left: string; right: string } {
+  const loser = loserLine ?? "—";
+  const winner = winnerLine ?? "—";
+  if (bracketCol < 0) {
+    return { left: winner, right: loser };
+  }
+  return { left: loser, right: winner };
 }
 
 export function fixedSwissMatchColForCount(
@@ -403,7 +483,7 @@ function resolveFixedColCollisions(
     }
     const m = id.match(/^r(\d+)s(\d+)$/);
     if (m) slotY.set(`${m[1]}:${m[2]}`, y);
-    lastBottom = y + cardH;
+    lastBottom = y + layoutMatchCardHeight(id, cardH);
   }
 }
 
@@ -425,7 +505,7 @@ function resolveFixedColCollisionsInOrder(
     }
     const m = id.match(/^r(\d+)s(\d+)$/);
     if (m) slotY.set(`${m[1]}:${m[2]}`, y);
-    lastBottom = y + cardH;
+    lastBottom = y + layoutMatchCardHeight(id, cardH);
   }
 }
 
@@ -1452,8 +1532,16 @@ export function buildFixedSwissBracketLayout(
     maxRoundEarly,
   );
   const cardH = FIXED_SWISS_CARD_H;
+  const cardHeights = new Map<string, number>();
+  for (const m of matches) {
+    cardHeights.set(m.id, estimateFixedSwissCardHeight(m, edges));
+  }
+  layoutCardHeights = cardHeights;
+  layoutRound1SlotY = buildFixedSwissRound1SlotY(matches, cardHeights, gridSize);
 
   if (rounds.length === 0) {
+    layoutCardHeights = undefined;
+    layoutRound1SlotY = undefined;
     return {
       rounds,
       positions: new Map(),
@@ -1468,6 +1556,7 @@ export function buildFixedSwissBracketLayout(
         GRID_PAD +
         (FIXED_SWISS_COL_W - FIXED_SWISS_CARD_W) / 2 +
         FIXED_SWISS_CARD_W / 2,
+      cardHeights,
     };
   }
 
@@ -1481,11 +1570,14 @@ export function buildFixedSwissBracketLayout(
   let minCol = 0;
   let maxCol = 0;
   let maxY = 0;
-  for (const [, pos] of positions) {
+  for (const [id, pos] of positions) {
     minCol = Math.min(minCol, pos.col);
     maxCol = Math.max(maxCol, pos.col);
-    maxY = Math.max(maxY, pos.y + cardH);
+    maxY = Math.max(maxY, pos.y + layoutMatchCardHeight(id, cardH));
   }
+
+  layoutCardHeights = undefined;
+  layoutRound1SlotY = undefined;
 
   const totalWidth =
     (maxCol - minCol + 1) * FIXED_SWISS_COL_W + GRID_PAD * 2;
@@ -1511,6 +1603,7 @@ export function buildFixedSwissBracketLayout(
     colWidth: FIXED_SWISS_COL_W,
     cardWidth: FIXED_SWISS_CARD_W,
     cardHeight: cardH,
+    cardHeights,
   };
 }
 

@@ -8,7 +8,11 @@ import {
 } from "@/lib/bracket-formats/settings-server";
 import { isPairFormat } from "@/lib/pair-tournament";
 import { prisma } from "@/lib/prisma";
-import { tournamentAdminInclude } from "@/lib/tournament-admin";
+import {
+  isTournamentBracketComplete,
+  tournamentAdminInclude,
+  type AdminTournament,
+} from "@/lib/tournament-admin";
 import {
   requireTournamentManageAccess,
   tournamentManageActorType,
@@ -90,6 +94,28 @@ export async function PATCH(
       if (count < 2) {
         return NextResponse.json(
           { error: "Нужно минимум 2 подтверждённых участника" },
+          { status: 400 },
+        );
+      }
+    }
+
+    if (data.status === "FINISHED") {
+      const current = await prisma.tournament.findUnique({
+        where: { id },
+        include: tournamentAdminInclude,
+      });
+      if (!current) {
+        return NextResponse.json({ error: "Турнир не найден" }, { status: 404 });
+      }
+      if (current.status !== "ACTIVE") {
+        return NextResponse.json(
+          { error: "Завершить можно только идущий турнир" },
+          { status: 400 },
+        );
+      }
+      if (!isTournamentBracketComplete(current as AdminTournament)) {
+        return NextResponse.json(
+          { error: "Сначала разыграйте все встречи сетки" },
           { status: 400 },
         );
       }

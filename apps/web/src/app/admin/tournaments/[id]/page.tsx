@@ -16,6 +16,7 @@ import {
   validateCanAddParticipants,
 } from "@/lib/tournament-participant-limit";
 import {
+  canFinishTournament,
   canStartTournament,
   countConfirmedParticipants,
   type AdminTournament,
@@ -61,7 +62,6 @@ export default function AdminTournamentManagePage() {
   const [regError, setRegError] = useState<string | null>(null);
   const [regMessage, setRegMessage] = useState<string | null>(null);
   const [regLoading, setRegLoading] = useState(false);
-  const [deleting, setDeleting] = useState(false);
 
   const reload = useCallback(async () => {
     const res = await fetch(`/api/tournaments/${id}`);
@@ -241,18 +241,13 @@ export default function AdminTournamentManagePage() {
     ) {
       return;
     }
-    setDeleting(true);
-    try {
-      const res = await fetch(`/api/tournaments/${tournament.id}`, { method: "DELETE" });
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.error ?? "Не удалось удалить");
-        return;
-      }
-      router.push("/admin/tournaments");
-    } finally {
-      setDeleting(false);
+    const res = await fetch(`/api/tournaments/${tournament.id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const data = await res.json();
+      alert(data.error ?? "Не удалось удалить");
+      return;
     }
+    router.push("/admin/tournaments");
   }
 
   async function registerParticipant() {
@@ -460,7 +455,14 @@ export default function AdminTournamentManagePage() {
   }
 
   const canStart = canStartTournament(tournament);
+  const canFinish = canFinishTournament(tournament);
   const confirmed = countConfirmedParticipants(tournament);
+  const finishHint =
+    tournament.status === "ACTIVE" && !canFinish
+      ? tournament.matches.length === 0
+        ? "Сначала сформируйте сетку"
+        : `Разыграно ${tournament.matches.filter((m) => m.status === "FINISHED" || m.status === "WALKOVER" || m.winnerTeam).length} из ${tournament.matches.length} встреч`
+      : undefined;
 
   return (
     <div className="space-y-8">
@@ -504,9 +506,10 @@ export default function AdminTournamentManagePage() {
             {tournament.status === "ACTIVE" && (
               <button
                 type="button"
-                disabled={finishing}
+                disabled={finishing || !canFinish}
+                title={finishHint}
                 onClick={finishTournament}
-                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:border-zinc-500 disabled:opacity-50"
+                className="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:border-zinc-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {finishing ? "…" : "Завершить"}
               </button>
@@ -517,17 +520,6 @@ export default function AdminTournamentManagePage() {
             >
               На сайте
             </Link>
-            <button
-              type="button"
-              disabled={deleting}
-              onClick={deleteTournament}
-              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {deleting && (
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              )}
-              {deleting ? "Удаление…" : "Удалить"}
-            </button>
           </div>
         </div>
       </div>

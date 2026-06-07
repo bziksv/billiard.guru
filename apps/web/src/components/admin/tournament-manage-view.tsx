@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState, useEffect, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { PlayerContactLinks } from "@/components/admin/player-contact-links";
+import { TournamentParticipantInfo } from "@/components/admin/tournament-participant-info";
 import {
   MatchResultModal,
   type MatchResultPayload,
@@ -187,6 +188,15 @@ function RegistrationActionButton({
 
 export type TournamentManageViewMode = "full" | "tournament" | "bracket";
 
+function defaultManageTab(
+  tournament: AdminTournament,
+  viewMode: TournamentManageViewMode,
+): ManageTab {
+  if (viewMode === "bracket") return "bracket";
+  if (viewMode === "tournament") return "participants";
+  return tournament.matches.length > 0 ? "bracket" : "participants";
+}
+
 export function TournamentManageView({
   tournament: t,
   clubOptions,
@@ -240,9 +250,10 @@ export function TournamentManageView({
 }) {
   const effectiveViewMode: TournamentManageViewMode =
     initialTab === "bracket" ? "bracket" : viewMode;
-  const [tab, setTab] = useState<ManageTab>(
-    effectiveViewMode === "bracket" ? "bracket" : "participants",
+  const [tab, setTab] = useState<ManageTab>(() =>
+    defaultManageTab(t, effectiveViewMode),
   );
+  const prevMatchCountRef = useRef(t.matches.length);
   const [presentationOpenInternal, setPresentationOpenInternal] = useState(false);
   const presentationOpen = presentationOpenProp ?? presentationOpenInternal;
   const setPresentationOpen = (open: boolean) => {
@@ -253,6 +264,21 @@ export function TournamentManageView({
   };
   const showParticipants = effectiveViewMode !== "bracket";
   const showBracketSection = effectiveViewMode !== "tournament";
+
+  useEffect(() => {
+    const hadMatches = prevMatchCountRef.current > 0;
+    const hasMatches = t.matches.length > 0;
+    prevMatchCountRef.current = t.matches.length;
+    if (
+      !hadMatches &&
+      hasMatches &&
+      showBracketSection &&
+      tab === "participants"
+    ) {
+      setTab("bracket");
+    }
+  }, [t.matches.length, showBracketSection, tab]);
+
   const showTabBar =
     showBracketSection &&
     (effectiveViewMode === "bracket" || (embedded && effectiveViewMode === "full"));
@@ -355,7 +381,11 @@ export function TournamentManageView({
   const inactiveTeams = t.teams.filter(
     (team) => team.status === "CANCELLED" || team.status === "REJECTED",
   );
-  const canModifyRegistrations = canCancelRegistration(t.status, "organizer");
+  const canModifyRegistrations = canCancelRegistration(
+    t.status,
+    "organizer",
+    bracketLocked,
+  );
   const participantCount = pair
     ? activeTeams.length
     : t.registrations.filter((r) => r.status !== "CANCELLED").length;
@@ -437,21 +467,6 @@ export function TournamentManageView({
             >
               {editing ? "Закрыть настройки" : "Настройки турнира"}
             </button>
-            <button
-              type="button"
-              disabled={deleting}
-              onClick={async () => {
-                setDeleting(true);
-                try {
-                  await onDelete();
-                } finally {
-                  setDeleting(false);
-                }
-              }}
-              className="text-xs text-red-400 hover:underline disabled:opacity-50"
-            >
-              {deleting ? "Удаление…" : "Удалить"}
-            </button>
           </div>
         </div>
       )}
@@ -463,11 +478,15 @@ export function TournamentManageView({
               {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
             </h2>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            {showTabBar && !editing && (
-              <div className="admin-tab-bar">{manageTabButtons}</div>
+          <div className="flex items-center gap-2">
+            {showTabBar && !editing ? (
+              <div className="min-w-0 flex-1 overflow-x-auto">
+                <div className="admin-tab-bar w-max">{manageTabButtons}</div>
+              </div>
+            ) : (
+              <div className="min-w-0 flex-1" />
             )}
-            <div className="ml-auto flex shrink-0 items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <button
                 type="button"
                 onClick={() => setEditing((v) => !v)}
@@ -604,6 +623,27 @@ export function TournamentManageView({
           >
             {editSaving ? "Сохранение…" : "Сохранить"}
           </button>
+          <div className="border-t border-zinc-700 pt-4">
+            <p className="text-sm font-medium text-zinc-200">Удаление турнира</p>
+            <p className="mt-1 text-xs text-zinc-500">
+              Регистрации, команды и все встречи будут удалены без восстановления.
+            </p>
+            <button
+              type="button"
+              disabled={deleting}
+              onClick={async () => {
+                setDeleting(true);
+                try {
+                  await onDelete();
+                } finally {
+                  setDeleting(false);
+                }
+              }}
+              className="admin-btn admin-btn--danger mt-3 px-4 py-2 text-sm disabled:opacity-50"
+            >
+              {deleting ? "Удаление…" : "Удалить турнир"}
+            </button>
+          </div>
         </div>
       )}
 
@@ -618,8 +658,10 @@ export function TournamentManageView({
               {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
             </h2>
           )}
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="admin-tab-bar">{manageTabButtons}</div>
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1 overflow-x-auto">
+              <div className="admin-tab-bar w-max">{manageTabButtons}</div>
+            </div>
             {showTabBarFullscreenButton && (
               <button
                 type="button"
@@ -846,8 +888,8 @@ function ParticipantsTab({
       {pair && activeTeams.length > 0 && (
         <ul className="space-y-2">
           {bracketLocked && (
-            <p className="text-xs text-amber-400/90">
-              Сетка сформирована — состав пар изменить нельзя, только результат матчей.
+            <p className="tournament-bracket-locked-hint">
+              Сетка сформирована — состав пар зафиксирован, изменить или убрать нельзя.
             </p>
           )}
           {activeTeams.map((team) => (
@@ -874,19 +916,14 @@ function ParticipantsTab({
                 key={r.id}
                 className="tournament-participant-card tournament-participant-card--pending"
               >
-                <div className="min-w-0 flex-1">
-                  <div className="tournament-participant-name">
-                    {r.player.lastName} {r.player.firstName}
-                    <span className="tournament-participant-meta ml-1 font-normal">
-                      · рейтинг {r.player.rating}
-                      {r.source === "SELF" ? " · самостоятельная заявка" : ""}
-                    </span>
-                  </div>
-                  <PlayerContactLinks
-                    phone={r.player.phone}
-                    telegramUsername={r.player.telegramUsername}
-                  />
-                </div>
+                <TournamentParticipantInfo
+                  lastName={r.player.lastName}
+                  firstName={r.player.firstName}
+                  rating={r.player.rating}
+                  phone={r.player.phone}
+                  telegramUsername={r.player.telegramUsername}
+                  note={r.source === "SELF" ? "самостоятельная заявка" : null}
+                />
                 <div className="flex shrink-0 flex-wrap gap-2">
                   <RegistrationActionButton
                     variant="primary"
@@ -911,24 +948,24 @@ function ParticipantsTab({
 
       {!pair && confirmedRegistrations.length > 0 && (
         <div>
+          {bracketLocked && (
+            <p className="tournament-bracket-locked-hint mb-2">
+              Сетка сформирована — состав участников зафиксирован, снять или добавить нельзя.
+            </p>
+          )}
           <p className="tournament-section-label">
             Подтверждённые участники ({confirmedRegistrations.length})
           </p>
           <ul className="space-y-2">
             {confirmedRegistrations.map((r) => (
               <li key={r.id} className="tournament-participant-card">
-                <div className="min-w-0 flex-1">
-                  <div className="tournament-participant-name">
-                    {r.player.lastName} {r.player.firstName}
-                    <span className="tournament-participant-meta ml-1 font-normal">
-                      · рейтинг {r.player.rating}
-                    </span>
-                  </div>
-                  <PlayerContactLinks
-                    phone={r.player.phone}
-                    telegramUsername={r.player.telegramUsername}
-                  />
-                </div>
+                <TournamentParticipantInfo
+                  lastName={r.player.lastName}
+                  firstName={r.player.firstName}
+                  rating={r.player.rating}
+                  phone={r.player.phone}
+                  telegramUsername={r.player.telegramUsername}
+                />
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
                   <StatusBadge
                     status={r.status}
@@ -958,18 +995,13 @@ function ParticipantsTab({
           <ul className="space-y-2">
             {otherRegistrations.map((r) => (
               <li key={r.id} className="tournament-participant-card opacity-80">
-                <div className="min-w-0 flex-1">
-                  <div className="tournament-participant-name">
-                    {r.player.lastName} {r.player.firstName}
-                    <span className="tournament-participant-meta ml-1 font-normal">
-                      · рейтинг {r.player.rating}
-                    </span>
-                  </div>
-                  <PlayerContactLinks
-                    phone={r.player.phone}
-                    telegramUsername={r.player.telegramUsername}
-                  />
-                </div>
+                <TournamentParticipantInfo
+                  lastName={r.player.lastName}
+                  firstName={r.player.firstName}
+                  rating={r.player.rating}
+                  phone={r.player.phone}
+                  telegramUsername={r.player.telegramUsername}
+                />
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
                   <StatusBadge
                     status={r.status}
@@ -1700,7 +1732,7 @@ function ProtocolTab({
             : ""}
         </p>
         {preliminary && !finished && (
-          <p className="mt-1 text-xs text-amber-400/90">
+          <p className="tournament-bracket-locked-hint mt-1">
             Места предварительные — обновятся после завершения{" "}
             {swiss ? "туров" : hasMatches ? "матчей" : "турнира"}.
           </p>

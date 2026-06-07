@@ -11,11 +11,13 @@ export function RegistrationCancelButton({
   registrationId,
   tournamentStatus,
   registrationStatus,
+  bracketFormed = false,
   className,
 }: {
   registrationId: string;
   tournamentStatus: string;
   registrationStatus: string;
+  bracketFormed?: boolean;
   className?: string;
 }) {
   const router = useRouter();
@@ -24,7 +26,7 @@ export function RegistrationCancelButton({
 
   if (
     !["PENDING", "CONFIRMED"].includes(registrationStatus) ||
-    !canCancelRegistration(tournamentStatus, "player")
+    !canCancelRegistration(tournamentStatus, "player", bracketFormed)
   ) {
     return null;
   }

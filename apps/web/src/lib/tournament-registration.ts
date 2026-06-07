@@ -2,8 +2,10 @@
 export function canCancelRegistration(
   tournamentStatus: string,
   role: "player" | "organizer",
+  bracketFormed = false,
 ): boolean {
   if (tournamentStatus === "FINISHED") return false;
+  if (bracketFormed) return false;
   if (role === "organizer") {
     return tournamentStatus === "OPEN" || tournamentStatus === "ACTIVE";
   }

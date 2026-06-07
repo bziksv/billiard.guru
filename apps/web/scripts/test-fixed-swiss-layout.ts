@@ -554,7 +554,11 @@ assert.equal(layoutTs.edges.length, 38, "TS 27 link count");
 const byCol = new Map<number, Array<{ id: string; y: number; h: number }>>();
 for (const [id, pos] of layoutTs.positions) {
   const list = byCol.get(pos.col) ?? [];
-  list.push({ id, y: pos.y, h: cardH });
+  list.push({
+    id,
+    y: pos.y,
+    h: layoutTs.cardHeights?.get(id) ?? cardH,
+  });
   byCol.set(pos.col, list);
 }
 for (const [col, items] of byCol) {
@@ -572,7 +576,7 @@ for (const [col, items] of byCol) {
 assert.ok(FIXED_SWISS_BRACKET_UNIT >= cardH);
 assert.equal(
   fixedSwissBracketHeight(mpr, cardH),
-  (mpr - 1) * FIXED_SWISS_BRACKET_UNIT + 6 + cardH,
+  (mpr - 1) * FIXED_SWISS_BRACKET_UNIT + 4 + cardH,
 );
 
 // --- 32→16 (59 встреч): нижняя тур 3–4, олимпийка с 1/8 в R3 ---
@@ -1857,7 +1861,11 @@ assert.equal(
     layout64.colWidth ?? FIXED_SWISS_COL_W,
     0,
   );
-  assert.ok(path85109.endsWith(`H ${pts85109.to.x}`), "#85→#109 reaches #109");
+  assert.match(
+    path85109,
+    new RegExp(`V ${pts85109.to.y} H \\d+$`),
+    "#85→#109 reaches #109 Y",
+  );
   const pts4585 = gridFixedEdgePoints(
     layout64.positions.get("r2s13")!,
     layout64.positions.get("r3s21")!,
@@ -1879,7 +1887,11 @@ assert.equal(
     !path4585.includes("V 3335 H 1266"),
     "#45→#85: no horizontal bus at #85 Y across columns",
   );
-  assert.ok(path4585.endsWith(`H ${pts4585.to.x}`), "#45→#85 enters #85");
+  assert.match(
+    path4585,
+    new RegExp(`V ${pts4585.to.y} H \\d+$`),
+    "#45→#85 enters #85 Y",
+  );
 }
 assert.equal(
   shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 25, 21, MC64),

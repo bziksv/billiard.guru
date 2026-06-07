@@ -169,7 +169,18 @@ export async function PATCH(request: NextRequest) {
       player.role === "SUPERADMIN" ||
       (await playerCanManageClub(existing.tournament.club, player));
 
+    const bracketFormed =
+      (await prisma.tournamentMatch.count({
+        where: { tournamentId: existing.tournamentId },
+      })) > 0;
+
     if (status === "CANCELLED") {
+      if (bracketFormed) {
+        return NextResponse.json(
+          { error: "Нельзя снять участника после формирования сетки" },
+          { status: 400 },
+        );
+      }
       if (isOwner) {
         if (!canCancelRegistration(existing.tournament.status, "player")) {
           return NextResponse.json(

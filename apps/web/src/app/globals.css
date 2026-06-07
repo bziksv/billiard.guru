@@ -4007,6 +4007,7 @@ html.light .admin-app {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    gap: 1rem;
   }
 }
 
@@ -4015,8 +4016,94 @@ html.light .admin-app {
   background-color: var(--tournament-pending-bg);
 }
 
+.tournament-participant-info {
+  min-width: 0;
+  flex: 1;
+}
+
 .tournament-participant-name {
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--admin-text);
+}
+
+.tournament-participant-note {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--admin-text-muted);
+}
+
+.tournament-participant-details {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem 1rem;
+}
+
+.tournament-participant-contacts {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem 1rem;
+}
+
+.tournament-participant-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  color: var(--admin-text-secondary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.tournament-participant-contact--phone:hover {
+  color: var(--admin-nav-active-icon);
+}
+
+.tournament-participant-contact--telegram:hover {
+  color: #0ea5e9;
+}
+
+html.light .tournament-participant-contact--telegram:hover {
+  color: #0284c7;
+}
+
+.tournament-participant-contact--empty {
+  opacity: 0.65;
+}
+
+.tournament-participant-contact-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+  flex: none;
+  opacity: 0.75;
+}
+
+.tournament-participant-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid var(--admin-border);
+  background-color: var(--admin-inset-bg);
+  padding: 0.1875rem 0.625rem;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.tournament-participant-rating-label {
+  color: var(--admin-text-muted);
+}
+
+.tournament-participant-rating-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
   color: var(--admin-text);
 }
 
@@ -4037,6 +4124,12 @@ html.light .admin-app {
   font-size: 0.75rem;
   line-height: 1.45;
   color: var(--admin-text-muted);
+}
+
+.tournament-bracket-locked-hint {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--admin-notify-test-banner-text);
 }
 
 .tournament-info-panel {

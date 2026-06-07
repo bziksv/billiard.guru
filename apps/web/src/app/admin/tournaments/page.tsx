@@ -652,7 +652,14 @@ function FinishedTournamentRow({
 
   return (
     <tr className="border-b border-zinc-800/80 last:border-0 hover:bg-zinc-950/50">
-      <td className="px-4 py-3 font-medium">{t.name}</td>
+      <td className="px-4 py-3 font-medium">
+        <Link
+          href={`/admin/tournaments/${t.id}`}
+          className="hover:text-emerald-400 hover:underline"
+        >
+          {t.name}
+        </Link>
+      </td>
       <td className="px-4 py-3 text-zinc-300">{t.club.name}</td>
       <td className="px-4 py-3 text-zinc-400">
         {t.club.city?.nameRu ?? "—"}

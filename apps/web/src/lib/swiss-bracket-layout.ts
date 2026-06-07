@@ -37,6 +37,8 @@ export type SwissBracketLayout = {
   colWidth?: number;
   cardWidth?: number;
   cardHeight?: number;
+  /** Фикс. швейцарка: оценка высоты каждой карточки для раскладки. */
+  cardHeights?: Map<string, number>;
 };
 
 export const GRID_COL_W = 280;

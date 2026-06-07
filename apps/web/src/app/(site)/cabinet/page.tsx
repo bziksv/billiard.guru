@@ -32,7 +32,12 @@ export default async function CabinetPage() {
       status: { notIn: ["CANCELLED", "REJECTED"] },
     },
     include: {
-      tournament: { include: { club: true } },
+      tournament: {
+        include: {
+          club: true,
+          _count: { select: { matches: true } },
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -187,6 +192,7 @@ export default async function CabinetPage() {
                     registrationId={r.id}
                     tournamentStatus={r.tournament.status}
                     registrationStatus={r.status}
+                    bracketFormed={r.tournament._count.matches > 0}
                     className="mt-2"
                   />
                 </li>

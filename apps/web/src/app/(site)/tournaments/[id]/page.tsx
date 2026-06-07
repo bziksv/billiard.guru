@@ -264,6 +264,7 @@ export default async function TournamentPage({
                       registrationId={myParticipation.id}
                       tournamentStatus={tournament.status}
                       registrationStatus={myParticipation.status}
+                      bracketFormed={tournament.matches.length > 0}
                       className="mt-3"
                     />
                   )}

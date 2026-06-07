@@ -10,6 +10,7 @@ import {
 } from "@/lib/tournament-admin";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
+import { cn } from "@/lib/cn";
 
 export function TournamentListCard({
   tournament: t,
@@ -23,13 +24,20 @@ export function TournamentListCard({
   const confirmed = countConfirmedParticipants(t);
   const pending = countPendingApplications(t);
   const canStart = canStartTournament(t);
+  const tournamentHref = `/admin/tournaments/${t.id}`;
+  const openPrimary = t.status === "ACTIVE" || t.matches.length > 0;
 
   return (
     <div className="admin-card p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-semibold">{t.name}</h3>
+            <Link
+              href={tournamentHref}
+              className="font-semibold hover:text-emerald-400 hover:underline"
+            >
+              {t.name}
+            </Link>
             <StatusBadge
               status={t.status}
               label={TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
@@ -58,13 +66,14 @@ export function TournamentListCard({
               {starting ? "Запуск…" : "Начать турнир"}
             </button>
           )}
-          {(t.status === "ACTIVE" || t.matches.length > 0) && (
-            <Link href={`/admin/brackets/tournament/${t.id}`} className="admin-btn-primary">
-              Сетка
-            </Link>
-          )}
-          <Link href={`/admin/tournaments/${t.id}`} className="admin-btn-secondary">
-            {t.status === "ACTIVE" ? "Участники" : "Управление"}
+          <Link
+            href={tournamentHref}
+            className={cn(
+              "admin-btn px-4 py-2 text-sm",
+              openPrimary ? "admin-btn--primary" : "admin-btn--outline",
+            )}
+          >
+            {t.status === "ACTIVE" ? "Турнир" : "Управление"}
           </Link>
         </div>
       </div>

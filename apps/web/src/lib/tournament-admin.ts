@@ -116,6 +116,20 @@ export function canStartTournament(t: AdminTournament): boolean {
   return t.status === "OPEN" && countConfirmedParticipants(t) >= 2;
 }
 
+export function isTournamentBracketComplete(t: AdminTournament): boolean {
+  if (t.matches.length === 0) return false;
+  return t.matches.every(
+    (m) =>
+      m.status === "FINISHED" ||
+      m.status === "WALKOVER" ||
+      !!m.winnerTeam,
+  );
+}
+
+export function canFinishTournament(t: AdminTournament): boolean {
+  return t.status === "ACTIVE" && isTournamentBracketComplete(t);
+}
+
 export interface TournamentStandingRow {
   place: number | null;
   /** Верхняя граница диапазона мест (если отличается от place). */
