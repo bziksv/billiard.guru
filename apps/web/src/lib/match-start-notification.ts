@@ -3,7 +3,7 @@ import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { describeHandicapShort } from "@/lib/handicap";
 import { formatRating } from "@/lib/rating";
-import { teamLabel, teamRating } from "@/lib/pair-tournament";
+import { teamLabel } from "@/lib/pair-tournament";
 import { formatStartsAt } from "@/lib/public-display";
 import { buildBracketMatchNumbers } from "@/lib/tournament-match-schedule";
 import { dispatchNotification } from "@/lib/notifications";
@@ -47,6 +47,11 @@ function playerOnTeam(team: NotifyTeam | null, playerId: string): boolean {
   return team.player1.id === playerId || team.player2?.id === playerId;
 }
 
+function notifyTeamRating(team: NotifyTeam): number {
+  if (!team.player2) return team.player1.rating;
+  return team.player1.rating + team.player2.rating;
+}
+
 function linesForPlayer(
   playerId: string,
   team1: NotifyTeam | null,
@@ -60,10 +65,10 @@ function linesForPlayer(
   if (!myTeam || !oppTeam) return { ratingsLine: "", handicapLine: "" };
 
   const ratingsLine =
-    `Рейтинг: ${formatRating(teamRating(myTeam))} — ${formatRating(teamRating(oppTeam))}\n`;
+    `Рейтинг: ${formatRating(notifyTeamRating(myTeam))} — ${formatRating(notifyTeamRating(oppTeam))}\n`;
 
-  const high = Math.max(teamRating(team1!), teamRating(team2!));
-  const low = Math.min(teamRating(team1!), teamRating(team2!));
+  const high = Math.max(notifyTeamRating(myTeam), notifyTeamRating(oppTeam));
+  const low = Math.min(notifyTeamRating(myTeam), notifyTeamRating(oppTeam));
   const short = describeHandicapShort(high, low, { halfStep: handicapHalfStep });
   const handicapLine =
     short === "Без форы" ? "" : `Фора: ${short}\n`;
