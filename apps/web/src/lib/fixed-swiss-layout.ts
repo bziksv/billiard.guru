@@ -31,7 +31,9 @@ import {
 import {
   GRID_CARD_W,
   GRID_LABEL_OFFSET,
+  GRID_META_H,
   GRID_PAD,
+  GRID_ROW_H,
   gridCardHeight,
   teamDividerY,
   type SwissBracketEdge,
@@ -47,8 +49,26 @@ export const FIXED_SWISS_COL_W = 248;
 export const FIXED_SWISS_CARD_W = GRID_CARD_W;
 /** Зазор между gutter и левым краем карточки — линия не «наезжает» на блок. */
 const FIXED_SWISS_LINE_ENTRY_GAP = 12;
-/** До 3 строк подвала: место, проигравший, победитель. */
-export const FIXED_SWISS_CARD_H = gridCardHeight(true, 3);
+/** Высота строки «Фора» / подвала на карточке (px). */
+export const FIXED_SWISS_COMPACT_ROW_H = 18;
+/** Макс. высота для раскладки: мета + 2 строки + фора + 2 строки подвала. */
+export const FIXED_SWISS_CARD_H =
+  GRID_META_H +
+  GRID_ROW_H * 2 +
+  FIXED_SWISS_COMPACT_ROW_H * 3;
+
+/** Высота карточки по фактическому содержимому (для отрисовки). */
+export function fixedSwissMatchCardHeight(
+  hasHandicap: boolean,
+  footerRowCount: number,
+): number {
+  return (
+    GRID_META_H +
+    GRID_ROW_H * 2 +
+    (hasHandicap ? FIXED_SWISS_COMPACT_ROW_H : 0) +
+    footerRowCount * FIXED_SWISS_COMPACT_ROW_H
+  );
+}
 export const FIXED_SWISS_BRACKET_UNIT = 184;
 
 /** Зазор между финалом (#27) и матчем за 3–4 (#28) в колонке «Финал». */

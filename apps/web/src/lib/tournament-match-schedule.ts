@@ -63,6 +63,20 @@ export function formatMatchDateTime(iso: string | null | undefined): string {
   });
 }
 
+/** Сколько идёт встреча: «01:23» (часы:минуты с начала). */
+export function formatMatchElapsedHm(
+  startedAt: string | null | undefined,
+  now: Date = new Date(),
+): string | null {
+  if (!startedAt) return null;
+  const startMs = new Date(startedAt).getTime();
+  if (Number.isNaN(startMs)) return null;
+  const totalMinutes = Math.floor(Math.max(0, now.getTime() - startMs) / 60_000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
 export function buildBracketMatchNumbers(
   matches: BracketMatchView[],
   format: string,

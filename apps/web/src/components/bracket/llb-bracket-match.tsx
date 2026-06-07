@@ -12,6 +12,7 @@ import { isMatchResolved } from "@/lib/match-result";
 import {
   getMatchDestinations,
   GRID_CARD_W,
+  GRID_FOOTER_LINE_H,
   gridFooterHeight,
   GRID_META_H,
   GRID_ROW_H,
@@ -20,6 +21,8 @@ import {
 } from "@/lib/swiss-bracket-layout";
 import {
   FIXED_SWISS_CARD_H,
+  FIXED_SWISS_COMPACT_ROW_H,
+  fixedSwissMatchCardHeight,
   fixedSwissPlacementLabel,
 } from "@/lib/fixed-swiss-layout";
 import {
@@ -383,7 +386,6 @@ export function LlbBracketMatch({
             : "0"
           : "—";
 
-  const footerParts: string[] = [];
   const matchCount = matchNumbers.size;
   const gridSize = inferFixedSwissGridSize(matchCount);
   const matchesPerRound = gridSize / 2;
@@ -408,34 +410,52 @@ export function LlbBracketMatch({
     matchCount,
     matchNumber,
   );
-  if (placement) {
-    footerParts.push(placement);
+  const winnerLine =
+    winnerToNo !== undefined
+      ? winnerKind === "bye"
+        ? `автопроход на #${winnerToNo}`
+        : `победитель на #${winnerToNo}`
+      : null;
+  const loserLine =
+    loserToNo !== undefined
+      ? roundOneBye && phantomRow
+        ? `× на #${loserToNo}`
+        : `проигравший на #${loserToNo}`
+      : null;
+
+  type FooterRow =
+    | { kind: "text"; text: string }
+    | { kind: "split"; left: string; right: string };
+
+  const footerRows: FooterRow[] = [];
+
+  if (winnerLine && loserLine) {
+    if (placement) {
+      footerRows.push({ kind: "text", text: placement });
+    }
+    footerRows.push({ kind: "split", left: winnerLine, right: loserLine });
+  } else if (placement && winnerLine) {
+    footerRows.push({ kind: "text", text: `${placement} · ${winnerLine}` });
+  } else if (placement && loserLine) {
+    footerRows.push({ kind: "text", text: `${placement} · ${loserLine}` });
+  } else if (placement) {
+    footerRows.push({ kind: "text", text: placement });
+  } else if (winnerLine) {
+    footerRows.push({ kind: "text", text: winnerLine });
+  } else if (loserLine) {
+    footerRows.push({ kind: "text", text: loserLine });
   }
   if (match.status === "WALKOVER") {
-    footerParts.push("тех. поражение");
-  }
-  if (loserToNo !== undefined) {
-    footerParts.push(
-      roundOneBye && phantomRow
-        ? `× на #${loserToNo}`
-        : `проигравший на #${loserToNo}`,
-    );
-  }
-  if (winnerToNo !== undefined) {
-    footerParts.push(
-      winnerKind === "bye"
-        ? `автопроход на #${winnerToNo}`
-        : `победитель на #${winnerToNo}`,
-    );
+    footerRows.push({ kind: "text", text: "тех. поражение" });
   }
 
-  const footerLineCount = Math.max(
-    footerParts.length,
-    isFixedSwissGrid ? 2 : 1,
-  );
-  const footerHeight = gridFooterHeight(
-    isFixedSwissGrid ? Math.max(3, footerLineCount) : footerLineCount,
-  );
+  const footerRowH = isFixedSwissGrid ? FIXED_SWISS_COMPACT_ROW_H : GRID_FOOTER_LINE_H;
+  const footerHeight = isFixedSwissGrid
+    ? footerRows.length * footerRowH
+    : gridFooterHeight(Math.max(footerRows.length, 1));
+  const cardHeight = isFixedSwissGrid
+    ? fixedSwissMatchCardHeight(Boolean(showHandicap && handicapShort), footerRows.length)
+    : FIXED_SWISS_CARD_H;
 
   function handlePlayerClick(playerId: string, preview: TeamWithPlayers["player1"]) {
     onPlayerClick?.(playerId, preview);
@@ -480,7 +500,8 @@ export function LlbBracketMatch({
       )}
       style={{
         width: GRID_CARD_W,
-        height: FIXED_SWISS_CARD_H,
+        height: cardHeight,
+        maxHeight: cardHeight,
       }}
     >
       <MatchArea
@@ -607,7 +628,7 @@ export function LlbBracketMatch({
             data-bracket-interactive
             onClick={openResult}
             className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-left text-[9px] leading-[18px] text-[var(--bracket-meta-text)] transition-colors hover:bg-emerald-950/25"
-            style={{ height: 18, maxHeight: 18 }}
+            style={{ height: FIXED_SWISS_COMPACT_ROW_H, maxHeight: FIXED_SWISS_COMPACT_ROW_H }}
             title={`Фора: ${handicap}`}
           >
             <span className="block truncate">
@@ -620,7 +641,7 @@ export function LlbBracketMatch({
         ) : (
           <div
             className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-[9px] leading-[18px] text-[var(--bracket-meta-text)]"
-            style={{ height: 18, maxHeight: 18 }}
+            style={{ height: FIXED_SWISS_COMPACT_ROW_H, maxHeight: FIXED_SWISS_COMPACT_ROW_H }}
             title={`Фора: ${handicap}`}
           >
             <span className="block truncate">
@@ -633,22 +654,50 @@ export function LlbBracketMatch({
         )
       )}
 
-      {footerParts.length > 0 ? (
+      {footerRows.length > 0 ? (
         <MatchArea
           onMatchClick={openResult}
-          className="mt-auto flex shrink-0 flex-col justify-center gap-0.5 border-t border-[var(--bracket-row-border)] px-2 py-1 text-[9px] leading-snug text-[var(--bracket-meta-text)]"
-          style={{ minHeight: footerHeight }}
+          className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] text-[9px] text-[var(--bracket-meta-text)]"
+          style={{ height: footerHeight, maxHeight: footerHeight }}
         >
-          {footerParts.map((line) => (
-            <span key={line}>{line}</span>
-          ))}
+          {footerRows.map((row) =>
+            row.kind === "split" ? (
+              <div
+                key={`${row.left}|${row.right}`}
+                className="grid grid-cols-2 leading-[18px]"
+                style={{ height: footerRowH, maxHeight: footerRowH }}
+              >
+                <span
+                  className="truncate px-2 text-left"
+                  title={row.left}
+                >
+                  {row.left}
+                </span>
+                <span
+                  className="truncate border-l border-[var(--bracket-row-border)] px-2 text-left"
+                  title={row.right}
+                >
+                  {row.right}
+                </span>
+              </div>
+            ) : (
+              <div
+                key={row.text}
+                className="truncate px-2 text-left leading-[18px]"
+                style={{ height: footerRowH, maxHeight: footerRowH }}
+                title={row.text}
+              >
+                {row.text}
+              </div>
+            ),
+          )}
         </MatchArea>
       ) : (
         openResult && (
           <MatchArea
             onMatchClick={openResult}
-            className="flex items-center justify-center border-t border-[var(--bracket-row-border)] px-2 py-1 text-[9px] text-[var(--bracket-meta-text)]"
-            style={{ minHeight: footerHeight }}
+            className="flex shrink-0 items-center justify-center overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-[9px] leading-[18px] text-[var(--bracket-meta-text)]"
+            style={{ height: footerHeight, maxHeight: footerHeight }}
           >
             результат встречи →
           </MatchArea>

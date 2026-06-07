@@ -67,6 +67,7 @@ import {
   filterCurrentMatches,
   filterUpcomingMatches,
   formatMatchDateTime,
+  formatMatchElapsedHm,
   matchHandicapFullLabel,
   matchHandicapShortLabel,
   matchParticipantsLabel,
@@ -1453,6 +1454,13 @@ function MatchesScheduleTab({
 }) {
   const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
   const [matchSaving, setMatchSaving] = useState(false);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    if (variant !== "current" || matches.length === 0) return;
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, [variant, matches.length]);
 
   async function handleSaveMatchResult(payload: MatchResultPayload) {
     setMatchSaving(true);
@@ -1480,6 +1488,7 @@ function MatchesScheduleTab({
         ? "Нет готовых встреч — дождитесь соперников или сформируйте следующий тур."
         : "Пока нет завершённых встреч.";
   const showScore = variant === "current" || variant === "completed";
+  const showElapsed = variant === "current";
   const showHandicap = variant === "upcoming";
   const rowHint =
     variant === "completed"
@@ -1511,6 +1520,9 @@ function MatchesScheduleTab({
                 )}
                 {showScore && (
                   <th className="px-4 py-3 font-medium">Счёт</th>
+                )}
+                {showElapsed && (
+                  <th className="px-4 py-3 font-medium">Идёт</th>
                 )}
                 <th className="px-4 py-3 font-medium">Начало</th>
                 <th className="px-4 py-3 font-medium">Окончание</th>
@@ -1553,6 +1565,11 @@ function MatchesScheduleTab({
                     {showScore && (
                       <td className="px-4 py-3 font-mono">
                         {matchScoreLabel(match)}
+                      </td>
+                    )}
+                    {showElapsed && (
+                      <td className="px-4 py-3 font-mono tabular-nums text-amber-600 dark:text-amber-400">
+                        {formatMatchElapsedHm(match.startedAt, now) ?? "—"}
                       </td>
                     )}
                     <td className="px-4 py-3 font-mono tournament-participant-meta">
