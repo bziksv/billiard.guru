@@ -8,6 +8,7 @@ import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-da
 import { SiteContainer } from "@/components/site/site-container";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
+import { TelegramLink } from "@/lib/contact-links";
 
 type Step = "phone" | "register" | "confirm" | "login";
 
@@ -186,23 +187,25 @@ function LoginForm() {
       <h1 className="text-2xl font-bold text-[var(--text-primary)]">Вход и регистрация</h1>
       <p className="mt-2 text-sm text-[var(--text-secondary)]">
         Один номер телефона: если вы уже в базе — вход через Telegram; если нет — короткая
-        регистрация и подтверждение в боте @{TELEGRAM_BOT_USERNAME}.
+        регистрация и подтверждение в боте{" "}
+        <TelegramLink
+          username={TELEGRAM_BOT_USERNAME}
+          className="font-medium text-emerald-700 underline dark:text-emerald-400"
+        />
+        .
       </p>
 
       {step === "phone" && (
         <form onSubmit={startAuth} className="mt-6 space-y-4">
-          <label className="block text-sm">
-            <span className="mb-1 block text-[var(--text-secondary)]">Телефон</span>
-            <PhoneInput
-              countryName={countryName}
-              value={phone}
-              onChange={(e164, valid) => {
-                setPhone(e164);
-                setPhoneValid(valid);
-              }}
-              required
-            />
-          </label>
+          <PhoneInput
+            countryName={countryName}
+            value={phone}
+            onChange={(e164, valid) => {
+              setPhone(e164);
+              setPhoneValid(valid);
+            }}
+            required
+          />
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <PersonalDataConsentCheckbox
             checked={consentAccepted}

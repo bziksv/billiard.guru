@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
 import { getDbBackupSettings, saveDbBackupSettings } from "@/lib/db-backup-server";
+import { INTERVAL_MINUTE_OPTIONS } from "@/lib/db-backup-types";
 
 const patchSchema = z.object({
   autoEnabled: z.boolean().optional(),
-  autoIntervalHours: z
+  autoIntervalMinutes: z
     .number()
     .int()
     .min(0)
-    .max(168)
-    .refine((h) => h === 0 || [1, 2, 3, 4, 6, 8, 12, 24].includes(h), {
+    .max(10_080)
+    .refine((m) => m === 0 || INTERVAL_MINUTE_OPTIONS.includes(m as (typeof INTERVAL_MINUTE_OPTIONS)[number]), {
       message: "Недопустимый интервал",
     })
     .optional(),

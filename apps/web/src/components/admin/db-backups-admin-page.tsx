@@ -5,7 +5,8 @@ import { AsyncButton } from "@/components/ui/async-text-button";
 import {
   describeBackupSchedule,
   formatBytes,
-  INTERVAL_HOUR_OPTIONS,
+  formatIntervalLabel,
+  INTERVAL_MINUTE_OPTIONS,
   type DbBackupEntry,
   type DbBackupSettings,
 } from "@/lib/db-backup-types";
@@ -37,7 +38,7 @@ export function DbBackupsAdminPage() {
 
   const [draftAutoEnabled, setDraftAutoEnabled] = useState(false);
   const [draftScheduleMode, setDraftScheduleMode] = useState<ScheduleMode>("daily");
-  const [draftIntervalHours, setDraftIntervalHours] = useState(1);
+  const [draftIntervalMinutes, setDraftIntervalMinutes] = useState(60);
   const [draftHour, setDraftHour] = useState(3);
   const [draftMinute, setDraftMinute] = useState(0);
   const [draftRetain, setDraftRetain] = useState(14);
@@ -52,9 +53,9 @@ export function DbBackupsAdminPage() {
     setBackups(data.backups);
     setSettings(data.settings);
     setDraftAutoEnabled(data.settings.autoEnabled);
-    const interval = data.settings.autoIntervalHours ?? 0;
+    const interval = data.settings.autoIntervalMinutes ?? 0;
     setDraftScheduleMode(interval > 0 ? "interval" : "daily");
-    setDraftIntervalHours(interval > 0 ? interval : 1);
+    setDraftIntervalMinutes(interval > 0 ? interval : 60);
     setDraftHour(data.settings.autoHour);
     setDraftMinute(data.settings.autoMinute);
     setDraftRetain(data.settings.retainCount);
@@ -89,8 +90,8 @@ export function DbBackupsAdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           autoEnabled: draftAutoEnabled,
-          autoIntervalHours:
-            draftScheduleMode === "interval" ? draftIntervalHours : 0,
+          autoIntervalMinutes:
+            draftScheduleMode === "interval" ? draftIntervalMinutes : 0,
           autoHour: draftHour,
           autoMinute: draftMinute,
           retainCount: draftRetain,
@@ -160,7 +161,6 @@ export function DbBackupsAdminPage() {
               setError(e instanceof Error ? e.message : "Не удалось создать бэкап"),
             )
           }
-          disabled={!settings?.mysqldumpAvailable}
           className="admin-btn admin-btn--primary px-4 py-2 text-sm"
           loadingLabel="Создание…"
         >
@@ -169,15 +169,11 @@ export function DbBackupsAdminPage() {
       </div>
 
       {error && (
-        <p className="rounded-lg border border-red-800/50 bg-red-950/30 px-4 py-3 text-sm text-red-300">
+        <p className="admin-error-panel" role="alert">
           {error}
         </p>
       )}
-      {message && (
-        <p className="rounded-lg border border-emerald-800/40 bg-emerald-950/25 px-4 py-3 text-sm text-emerald-300">
-          {message}
-        </p>
-      )}
+      {message && <p className="admin-success-panel">{message}</p>}
 
       <section className="admin-card p-5">
         <h2 className="mb-4 text-sm font-semibold">Состояние</h2>
@@ -193,6 +189,11 @@ export function DbBackupsAdminPage() {
             <dd className="mt-1">
               mysqldump: {settings?.mysqldumpAvailable ? "✓" : "✗"} · mysql:{" "}
               {settings?.mysqlAvailable ? "✓" : "✗"}
+              {!settings?.mysqldumpAvailable && (
+                <span className="admin-muted block text-xs">
+                  без CLI — дамп через Node.js (mariadb driver)
+                </span>
+              )}
             </dd>
           </div>
           <div>
@@ -220,8 +221,11 @@ export function DbBackupsAdminPage() {
         </dl>
         {!toolsOk && (
           <p className="mt-4 text-sm text-amber-600 dark:text-amber-400/90">
-            На сервере нужны клиенты MySQL (<code className="text-xs">mysqldump</code> и{" "}
-            <code className="text-xs">mysql</code> в PATH). На Beget обычно доступны по SSH.
+            Клиенты MySQL в PATH не найдены — бэкап выполняется через Node.js (тот же драйвер,
+            что и Prisma). Для Beget можно также установить{" "}
+            <code className="text-xs">mariadb</code> или{" "}
+            <code className="text-xs">mysql-client@8.4</code> и задать{" "}
+            <code className="text-xs">DB_BACKUP_MYSQLDUMP</code> в .env.
           </p>
         )}
       </section>
@@ -233,10 +237,10 @@ export function DbBackupsAdminPage() {
           <code className="rounded bg-[var(--admin-inset-bg)] px-1 py-0.5 text-xs">
             POST /api/admin/db-backups/cron
           </code>{" "}
-          (см. <code className="text-xs">scripts/db-backup-cron.sh</code>). Для режима
-          «каждый час» поставьте cron раз в час — например{" "}
-          <code className="text-xs">0 * * * *</code>. При «раз в сутки» достаточно одного
-          вызова в день после заданного времени.
+          (см. <code className="text-xs">scripts/db-backup-cron.sh</code>). Для интервала
+          «каждые N минут» cron должен срабатывать чаще интервала — например при «каждые 15
+          мин» достаточно <code className="text-xs">*/5 * * * *</code>. При «раз в сутки» —
+          один вызов в день после заданного времени.
         </p>
 
         <label className="mb-4 flex cursor-pointer items-center gap-2.5 text-sm">
@@ -290,13 +294,13 @@ export function DbBackupsAdminPage() {
             <label>
               <span className="admin-label-xs">Каждые</span>
               <select
-                value={draftIntervalHours}
-                onChange={(e) => setDraftIntervalHours(Number(e.target.value))}
+                value={draftIntervalMinutes}
+                onChange={(e) => setDraftIntervalMinutes(Number(e.target.value))}
                 className="admin-input mt-1 block w-44 px-3 py-2 text-sm"
               >
-                {INTERVAL_HOUR_OPTIONS.map((h) => (
-                  <option key={h} value={h}>
-                    {h === 1 ? "1 час" : h === 24 ? "24 часа (сутки)" : `${h} ч`}
+                {INTERVAL_MINUTE_OPTIONS.map((m) => (
+                  <option key={m} value={m}>
+                    {formatIntervalLabel(m)}
                   </option>
                 ))}
               </select>

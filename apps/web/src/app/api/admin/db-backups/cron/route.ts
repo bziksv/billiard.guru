@@ -21,13 +21,6 @@ export async function POST(request: NextRequest) {
     }
 
     const settings = await getDbBackupSettings();
-    if (!settings.mysqldumpAvailable) {
-      return NextResponse.json(
-        { error: "mysqldump недоступен на сервере" },
-        { status: 503 },
-      );
-    }
-
     const result = await runScheduledDbBackupIfDue();
     return NextResponse.json({
       ok: true,

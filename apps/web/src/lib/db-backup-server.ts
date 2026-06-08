@@ -3,7 +3,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/prisma";
 import { getDatabaseUrlFromEnv, parseDatabaseUrl } from "@/lib/database-url";
+import {
+  createSqlDumpViaNode,
+  restoreSqlDumpViaNode,
+} from "@/lib/db-backup-node";
 import type { DbBackupEntry, DbBackupKind, DbBackupSettings } from "@/lib/db-backup-types";
+import { normalizeIntervalFromDb } from "@/lib/db-backup-types";
 
 export type { DbBackupEntry, DbBackupKind, DbBackupSettings } from "@/lib/db-backup-types";
 
@@ -94,6 +99,85 @@ async function commandExists(bin: string): Promise<boolean> {
   }
 }
 
+async function binaryAvailable(bin: string): Promise<boolean> {
+  if (bin.includes("/")) {
+    try {
+      await fs.access(bin, fs.constants.X_OK);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return commandExists(bin);
+}
+
+const DUMP_BINARY_CANDIDATES = [
+  () => process.env.DB_BACKUP_MYSQLDUMP?.trim(),
+  () => "mariadb-dump",
+  () => "/opt/homebrew/opt/mariadb/bin/mariadb-dump",
+  () => "/opt/homebrew/opt/mysql-client@8.4/bin/mysqldump",
+  () => "/opt/homebrew/opt/mysql-client@8.0/bin/mysqldump",
+  () => "mysqldump",
+] as const;
+
+const MYSQL_BINARY_CANDIDATES = [
+  () => process.env.DB_BACKUP_MYSQL?.trim(),
+  () => "mariadb",
+  () => "/opt/homebrew/opt/mariadb/bin/mariadb",
+  () => "/opt/homebrew/opt/mysql-client@8.4/bin/mysql",
+  () => "/opt/homebrew/opt/mysql-client@8.0/bin/mysql",
+  () => "mysql",
+] as const;
+
+async function resolveBinary(
+  candidates: readonly (() => string | undefined)[],
+): Promise<string | null> {
+  for (const pick of candidates) {
+    const bin = pick();
+    if (bin && (await binaryAvailable(bin))) {
+      return bin;
+    }
+  }
+  return null;
+}
+
+async function readCliVersion(bin: string): Promise<string> {
+  const { stdout } = await runCommand(bin, ["--version"]);
+  return stdout.trim();
+}
+
+/** MySQL 8.4+/9.x CLI на Mac часто не грузит mysql_native_password (Beget, Docker 8.x). */
+function isIncompatibleMysqlCliVersion(version: string, bin: string): boolean {
+  if (bin.includes("mariadb")) return false;
+  if (bin.includes("mysql-client@8.0") || bin.includes("mysql-client@8.4")) {
+    return false;
+  }
+  if (process.env.DB_BACKUP_MYSQLDUMP && bin === process.env.DB_BACKUP_MYSQLDUMP.trim()) {
+    return false;
+  }
+  if (process.env.DB_BACKUP_MYSQL && bin === process.env.DB_BACKUP_MYSQL.trim()) {
+    return false;
+  }
+  return /Ver (9\.|8\.[4-9]\.)/.test(version);
+}
+
+function isAuthPluginError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("mysql_native_password") ||
+    message.includes("Authentication plugin") ||
+    message.includes("2059")
+  );
+}
+
+async function unlinkIfExists(filePath: string): Promise<void> {
+  try {
+    await fs.unlink(filePath);
+  } catch {
+    // ignore
+  }
+}
+
 function mysqlArgs(db: ReturnType<typeof parseDatabaseUrl>, extra: string[] = []) {
   const args = [
     `--host=${db.host}`,
@@ -105,7 +189,7 @@ function mysqlArgs(db: ReturnType<typeof parseDatabaseUrl>, extra: string[] = []
   return args;
 }
 
-async function createSqlDump(filePath: string): Promise<void> {
+async function createSqlDumpViaCli(filePath: string, dumpBin: string): Promise<void> {
   const db = parseDatabaseUrl(getDatabaseUrlFromEnv());
   const args = [
     `--host=${db.host}`,
@@ -119,12 +203,37 @@ async function createSqlDump(filePath: string): Promise<void> {
     filePath,
     db.database,
   ];
-  await runCommand("mysqldump", args, {
+  await runCommand(dumpBin, args, {
     MYSQL_PWD: db.password,
   });
 }
 
-async function restoreSqlDump(filePath: string): Promise<void> {
+async function createSqlDump(filePath: string): Promise<void> {
+  const dumpBin = await resolveBinary(DUMP_BINARY_CANDIDATES);
+  if (dumpBin) {
+    const version = await readCliVersion(dumpBin).catch(() => "");
+    if (!isIncompatibleMysqlCliVersion(version, dumpBin)) {
+      try {
+        await createSqlDumpViaCli(filePath, dumpBin);
+        const stat = await fs.stat(filePath);
+        if (stat.size > 0) return;
+        await unlinkIfExists(filePath);
+      } catch (error) {
+        await unlinkIfExists(filePath);
+        if (!isAuthPluginError(error)) throw error;
+      }
+    }
+  }
+
+  await createSqlDumpViaNode(filePath);
+  const stat = await fs.stat(filePath);
+  if (stat.size === 0) {
+    await unlinkIfExists(filePath);
+    throw new Error("Бэкап пустой — проверьте DATABASE_URL и доступ к БД");
+  }
+}
+
+async function restoreSqlDumpViaCli(filePath: string, mysqlBin: string): Promise<void> {
   const db = parseDatabaseUrl(getDatabaseUrlFromEnv());
   const { readFile } = await import("node:fs/promises");
   const sql = await readFile(filePath, "utf8");
@@ -132,7 +241,7 @@ async function restoreSqlDump(filePath: string): Promise<void> {
 
   await new Promise<void>((resolve, reject) => {
     const child = spawnProc(
-      "mysql",
+      mysqlBin,
       mysqlArgs(db),
       {
         env: { ...process.env, MYSQL_PWD: db.password },
@@ -146,35 +255,53 @@ async function restoreSqlDump(filePath: string): Promise<void> {
     child.on("error", reject);
     child.on("close", (code) => {
       if (code === 0) resolve();
-      else reject(new Error(stderr.trim() || `mysql завершился с кодом ${code}`));
+      else reject(new Error(stderr.trim() || `${mysqlBin} завершился с кодом ${code}`));
     });
     child.stdin?.write(sql);
     child.stdin?.end();
   });
 }
 
+async function restoreSqlDump(filePath: string): Promise<void> {
+  const mysqlBin = await resolveBinary(MYSQL_BINARY_CANDIDATES);
+  if (mysqlBin) {
+    const version = await readCliVersion(mysqlBin).catch(() => "");
+    if (!isIncompatibleMysqlCliVersion(version, mysqlBin)) {
+      try {
+        await restoreSqlDumpViaCli(filePath, mysqlBin);
+        return;
+      } catch (error) {
+        if (!isAuthPluginError(error)) throw error;
+      }
+    }
+  }
+
+  await restoreSqlDumpViaNode(filePath);
+}
+
 export async function getDbBackupSettings(): Promise<DbBackupSettings> {
-  const [row, mysqldumpAvailable, mysqlAvailable] = await Promise.all([
+  const [row, dumpBin, mysqlBin] = await Promise.all([
     prisma.dbBackupConfig.findUnique({ where: { id: CONFIG_ID } }),
-    commandExists("mysqldump"),
-    commandExists("mysql"),
+    resolveBinary(DUMP_BINARY_CANDIDATES),
+    resolveBinary(MYSQL_BINARY_CANDIDATES),
   ]);
 
   return {
     autoEnabled: row?.autoEnabled ?? false,
-    autoIntervalHours: row?.autoIntervalHours ?? 0,
+    autoIntervalMinutes: normalizeIntervalFromDb(row?.autoIntervalHours ?? 0),
     autoHour: row?.autoHour ?? 3,
     autoMinute: row?.autoMinute ?? 0,
     retainCount: row?.retainCount ?? 14,
     lastAutoBackupAt: row?.lastAutoBackupAt?.toISOString() ?? null,
     backupDir: resolveBackupDir(),
-    mysqldumpAvailable,
-    mysqlAvailable,
+    mysqldumpAvailable: Boolean(dumpBin),
+    mysqlAvailable: Boolean(mysqlBin),
   };
 }
 
 export async function saveDbBackupSettings(data: {
   autoEnabled?: boolean;
+  autoIntervalMinutes?: number;
   autoHour?: number;
   autoMinute?: number;
   retainCount?: number;
@@ -184,12 +311,16 @@ export async function saveDbBackupSettings(data: {
     create: {
       id: CONFIG_ID,
       autoEnabled: data.autoEnabled ?? false,
+      autoIntervalHours: data.autoIntervalMinutes ?? 0,
       autoHour: data.autoHour ?? 3,
       autoMinute: data.autoMinute ?? 0,
       retainCount: data.retainCount ?? 14,
     },
     update: {
       ...(data.autoEnabled !== undefined ? { autoEnabled: data.autoEnabled } : {}),
+      ...(data.autoIntervalMinutes !== undefined
+        ? { autoIntervalHours: data.autoIntervalMinutes }
+        : {}),
       ...(data.autoHour !== undefined ? { autoHour: data.autoHour } : {}),
       ...(data.autoMinute !== undefined ? { autoMinute: data.autoMinute } : {}),
       ...(data.retainCount !== undefined ? { retainCount: data.retainCount } : {}),
@@ -244,13 +375,6 @@ async function resolveBackupFile(id: string): Promise<string> {
 }
 
 export async function createDbBackup(kind: DbBackupKind): Promise<DbBackupEntry> {
-  const settings = await getDbBackupSettings();
-  if (!settings.mysqldumpAvailable) {
-    throw new Error(
-      "mysqldump не найден в PATH. Установите MySQL client или задайте путь на сервере.",
-    );
-  }
-
   const dir = await ensureBackupDir();
   const filename = formatBackupFilename(kind);
   const filePath = path.join(dir, filename);
@@ -266,6 +390,7 @@ export async function createDbBackup(kind: DbBackupKind): Promise<DbBackupEntry>
     });
   }
 
+  const settings = await getDbBackupSettings();
   await pruneOldBackups(settings.retainCount);
 
   return {
@@ -296,10 +421,6 @@ export async function getDbBackupFilePath(id: string): Promise<string> {
 }
 
 export async function restoreDbBackup(id: string): Promise<void> {
-  const settings = await getDbBackupSettings();
-  if (!settings.mysqlAvailable) {
-    throw new Error("mysql не найден в PATH");
-  }
   const filePath = await getDbBackupFilePath(id);
   if (filePath.endsWith(".gz")) {
     throw new Error("Восстановление .sql.gz пока не поддерживается");
@@ -310,11 +431,11 @@ export async function restoreDbBackup(id: string): Promise<void> {
 export function isAutoBackupDue(settings: DbBackupSettings): boolean {
   if (!settings.autoEnabled) return false;
 
-  if (settings.autoIntervalHours > 0) {
+  if (settings.autoIntervalMinutes > 0) {
     if (!settings.lastAutoBackupAt) return true;
     const elapsedMs =
       Date.now() - new Date(settings.lastAutoBackupAt).getTime();
-    return elapsedMs >= settings.autoIntervalHours * 60 * 60 * 1000;
+    return elapsedMs >= settings.autoIntervalMinutes * 60 * 1000;
   }
 
   const now = new Date();

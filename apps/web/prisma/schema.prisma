@@ -627,10 +627,10 @@ model TournamentDefaultsConfig {
 model DbBackupConfig {
   id               String    @id @default("default")
   autoEnabled      Boolean   @default(false) @map("auto_enabled")
-  /// Час (0–23) по времени сервера — только при autoIntervalHours = 0
+  /// Час (0–23) по времени сервера — только при autoIntervalHours = 0 (режим «раз в сутки»)
   autoHour         Int       @default(3) @map("auto_hour")
   autoMinute       Int       @default(0) @map("auto_minute")
-  /// 0 = раз в сутки; 1, 2, 6… = каждые N часов с момента последнего автобэкапа
+  /// 0 = раз в сутки; иначе интервал в минутах (колонка auto_interval_hours — историческое имя)
   autoIntervalHours Int      @default(0) @map("auto_interval_hours")
   /// Сколько последних дампов хранить
   retainCount      Int       @default(14) @map("retain_count")

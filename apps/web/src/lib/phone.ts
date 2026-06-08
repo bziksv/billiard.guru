@@ -11,7 +11,7 @@ export const COUNTRY_PHONE_RULES: Record<string, CountryPhoneRule> = {
     dial: "7",
     localLength: 10,
     trunkPrefix: "8",
-    example: "+7 (960) 134-03-03",
+    example: "+7 (917) 234-56-78",
   },
   Казахстан: {
     dial: "7",
