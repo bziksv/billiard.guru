@@ -475,12 +475,12 @@ export type $DbBackupConfigPayload<ExtArgs extends runtime.Types.Extensions.Inte
     id: string
     autoEnabled: boolean
     /**
-     * Час (0–23) по времени сервера — только при autoIntervalHours = 0
+     * Час (0–23) по времени сервера — только при autoIntervalHours = 0 (режим «раз в сутки»)
      */
     autoHour: number
     autoMinute: number
     /**
-     * 0 = раз в сутки; 1, 2, 6… = каждые N часов с момента последнего автобэкапа
+     * 0 = раз в сутки; иначе интервал в минутах (колонка auto_interval_hours — историческое имя)
      */
     autoIntervalHours: number
     /**

@@ -9,6 +9,7 @@ import {
 } from "@/lib/bracket-canvas-class";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
+import { BracketStreamLink } from "@/components/bracket/bracket-stream-link";
 import { isMatchResolved } from "@/lib/match-result";
 import excelRef from "@/lib/excel-bracket-64-reference.json";
 import {
@@ -59,9 +60,12 @@ function ExcelMatchCard({
     <>
       <div className="llb-bracket-match__meta flex items-center justify-between px-2 font-mono text-[11px] tabular-nums">
         <span>#{refMatch.no}</span>
-        {finished && (
-          <span className="text-[10px] text-[var(--bracket-meta-text)]">✓</span>
-        )}
+        <span className="flex items-center gap-1">
+          {live?.streamUrl && <BracketStreamLink url={live.streamUrl} />}
+          {finished && (
+            <span className="text-[10px] text-[var(--bracket-meta-text)]">✓</span>
+          )}
+        </span>
       </div>
       <div
         className={cn(
@@ -154,6 +158,7 @@ export function ExcelBracketView({
       >
         <div
           className="relative"
+          data-bracket-capture
           style={{ width: layout.totalWidth, height: layout.totalHeight }}
         >
           {layout.colOrder.map((excelCol) => {

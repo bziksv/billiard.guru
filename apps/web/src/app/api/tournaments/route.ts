@@ -6,6 +6,12 @@ import { writeAuditLog } from "@/lib/audit";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { requestClubTournamentApproval } from "@/lib/tournament-approval";
+import { validateTournamentTableIds } from "@/lib/tournament-table-pick";
+import {
+  sanitizeTournamentTableStreams,
+  tableStreamsToJson,
+  validateTournamentTableStreams,
+} from "@/lib/tournament-stream";
 import { tournamentSchema } from "@/lib/validators";
 import { ZodError } from "zod";
 
@@ -82,6 +88,21 @@ export async function POST(request: NextRequest) {
 
     const suppressNotifications = data.suppressNotifications === true;
 
+    const tableError = validateTournamentTableIds(
+      data.tableIds,
+      club.floorPlan,
+      club.tableCounts,
+    );
+    if (tableError) {
+      return NextResponse.json({ error: tableError }, { status: 400 });
+    }
+
+    const streamsError = validateTournamentTableStreams(data.tableIds, data.tableStreams);
+    if (streamsError) {
+      return NextResponse.json({ error: streamsError }, { status: 400 });
+    }
+    const tableStreams = sanitizeTournamentTableStreams(data.tableIds, data.tableStreams);
+
     const tournament = await prisma.tournament.create({
       data: {
         name: data.name,
@@ -94,6 +115,8 @@ export async function POST(request: NextRequest) {
         ratingSource: data.ratingSource,
         handicapHalfStep: data.handicapHalfStep,
         suppressNotifications,
+        tableIds: data.tableIds,
+        tableStreams: tableStreamsToJson(tableStreams),
         publishedAt: suppressNotifications ? new Date() : null,
       },
       include: { club: { include: { city: true } } },
@@ -120,6 +143,8 @@ export async function POST(request: NextRequest) {
       payload: {
         format: data.format,
         ratingMax: data.ratingMax,
+        tableIds: data.tableIds,
+        tableStreams,
         approvalSent: !suppressNotifications,
         suppressNotifications,
       },

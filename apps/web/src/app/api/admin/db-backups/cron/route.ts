@@ -21,11 +21,19 @@ export async function POST(request: NextRequest) {
     }
 
     const settings = await getDbBackupSettings();
+    const due = isAutoBackupDue(settings);
     const result = await runScheduledDbBackupIfDue();
     return NextResponse.json({
       ok: true,
       ran: result.ran,
-      due: isAutoBackupDue(settings),
+      due,
+      schedule: {
+        autoEnabled: settings.autoEnabled,
+        autoIntervalMinutes: settings.autoIntervalMinutes,
+        autoHour: settings.autoHour,
+        autoMinute: settings.autoMinute,
+        lastAutoBackupAt: settings.lastAutoBackupAt,
+      },
       backup: result.backup ?? null,
     });
   } catch (error) {

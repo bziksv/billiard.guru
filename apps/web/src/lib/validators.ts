@@ -225,6 +225,8 @@ export const tournamentSchema = z.object({
   ratingSource: tournamentRatingSourceSchema.optional().default("CLUB"),
   handicapHalfStep: z.boolean().optional().default(true),
   suppressNotifications: z.boolean().optional().default(false),
+  tableIds: z.array(z.string().min(1)).min(1, "Выберите хотя бы один стол"),
+  tableStreams: z.record(z.string().min(1), z.string().max(2000)).optional(),
   status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
 });
 
@@ -278,6 +280,16 @@ export const tournamentRegistrationSchema = z.object({
   source: z.enum(["CLUB", "SELF"]),
 });
 
+export const tournamentRegistrationPatchSchema = z
+  .object({
+    id: z.string().min(1),
+    status: z.enum(["CONFIRMED", "REJECTED", "CANCELLED"]).optional(),
+    feePaid: z.boolean().optional(),
+  })
+  .refine((d) => d.status !== undefined || d.feePaid !== undefined, {
+    message: "Нечего обновлять",
+  });
+
 export const tournamentTeamSchema = z
   .object({
     tournamentId: z.string().min(1),
@@ -299,6 +311,7 @@ export const tournamentTeamUpdateSchema = z
     player2Id: z.string().min(1).optional(),
     name: z.string().max(120).optional().nullable(),
     status: z.enum(["CONFIRMED", "REJECTED", "CANCELLED"]).optional(),
+    feePaid: z.boolean().optional(),
   })
   .refine(
     (d) => {
@@ -344,6 +357,7 @@ export const matchResultSchema = z.object({
   team2Score: z.coerce.number().int().min(0).nullable().optional(),
   startedAt: z.string().nullable().optional(),
   finishedAt: z.string().nullable().optional(),
+  tableId: z.string().min(1).nullable().optional(),
 });
 
 export const ideaCreateSchema = z.object({

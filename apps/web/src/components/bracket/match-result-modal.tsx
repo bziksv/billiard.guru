@@ -23,6 +23,7 @@ export interface MatchResultPayload {
   team2Score?: number | null;
   startedAt?: string | null;
   finishedAt?: string | null;
+  tableId?: string | null;
 }
 
 function toDatetimeLocal(iso: string | null | undefined): string {
@@ -73,6 +74,7 @@ export function MatchResultModal({
   matchNumber,
   open,
   saving,
+  tournamentTables = [],
   onClose,
   onSave,
   onCancel,
@@ -81,6 +83,7 @@ export function MatchResultModal({
   matchNumber?: number;
   open: boolean;
   saving: boolean;
+  tournamentTables?: { id: string; label: string }[];
   onClose: () => void;
   onSave: (payload: MatchResultPayload) => Promise<void>;
   onCancel?: (matchId: string) => Promise<void>;
@@ -89,6 +92,7 @@ export function MatchResultModal({
   const [team2Score, setTeam2Score] = useState("");
   const [startedAt, setStartedAt] = useState("");
   const [finishedAt, setFinishedAt] = useState("");
+  const [tableId, setTableId] = useState("");
   const [winnerTeamId, setWinnerTeamId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState(false);
@@ -99,6 +103,7 @@ export function MatchResultModal({
     setTeam2Score(defaultScoreInput(match.team2Score));
     setStartedAt(toDatetimeLocal(match.startedAt));
     setFinishedAt(toDatetimeLocal(match.finishedAt));
+    setTableId(match.tableId ?? "");
     setWinnerTeamId(match.winnerTeamId ?? "");
     setError(null);
     setConfirmCancel(false);
@@ -139,6 +144,7 @@ export function MatchResultModal({
     const payload: MatchResultPayload = {
       matchId: match!.id,
       ...times,
+      tableId: tableId || null,
     };
     try {
       await onSave(payload);
@@ -178,6 +184,7 @@ export function MatchResultModal({
       matchId: match!.id,
       team1Score: parsed.s1,
       team2Score: parsed.s2,
+      tableId: tableId || null,
       ...times,
     };
     try {
@@ -248,6 +255,7 @@ export function MatchResultModal({
       winnerTeamId: winner,
       team1Score: s1,
       team2Score: s2,
+      tableId: tableId || null,
       ...times,
     };
 
@@ -390,6 +398,24 @@ export function MatchResultModal({
                 ))}
               </div>
             </div>
+          )}
+
+          {tournamentTables.length > 0 && (
+            <label className="block text-sm">
+              <span className="admin-label-xs mb-1.5 block">Стол</span>
+              <select
+                value={tableId}
+                onChange={(event) => setTableId(event.target.value)}
+                className="admin-input w-full px-2 py-2 text-sm"
+              >
+                <option value="">Не выбран</option>
+                {tournamentTables.map((table) => (
+                  <option key={table.id} value={table.id}>
+                    {table.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
 
           <div className="space-y-4">

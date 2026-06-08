@@ -21,7 +21,7 @@ import {
 } from "@/lib/tournament-registration-notify";
 import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
 import { assertPlayerEligibleForTournamentRating } from "@/lib/tournament-rating-limit-server";
-import { tournamentRegistrationSchema } from "@/lib/validators";
+import { tournamentRegistrationPatchSchema, tournamentRegistrationSchema } from "@/lib/validators";
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
             source: data.source,
             clubId: data.clubId ?? null,
             confirmedAt: null,
+            feePaid: false,
           },
           include: {
             player: { include: { city: { include: { country: true } } } },
@@ -155,19 +156,38 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
     }
 
-    const { id, status } = await request.json();
-    if (!id || !["CONFIRMED", "REJECTED", "CANCELLED"].includes(status)) {
-      return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });
-    }
+    const body = await request.json();
+    const data = tournamentRegistrationPatchSchema.parse(body);
 
     const existing = await prisma.tournamentRegistration.findUnique({
-      where: { id },
+      where: { id: data.id },
       include: {
         tournament: { include: { club: true } },
       },
     });
     if (!existing) {
       return NextResponse.json({ error: "Заявка не найдена" }, { status: 404 });
+    }
+
+    const isOrganizer =
+      player.role === "SUPERADMIN" ||
+      (await playerCanManageClub(existing.tournament.club, player));
+
+    if (data.feePaid !== undefined && data.status === undefined) {
+      if (!isOrganizer) {
+        return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
+      }
+      const registration = await prisma.tournamentRegistration.update({
+        where: { id: data.id },
+        data: { feePaid: data.feePaid },
+        include: { player: true, tournament: true },
+      });
+      return NextResponse.json(registration);
+    }
+
+    const { status } = data;
+    if (!status) {
+      return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });
     }
 
     await reopenTournamentIfBracketEmpty(existing.tournamentId);
@@ -177,9 +197,6 @@ export async function PATCH(request: NextRequest) {
     }
 
     const isOwner = existing.playerId === player.id;
-    const isOrganizer =
-      player.role === "SUPERADMIN" ||
-      (await playerCanManageClub(existing.tournament.club, player));
 
     const bracketFormed =
       (await prisma.tournamentMatch.count({
@@ -223,15 +240,29 @@ export async function PATCH(request: NextRequest) {
           { status: 400 },
         );
       }
+      if (status === "CONFIRMED") {
+        const feeOk = data.feePaid === true || existing.feePaid;
+        if (!feeOk) {
+          return NextResponse.json(
+            { error: "Отметьте «Сдал взнос» перед подтверждением" },
+            { status: 400 },
+          );
+        }
+      }
     } else {
       return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });
     }
 
     const registration = await prisma.tournamentRegistration.update({
-      where: { id },
+      where: { id: data.id },
       data: {
         status,
         confirmedAt: status === "CONFIRMED" ? new Date() : null,
+        ...(status === "CONFIRMED"
+          ? { feePaid: true }
+          : status === "REJECTED" || status === "CANCELLED"
+            ? { feePaid: false }
+            : {}),
       },
       include: { player: true, tournament: true },
     });
@@ -251,7 +282,10 @@ export async function PATCH(request: NextRequest) {
     }
 
     return NextResponse.json(registration);
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.name === "ZodError") {
+      return NextResponse.json({ error: "Ошибка валидации" }, { status: 400 });
+    }
     return NextResponse.json({ error: "Не удалось обновить" }, { status: 500 });
   }
 }

@@ -331,6 +331,7 @@ export function SwissBracketView({
       >
         <div
           className="relative min-w-max"
+          data-bracket-capture
           style={{
             width: layout.totalWidth,
             height: layout.totalHeight,

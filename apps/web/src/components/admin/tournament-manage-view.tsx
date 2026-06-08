@@ -40,6 +40,11 @@ import {
 import { mapBracketMatchesByExcelNo } from "@/lib/excel-bracket-match-map";
 import { ExcelBracketView } from "@/components/bracket/excel-bracket-view";
 import { BracketPresentationShell } from "@/components/bracket/bracket-presentation-shell";
+import { BracketScreenshotModal } from "@/components/bracket/bracket-screenshot-modal";
+import {
+  captureBracketScreenshot,
+  loadImagePreview,
+} from "@/lib/bracket-screenshot";
 import { isOutdatedFixedSwiss27Bracket, isOutdatedFixedSwiss32Bracket } from "@/lib/fixed-swiss-grid";
 import {
   getDefaultBracketParticipantRules,
@@ -79,6 +84,7 @@ import {
   matchStageLabel,
   matchScoreLabel,
 } from "@/lib/tournament-match-schedule";
+import { resolveMatchStreamUrl, tournamentTableOptions } from "@/lib/tournament-stream";
 
 type Team = AdminTournament["teams"][number] & TeamWithPlayers;
 type Match = AdminTournament["matches"][number];
@@ -180,6 +186,9 @@ function ManageTabButtons({
   currentCount,
   upcomingCount,
   completedCount,
+  showScreenshot,
+  onScreenshot,
+  screenshotLoading,
 }: {
   tab: ManageTab;
   onTabChange: (tab: ManageTab) => void;
@@ -188,6 +197,9 @@ function ManageTabButtons({
   currentCount: number;
   upcomingCount: number;
   completedCount: number;
+  showScreenshot?: boolean;
+  onScreenshot?: () => void | Promise<void>;
+  screenshotLoading?: boolean;
 }) {
   return (
     <>
@@ -239,6 +251,16 @@ function ManageTabButtons({
       >
         Итоговый протокол
       </button>
+      {showScreenshot && (
+        <button
+          type="button"
+          onClick={() => void onScreenshot?.()}
+          disabled={screenshotLoading}
+          className="admin-btn admin-btn--outline shrink-0 px-3 py-1.5 text-xs sm:text-sm disabled:opacity-50"
+        >
+          {screenshotLoading ? "Скрин…" : "Скрин"}
+        </button>
+      )}
     </>
   );
 }
@@ -248,16 +270,19 @@ function RegistrationActionButton({
   onClick,
   children,
   loadingLabel = "…",
+  disabled = false,
 }: {
   variant: "primary" | "danger" | "outline";
   onClick: () => void | Promise<void>;
   children: ReactNode;
   loadingLabel?: string;
+  disabled?: boolean;
 }) {
   return (
     <AsyncButton
       onClick={onClick}
       loadingLabel={loadingLabel}
+      disabled={disabled}
       className={cn(
         "admin-btn min-h-[2.25rem] min-w-[7.5rem] px-3 py-2 text-xs sm:text-sm",
         variant === "primary" && "admin-btn--primary",
@@ -267,6 +292,56 @@ function RegistrationActionButton({
     >
       {children}
     </AsyncButton>
+  );
+}
+
+function ParticipantIndex({ index }: { index: number }) {
+  return (
+    <span className="tournament-participant-index" aria-hidden>
+      {index}
+    </span>
+  );
+}
+
+function FeePaidCheckbox({
+  checked,
+  disabled = false,
+  onChange,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (checked: boolean) => void | Promise<void>;
+}) {
+  const [saving, setSaving] = useState(false);
+
+  async function handleChange(next: boolean) {
+    if (disabled || saving) return;
+    setSaving(true);
+    try {
+      await onChange(next);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Не удалось сохранить");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <label
+      className={cn(
+        "tournament-fee-paid-label",
+        disabled && "tournament-fee-paid-label--disabled",
+      )}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled || saving}
+        onChange={(e) => void handleChange(e.target.checked)}
+        className="h-4 w-4 rounded border-zinc-600"
+      />
+      <span>Сдал взнос</span>
+    </label>
   );
 }
 
@@ -434,6 +509,12 @@ export function TournamentManageView({
   const [editError, setEditError] = useState<string | null>(null);
   const [editSaving, setEditSaving] = useState(false);
   const [bracketActionNotice, setBracketActionNotice] = useState<string | null>(null);
+  const [screenshotLoading, setScreenshotLoading] = useState(false);
+  const [screenshotPreview, setScreenshotPreview] = useState<{
+    blob: Blob;
+    url: string;
+  } | null>(null);
+  const [screenshotError, setScreenshotError] = useState<string | null>(null);
 
   const pendingRegistrations = t.registrations.filter((r) => r.status === "PENDING");
   const confirmedRegistrations = t.registrations.filter(
@@ -529,10 +610,21 @@ export function TournamentManageView({
         team2Score: m.team2Score,
         startedAt: m.startedAt,
         finishedAt: m.finishedAt,
+        tableId: m.tableId ?? null,
+        streamUrl: resolveMatchStreamUrl(
+          { tableId: m.tableId ?? null },
+          { tableIds: t.tableIds, tableStreams: t.tableStreams },
+          t.club.floorPlan,
+        ),
         team1: applyTournamentRatingsToTeam(m.team1, ratingSource, clubPlayerRatings),
         team2: applyTournamentRatingsToTeam(m.team2, ratingSource, clubPlayerRatings),
       })),
-    [t.matches, ratingSource, clubPlayerRatings],
+    [t.matches, t.tableIds, t.tableStreams, t.club.floorPlan, ratingSource, clubPlayerRatings],
+  );
+  const tournamentTables = useMemo(
+    () =>
+      tournamentTableOptions(t.tableIds, t.club.floorPlan, t.club.tableCounts),
+    [t.tableIds, t.club.floorPlan, t.club.tableCounts],
   );
   const currentMatches = useMemo(
     () => filterCurrentMatches(bracketMatches),
@@ -578,8 +670,56 @@ export function TournamentManageView({
       currentCount={currentMatches.length}
       upcomingCount={upcomingMatches.length}
       completedCount={completedMatches.length}
+      showScreenshot={showBracketSection && bracketMatches.length > 0}
+      onScreenshot={handleBracketScreenshot}
+      screenshotLoading={screenshotLoading}
     />
   );
+
+  async function handleBracketScreenshot() {
+    if (bracketMatches.length === 0) {
+      setScreenshotError("Сетка ещё не сформирована");
+      return;
+    }
+    setScreenshotLoading(true);
+    setScreenshotError(null);
+    if (tab !== "bracket") {
+      setTab("bracket");
+    }
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    try {
+      const blob = await captureBracketScreenshot(t.name);
+      const url = await loadImagePreview(blob);
+      if (screenshotPreview?.url) {
+        URL.revokeObjectURL(screenshotPreview.url);
+      }
+      setScreenshotPreview({ blob, url });
+    } catch (error) {
+      setScreenshotError(
+        error instanceof Error ? error.message : "Не удалось сделать скрин сетки",
+      );
+    } finally {
+      setScreenshotLoading(false);
+    }
+  }
+
+  function closeScreenshotModal() {
+    if (screenshotPreview?.url) {
+      URL.revokeObjectURL(screenshotPreview.url);
+    }
+    setScreenshotPreview(null);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (screenshotPreview?.url) {
+        URL.revokeObjectURL(screenshotPreview.url);
+      }
+    };
+  }, [screenshotPreview?.url]);
 
   const presentationContentIsBracket = tab === "bracket";
 
@@ -870,6 +1010,7 @@ export function TournamentManageView({
           onDismissActionNotice={() => setBracketActionNotice(null)}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
+          tournamentTables={tournamentTables}
         />
       )}
 
@@ -883,6 +1024,7 @@ export function TournamentManageView({
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
+          tournamentTables={tournamentTables}
         />
       )}
 
@@ -896,6 +1038,7 @@ export function TournamentManageView({
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
+          tournamentTables={tournamentTables}
         />
       )}
 
@@ -909,6 +1052,7 @@ export function TournamentManageView({
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
+          tournamentTables={tournamentTables}
         />
       )}
 
@@ -971,6 +1115,7 @@ export function TournamentManageView({
             inPresentation
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
+            tournamentTables={tournamentTables}
           />
         )}
 
@@ -984,6 +1129,7 @@ export function TournamentManageView({
             matchNumbers={bracketMatchNumbers}
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
+            tournamentTables={tournamentTables}
           />
         )}
 
@@ -997,6 +1143,7 @@ export function TournamentManageView({
             matchNumbers={bracketMatchNumbers}
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
+            tournamentTables={tournamentTables}
           />
         )}
 
@@ -1010,6 +1157,7 @@ export function TournamentManageView({
             matchNumbers={bracketMatchNumbers}
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
+            tournamentTables={tournamentTables}
           />
         )}
 
@@ -1024,6 +1172,22 @@ export function TournamentManageView({
         )}
       </BracketPresentationShell>
 
+      <BracketScreenshotModal
+        open={screenshotPreview !== null}
+        tournamentName={t.name}
+        tournamentUrl={
+          typeof window !== "undefined"
+            ? `${window.location.origin}/tournaments/${t.id}/bracket`
+            : `https://billiard.guru/tournaments/${t.id}/bracket`
+        }
+        blob={screenshotPreview?.blob ?? null}
+        previewUrl={screenshotPreview?.url ?? null}
+        onClose={closeScreenshotModal}
+      />
+
+      {screenshotError && (
+        <p className="admin-error-panel text-sm">{screenshotError}</p>
+      )}
     </div>
   );
 }
@@ -1063,62 +1227,219 @@ function ParticipantsTab({
   onConfirmTeam: (id: string) => void | Promise<void>;
   onUpdated: () => void;
 }) {
+  const [confirmAllError, setConfirmAllError] = useState<string | null>(null);
+  const [markAllFeeOpen, setMarkAllFeeOpen] = useState(false);
+  const [markAllFeeLoading, setMarkAllFeeLoading] = useState(false);
+  const [markAllFeeError, setMarkAllFeeError] = useState<string | null>(null);
+
+  const pendingWithFee = pendingRegistrations.filter((r) => r.feePaid);
+  const pendingWithoutFee = pendingRegistrations.filter((r) => !r.feePaid);
+  const pendingTeamsWithoutFee = activeTeams.filter(
+    (team) =>
+      (team.status === "PENDING" || team.status === "REJECTED") && !team.feePaid,
+  );
+  const markAllFeeCount = pair ? pendingTeamsWithoutFee.length : pendingWithoutFee.length;
+
+  async function patchRegistrationFeePaid(id: string, feePaid: boolean) {
+    const res = await fetch("/api/tournaments/register", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, feePaid }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось сохранить отметку взноса");
+    }
+  }
+
+  async function patchTeamFeePaid(id: string, feePaid: boolean) {
+    const res = await fetch("/api/tournaments/teams", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, feePaid }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось сохранить отметку взноса");
+    }
+  }
+
+  async function setRegistrationFeePaid(id: string, feePaid: boolean) {
+    await patchRegistrationFeePaid(id, feePaid);
+    await onUpdated();
+  }
+
+  async function setTeamFeePaid(id: string, feePaid: boolean) {
+    await patchTeamFeePaid(id, feePaid);
+    await onUpdated();
+  }
+
+  async function confirmAllPending() {
+    if (pendingWithFee.length === 0) return;
+    setConfirmAllError(null);
+    try {
+      for (const registration of pendingWithFee) {
+        const res = await fetch("/api/tournaments/register", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: registration.id, status: "CONFIRMED" }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error ?? "Не удалось подтвердить заявки");
+        }
+      }
+      await onUpdated();
+    } catch (error) {
+      setConfirmAllError(error instanceof Error ? error.message : "Ошибка подтверждения");
+      throw error;
+    }
+  }
+
+  async function markAllFeePaid() {
+    setMarkAllFeeLoading(true);
+    setMarkAllFeeError(null);
+    try {
+      if (pair) {
+        for (const team of pendingTeamsWithoutFee) {
+          await patchTeamFeePaid(team.id, true);
+        }
+      } else {
+        for (const registration of pendingWithoutFee) {
+          await patchRegistrationFeePaid(registration.id, true);
+        }
+      }
+      await onUpdated();
+      setMarkAllFeeOpen(false);
+    } catch (error) {
+      setMarkAllFeeError(
+        error instanceof Error ? error.message : "Не удалось отметить взнос",
+      );
+      throw error;
+    } finally {
+      setMarkAllFeeLoading(false);
+    }
+  }
+
+  function closeMarkAllFeeModal() {
+    if (markAllFeeLoading) return;
+    setMarkAllFeeOpen(false);
+    setMarkAllFeeError(null);
+  }
+
+  const markAllFeeLabel = pair ? "команд" : "заявок";
+
   return (
     <div className="space-y-4">
       {pair && activeTeams.length > 0 && (
-        <ul className="space-y-2">
+        <div>
+          {pendingTeamsWithoutFee.length > 0 && (
+            <div className="mb-3 flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMarkAllFeeError(null);
+                  setMarkAllFeeOpen(true);
+                }}
+                className="admin-btn admin-btn--outline px-3 py-2 text-xs sm:text-sm"
+              >
+                Отметить всех ({pendingTeamsWithoutFee.length})
+              </button>
+            </div>
+          )}
+          <ul className="space-y-2">
           {bracketLocked && (
             <p className="tournament-bracket-locked-hint">
               Сетка сформирована — состав пар зафиксирован, изменить или убрать нельзя.
             </p>
           )}
-          {activeTeams.map((team) => (
+          {activeTeams.map((team, index) => (
             <PairTeamRow
               key={team.id}
+              index={index + 1}
               team={team}
               playerOptions={playerOptions}
               bracketLocked={bracketLocked}
               onConfirm={() => onConfirmTeam(team.id)}
+              onFeePaidChange={(feePaid) => setTeamFeePaid(team.id, feePaid)}
               onUpdated={onUpdated}
             />
           ))}
-        </ul>
+          </ul>
+        </div>
       )}
 
       {!pair && pendingRegistrations.length > 0 && (
         <div>
-          <p className="tournament-section-label tournament-section-label--pending">
-            Заявки на участие ({pendingRegistrations.length})
-          </p>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="tournament-section-label tournament-section-label--pending mb-0">
+              Заявки на участие ({pendingRegistrations.length})
+            </p>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setMarkAllFeeError(null);
+                  setMarkAllFeeOpen(true);
+                }}
+                disabled={pendingWithoutFee.length === 0}
+                className="admin-btn admin-btn--outline px-3 py-2 text-xs sm:text-sm disabled:opacity-50"
+              >
+                Отметить всех
+                {pendingWithoutFee.length > 0 ? ` (${pendingWithoutFee.length})` : ""}
+              </button>
+              <AsyncButton
+                onClick={confirmAllPending}
+                loadingLabel="Подтверждаем…"
+                disabled={pendingWithFee.length === 0}
+                className="admin-btn admin-btn--primary px-3 py-2 text-xs sm:text-sm"
+              >
+                Подтвердить всех{pendingWithFee.length > 0 ? ` (${pendingWithFee.length})` : ""}
+              </AsyncButton>
+            </div>
+          </div>
+          {confirmAllError && (
+            <p className="admin-error-panel mb-3 text-sm">{confirmAllError}</p>
+          )}
           <ul className="space-y-2">
-            {pendingRegistrations.map((r) => (
+            {pendingRegistrations.map((r, index) => (
               <li
                 key={r.id}
                 className="tournament-participant-card tournament-participant-card--pending"
               >
-                <TournamentParticipantInfo
-                  lastName={r.player.lastName}
-                  firstName={r.player.firstName}
-                  rating={r.player.rating}
-                  phone={r.player.phone}
-                  telegramUsername={r.player.telegramUsername}
-                  note={r.source === "SELF" ? "самостоятельная заявка" : null}
-                />
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  <RegistrationActionButton
-                    variant="primary"
-                    loadingLabel="Подтверждаем…"
-                    onClick={() => onConfirmRegistration(r.id)}
-                  >
-                    Подтвердить
-                  </RegistrationActionButton>
-                  <RegistrationActionButton
-                    variant="danger"
-                    loadingLabel="Отклоняем…"
-                    onClick={() => onRejectRegistration(r.id)}
-                  >
-                    Отклонить
-                  </RegistrationActionButton>
+                <ParticipantIndex index={index + 1} />
+                <div className="tournament-participant-card-main">
+                  <TournamentParticipantInfo
+                    lastName={r.player.lastName}
+                    firstName={r.player.firstName}
+                    rating={r.player.rating}
+                    phone={r.player.phone}
+                    telegramUsername={r.player.telegramUsername}
+                    note={r.source === "SELF" ? "самостоятельная заявка" : null}
+                  />
+                </div>
+                <div className="tournament-participant-card-actions">
+                  <FeePaidCheckbox
+                    checked={Boolean(r.feePaid)}
+                    onChange={(feePaid) => setRegistrationFeePaid(r.id, feePaid)}
+                  />
+                  <div className="tournament-participant-card-buttons">
+                    <RegistrationActionButton
+                      variant="primary"
+                      loadingLabel="Подтверждаем…"
+                      disabled={!r.feePaid}
+                      onClick={() => onConfirmRegistration(r.id)}
+                    >
+                      Подтвердить
+                    </RegistrationActionButton>
+                    <RegistrationActionButton
+                      variant="danger"
+                      loadingLabel="Отклоняем…"
+                      onClick={() => onRejectRegistration(r.id)}
+                    >
+                      Отклонить
+                    </RegistrationActionButton>
+                  </div>
                 </div>
               </li>
             ))}
@@ -1137,29 +1458,35 @@ function ParticipantsTab({
             Подтверждённые участники ({confirmedRegistrations.length})
           </p>
           <ul className="space-y-2">
-            {confirmedRegistrations.map((r) => (
+            {confirmedRegistrations.map((r, index) => (
               <li key={r.id} className="tournament-participant-card">
-                <TournamentParticipantInfo
-                  lastName={r.player.lastName}
-                  firstName={r.player.firstName}
-                  rating={r.player.rating}
-                  phone={r.player.phone}
-                  telegramUsername={r.player.telegramUsername}
-                />
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  <StatusBadge
-                    status={r.status}
-                    label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
+                <ParticipantIndex index={index + 1} />
+                <div className="tournament-participant-card-main">
+                  <TournamentParticipantInfo
+                    lastName={r.player.lastName}
+                    firstName={r.player.firstName}
+                    rating={r.player.rating}
+                    phone={r.player.phone}
+                    telegramUsername={r.player.telegramUsername}
                   />
-                  {canModifyRegistrations && (
-                    <RegistrationActionButton
-                      variant="outline"
-                      loadingLabel="Снимаем…"
-                      onClick={() => onCancelRegistration(r.id)}
-                    >
-                      Снять
-                    </RegistrationActionButton>
-                  )}
+                </div>
+                <div className="tournament-participant-card-actions">
+                  <FeePaidCheckbox checked disabled onChange={async () => {}} />
+                  <div className="tournament-participant-card-buttons">
+                    <StatusBadge
+                      status={r.status}
+                      label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
+                    />
+                    {canModifyRegistrations && (
+                      <RegistrationActionButton
+                        variant="outline"
+                        loadingLabel="Снимаем…"
+                        onClick={() => onCancelRegistration(r.id)}
+                      >
+                        Снять
+                      </RegistrationActionButton>
+                    )}
+                  </div>
                 </div>
               </li>
             ))}
@@ -1173,33 +1500,47 @@ function ParticipantsTab({
             Снятые и отклонённые ({otherRegistrations.length})
           </p>
           <ul className="space-y-2">
-            {otherRegistrations.map((r) => (
+            {otherRegistrations.map((r, index) => (
               <li key={r.id} className="tournament-participant-card opacity-80">
-                <TournamentParticipantInfo
-                  lastName={r.player.lastName}
-                  firstName={r.player.firstName}
-                  rating={r.player.rating}
-                  phone={r.player.phone}
-                  telegramUsername={r.player.telegramUsername}
-                />
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
-                  <StatusBadge
-                    status={r.status}
-                    label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
+                <ParticipantIndex index={index + 1} />
+                <div className="tournament-participant-card-main">
+                  <TournamentParticipantInfo
+                    lastName={r.player.lastName}
+                    firstName={r.player.firstName}
+                    rating={r.player.rating}
+                    phone={r.player.phone}
+                    telegramUsername={r.player.telegramUsername}
                   />
+                </div>
+                <div className="tournament-participant-card-actions">
                   {canModifyRegistrations &&
                     registrationOpen &&
                     (r.status === "CANCELLED" || r.status === "REJECTED") && (
-                      <RegistrationActionButton
-                        variant="primary"
-                        loadingLabel={
-                          r.status === "CANCELLED" ? "Регистрируем…" : "Подтверждаем…"
-                        }
-                        onClick={() => onConfirmRegistration(r.id)}
-                      >
-                        {r.status === "CANCELLED" ? "Зарегистрировать снова" : "Подтвердить"}
-                      </RegistrationActionButton>
+                      <FeePaidCheckbox
+                        checked={Boolean(r.feePaid)}
+                        onChange={(feePaid) => setRegistrationFeePaid(r.id, feePaid)}
+                      />
                     )}
+                  <div className="tournament-participant-card-buttons">
+                    <StatusBadge
+                      status={r.status}
+                      label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
+                    />
+                    {canModifyRegistrations &&
+                      registrationOpen &&
+                      (r.status === "CANCELLED" || r.status === "REJECTED") && (
+                        <RegistrationActionButton
+                          variant="primary"
+                          loadingLabel={
+                            r.status === "CANCELLED" ? "Регистрируем…" : "Подтверждаем…"
+                          }
+                          disabled={!r.feePaid}
+                          onClick={() => onConfirmRegistration(r.id)}
+                        >
+                          {r.status === "CANCELLED" ? "Зарегистрировать снова" : "Подтвердить"}
+                        </RegistrationActionButton>
+                      )}
+                  </div>
                 </div>
               </li>
             ))}
@@ -1263,6 +1604,18 @@ function ParticipantsTab({
       {pair && activeTeams.length === 0 && (
         <p className="tournament-hint">Команд пока нет.</p>
       )}
+
+      <ConfirmModal
+        open={markAllFeeOpen}
+        title="Отметить «Сдал взнос» у всех?"
+        description={`Будет отмечено «Сдал взнос» у ${markAllFeeCount} ${markAllFeeLabel} без галки. Участники не будут подтверждены автоматически — для этого используйте «Подтвердить всех».`}
+        confirmLabel="Да, отметить всех"
+        variant="default"
+        loading={markAllFeeLoading}
+        error={markAllFeeError}
+        onConfirm={markAllFeePaid}
+        onClose={closeMarkAllFeeModal}
+      />
     </div>
   );
 }
@@ -1605,6 +1958,7 @@ function BracketTab({
   onDismissActionNotice,
   onSaveMatchResult,
   onCancelMatchResult,
+  tournamentTables = [],
 }: {
   t: AdminTournament;
   format: string;
@@ -1625,6 +1979,7 @@ function BracketTab({
   onDismissActionNotice?: () => void;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
+  tournamentTables?: { id: string; label: string }[];
 }) {
   const dynamicSwiss = isDynamicSwissFormat(format);
   const excelRef = isExcelRef64Format(format);
@@ -1733,6 +2088,7 @@ function BracketTab({
         matchNumber={modalMatch ? matchNumbers.get(modalMatch.id) : undefined}
         open={modalMatch !== null}
         saving={matchSaving}
+        tournamentTables={tournamentTables}
         onClose={() => setModalMatch(null)}
         onSave={handleSaveMatchResult}
         onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
@@ -1806,6 +2162,7 @@ function MatchesScheduleTab({
   matchNumbers,
   onSaveMatchResult,
   onCancelMatchResult,
+  tournamentTables = [],
 }: {
   variant: "current" | "upcoming" | "completed";
   format: string;
@@ -1815,6 +2172,7 @@ function MatchesScheduleTab({
   matchNumbers: Map<string, number>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
+  tournamentTables?: { id: string; label: string }[];
 }) {
   const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
   const [matchSaving, setMatchSaving] = useState(false);
@@ -1970,6 +2328,7 @@ function MatchesScheduleTab({
         matchNumber={modalMatch ? matchNumbers.get(modalMatch.id) : undefined}
         open={modalMatch !== null}
         saving={matchSaving}
+        tournamentTables={tournamentTables}
         onClose={() => setModalMatch(null)}
         onSave={handleSaveMatchResult}
         onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
@@ -2121,16 +2480,20 @@ function MatchRow({
 }
 
 function PairTeamRow({
+  index,
   team,
   playerOptions,
   bracketLocked,
   onConfirm,
+  onFeePaidChange,
   onUpdated,
 }: {
+  index: number;
   team: Team;
   playerOptions: { value: string; label: string }[];
   bracketLocked: boolean;
   onConfirm: () => void | Promise<void>;
+  onFeePaidChange: (feePaid: boolean) => void | Promise<void>;
   onUpdated: () => void;
 }) {
   const [editing, setEditing] = useState(false);
@@ -2237,6 +2600,7 @@ function PairTeamRow({
 
   return (
     <li className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-zinc-900 px-3 py-2 text-sm">
+      <ParticipantIndex index={index} />
       <div className="min-w-0 flex-1">
         <div>
           {team.seed ? `#${team.seed} · ` : ""}
@@ -2264,38 +2628,54 @@ function PairTeamRow({
           )}
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <StatusBadge
-          status={team.status}
-          label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
-        />
+      <div className="tournament-participant-card-actions">
         {(team.status === "PENDING" || team.status === "REJECTED") && (
-          <RegistrationActionButton variant="primary" loadingLabel="Подтверждаем…" onClick={onConfirm}>
-            Подтвердить
-          </RegistrationActionButton>
+          <FeePaidCheckbox
+            checked={Boolean(team.feePaid)}
+            onChange={onFeePaidChange}
+          />
         )}
-        {!bracketLocked && team.status !== "CANCELLED" && (
-          <>
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="text-xs text-emerald-400 hover:underline"
-            >
-              Изменить
-            </button>
-            <button
-              type="button"
-              onClick={removeTeam}
-              disabled={removing}
-              className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {removing && (
-                <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              )}
-              {removing ? "…" : "Убрать"}
-            </button>
-          </>
+        {team.status === "CONFIRMED" && (
+          <FeePaidCheckbox checked disabled onChange={async () => {}} />
         )}
+        <div className="tournament-participant-card-buttons">
+          <StatusBadge
+            status={team.status}
+            label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
+          />
+          {(team.status === "PENDING" || team.status === "REJECTED") && (
+            <RegistrationActionButton
+              variant="primary"
+              loadingLabel="Подтверждаем…"
+              disabled={!team.feePaid}
+              onClick={onConfirm}
+            >
+              Подтвердить
+            </RegistrationActionButton>
+          )}
+          {!bracketLocked && team.status !== "CANCELLED" && (
+            <>
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="text-xs text-emerald-400 hover:underline"
+              >
+                Изменить
+              </button>
+              <button
+                type="button"
+                onClick={removeTeam}
+                disabled={removing}
+                className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {removing && (
+                  <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                )}
+                {removing ? "…" : "Убрать"}
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </li>
   );

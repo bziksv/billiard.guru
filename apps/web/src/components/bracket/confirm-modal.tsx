@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useId, useState } from "react";
 import { cn } from "@/lib/cn";
 
 export function ConfirmModal({
@@ -11,6 +12,8 @@ export function ConfirmModal({
   variant = "default",
   loading = false,
   error = null,
+  confirmPhrase,
+  confirmPhraseLabel,
   onConfirm,
   onClose,
 }: {
@@ -22,9 +25,21 @@ export function ConfirmModal({
   variant?: "default" | "danger";
   loading?: boolean;
   error?: string | null;
+  /** Если задано — кнопка подтверждения активна только при точном вводе. */
+  confirmPhrase?: string;
+  confirmPhraseLabel?: string;
   onConfirm: () => void | Promise<void>;
   onClose: () => void;
 }) {
+  const phraseInputId = useId();
+  const [typedPhrase, setTypedPhrase] = useState("");
+
+  useEffect(() => {
+    if (!open) setTypedPhrase("");
+  }, [open]);
+
+  const phraseOk = !confirmPhrase || typedPhrase === confirmPhrase;
+
   if (!open) return null;
 
   return (
@@ -56,6 +71,24 @@ export function ConfirmModal({
             </div>
           )}
 
+          {confirmPhrase && (
+            <label htmlFor={phraseInputId} className="block text-sm">
+              <span className="bracket-modal-muted mb-1.5 block text-xs leading-relaxed">
+                {confirmPhraseLabel ??
+                  `Введите «${confirmPhrase}» для подтверждения`}
+              </span>
+              <input
+                id={phraseInputId}
+                type="text"
+                value={typedPhrase}
+                onChange={(e) => setTypedPhrase(e.target.value)}
+                autoComplete="off"
+                className="site-input w-full"
+                placeholder={confirmPhrase}
+              />
+            </label>
+          )}
+
           {error && (
             <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
               {error}
@@ -74,7 +107,7 @@ export function ConfirmModal({
           </button>
           <button
             type="button"
-            disabled={loading}
+            disabled={loading || !phraseOk}
             onClick={() => void onConfirm()}
             className={cn(
               "admin-btn px-4 py-2 text-sm disabled:opacity-50",

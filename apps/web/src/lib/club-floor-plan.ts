@@ -41,6 +41,8 @@ export type FloorPlanItem = {
   priceTierLabel?: string;
   /** Тарифы из priceTiers клуба; пусто — все почасовые тарифы клуба */
   priceTierLabels?: string[];
+  /** Ссылка на трансляцию (YouTube, Rutube и т.п.) */
+  streamUrl?: string;
 };
 
 export type ClubFloorPlan = {
@@ -211,6 +213,9 @@ export function parseFloorPlan(raw: unknown): ClubFloorPlan | null {
       if (typeof row.priceTierLabel === "string" && row.priceTierLabel.trim()) {
         item.priceTierLabel = row.priceTierLabel.trim().slice(0, 80);
       }
+      if (typeof row.streamUrl === "string" && row.streamUrl.trim()) {
+        item.streamUrl = row.streamUrl.trim().slice(0, 2000);
+      }
     } else if (typeof row.label === "string" && row.label.trim()) {
       item.label = row.label.trim().slice(0, 40);
     }
@@ -234,6 +239,7 @@ export function floorPlanToJson(plan: ClubFloorPlan | null): Record<string, unkn
       ...(item.tableIndex && { tableIndex: item.tableIndex }),
       ...(item.label && { label: item.label }),
       ...(item.priceTierLabels?.length && { priceTierLabels: item.priceTierLabels }),
+      ...(item.streamUrl && { streamUrl: item.streamUrl }),
     })),
   };
 }

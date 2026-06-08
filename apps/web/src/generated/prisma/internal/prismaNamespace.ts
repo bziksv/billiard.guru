@@ -2435,6 +2435,8 @@ export const TournamentScalarFieldEnum = {
   ratingSource: 'ratingSource',
   handicapHalfStep: 'handicapHalfStep',
   suppressNotifications: 'suppressNotifications',
+  tableIds: 'tableIds',
+  tableStreams: 'tableStreams',
   startsAt: 'startsAt',
   clubApprovalToken: 'clubApprovalToken',
   publishedAt: 'publishedAt',
@@ -2454,6 +2456,7 @@ export const TournamentTeamScalarFieldEnum = {
   clubId: 'clubId',
   source: 'source',
   status: 'status',
+  feePaid: 'feePaid',
   seed: 'seed',
   swissPoints: 'swissPoints',
   createdAt: 'createdAt',
@@ -2475,6 +2478,7 @@ export const TournamentMatchScalarFieldEnum = {
   team2Score: 'team2Score',
   startedAt: 'startedAt',
   finishedAt: 'finishedAt',
+  tableId: 'tableId',
   status: 'status',
   createdAt: 'createdAt'
 } as const
@@ -2489,6 +2493,7 @@ export const TournamentRegistrationScalarFieldEnum = {
   clubId: 'clubId',
   source: 'source',
   status: 'status',
+  feePaid: 'feePaid',
   createdAt: 'createdAt',
   confirmedAt: 'confirmedAt'
 } as const
@@ -2882,7 +2887,8 @@ export const TournamentMatchOrderByRelevanceFieldEnum = {
   tournamentId: 'tournamentId',
   team1Id: 'team1Id',
   team2Id: 'team2Id',
-  winnerTeamId: 'winnerTeamId'
+  winnerTeamId: 'winnerTeamId',
+  tableId: 'tableId'
 } as const
 
 export type TournamentMatchOrderByRelevanceFieldEnum = (typeof TournamentMatchOrderByRelevanceFieldEnum)[keyof typeof TournamentMatchOrderByRelevanceFieldEnum]

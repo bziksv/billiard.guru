@@ -136,6 +136,7 @@ export function OlympicBracketView({
     >
       <div
         className="relative min-w-max"
+        data-bracket-capture
         style={{ width: canvasWidth, height: canvasHeight }}
       >
         <svg

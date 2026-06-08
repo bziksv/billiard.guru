@@ -22,6 +22,7 @@ export interface AdminTournamentParticipant {
   id: string;
   status: string;
   source?: string;
+  feePaid?: boolean;
   player: {
     id: string;
     firstName: string;
@@ -36,6 +37,7 @@ export interface AdminTournamentParticipant {
 export interface AdminTournamentTeam {
   id: string;
   status: string;
+  feePaid?: boolean;
   seed?: number | null;
   swissPoints?: number;
   player1: {
@@ -68,6 +70,7 @@ export interface AdminTournamentMatch {
   team2Score?: number | null;
   startedAt?: string | null;
   finishedAt?: string | null;
+  tableId?: string | null;
   team1: AdminTournamentTeam | null;
   team2: AdminTournamentTeam | null;
   winnerTeam: AdminTournamentTeam | null;
@@ -84,12 +87,16 @@ export interface AdminTournament {
   ratingSource?: "CLUB" | "SYSTEM";
   handicapHalfStep?: boolean;
   suppressNotifications?: boolean;
+  tableIds?: unknown;
+  tableStreams?: unknown;
   startsAt?: string | null;
   club: {
     name: string;
     id?: string;
     phone?: string;
     telegramId?: string | null;
+    floorPlan?: unknown;
+    tableCounts?: unknown;
     city?: { id: string; nameRu: string; country: { id: string; nameRu: string } };
   };
   registrations: AdminTournamentParticipant[];

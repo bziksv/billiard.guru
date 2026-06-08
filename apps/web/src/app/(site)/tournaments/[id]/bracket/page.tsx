@@ -14,6 +14,7 @@ import {
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { resolveMatchStreamUrl } from "@/lib/tournament-stream";
 import { APP_NAME } from "@/lib/brand";
 
 export const metadata = {
@@ -56,6 +57,12 @@ export default async function TournamentBracketPage({
     notFound();
   }
 
+  const streamContext = {
+    tableIds: tournament.tableIds,
+    tableStreams: tournament.tableStreams,
+  };
+  const floorPlan = tournament.club.floorPlan;
+
   const matches: BracketMatchView[] = tournament.matches.map((m) => ({
     id: m.id,
     round: m.round,
@@ -66,6 +73,8 @@ export default async function TournamentBracketPage({
     team2Score: m.team2Score,
     startedAt: m.startedAt?.toISOString() ?? null,
     finishedAt: m.finishedAt?.toISOString() ?? null,
+    tableId: m.tableId,
+    streamUrl: resolveMatchStreamUrl({ tableId: m.tableId }, streamContext, floorPlan),
     team1: m.team1,
     team2: m.team2,
   }));

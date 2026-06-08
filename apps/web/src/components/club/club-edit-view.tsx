@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { ConfirmModal } from "@/components/bracket/confirm-modal";
 import { ClubPhotosEditor } from "@/components/club/club-photos-editor";
 import { clubEditablePhotoUrls } from "@/lib/club-photos";
 import { ClubConfirmPanel } from "@/components/admin/club-confirm-panel";
@@ -48,6 +50,7 @@ interface Club {
   bookingSlotMinutes: number;
   bookingAdvanceDays: number;
   city: { nameRu: string; country: { nameRu: string } };
+  _count?: { tournaments: number };
 }
 
 export function ClubEditView({
@@ -57,11 +60,15 @@ export function ClubEditView({
   clubId: string;
   variant: "admin" | "manage";
 }) {
+  const router = useRouter();
   const [club, setClub] = useState<Club | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const [name, setName] = useState("");
   const [cityId, setCityId] = useState("");
@@ -207,6 +214,25 @@ export function ClubEditView({
     setMessage("Фото удалено");
   }
 
+  async function deleteClub() {
+    if (!club) return;
+    setDeleteLoading(true);
+    setDeleteError(null);
+    const res = await fetch(`/api/clubs/${clubId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirmName: club.name }),
+    });
+    const data = await res.json();
+    setDeleteLoading(false);
+    if (!res.ok) {
+      setDeleteError(data.error ?? "Не удалось удалить клуб");
+      return;
+    }
+    router.push("/admin/clubs");
+    router.refresh();
+  }
+
   if (loading) return <p className="text-sm text-zinc-500">Загрузка…</p>;
   if (!club) return <p className="text-sm text-red-400">{error ?? "Клуб не найден"}</p>;
 
@@ -248,8 +274,44 @@ export function ClubEditView({
           >
             На сайте
           </Link>
+          {variant === "admin" && (
+            <button
+              type="button"
+              onClick={() => {
+                setDeleteError(null);
+                setDeleteOpen(true);
+              }}
+              className="admin-btn admin-btn--danger px-4 py-2 text-sm"
+            >
+              Удалить клуб
+            </button>
+          )}
         </div>
       </div>
+
+      {variant === "admin" && (
+        <ConfirmModal
+          open={deleteOpen}
+          title="Удалить клуб?"
+          description={
+            club._count && club._count.tournaments > 0
+              ? `Клуб «${club.name}» и ${club._count.tournaments} турнир(ов) будут удалены безвозвратно. Также исчезнут новости, брони, рейтинги и сотрудники этого клуба.`
+              : `Клуб «${club.name}» будет удалён безвозвратно вместе с новостями, бронями, рейтингами и сотрудниками.`
+          }
+          confirmLabel="Удалить навсегда"
+          variant="danger"
+          loading={deleteLoading}
+          error={deleteError}
+          confirmPhrase={club.name}
+          confirmPhraseLabel={`Введите название клуба «${club.name}» для подтверждения`}
+          onConfirm={deleteClub}
+          onClose={() => {
+            if (deleteLoading) return;
+            setDeleteOpen(false);
+            setDeleteError(null);
+          }}
+        />
+      )}
 
       <div className="flex items-start gap-6 lg:gap-10">
         <div className="min-w-0 max-w-2xl flex-1 space-y-8">

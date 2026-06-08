@@ -8,6 +8,7 @@ import {
 import { teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
+import { BracketStreamLink } from "@/components/bracket/bracket-stream-link";
 import {
   isActiveBracketMatch,
   isMatchReadyForResult,
@@ -572,11 +573,15 @@ export function LlbBracketMatch({
               <span className="tabular-nums text-[var(--bracket-meta-text)]">
                 сл.{match.slot}
               </span>
+              {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
             </>
           ) : (
-            <span className="bracket-round-label font-semibold tabular-nums">
-              №{matchNumber}
-            </span>
+            <>
+              <span className="bracket-round-label font-semibold tabular-nums">
+                №{matchNumber}
+              </span>
+              {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
+            </>
           )}
         </MatchArea>
       )}

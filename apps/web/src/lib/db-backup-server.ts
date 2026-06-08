@@ -345,12 +345,20 @@ export async function getDbBackupSettings(): Promise<DbBackupSettings> {
   };
 
   const cronScriptPath = path.join(repoRoot, "scripts", "db-backup-cron.sh");
+  const cronPhpScriptPath = path.join(repoRoot, "scripts", "db-backup-cron.php");
   let scriptExists = false;
+  let phpScriptExists = false;
   try {
     await fs.access(cronScriptPath, fs.constants.R_OK);
     scriptExists = true;
   } catch {
     scriptExists = false;
+  }
+  try {
+    await fs.access(cronPhpScriptPath, fs.constants.R_OK);
+    phpScriptExists = true;
+  } catch {
+    phpScriptExists = false;
   }
 
   return {
@@ -365,8 +373,10 @@ export async function getDbBackupSettings(): Promise<DbBackupSettings> {
         repoRoot,
         envFilePath: path.join(repoRoot, "apps", "web", ".env"),
         cronScriptPath,
+        cronPhpScriptPath,
         logPath: resolveCronLogPath(),
         scriptExists,
+        phpScriptExists,
       },
       schedule,
       Boolean(process.env.DB_BACKUP_CRON_SECRET?.trim()),

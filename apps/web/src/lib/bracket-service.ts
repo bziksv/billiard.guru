@@ -20,6 +20,7 @@ import { getResolvedParticipantRules } from "@/lib/bracket-formats/settings-serv
 import { logger } from "@/lib/logger";
 import excelRef from "@/lib/excel-bracket-64-reference.json";
 import { notifyMatchStartScheduled } from "@/lib/match-start-notification";
+import { pickFreeTournamentTableId } from "@/lib/tournament-stream";
 import {
   buildOlympicBracket,
   buildOlympicBracketWithBronze,
@@ -94,6 +95,7 @@ export interface MatchResultInput {
   team2Score?: number | null;
   startedAt?: string | null;
   finishedAt?: string | null;
+  tableId?: string | null;
 }
 
 function parseOptionalDate(value: string | null | undefined) {
@@ -1391,6 +1393,24 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
         }
       : {};
 
+  let tableId: string | null | undefined = undefined;
+  if (input.tableId !== undefined) {
+    tableId = input.tableId;
+  } else if (
+    startedAt !== undefined &&
+    startedAt !== null &&
+    !match.tableId &&
+    !match.startedAt
+  ) {
+    tableId = await pickFreeTournamentTableId(db, match.tournamentId, match.id);
+  }
+  if (
+    (input.winnerTeamId || (finishedAt !== undefined && finishedAt !== null)) &&
+    !match.finishedAt
+  ) {
+    tableId = null;
+  }
+
   await db.tournamentMatch.update({
     where: { id: input.matchId },
     data: {
@@ -1398,6 +1418,7 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
       ...(input.team2Score !== undefined && { team2Score: input.team2Score }),
       ...(startedAt !== undefined && { startedAt }),
       ...(finishedAt !== undefined && { finishedAt }),
+      ...(tableId !== undefined && { tableId }),
       ...autoTimes,
     },
   });

@@ -15,6 +15,8 @@ export type BracketMatchView = {
   team2Score?: number | null;
   startedAt?: string | null;
   finishedAt?: string | null;
+  tableId?: string | null;
+  streamUrl?: string | null;
 };
 
 export type SwissStandingView = BracketTeamView & {

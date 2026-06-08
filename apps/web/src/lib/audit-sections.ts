@@ -58,7 +58,13 @@ export function inferAuditSection(
   }
   if (action.startsWith("idea.") || entityType === "idea") return "ideas";
   if (action.startsWith("tournament.") || entityType === "tournament") return "tournaments";
-  if (action === "club.update" || action === "club.create" || entityType === "club") {
+  if (
+    action === "club.update" ||
+    action === "club.create" ||
+    action === "club.delete" ||
+    entityType === "club"
+  ) {
+    if (action === "club.delete") return "admin_clubs";
     return action.includes("floor") ? "floor" : "club";
   }
   if (action.startsWith("player.")) return "admin_players";
@@ -68,6 +74,7 @@ export function inferAuditSection(
 export const AUDIT_ACTION_LABELS: Record<string, string> = {
   "club.update": "Изменён профиль клуба",
   "club.create": "Создан клуб",
+  "club.delete": "Удалён клуб",
   "club_staff.add": "Добавлен сотрудник",
   "club_staff.remove": "Удалён сотрудник",
   "table_booking.create": "Новая бронь",

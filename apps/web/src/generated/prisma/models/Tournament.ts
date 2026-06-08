@@ -81,6 +81,8 @@ export type TournamentCountAggregateOutputType = {
   ratingSource: number
   handicapHalfStep: number
   suppressNotifications: number
+  tableIds: number
+  tableStreams: number
   startsAt: number
   clubApprovalToken: number
   publishedAt: number
@@ -145,6 +147,8 @@ export type TournamentCountAggregateInputType = {
   ratingSource?: true
   handicapHalfStep?: true
   suppressNotifications?: true
+  tableIds?: true
+  tableStreams?: true
   startsAt?: true
   clubApprovalToken?: true
   publishedAt?: true
@@ -250,6 +254,8 @@ export type TournamentGroupByOutputType = {
   ratingSource: $Enums.TournamentRatingSource
   handicapHalfStep: boolean
   suppressNotifications: boolean
+  tableIds: runtime.JsonValue | null
+  tableStreams: runtime.JsonValue | null
   startsAt: Date | null
   clubApprovalToken: string | null
   publishedAt: Date | null
@@ -291,6 +297,8 @@ export type TournamentWhereInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolFilter<"Tournament"> | boolean
+  tableIds?: Prisma.JsonNullableFilter<"Tournament">
+  tableStreams?: Prisma.JsonNullableFilter<"Tournament">
   startsAt?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   clubApprovalToken?: Prisma.StringNullableFilter<"Tournament"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
@@ -313,6 +321,8 @@ export type TournamentOrderByWithRelationInput = {
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
+  tableIds?: Prisma.SortOrderInput | Prisma.SortOrder
+  tableStreams?: Prisma.SortOrderInput | Prisma.SortOrder
   startsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   clubApprovalToken?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -340,6 +350,8 @@ export type TournamentWhereUniqueInput = Prisma.AtLeast<{
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolFilter<"Tournament"> | boolean
+  tableIds?: Prisma.JsonNullableFilter<"Tournament">
+  tableStreams?: Prisma.JsonNullableFilter<"Tournament">
   startsAt?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Tournament"> | Date | string
@@ -361,6 +373,8 @@ export type TournamentOrderByWithAggregationInput = {
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
+  tableIds?: Prisma.SortOrderInput | Prisma.SortOrder
+  tableStreams?: Prisma.SortOrderInput | Prisma.SortOrder
   startsAt?: Prisma.SortOrderInput | Prisma.SortOrder
   clubApprovalToken?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -387,6 +401,8 @@ export type TournamentScalarWhereWithAggregatesInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceWithAggregatesFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolWithAggregatesFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolWithAggregatesFilter<"Tournament"> | boolean
+  tableIds?: Prisma.JsonNullableWithAggregatesFilter<"Tournament">
+  tableStreams?: Prisma.JsonNullableWithAggregatesFilter<"Tournament">
   startsAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tournament"> | Date | string | null
   clubApprovalToken?: Prisma.StringNullableWithAggregatesFilter<"Tournament"> | string | null
   publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Tournament"> | Date | string | null
@@ -404,6 +420,8 @@ export type TournamentCreateInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -426,6 +444,8 @@ export type TournamentUncheckedCreateInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -446,6 +466,8 @@ export type TournamentUpdateInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -468,6 +490,8 @@ export type TournamentUncheckedUpdateInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -489,6 +513,8 @@ export type TournamentCreateManyInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -506,6 +532,8 @@ export type TournamentUpdateManyMutationInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -524,6 +552,8 @@ export type TournamentUncheckedUpdateManyInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -558,6 +588,8 @@ export type TournamentCountOrderByAggregateInput = {
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
+  tableIds?: Prisma.SortOrder
+  tableStreams?: Prisma.SortOrder
   startsAt?: Prisma.SortOrder
   clubApprovalToken?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
@@ -720,6 +752,8 @@ export type TournamentCreateWithoutClubInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -740,6 +774,8 @@ export type TournamentUncheckedCreateWithoutClubInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -790,6 +826,8 @@ export type TournamentScalarWhereInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolFilter<"Tournament"> | boolean
+  tableIds?: Prisma.JsonNullableFilter<"Tournament">
+  tableStreams?: Prisma.JsonNullableFilter<"Tournament">
   startsAt?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
   clubApprovalToken?: Prisma.StringNullableFilter<"Tournament"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"Tournament"> | Date | string | null
@@ -807,6 +845,8 @@ export type TournamentCreateWithoutTeamsInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -828,6 +868,8 @@ export type TournamentUncheckedCreateWithoutTeamsInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -863,6 +905,8 @@ export type TournamentUpdateWithoutTeamsInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -884,6 +928,8 @@ export type TournamentUncheckedUpdateWithoutTeamsInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -903,6 +949,8 @@ export type TournamentCreateWithoutMatchesInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -924,6 +972,8 @@ export type TournamentUncheckedCreateWithoutMatchesInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -959,6 +1009,8 @@ export type TournamentUpdateWithoutMatchesInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -980,6 +1032,8 @@ export type TournamentUncheckedUpdateWithoutMatchesInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -999,6 +1053,8 @@ export type TournamentCreateWithoutRegistrationsInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -1020,6 +1076,8 @@ export type TournamentUncheckedCreateWithoutRegistrationsInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -1055,6 +1113,8 @@ export type TournamentUpdateWithoutRegistrationsInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1076,6 +1136,8 @@ export type TournamentUncheckedUpdateWithoutRegistrationsInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1095,6 +1157,8 @@ export type TournamentCreateManyClubInput = {
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Date | string | null
   clubApprovalToken?: string | null
   publishedAt?: Date | string | null
@@ -1112,6 +1176,8 @@ export type TournamentUpdateWithoutClubInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1132,6 +1198,8 @@ export type TournamentUncheckedUpdateWithoutClubInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1152,6 +1220,8 @@ export type TournamentUncheckedUpdateManyWithoutClubInput = {
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   startsAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clubApprovalToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1219,6 +1289,8 @@ export type TournamentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   ratingSource?: boolean
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: boolean
+  tableStreams?: boolean
   startsAt?: boolean
   clubApprovalToken?: boolean
   publishedAt?: boolean
@@ -1244,6 +1316,8 @@ export type TournamentSelectScalar = {
   ratingSource?: boolean
   handicapHalfStep?: boolean
   suppressNotifications?: boolean
+  tableIds?: boolean
+  tableStreams?: boolean
   startsAt?: boolean
   clubApprovalToken?: boolean
   publishedAt?: boolean
@@ -1251,7 +1325,7 @@ export type TournamentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "clubId" | "format" | "status" | "ratingMax" | "ratingSource" | "handicapHalfStep" | "suppressNotifications" | "startsAt" | "clubApprovalToken" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
+export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "clubId" | "format" | "status" | "ratingMax" | "ratingSource" | "handicapHalfStep" | "suppressNotifications" | "tableIds" | "tableStreams" | "startsAt" | "clubApprovalToken" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
 export type TournamentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Tournament$registrationsArgs<ExtArgs>
@@ -1291,6 +1365,14 @@ export type $TournamentPayload<ExtArgs extends runtime.Types.Extensions.Internal
      * Не слать Telegram по этому турниру (тестовые копии и отладка)
      */
     suppressNotifications: boolean
+    /**
+     * ID столов схемы зала или virtual:FORMAT:n — под турнир
+     */
+    tableIds: runtime.JsonValue | null
+    /**
+     * Ссылки на трансляции по id стола { "floor-id": "https://..." }
+     */
+    tableStreams: runtime.JsonValue | null
     startsAt: Date | null
     clubApprovalToken: string | null
     publishedAt: Date | null
@@ -1679,6 +1761,8 @@ export interface TournamentFieldRefs {
   readonly ratingSource: Prisma.FieldRef<"Tournament", 'TournamentRatingSource'>
   readonly handicapHalfStep: Prisma.FieldRef<"Tournament", 'Boolean'>
   readonly suppressNotifications: Prisma.FieldRef<"Tournament", 'Boolean'>
+  readonly tableIds: Prisma.FieldRef<"Tournament", 'Json'>
+  readonly tableStreams: Prisma.FieldRef<"Tournament", 'Json'>
   readonly startsAt: Prisma.FieldRef<"Tournament", 'DateTime'>
   readonly clubApprovalToken: Prisma.FieldRef<"Tournament", 'String'>
   readonly publishedAt: Prisma.FieldRef<"Tournament", 'DateTime'>

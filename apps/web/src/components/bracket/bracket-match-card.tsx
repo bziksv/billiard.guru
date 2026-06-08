@@ -8,6 +8,7 @@ import {
   type BracketCardFooterRow,
   type BracketMatchView,
 } from "@/lib/bracket-view";
+import { BracketStreamLink } from "@/components/bracket/bracket-stream-link";
 import { isMatchResolved } from "@/lib/match-result";
 import { GRID_FOOTER_LINE_H, GRID_META_H } from "@/lib/swiss-bracket-layout";
 import { cn } from "@/lib/cn";
@@ -303,22 +304,24 @@ export function BracketMatchCard({
             type="button"
             data-bracket-interactive
             onClick={openMatch}
-            className="llb-bracket-match__meta bracket-match-meta--clickable flex w-full items-center justify-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
+            className="llb-bracket-match__meta bracket-match-meta--clickable flex w-full items-center justify-center gap-1.5 border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
             style={{ height: GRID_META_H }}
             title="Результат встречи"
           >
             <span className="bracket-round-label font-semibold tabular-nums">
               №{matchNumber}
             </span>
+            {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
           </button>
         ) : (
           <div
-            className="llb-bracket-match__meta flex items-center justify-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
+            className="llb-bracket-match__meta flex items-center justify-center gap-1.5 border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
             style={{ height: GRID_META_H }}
           >
             <span className="bracket-round-label font-semibold tabular-nums">
               №{matchNumber}
             </span>
+            {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
           </div>
         ))}
       <TeamLine

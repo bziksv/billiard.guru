@@ -365,3 +365,64 @@ export async function PATCH(
     return NextResponse.json({ error: "Не удалось обновить клуб" }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const session = await requireSuperAdmin();
+    const { id } = await params;
+
+    const club = await prisma.club.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        _count: { select: { tournaments: true } },
+      },
+    });
+    if (!club) {
+      return NextResponse.json({ error: "Клуб не найден" }, { status: 404 });
+    }
+
+    const body = (await request.json().catch(() => ({}))) as {
+      confirmName?: unknown;
+    };
+    const confirmName =
+      typeof body.confirmName === "string" ? body.confirmName.trim() : "";
+    if (confirmName !== club.name) {
+      return NextResponse.json(
+        { error: "Введите точное название клуба для подтверждения" },
+        { status: 400 },
+      );
+    }
+
+    await prisma.$transaction(async (tx) => {
+      await tx.tournament.deleteMany({ where: { clubId: id } });
+      await tx.club.delete({ where: { id } });
+    });
+
+    await writeAuditLog({
+      actorType: "admin",
+      actorId: session.playerId,
+      action: "club.delete",
+      entityType: "club",
+      entityId: id,
+      section: "admin_clubs",
+      clubId: id,
+      summary: `Удалён клуб «${club.name}»`,
+      payload: {
+        name: club.name,
+        tournamentsDeleted: club._count.tournaments,
+      },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
+    console.error("[clubs DELETE]", error);
+    return NextResponse.json({ error: "Не удалось удалить клуб" }, { status: 500 });
+  }
+}

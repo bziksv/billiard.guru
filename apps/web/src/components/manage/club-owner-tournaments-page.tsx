@@ -20,6 +20,7 @@ import {
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
 import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
+import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
 
 const CURRENT_STATUSES = new Set([
   "DRAFT",
@@ -39,6 +40,8 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
+  const [tableStreams, setTableStreams] = useState<Record<string, string>>({});
   const [tab, setTab] = useState<"create" | "current" | "finished">("current");
 
   async function reloadTournaments() {
@@ -79,6 +82,10 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
 
   async function createTournament(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (selectedTableIds.length === 0) {
+      setCreateMessage("Выберите хотя бы один стол");
+      return;
+    }
     const formEl = e.currentTarget;
     const form = new FormData(formEl);
     setCreateMessage(null);
@@ -99,6 +106,8 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
           ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
           handicapHalfStep: form.get("handicapHalfStep") === "on",
           suppressNotifications: form.get("suppressNotifications") === "on",
+          tableIds: selectedTableIds,
+          tableStreams,
         }),
       });
       const data = await res.json();
@@ -108,6 +117,8 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
       }
       await reloadTournaments();
       setNewFormat("OLYMPIC");
+      setSelectedTableIds([]);
+      setTableStreams({});
       formEl.reset();
       setCreateMessage(
         data.message ??
@@ -195,6 +206,15 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               className="site-input w-full resize-y"
             />
             <input name="startsAt" type="datetime-local" className="site-input w-full" />
+            <div className="sm:col-span-2">
+              <TournamentTablePicker
+                clubId={clubId}
+                selectedIds={selectedTableIds}
+                streamUrls={tableStreams}
+                onChange={setSelectedTableIds}
+                onStreamUrlsChange={setTableStreams}
+              />
+            </div>
             <label className="flex cursor-pointer items-start gap-3 text-sm">
               <input
                 type="checkbox"
@@ -259,7 +279,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
             <div className="flex flex-wrap items-center gap-4">
               <button
                 type="submit"
-                disabled={creating}
+                disabled={creating || selectedTableIds.length === 0}
                 className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {creating && (

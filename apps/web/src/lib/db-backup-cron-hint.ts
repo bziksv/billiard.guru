@@ -39,6 +39,9 @@ export function recommendCronExpression(input: DbBackupCronScheduleInput): strin
   return `${minute} ${hour} * * *`;
 }
 
+/** PHP на shared-хостинге Beget для cron (не bash-скрипт). */
+export const BEGET_CRON_PHP_BIN = "/usr/local/bin/php8.2";
+
 export function buildCronLine(
   cronExpression: string,
   cronScriptPath: string,
@@ -48,6 +51,18 @@ export function buildCronLine(
     return `# Автобэкап выключен — строку в crontab не добавляйте`;
   }
   return `${cronExpression} ${cronScriptPath} >> ${logPath} 2>&1`;
+}
+
+/** Строка crontab для панели Beget (cron через php8.2). */
+export function buildBegetCronLine(
+  cronExpression: string,
+  phpScriptPath: string,
+  logPath: string,
+): string {
+  if (cronExpression === "—") {
+    return `# Автобэкап выключен — строку в crontab не добавляйте`;
+  }
+  return `${cronExpression} ${BEGET_CRON_PHP_BIN} ${phpScriptPath} >> ${logPath} 2>&1`;
 }
 
 export function cronSetupNote(input: DbBackupCronScheduleInput): string {
@@ -64,17 +79,25 @@ export function cronSetupNote(input: DbBackupCronScheduleInput): string {
 export type DbBackupCronSetup = {
   repoRoot: string;
   envFilePath: string;
+  /** Bash-скрипт (SSH / VPS). */
   cronScriptPath: string;
+  /** PHP-обёртка для cron на Beget. */
+  cronPhpScriptPath: string;
   logPath: string;
   cronExpression: string;
+  /** Bash: прямой запуск .sh */
   cronLine: string;
+  /** Beget: php8.2 + db-backup-cron.php */
+  cronLineBeget: string;
   cronSecretConfigured: boolean;
   /** Строка для apps/web/.env, если секрет ещё не задан */
   envSecretLine: string;
   generateSecretCommand: string;
   note: string;
   testCommand: string;
+  testCommandBeget: string;
   scriptExists: boolean;
+  phpScriptExists: boolean;
 };
 
 export function buildDbBackupCronSetup(
@@ -82,8 +105,10 @@ export function buildDbBackupCronSetup(
     repoRoot: string;
     envFilePath: string;
     cronScriptPath: string;
+    cronPhpScriptPath: string;
     logPath: string;
     scriptExists: boolean;
+    phpScriptExists: boolean;
   },
   schedule: DbBackupCronScheduleInput,
   cronSecretConfigured: boolean,
@@ -93,14 +118,22 @@ export function buildDbBackupCronSetup(
     repoRoot: paths.repoRoot,
     envFilePath: paths.envFilePath,
     cronScriptPath: paths.cronScriptPath,
+    cronPhpScriptPath: paths.cronPhpScriptPath,
     logPath: paths.logPath,
     cronExpression,
     cronLine: buildCronLine(cronExpression, paths.cronScriptPath, paths.logPath),
+    cronLineBeget: buildBegetCronLine(
+      cronExpression,
+      paths.cronPhpScriptPath,
+      paths.logPath,
+    ),
     cronSecretConfigured,
     envSecretLine: "DB_BACKUP_CRON_SECRET=замените-на-длинную-случайную-строку",
     generateSecretCommand: "openssl rand -hex 32",
     note: cronSetupNote(schedule),
     testCommand: paths.cronScriptPath,
+    testCommandBeget: `${BEGET_CRON_PHP_BIN} ${paths.cronPhpScriptPath}`,
     scriptExists: paths.scriptExists,
+    phpScriptExists: paths.phpScriptExists,
   };
 }

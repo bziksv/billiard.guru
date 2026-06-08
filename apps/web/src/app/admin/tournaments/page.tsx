@@ -27,6 +27,7 @@ import {
   tournamentRatingSourceHint,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
+import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
 
 interface Club {
   id: string;
@@ -110,6 +111,8 @@ export default function TournamentsPage() {
   const [newFormat, setNewFormat] = useState("OLYMPIC");
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
+  const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
+  const [tableStreams, setTableStreams] = useState<Record<string, string>>({});
   const [startingId, setStartingId] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [geoCountries, setGeoCountries] = useState<GeoCountry[]>([]);
@@ -122,6 +125,11 @@ export default function TournamentsPage() {
   const [finishedSearch, setFinishedSearch] = useState("");
   const [filtersReady, setFiltersReady] = useState(false);
   const [tab, setTab] = useState<"create" | "current" | "finished">("current");
+
+  useEffect(() => {
+    setSelectedTableIds([]);
+    setTableStreams({});
+  }, [newClubId]);
 
   useEffect(() => {
     if (defaultsReady) setRatingSource(tournamentDefaults.ratingSource);
@@ -270,6 +278,14 @@ export default function TournamentsPage() {
 
   async function createTournament(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (!newClubId) {
+      setCreateMessage("Выберите клуб");
+      return;
+    }
+    if (selectedTableIds.length === 0) {
+      setCreateMessage("Выберите хотя бы один стол");
+      return;
+    }
     const formEl = e.currentTarget;
     const form = new FormData(formEl);
     setCreateMessage(null);
@@ -288,6 +304,8 @@ export default function TournamentsPage() {
         ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
         handicapHalfStep: form.get("handicapHalfStep") === "on",
         suppressNotifications: form.get("suppressNotifications") === "on",
+        tableIds: selectedTableIds,
+        tableStreams,
       }),
     });
     const data = await res.json();
@@ -298,6 +316,8 @@ export default function TournamentsPage() {
     await reloadTournaments();
     setNewClubId("");
     setNewFormat("OLYMPIC");
+    setSelectedTableIds([]);
+    setTableStreams({});
     formEl.reset();
     setCreateMessage(
       data.message ??
@@ -416,6 +436,17 @@ export default function TournamentsPage() {
             type="datetime-local"
             className="sm:col-span-2 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
           />
+          {newClubId && (
+            <div className="sm:col-span-2">
+              <TournamentTablePicker
+                clubId={newClubId}
+                selectedIds={selectedTableIds}
+                streamUrls={tableStreams}
+                onChange={setSelectedTableIds}
+                onStreamUrlsChange={setTableStreams}
+              />
+            </div>
+          )}
           <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
             <input
               type="checkbox"
@@ -481,7 +512,8 @@ export default function TournamentsPage() {
           <div className="sm:col-span-2 flex flex-wrap items-center gap-4">
             <button
               type="submit"
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500"
+              disabled={!newClubId || selectedTableIds.length === 0}
+              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
               Создать
             </button>

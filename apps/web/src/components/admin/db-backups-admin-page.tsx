@@ -101,9 +101,11 @@ function CronSetupBlock({
         </li>
 
         <li>
-          <p className="admin-label-xs mb-2">Строка в crontab</p>
+          <p className="admin-label-xs mb-2">Строка в crontab (Beget)</p>
           <p className="admin-muted mb-2 text-xs">
-            Панель Beget → Cron → <code className="text-xs">crontab -e</code>
+            На Beget cron запускается через <code className="text-xs">php8.2</code>. Не
+            указывайте <code className="text-xs">.sh</code> после php — нужен файл{" "}
+            <code className="text-xs">db-backup-cron.php</code>.
           </p>
           <dl className="mb-3 grid gap-2 text-sm sm:grid-cols-2">
             <div className="sm:col-span-2">
@@ -111,8 +113,8 @@ function CronSetupBlock({
               <dd className="mt-1 font-mono text-xs break-all">{setup.repoRoot}</dd>
             </div>
             <div className="sm:col-span-2">
-              <dt className="admin-label-xs">Скрипт</dt>
-              <dd className="mt-1 font-mono text-xs break-all">{setup.cronScriptPath}</dd>
+              <dt className="admin-label-xs">PHP-скрипт (Beget)</dt>
+              <dd className="mt-1 font-mono text-xs break-all">{setup.cronPhpScriptPath}</dd>
             </div>
             <div>
               <dt className="admin-label-xs">Лог</dt>
@@ -123,23 +125,51 @@ function CronSetupBlock({
               <dd className="mt-1 font-mono text-xs">{setup.cronExpression}</dd>
             </div>
           </dl>
+          {!setup.phpScriptExists && (
+            <p className="admin-error-panel mb-3 text-sm">
+              PHP-скрипт не найден:{" "}
+              <span className="font-mono text-xs">{setup.cronPhpScriptPath}</span>. Выполните{" "}
+              <code className="text-xs">git pull</code> на сервере.
+            </p>
+          )}
           <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap">
-            {setup.cronLine}
+            {setup.cronLineBeget}
           </pre>
           <button
             type="button"
             className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
-            onClick={() => void handleCopy("cron", setup.cronLine)}
+            onClick={() => void handleCopy("cron-beget", setup.cronLineBeget)}
             disabled={setup.cronExpression === "—"}
           >
-            {copied === "cron" ? "Скопировано" : "Копировать строку cron"}
+            {copied === "cron-beget" ? "Скопировано" : "Копировать строку cron (Beget)"}
           </button>
+          <details className="admin-muted mt-4 text-xs">
+            <summary className="cursor-pointer font-medium">SSH / bash (не Beget)</summary>
+            <p className="mt-2 mb-2">
+              Скрипт: <span className="font-mono">{setup.cronScriptPath}</span>
+            </p>
+            <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap">
+              {setup.cronLine}
+            </pre>
+            <button
+              type="button"
+              className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
+              onClick={() => void handleCopy("cron", setup.cronLine)}
+              disabled={setup.cronExpression === "—"}
+            >
+              {copied === "cron" ? "Скопировано" : "Копировать bash-строку"}
+            </button>
+          </details>
         </li>
 
         <li>
           <p className="admin-label-xs mb-2">Проверка вручную (SSH)</p>
+          <p className="admin-muted mb-2 text-xs">
+            После добавления секрета в .env перезапустите Passenger:{" "}
+            <code className="text-xs">touch …/standalone/tmp/restart.txt</code>
+          </p>
           <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs">
-            {`chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`}
+            {`${setup.testCommandBeget}\n# или bash:\nchmod +x ${setup.cronScriptPath}\n${setup.testCommand}`}
           </pre>
           <button
             type="button"
@@ -147,7 +177,7 @@ function CronSetupBlock({
             onClick={() =>
               void handleCopy(
                 "test",
-                `chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`,
+                `${setup.testCommandBeget}\n# или bash:\nchmod +x ${setup.cronScriptPath}\n${setup.testCommand}`,
               )
             }
           >
@@ -285,8 +315,10 @@ export function DbBackupsAdminPage() {
         repoRoot: settings.cronSetup.repoRoot,
         envFilePath: settings.cronSetup.envFilePath,
         cronScriptPath: settings.cronSetup.cronScriptPath,
+        cronPhpScriptPath: settings.cronSetup.cronPhpScriptPath,
         logPath: settings.cronSetup.logPath,
         scriptExists: settings.cronSetup.scriptExists,
+        phpScriptExists: settings.cronSetup.phpScriptExists,
       },
       {
         autoEnabled: draftAutoEnabled,

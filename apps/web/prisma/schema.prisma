@@ -364,6 +364,10 @@ model Tournament {
   handicapHalfStep    Boolean          @default(true) @map("handicap_half_step")
   /// Не слать Telegram по этому турниру (тестовые копии и отладка)
   suppressNotifications Boolean        @default(false) @map("suppress_notifications")
+  /// ID столов схемы зала или virtual:FORMAT:n — под турнир
+  tableIds            Json?            @map("table_ids")
+  /// Ссылки на трансляции по id стола { "floor-id": "https://..." }
+  tableStreams        Json?            @map("table_streams")
   startsAt            DateTime?        @map("starts_at")
   clubApprovalToken   String?          @unique @map("club_approval_token")
   publishedAt         DateTime?        @map("published_at")
@@ -390,6 +394,7 @@ model TournamentTeam {
   club         Club?              @relation(fields: [clubId], references: [id])
   source       RegistrationSource
   status       RegistrationStatus @default(PENDING)
+  feePaid      Boolean            @default(false) @map("fee_paid")
   seed         Int?
   swissPoints  Int                @default(0) @map("swiss_points")
   createdAt    DateTime           @default(now()) @map("created_at")
@@ -419,6 +424,8 @@ model TournamentMatch {
   team2Score   Int?            @map("team2_score")
   startedAt    DateTime?       @map("started_at")
   finishedAt   DateTime?       @map("finished_at")
+  /// Стол турнира (id с плана зала или virtual:FORMAT:n)
+  tableId      String?         @map("table_id")
   status       MatchStatus     @default(SCHEDULED)
   createdAt    DateTime        @default(now()) @map("created_at")
 
@@ -436,6 +443,7 @@ model TournamentRegistration {
   club         Club?              @relation(fields: [clubId], references: [id])
   source       RegistrationSource
   status       RegistrationStatus @default(PENDING)
+  feePaid      Boolean            @default(false) @map("fee_paid")
   createdAt    DateTime           @default(now()) @map("created_at")
   confirmedAt  DateTime?          @map("confirmed_at")
 

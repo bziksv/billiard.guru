@@ -164,6 +164,32 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Команда не найдена" }, { status: 404 });
     }
 
+    const player = await getCurrentPlayer();
+    if (!player) {
+      return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
+    }
+    const isOrganizer =
+      player.role === "SUPERADMIN" ||
+      (await playerCanManageClub(existing.tournament.club, player));
+
+    if (
+      data.feePaid !== undefined &&
+      data.status === undefined &&
+      !data.player1Id &&
+      !data.player2Id &&
+      data.name === undefined
+    ) {
+      if (!isOrganizer) {
+        return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
+      }
+      const team = await prisma.tournamentTeam.update({
+        where: { id: data.id },
+        data: { feePaid: data.feePaid },
+        include: { player1: true, player2: true, tournament: true },
+      });
+      return NextResponse.json(team);
+    }
+
     const matchCount = await prisma.tournamentMatch.count({
       where: { tournamentId: existing.tournamentId },
     });
@@ -240,13 +266,6 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (data.status) {
-      const player = await getCurrentPlayer();
-      if (!player) {
-        return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
-      }
-      const isOrganizer =
-        player.role === "SUPERADMIN" ||
-        (await playerCanManageClub(existing.tournament.club, player));
       if (!isOrganizer) {
         return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
       }
@@ -271,11 +290,26 @@ export async function PATCH(request: NextRequest) {
         }
       }
 
+      if (data.status === "CONFIRMED") {
+        const feeOk = data.feePaid === true || existing.feePaid;
+        if (!feeOk) {
+          return NextResponse.json(
+            { error: "Отметьте «Сдал взнос» перед подтверждением" },
+            { status: 400 },
+          );
+        }
+      }
+
       const team = await prisma.tournamentTeam.update({
         where: { id: data.id },
         data: {
           status: data.status,
           confirmedAt: data.status === "CONFIRMED" ? new Date() : null,
+          ...(data.status === "CONFIRMED"
+            ? { feePaid: true }
+            : data.status === "REJECTED" || data.status === "CANCELLED"
+              ? { feePaid: false }
+              : {}),
         },
         include: { player1: true, player2: true, tournament: true },
       });
