@@ -74,7 +74,7 @@ export async function createSqlDumpViaNode(filePath: string): Promise<void> {
 
     for (const table of tables) {
       if (!table) continue;
-      const createRows = await conn.query<Record<string, string>>(
+      const createRows = await conn.query<Record<string, string>[]>(
         `SHOW CREATE TABLE \`${table}\``,
       );
       const createSql = createRows[0]?.["Create Table"];
@@ -94,7 +94,7 @@ export async function createSqlDumpViaNode(filePath: string): Promise<void> {
     for (const trigger of triggers) {
       const name = trigger.Trigger;
       if (!name) continue;
-      const createRows = await conn.query<Record<string, string>>(
+      const createRows = await conn.query<Record<string, string>[]>(
         `SHOW CREATE TRIGGER \`${name}\``,
       );
       const createSql = createRows[0]?.["SQL Original Statement"] ??
