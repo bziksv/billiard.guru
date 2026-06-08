@@ -63,27 +63,44 @@ export function cronSetupNote(input: DbBackupCronScheduleInput): string {
 
 export type DbBackupCronSetup = {
   repoRoot: string;
+  envFilePath: string;
   cronScriptPath: string;
   logPath: string;
   cronExpression: string;
   cronLine: string;
   cronSecretConfigured: boolean;
+  /** Строка для apps/web/.env, если секрет ещё не задан */
+  envSecretLine: string;
+  generateSecretCommand: string;
   note: string;
   testCommand: string;
+  scriptExists: boolean;
 };
 
 export function buildDbBackupCronSetup(
-  paths: { repoRoot: string; cronScriptPath: string; logPath: string },
+  paths: {
+    repoRoot: string;
+    envFilePath: string;
+    cronScriptPath: string;
+    logPath: string;
+    scriptExists: boolean;
+  },
   schedule: DbBackupCronScheduleInput,
   cronSecretConfigured: boolean,
 ): DbBackupCronSetup {
   const cronExpression = recommendCronExpression(schedule);
   return {
-    ...paths,
+    repoRoot: paths.repoRoot,
+    envFilePath: paths.envFilePath,
+    cronScriptPath: paths.cronScriptPath,
+    logPath: paths.logPath,
     cronExpression,
     cronLine: buildCronLine(cronExpression, paths.cronScriptPath, paths.logPath),
     cronSecretConfigured,
+    envSecretLine: "DB_BACKUP_CRON_SECRET=замените-на-длинную-случайную-строку",
+    generateSecretCommand: "openssl rand -hex 32",
     note: cronSetupNote(schedule),
     testCommand: paths.cronScriptPath,
+    scriptExists: paths.scriptExists,
   };
 }

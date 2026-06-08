@@ -53,68 +53,108 @@ function CronSetupBlock({
       <div>
         <h3 className="text-sm font-semibold">Cron на сервере (Beget / SSH)</h3>
         <p className="admin-muted mt-1 text-sm">{setup.note}</p>
+        <p className="admin-muted mt-2 text-sm">
+          Секрет <strong className="font-medium">не</strong> вставляется в crontab — он лежит в{" "}
+          <code className="text-xs">.env</code>, скрипт читает его сам при каждом запуске.
+        </p>
       </div>
 
-      <dl className="grid gap-3 text-sm sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <dt className="admin-label-xs">Корень проекта (setka)</dt>
-          <dd className="mt-1 font-mono text-xs break-all">{setup.repoRoot}</dd>
-        </div>
-        <div className="sm:col-span-2">
-          <dt className="admin-label-xs">Скрипт</dt>
-          <dd className="mt-1 font-mono text-xs break-all">{setup.cronScriptPath}</dd>
-        </div>
-        <div>
-          <dt className="admin-label-xs">Лог cron</dt>
-          <dd className="mt-1 font-mono text-xs break-all">{setup.logPath}</dd>
-        </div>
-        <div>
-          <dt className="admin-label-xs">Расписание cron</dt>
-          <dd className="mt-1 font-mono text-xs">{setup.cronExpression}</dd>
-        </div>
-      </dl>
-
-      {!secretConfigured && (
-        <p className="text-sm text-amber-600 dark:text-amber-400/90">
-          В <code className="text-xs">apps/web/.env</code> задайте{" "}
-          <code className="text-xs">DB_BACKUP_CRON_SECRET</code> — без него скрипт не вызовет API.
+      {!setup.scriptExists && (
+        <p className="admin-error-panel text-sm">
+          Скрипт не найден: <span className="font-mono text-xs">{setup.cronScriptPath}</span>.
+          Проверьте деплой (<code className="text-xs">git pull</code>) или задайте{" "}
+          <code className="text-xs">SETKA_REPO_ROOT</code> в .env.
         </p>
       )}
 
-      <div>
-        <p className="admin-label-xs mb-2">
-          Строка для <code className="text-xs">crontab -e</code>
-        </p>
-        <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap">
-          {setup.cronLine}
-        </pre>
-        <button
-          type="button"
-          className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
-          onClick={() => void handleCopy("cron", setup.cronLine)}
-        >
-          {copied === "cron" ? "Скопировано" : "Копировать строку cron"}
-        </button>
-      </div>
+      <ol className="list-decimal space-y-4 pl-5 text-sm">
+        <li>
+          <p className="admin-label-xs mb-2">Секрет в .env (один раз)</p>
+          {secretConfigured ? (
+            <p className="admin-muted text-sm">
+              <code className="text-xs">DB_BACKUP_CRON_SECRET</code> задан в{" "}
+              <span className="font-mono text-xs">{setup.envFilePath}</span>
+            </p>
+          ) : (
+            <>
+              <p className="admin-muted mb-2 text-sm">
+                Сгенерируйте на сервере:{" "}
+                <code className="text-xs">{setup.generateSecretCommand}</code>
+              </p>
+              <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs">
+                {setup.envSecretLine}
+              </pre>
+              <p className="admin-muted mt-1 text-xs">
+                Добавьте строку в{" "}
+                <span className="font-mono">{setup.envFilePath}</span>, затем перезапустите
+                приложение (Passenger).
+              </p>
+              <button
+                type="button"
+                className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
+                onClick={() => void handleCopy("env", setup.envSecretLine)}
+              >
+                {copied === "env" ? "Скопировано" : "Копировать шаблон для .env"}
+              </button>
+            </>
+          )}
+        </li>
 
-      <div>
-        <p className="admin-label-xs mb-2">Проверка вручную (SSH)</p>
-        <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs">
-          {`chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`}
-        </pre>
-        <button
-          type="button"
-          className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
-          onClick={() =>
-            void handleCopy(
-              "test",
-              `chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`,
-            )
-          }
-        >
-          {copied === "test" ? "Скопировано" : "Копировать команды проверки"}
-        </button>
-      </div>
+        <li>
+          <p className="admin-label-xs mb-2">Строка в crontab</p>
+          <p className="admin-muted mb-2 text-xs">
+            Панель Beget → Cron → <code className="text-xs">crontab -e</code>
+          </p>
+          <dl className="mb-3 grid gap-2 text-sm sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <dt className="admin-label-xs">Корень setka</dt>
+              <dd className="mt-1 font-mono text-xs break-all">{setup.repoRoot}</dd>
+            </div>
+            <div className="sm:col-span-2">
+              <dt className="admin-label-xs">Скрипт</dt>
+              <dd className="mt-1 font-mono text-xs break-all">{setup.cronScriptPath}</dd>
+            </div>
+            <div>
+              <dt className="admin-label-xs">Лог</dt>
+              <dd className="mt-1 font-mono text-xs break-all">{setup.logPath}</dd>
+            </div>
+            <div>
+              <dt className="admin-label-xs">Расписание cron</dt>
+              <dd className="mt-1 font-mono text-xs">{setup.cronExpression}</dd>
+            </div>
+          </dl>
+          <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap">
+            {setup.cronLine}
+          </pre>
+          <button
+            type="button"
+            className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
+            onClick={() => void handleCopy("cron", setup.cronLine)}
+            disabled={setup.cronExpression === "—"}
+          >
+            {copied === "cron" ? "Скопировано" : "Копировать строку cron"}
+          </button>
+        </li>
+
+        <li>
+          <p className="admin-label-xs mb-2">Проверка вручную (SSH)</p>
+          <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs">
+            {`chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`}
+          </pre>
+          <button
+            type="button"
+            className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
+            onClick={() =>
+              void handleCopy(
+                "test",
+                `chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`,
+              )
+            }
+          >
+            {copied === "test" ? "Скопировано" : "Копировать команды проверки"}
+          </button>
+        </li>
+      </ol>
     </div>
   );
 }
@@ -243,8 +283,10 @@ export function DbBackupsAdminPage() {
     buildDbBackupCronSetup(
       {
         repoRoot: settings.cronSetup.repoRoot,
+        envFilePath: settings.cronSetup.envFilePath,
         cronScriptPath: settings.cronSetup.cronScriptPath,
         logPath: settings.cronSetup.logPath,
+        scriptExists: settings.cronSetup.scriptExists,
       },
       {
         autoEnabled: draftAutoEnabled,

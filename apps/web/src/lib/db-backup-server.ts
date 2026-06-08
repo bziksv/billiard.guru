@@ -40,23 +40,40 @@ async function resolveRepoRoot(): Promise<string> {
   if (fromEnv) {
     return path.resolve(fromEnv);
   }
-  const cwd = process.cwd();
-  const candidates = [
-    path.join(cwd, "..", ".."),
-    path.join(cwd, ".."),
-    cwd,
-    path.join(cwd, "..", "..", ".."),
-  ];
-  for (const dir of candidates) {
-    const resolved = path.resolve(dir);
+
+  const hits: string[] = [];
+  let dir = path.resolve(process.cwd());
+  for (let depth = 0; depth < 12; depth++) {
+    const scriptPath = path.join(dir, "scripts", "db-backup-cron.sh");
     try {
-      await fs.access(path.join(resolved, "scripts", "db-backup-cron.sh"), fs.constants.R_OK);
-      return resolved;
+      await fs.access(scriptPath, fs.constants.R_OK);
+      hits.push(dir);
     } catch {
-      // try next
+      // not here
     }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
   }
-  return path.resolve(path.join(cwd, "..", ".."));
+
+  const setkaRoot = hits.find(
+    (d) => d.endsWith(`${path.sep}setka`) || d.endsWith("/setka"),
+  );
+  if (setkaRoot) {
+    return setkaRoot;
+  }
+
+  const backupDir = resolveBackupDir();
+  const dataMarker = `${path.sep}setka${path.sep}data${path.sep}db-backups`;
+  if (backupDir.includes(dataMarker) || backupDir.endsWith(`${path.sep}data${path.sep}db-backups`)) {
+    return path.resolve(backupDir, "..", "..");
+  }
+
+  if (hits.length > 0) {
+    return hits[hits.length - 1]!;
+  }
+
+  return path.resolve(process.cwd(), "..", "..");
 }
 
 function resolveCronLogPath(): string {
@@ -328,6 +345,13 @@ export async function getDbBackupSettings(): Promise<DbBackupSettings> {
   };
 
   const cronScriptPath = path.join(repoRoot, "scripts", "db-backup-cron.sh");
+  let scriptExists = false;
+  try {
+    await fs.access(cronScriptPath, fs.constants.R_OK);
+    scriptExists = true;
+  } catch {
+    scriptExists = false;
+  }
 
   return {
     ...schedule,
@@ -339,8 +363,10 @@ export async function getDbBackupSettings(): Promise<DbBackupSettings> {
     cronSetup: buildDbBackupCronSetup(
       {
         repoRoot,
+        envFilePath: path.join(repoRoot, "apps", "web", ".env"),
         cronScriptPath,
         logPath: resolveCronLogPath(),
+        scriptExists,
       },
       schedule,
       Boolean(process.env.DB_BACKUP_CRON_SECRET?.trim()),
