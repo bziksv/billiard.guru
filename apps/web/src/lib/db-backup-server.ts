@@ -9,6 +9,7 @@ import {
 } from "@/lib/db-backup-node";
 import type { DbBackupEntry, DbBackupKind, DbBackupSettings } from "@/lib/db-backup-types";
 import { normalizeIntervalFromDb } from "@/lib/db-backup-types";
+import { buildDbBackupCronSetup } from "@/lib/db-backup-cron-hint";
 
 export type { DbBackupEntry, DbBackupKind, DbBackupSettings } from "@/lib/db-backup-types";
 
@@ -32,6 +33,38 @@ function resolveBackupDir(): string {
     }
   }
   return path.resolve(candidates[0]!);
+}
+
+async function resolveRepoRoot(): Promise<string> {
+  const fromEnv = process.env.SETKA_REPO_ROOT?.trim();
+  if (fromEnv) {
+    return path.resolve(fromEnv);
+  }
+  const cwd = process.cwd();
+  const candidates = [
+    path.join(cwd, "..", ".."),
+    path.join(cwd, ".."),
+    cwd,
+    path.join(cwd, "..", "..", ".."),
+  ];
+  for (const dir of candidates) {
+    const resolved = path.resolve(dir);
+    try {
+      await fs.access(path.join(resolved, "scripts", "db-backup-cron.sh"), fs.constants.R_OK);
+      return resolved;
+    } catch {
+      // try next
+    }
+  }
+  return path.resolve(path.join(cwd, "..", ".."));
+}
+
+function resolveCronLogPath(): string {
+  const home = process.env.HOME?.trim();
+  if (home) {
+    return path.join(home, "db-backup-cron.log");
+  }
+  return "~/db-backup-cron.log";
 }
 
 async function ensureBackupDir(): Promise<string> {
@@ -280,22 +313,38 @@ async function restoreSqlDump(filePath: string): Promise<void> {
 }
 
 export async function getDbBackupSettings(): Promise<DbBackupSettings> {
-  const [row, dumpBin, mysqlBin] = await Promise.all([
+  const [row, dumpBin, mysqlBin, repoRoot] = await Promise.all([
     prisma.dbBackupConfig.findUnique({ where: { id: CONFIG_ID } }),
     resolveBinary(DUMP_BINARY_CANDIDATES),
     resolveBinary(MYSQL_BINARY_CANDIDATES),
+    resolveRepoRoot(),
   ]);
 
-  return {
+  const schedule = {
     autoEnabled: row?.autoEnabled ?? false,
     autoIntervalMinutes: normalizeIntervalFromDb(row?.autoIntervalHours ?? 0),
     autoHour: row?.autoHour ?? 3,
     autoMinute: row?.autoMinute ?? 0,
+  };
+
+  const cronScriptPath = path.join(repoRoot, "scripts", "db-backup-cron.sh");
+
+  return {
+    ...schedule,
     retainCount: row?.retainCount ?? 14,
     lastAutoBackupAt: row?.lastAutoBackupAt?.toISOString() ?? null,
     backupDir: resolveBackupDir(),
     mysqldumpAvailable: Boolean(dumpBin),
     mysqlAvailable: Boolean(mysqlBin),
+    cronSetup: buildDbBackupCronSetup(
+      {
+        repoRoot,
+        cronScriptPath,
+        logPath: resolveCronLogPath(),
+      },
+      schedule,
+      Boolean(process.env.DB_BACKUP_CRON_SECRET?.trim()),
+    ),
   };
 }
 

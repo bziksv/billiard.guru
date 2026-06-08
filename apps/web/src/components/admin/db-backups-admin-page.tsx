@@ -7,9 +7,11 @@ import {
   formatBytes,
   formatIntervalLabel,
   INTERVAL_MINUTE_OPTIONS,
+  type DbBackupCronSetup,
   type DbBackupEntry,
   type DbBackupSettings,
 } from "@/lib/db-backup-types";
+import { buildDbBackupCronSetup } from "@/lib/db-backup-cron-hint";
 
 type ScheduleMode = "daily" | "interval";
 
@@ -25,6 +27,96 @@ function formatDateTime(iso: string): string {
 
 function kindLabel(kind: DbBackupEntry["kind"]): string {
   return kind === "auto" ? "Авто" : "Вручную";
+}
+
+async function copyText(text: string): Promise<void> {
+  await navigator.clipboard.writeText(text);
+}
+
+function CronSetupBlock({
+  setup,
+  secretConfigured,
+}: {
+  setup: DbBackupCronSetup;
+  secretConfigured: boolean;
+}) {
+  const [copied, setCopied] = useState<string | null>(null);
+
+  async function handleCopy(label: string, text: string) {
+    await copyText(text);
+    setCopied(label);
+    window.setTimeout(() => setCopied(null), 2000);
+  }
+
+  return (
+    <div className="mt-5 space-y-4 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-inset-bg)] p-4">
+      <div>
+        <h3 className="text-sm font-semibold">Cron на сервере (Beget / SSH)</h3>
+        <p className="admin-muted mt-1 text-sm">{setup.note}</p>
+      </div>
+
+      <dl className="grid gap-3 text-sm sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <dt className="admin-label-xs">Корень проекта (setka)</dt>
+          <dd className="mt-1 font-mono text-xs break-all">{setup.repoRoot}</dd>
+        </div>
+        <div className="sm:col-span-2">
+          <dt className="admin-label-xs">Скрипт</dt>
+          <dd className="mt-1 font-mono text-xs break-all">{setup.cronScriptPath}</dd>
+        </div>
+        <div>
+          <dt className="admin-label-xs">Лог cron</dt>
+          <dd className="mt-1 font-mono text-xs break-all">{setup.logPath}</dd>
+        </div>
+        <div>
+          <dt className="admin-label-xs">Расписание cron</dt>
+          <dd className="mt-1 font-mono text-xs">{setup.cronExpression}</dd>
+        </div>
+      </dl>
+
+      {!secretConfigured && (
+        <p className="text-sm text-amber-600 dark:text-amber-400/90">
+          В <code className="text-xs">apps/web/.env</code> задайте{" "}
+          <code className="text-xs">DB_BACKUP_CRON_SECRET</code> — без него скрипт не вызовет API.
+        </p>
+      )}
+
+      <div>
+        <p className="admin-label-xs mb-2">
+          Строка для <code className="text-xs">crontab -e</code>
+        </p>
+        <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs leading-relaxed whitespace-pre-wrap">
+          {setup.cronLine}
+        </pre>
+        <button
+          type="button"
+          className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
+          onClick={() => void handleCopy("cron", setup.cronLine)}
+        >
+          {copied === "cron" ? "Скопировано" : "Копировать строку cron"}
+        </button>
+      </div>
+
+      <div>
+        <p className="admin-label-xs mb-2">Проверка вручную (SSH)</p>
+        <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs">
+          {`chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`}
+        </pre>
+        <button
+          type="button"
+          className="admin-btn admin-btn--outline mt-2 px-3 py-1.5 text-xs"
+          onClick={() =>
+            void handleCopy(
+              "test",
+              `chmod +x ${setup.cronScriptPath}\n${setup.testCommand}`,
+            )
+          }
+        >
+          {copied === "test" ? "Скопировано" : "Копировать команды проверки"}
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export function DbBackupsAdminPage() {
@@ -146,6 +238,24 @@ export function DbBackupsAdminPage() {
 
   const toolsOk = settings?.mysqldumpAvailable && settings?.mysqlAvailable;
 
+  const draftCronSetup =
+    settings &&
+    buildDbBackupCronSetup(
+      {
+        repoRoot: settings.cronSetup.repoRoot,
+        cronScriptPath: settings.cronSetup.cronScriptPath,
+        logPath: settings.cronSetup.logPath,
+      },
+      {
+        autoEnabled: draftAutoEnabled,
+        autoIntervalMinutes:
+          draftScheduleMode === "interval" ? draftIntervalMinutes : 0,
+        autoHour: draftHour,
+        autoMinute: draftMinute,
+      },
+      settings.cronSetup.cronSecretConfigured,
+    );
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -233,14 +343,8 @@ export function DbBackupsAdminPage() {
       <section className="admin-card p-5">
         <h2 className="mb-2 text-sm font-semibold">Автоматический бэкап</h2>
         <p className="admin-muted mb-4 text-sm">
-          Cron периодически вызывает{" "}
-          <code className="rounded bg-[var(--admin-inset-bg)] px-1 py-0.5 text-xs">
-            POST /api/admin/db-backups/cron
-          </code>{" "}
-          (см. <code className="text-xs">scripts/db-backup-cron.sh</code>). Для интервала
-          «каждые N минут» cron должен срабатывать чаще интервала — например при «каждые 15
-          мин» достаточно <code className="text-xs">*/5 * * * *</code>. При «раз в сутки» —
-          один вызов в день после заданного времени.
+          Расписание хранится в БД; cron на сервере только периодически вызывает API. Ниже —
+          готовая строка для crontab с путями этого сервера.
         </p>
 
         <label className="mb-4 flex cursor-pointer items-center gap-2.5 text-sm">
@@ -333,6 +437,13 @@ export function DbBackupsAdminPage() {
             Сохранить расписание
           </AsyncButton>
         </div>
+
+        {draftCronSetup && (
+          <CronSetupBlock
+            setup={draftCronSetup}
+            secretConfigured={draftCronSetup.cronSecretConfigured}
+          />
+        )}
       </section>
 
       <section>

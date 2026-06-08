@@ -102,6 +102,10 @@ export default async function TournamentPage({
     slot: m.slot,
     status: m.status,
     winnerTeamId: m.winnerTeamId,
+    team1Score: m.team1Score,
+    team2Score: m.team2Score,
+    startedAt: m.startedAt?.toISOString() ?? null,
+    finishedAt: m.finishedAt?.toISOString() ?? null,
     team1: m.team1,
     team2: m.team2,
   }));

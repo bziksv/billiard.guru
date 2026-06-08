@@ -9,6 +9,10 @@ export type DbBackupEntry = {
   database: string;
 };
 
+import type { DbBackupCronSetup } from "@/lib/db-backup-cron-hint";
+
+export type { DbBackupCronSetup } from "@/lib/db-backup-cron-hint";
+
 export type DbBackupSettings = {
   autoEnabled: boolean;
   /** 0 = раз в сутки в autoHour:autoMinute; иначе каждые N минут */
@@ -20,6 +24,7 @@ export type DbBackupSettings = {
   backupDir: string;
   mysqldumpAvailable: boolean;
   mysqlAvailable: boolean;
+  cronSetup: DbBackupCronSetup;
 };
 
 /** Доступные интервалы автобэкапа (минуты). */
