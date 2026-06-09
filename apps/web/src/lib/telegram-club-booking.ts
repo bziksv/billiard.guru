@@ -1,7 +1,6 @@
 import { writeAuditLog } from "@/lib/audit";
 import { clubOwnedByPlayer } from "@/lib/club-access";
 import { isClubStaffMember } from "@/lib/club-staff";
-import { parseFloorPlan } from "@/lib/club-floor-plan";
 import { logger } from "@/lib/logger";
 import {
   notifyPlayerBookingConfirmed,
@@ -169,80 +168,35 @@ export async function buildClubBookingFloorPlanPng(bookingId: string): Promise<B
   const booking = await prisma.tableBooking.findUnique({
     where: { id: bookingId },
     include: {
-      player: { select: { firstName: true, lastName: true } },
-      club: { select: { floorPlan: true } },
+      club: {
+        select: {
+          floorPlan: true,
+          tableCounts: true,
+          weeklyHours: true,
+          workingHours: true,
+        },
+      },
     },
   });
   if (!booking) return null;
 
-  const floorPlan = parseFloorPlan(booking.club.floorPlan);
-  if (!floorPlan) return null;
-
-  const {
-    bookingCalendarDayKey,
-    dayBookingsQueryWindow,
-    formatDayOverviewLabel,
-    formatDayOverviewTimeRange,
-    renderDayOverviewPng,
-  } = await import("@/lib/floor-plan-day-overview");
-  const { floorPlanStatesAtSlot, floorTableLabel } = await import("@/lib/floor-plan-booking");
-
-  const { queryStart, queryEnd, dayKey } = dayBookingsQueryWindow(booking.startsAt);
-
-  const dayBookings = await prisma.tableBooking.findMany({
-    where: {
-      clubId: booking.clubId,
-      startsAt: { gte: queryStart, lte: queryEnd },
-      status: { in: ["PENDING", "CONFIRMED"] },
-    },
-    include: {
-      player: { select: { firstName: true, lastName: true } },
-    },
-    orderBy: { startsAt: "asc" },
-  });
-
-  const sameDay = dayBookings.filter((b) => bookingCalendarDayKey(b.startsAt) === dayKey);
-
-  const slotExisting = dayBookings.map((b) => ({
-    floorItemId: b.floorItemId,
-    tableFormat: b.tableFormat,
-    startsAt: b.startsAt,
-    endsAt: b.endsAt,
-    status: b.status,
-    playerId: b.playerId,
-  }));
-
-  const tableStates = floorPlanStatesAtSlot(
-    floorPlan,
-    booking.startsAt,
-    booking.endsAt,
-    slotExisting,
-  );
-
-  const rows = sameDay.map((b) => ({
-    id: b.id,
-    startsAt: b.startsAt,
-    endsAt: b.endsAt,
-    tableFormat: b.tableFormat,
-    floorItemId: b.floorItemId,
-    floorTableLabel: floorTableLabel(floorPlan, b.floorItemId),
-    guestLabel: b.player
-      ? `${b.player.lastName} ${b.player.firstName}`.trim()
-      : b.guestName ?? "Гость",
-    status: b.status as "PENDING" | "CONFIRMED",
-    isNew: b.id === bookingId,
-  }));
-
   try {
-    return await renderDayOverviewPng(booking.club.floorPlan, {
-      dayLabel: formatDayOverviewLabel(booking.startsAt),
-      slotLabel: formatDayOverviewTimeRange(booking.startsAt, booking.endsAt),
-      bookings: rows,
-      tableStates,
-      highlightTableId: booking.floorItemId,
-    });
+    const {
+      buildCalendarImageOptionsForBooking,
+      renderWeekCalendarPng,
+    } = await import("@/lib/club-booking-calendar-image");
+
+    const options = await buildCalendarImageOptionsForBooking(
+      booking.clubId,
+      booking.club,
+      bookingId,
+      booking.startsAt,
+    );
+    if (!options || options.tables.length === 0) return null;
+
+    return await renderWeekCalendarPng(options);
   } catch (err) {
-    logger.warn({ err, bookingId }, "Club booking day overview PNG failed");
+    logger.warn({ err, bookingId }, "Club booking calendar PNG failed");
     return null;
   }
 }
