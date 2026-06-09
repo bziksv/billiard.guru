@@ -49,6 +49,20 @@ restore_standalone_if_failed() {
 
 trap restore_standalone_if_failed EXIT
 
+if command -v git >/dev/null && git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  if ! git -C "$REPO_ROOT" diff --quiet apps/web/.env.example 2>/dev/null; then
+    echo "⚠ Изменён apps/web/.env.example — git pull может быть заблокирован."
+    echo "  git stash push apps/web/.env.example   # или: git checkout -- apps/web/.env.example"
+    echo ""
+  fi
+  git -C "$REPO_ROOT" fetch origin main --quiet 2>/dev/null || true
+  behind="$(git -C "$REPO_ROOT" rev-list --count HEAD..origin/main 2>/dev/null || echo "")"
+  if [ -n "$behind" ] && [ "$behind" != "0" ]; then
+    echo "⚠ main отстаёт от origin/main на $behind коммит(ов). Сначала: git pull"
+    echo ""
+  fi
+fi
+
 backup_current_standalone() {
   if [ ! -f "$STANDALONE/server.js" ]; then
     return 0

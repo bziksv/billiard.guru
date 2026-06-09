@@ -92,6 +92,35 @@ case "$http_code" in
     ;;
   5*)
     fail "Ошибка сервера HTTP $http_code — смотрите логи Passenger"
+    echo ""
+    echo "→ Диагностика…"
+    db_health="$(curl -sS "$CHECK_URL/api/v1/health/db" --max-time 15 2>/dev/null || true)"
+    if [ -n "$db_health" ]; then
+      echo "  /api/v1/health/db: $db_health"
+    fi
+    tour_health="$(curl -sS "$CHECK_URL/api/v1/health/tournaments" --max-time 15 2>/dev/null || true)"
+    if [ -n "$tour_health" ]; then
+      echo "  /api/v1/health/tournaments: $tour_health"
+    else
+      tour_code="$(curl -sS -o /dev/null -w "%{http_code}" "$CHECK_URL/api/v1/health/tournaments" --max-time 15 2>/dev/null || echo "000")"
+      if [ "$tour_code" = "404" ]; then
+        echo "  /api/v1/health/tournaments: 404 — на сервере старый код, нужен git pull"
+      fi
+    fi
+    enums_file="$WEB/src/generated/prisma/enums.ts"
+    if [ -f "$enums_file" ] && ! grep -q 'FIXED_SWISS_32R8_2_3_mesta' "$enums_file" 2>/dev/null; then
+      echo "  Prisma enums.ts без FIXED_SWISS_32R8_2_3_mesta — git pull и ./scripts/beget-setup.sh"
+    fi
+    if command -v git >/dev/null && git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git -C "$REPO_ROOT" fetch origin main --quiet 2>/dev/null || true
+      behind="$(git -C "$REPO_ROOT" rev-list --count HEAD..origin/main 2>/dev/null || echo "")"
+      if [ -n "$behind" ] && [ "$behind" != "0" ]; then
+        echo "  git: отстаёт от origin/main на $behind коммит(ов) — git pull"
+      fi
+      if ! git -C "$REPO_ROOT" diff --quiet apps/web/.env.example 2>/dev/null; then
+        echo "  git: локальные правки apps/web/.env.example блокируют pull — stash или checkout"
+      fi
+    fi
     ;;
   *)
     fail "Неожиданный HTTP $http_code (ожидали 200/3xx)"
