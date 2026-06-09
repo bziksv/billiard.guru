@@ -265,12 +265,51 @@ export function buildFixedSwissTs32R8ElimAtEighthTemplate(): FixedSwissTemplate 
   };
 }
 
+/**
+ * 32→16 (56 встреч): как R8_2_3_mesta (55), плюс #60 — матч проигравших полуфиналистов.
+ * FIXED_SWISS_32R8_1_3_mesto.
+ */
+export function buildFixedSwissTs32R8ElimAtEighthBronzeTemplate(): FixedSwissTemplate {
+  const base = buildFixedSwissTs32R8ElimAtEighthTemplate();
+  return {
+    ...base,
+    matches: [
+      ...base.matches,
+      { round: 7, slot: 2, team1Id: null, team2Id: null },
+    ],
+    links: [
+      ...base.links,
+      { fromRound: 6, fromSlot: 1, kind: "loss", toRound: 7, toSlot: 2, toTeam: 1 },
+      { fromRound: 6, fromSlot: 2, kind: "loss", toRound: 7, toSlot: 2, toTeam: 2 },
+    ],
+    variant: "ts3216r8elimbronze",
+  };
+}
+
 /** 55 встреч / 7 туров — вылет с 1/8 (не путать с устаревшей 55/6). */
 export function isFixedSwissTs32R8ElimAtEighthMatchCount(
   matchCount: number,
   maxRound?: number,
 ): boolean {
   return matchCount === 55 && maxRound !== undefined && maxRound >= 7;
+}
+
+/** 56 встреч / 7 туров — R8_2_3_mesta + матч за 3–4 (#60). */
+export function isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  return matchCount === 56 && maxRound !== undefined && maxRound >= 7;
+}
+
+export function isFixedSwissTs32R8ElimAtEighthFamily(
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  return (
+    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+    isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)
+  );
 }
 
 /** 64→32 эталон (119/120 встреч; legacy 115/116): см. docs/BRACKET_REFERENCE_64_32.md */
@@ -1167,7 +1206,10 @@ export function isOutdatedFixedSwiss32Bracket(
   matchCount: number,
   maxRound?: number,
 ): boolean {
-  if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)) {
+  if (
+    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+    isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)
+  ) {
     return false;
   }
   return (

@@ -625,17 +625,7 @@ async function createBooking(
     },
   });
 
-  void notifyClubNewBooking(booking.club, {
-    tableFormat: booking.tableFormat,
-    floorTableLabel: floorTableLabel(floorPlan, booking.floorItemId),
-    floorItemId: booking.floorItemId,
-    startsAt: booking.startsAt,
-    endsAt: booking.endsAt,
-    player: booking.player,
-    guestName: null,
-    guestPhone: null,
-    playerNote: null,
-  });
+  void notifyClubNewBooking(booking.id);
 
   await writeAuditLog({
     actorType: "player",

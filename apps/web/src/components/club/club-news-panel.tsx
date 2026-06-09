@@ -3,7 +3,11 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import { AsyncTextButton } from "@/components/ui/async-text-button";
-import { IDEA_STATUS_LABELS } from "@/lib/validators";
+import {
+  CLUB_NEWS_CITY_BROADCAST_LABEL,
+  CLUB_NEWS_CITY_BROADCAST_PAID_HINT,
+} from "@/lib/club-news-display";
+import { CLUB_NEWS_STATUS_LABELS } from "@/lib/validators";
 
 interface ClubNewsItem {
   id: string;
@@ -13,6 +17,7 @@ interface ClubNewsItem {
   rejectReason: string | null;
   publishedAt: string | null;
   createdAt: string;
+  cityBroadcastRequested: boolean;
 }
 
 function formatNewsDate(iso: string) {
@@ -25,6 +30,7 @@ function formatNewsDate(iso: string) {
 
 function statusBadgeClass(status: string) {
   if (status === "APPROVED") return "bg-emerald-500/15 text-emerald-400";
+  if (status === "UNPUBLISHED") return "bg-zinc-500/15 text-zinc-400";
   if (status === "REJECTED") return "bg-red-500/15 text-red-400";
   return "bg-amber-500/15 text-amber-400";
 }
@@ -76,11 +82,7 @@ export function ClubNewsPanel({
     setNews((prev) => [data, ...prev]);
     setTitle("");
     setBody("");
-    setMessage(
-      data.status === "APPROVED"
-        ? "Новость опубликована"
-        : "Отправлено на модерацию — появится на сайте после одобления администратором",
-    );
+    setMessage("Отправлено на модерацию — появится на сайте после одобления администратором");
   }
 
   async function deleteNews(newsId: string) {
@@ -133,6 +135,23 @@ export function ClubNewsPanel({
             className="site-input w-full"
             required
           />
+          <label className="flex cursor-not-allowed items-start gap-3 rounded-lg border border-zinc-800/80 bg-zinc-900/40 p-3 opacity-60">
+            <input
+              type="checkbox"
+              checked={false}
+              disabled
+              readOnly
+              tabIndex={-1}
+              className="mt-0.5 h-4 w-4 shrink-0 cursor-not-allowed accent-emerald-600"
+              aria-disabled="true"
+            />
+            <span className="text-sm leading-snug text-zinc-400">
+              <span className="font-medium text-zinc-300">{CLUB_NEWS_CITY_BROADCAST_LABEL}</span>
+              <span className="mt-1 block text-xs text-zinc-500">
+                {CLUB_NEWS_CITY_BROADCAST_PAID_HINT}
+              </span>
+            </span>
+          </label>
           {error && <p className="text-sm text-red-400">{error}</p>}
           {message && <p className="text-sm text-emerald-400">{message}</p>}
           <button
@@ -164,7 +183,7 @@ export function ClubNewsPanel({
                       <span
                         className={`rounded px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${statusBadgeClass(item.status)}`}
                       >
-                        {IDEA_STATUS_LABELS[item.status] ?? item.status}
+                        {CLUB_NEWS_STATUS_LABELS[item.status] ?? item.status}
                       </span>
                       <time className="text-xs text-zinc-500">
                         {formatNewsDate(item.publishedAt ?? item.createdAt)}

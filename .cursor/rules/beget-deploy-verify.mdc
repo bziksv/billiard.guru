@@ -1,43 +1,40 @@
 ---
-description: Beget деплой — не оставлять 403, проверять после сборки и правок build/tsconfig
+description: Beget деплой — atomic releases, не ломать live при build, проверять prod
 alwaysApply: true
 ---
 
-# Beget: деплой и 403 Forbidden
+# Beget: деплой и стабильность prod
 
-**403 на billiard.guru** — почти всегда Apache/Passenger, не баг Next.js в рантайме.
+**403** — Apache/Passenger не видит приложение. **5xx / ERROR 1305321563** — Passenger/runtime (часто после деплоя или падения приложения).
 
-## Типичная цепочка «каждый раз 403»
+## Atomic releases (с beget-lib.sh)
 
-1. `git pull` → `./scripts/beget-setup.sh`
-2. **`npm run build` падает** (TypeScript, Prisma, env)
-3. Next.js **стирает `.next/`** в начале сборки → `standalone/` исчезает
-4. `public_html` всё ещё указывает на **несуществующий** каталог → **403**
+Live-трафик: `~/billiard.guru/current` → `releases/<id>`. Сборка — в `setka/apps/web/.next/standalone` (staging). **Passenger не должен указывать на `.next/standalone`** — Next.js удаляет `.next/` при каждом build.
 
-Пока сборка не прошла до конца, сайт может быть сломан.
+Деплой: `./scripts/beget-deploy.sh` (git pull + beget-setup). Откат: `./scripts/beget-rollback.sh`.
 
 ## Обязательно для агента
 
-После правок, влияющих на prod-сборку (`apps/web` TS, `tsconfig`, `next.config`, `package.json`, `scripts/beget-setup.sh`):
+После правок, влияющих на prod-сборку (`apps/web` TS, `tsconfig`, `next.config`, `package.json`, `scripts/beget-*.sh`):
 
 1. Локально: `cd apps/web && npm run build:beget` — **без ошибок**
 2. `scripts/` **не** должны ломать `next build` — в `apps/web/tsconfig.json` они в `exclude`
-3. После деплоя (или когда пользователь жалуется на 403): напомнить на сервере:
+3. После деплоя (или 403/5xx): на сервере:
    ```bash
-   cd ~/billiard.guru/setka && git pull && ./scripts/beget-setup.sh
+   cd ~/billiard.guru/setka && git pull && ./scripts/beget-deploy.sh
    ```
-   Скрипт сам откатывает standalone при падении сборки и гоняет `./scripts/beget-verify.sh`.
+   При 5xx после деплоя: `./scripts/beget-rollback.sh`, затем `./scripts/beget-diagnose.sh`.
 
 4. Проверка prod (агент **сам**):
    ```bash
    curl -s -o /dev/null -w "%{http_code}" -L https://billiard.guru/
    ```
-   Ожидается **200** (или 301/302), **не 403**.
+   Ожидается **200** (или 301/302), не 403/5xx.
 
-5. Если 403 — `./scripts/beget-diagnose.sh`, затем полный `./scripts/beget-setup.sh` (не только `touch restart.txt`).
+5. Если 403/5xx — `./scripts/beget-diagnose.sh`, затем `./scripts/beget-setup.sh` или rollback.
 
 ## Не ломать деплой
 
 - Тестовые скрипты в `apps/web/scripts/` — только `tsx`, не включать в tsconfig Next без нужды
 - Prisma client на Beget — из git; после `schema.prisma` на Mac: `npm run db:generate` → commit
-- Документация: `docs/DEPLOY.md`, раздел «403 Forbidden»
+- Документация: `docs/DEPLOY.md`

@@ -36,6 +36,7 @@ export async function GET() {
         createdAt: row.createdAt.toISOString(),
         publishedAt: row.publishedAt?.toISOString() ?? null,
         moderatedAt: row.moderatedAt?.toISOString() ?? null,
+        cityBroadcastRequested: row.cityBroadcastRequested,
         club: row.club,
         author: row.author,
       })),

@@ -35,6 +35,7 @@ import {
   fixedSwissTs28PlacementByMatchNo,
   fixedSwissTs32MatchCol,
   fixedSwissTs32PlacementByMatchNo,
+  fixedSwissTs32R8ElimPlacementByMatchNo,
   fixedSwissTs64MatchCol,
   fixedSwissTs64ColumnLabel,
   fixedSwissTs64PlacementByMatchNo,
@@ -635,6 +636,26 @@ assert.equal(inferFixedSwissGridSize(59), 32);
 assert.equal(isFixedSwissTs32MatchCount(59), true);
 assert.equal(isOutdatedFixedSwiss32Bracket(55), true);
 assert.equal(isOutdatedFixedSwiss32Bracket(55, 7), false);
+assert.equal(isOutdatedFixedSwiss32Bracket(56, 7), false);
+assert.equal(
+  buildFixedSwissTemplate(12, "FIXED_SWISS_32R8_1_3_mesto").matches.length,
+  56,
+  "FIXED_SWISS_32R8_1_3_mesto: R8_2_3 + матч за 3–4",
+);
+assertProtocolPlace(53, "loser", 55, { place: 5, placeTo: 8 }, 7);
+assertProtocolPlace(57, "loser", 55, { place: 3 }, 7);
+assertProtocolPlace(58, "loser", 55, { place: 3 }, 7);
+assertProtocolPlace(54, "loser", 55, { place: 5, placeTo: 8 }, 7);
+assertProtocolPlace(60, "winner", 56, { place: 3 }, 7);
+assertProtocolPlace(60, "loser", 56, { place: 4 }, 7);
+assert.equal(
+  fixedSwissTs32R8ElimPlacementByMatchNo(60, true),
+  "матч за 3–4 место",
+);
+assert.equal(
+  fixedSwissTs32R8ElimPlacementByMatchNo(57, true),
+  "полуфинал",
+);
 assert.equal(
   fixedSwissPlacementLabel(3, 9, 6, 16, 55, 41),
   null,

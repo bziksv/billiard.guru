@@ -67,7 +67,8 @@ export const NOTIFICATION_DEFAULT_TEMPLATES: Partial<Record<NotificationId, stri
     "{{tableHint}}" +
     "🕐 {{time}}\n" +
     "{{note}}\n\n" +
-    "Подтвердите в разделе «Брони столов».",
+    "🟢 свободен · 🟠 ожидает · 🔴 занят — на схеме ниже.\n" +
+    "Подтвердите кнопками или в разделе «Брони столов».",
 
   "player-booking-confirmed":
     "✅ <b>Бронь подтверждена</b>\n\n" +

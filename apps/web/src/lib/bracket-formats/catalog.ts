@@ -2,6 +2,7 @@ import {
   FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32R8_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
@@ -14,6 +15,7 @@ export type BracketFormatCode =
   | "FIXED_SWISS_32R4_2_3_mesta"
   | "FIXED_SWISS_32R4_1_3_mesto"
   | "FIXED_SWISS_32R8_2_3_mesta"
+  | "FIXED_SWISS_32R8_1_3_mesto"
   | "FIXED_SWISS_32R8_BRONZE";
 
 export interface BracketFormatDefinition {
@@ -41,6 +43,12 @@ const TS32_R8_IMPL = [
 const TS32_R8_BRONZE_IMPL = [
   "fixed-swiss-ts-grid.ts — buildFixedSwissTs32Template(withBronze)",
   "fixed-swiss-layout.ts — buildTsPositions32Bronze",
+  "swiss-bracket-view.tsx",
+] as const;
+
+const TS32_R8_ELIM_BRONZE_IMPL = [
+  "fixed-swiss-ts-grid.ts — buildFixedSwissTs32R8ElimAtEighthBronzeTemplate()",
+  "fixed-swiss-layout.ts — buildTsPositions32R8ElimAtEighthBronze",
   "swiss-bracket-view.tsx",
 ] as const;
 
@@ -116,6 +124,21 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
       "docs/FIXED_SWISS_BRACKET_LINES_32_16.md",
     ],
     implementation: [...TS32_R8_IMPL],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_SWISS_32R8_1_3_mesto",
+    adminLabel: FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    shortDescription:
+      "56 встреч — копия R8_2_3_mesta (55) + #60: матч проигравших полуфиналистов под финалом.",
+    guideSectionId: "swiss-fixed-32-r8-1-3",
+    docPaths: [
+      "docs/BRACKET_REFERENCE_32_16.md",
+      "docs/FIXED_SWISS_BRACKET_LINES_32_16.md",
+    ],
+    implementation: [...TS32_R8_ELIM_BRONZE_IMPL],
     testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
   },
   {

@@ -36,6 +36,7 @@ export type ClubNewsMinAggregateOutputType = {
   moderatedById: string | null
   rejectReason: string | null
   publishedAt: Date | null
+  cityBroadcastRequested: boolean | null
   createdAt: Date | null
 }
 
@@ -51,6 +52,7 @@ export type ClubNewsMaxAggregateOutputType = {
   moderatedById: string | null
   rejectReason: string | null
   publishedAt: Date | null
+  cityBroadcastRequested: boolean | null
   createdAt: Date | null
 }
 
@@ -66,6 +68,7 @@ export type ClubNewsCountAggregateOutputType = {
   moderatedById: number
   rejectReason: number
   publishedAt: number
+  cityBroadcastRequested: number
   createdAt: number
   _all: number
 }
@@ -83,6 +86,7 @@ export type ClubNewsMinAggregateInputType = {
   moderatedById?: true
   rejectReason?: true
   publishedAt?: true
+  cityBroadcastRequested?: true
   createdAt?: true
 }
 
@@ -98,6 +102,7 @@ export type ClubNewsMaxAggregateInputType = {
   moderatedById?: true
   rejectReason?: true
   publishedAt?: true
+  cityBroadcastRequested?: true
   createdAt?: true
 }
 
@@ -113,6 +118,7 @@ export type ClubNewsCountAggregateInputType = {
   moderatedById?: true
   rejectReason?: true
   publishedAt?: true
+  cityBroadcastRequested?: true
   createdAt?: true
   _all?: true
 }
@@ -201,6 +207,7 @@ export type ClubNewsGroupByOutputType = {
   moderatedById: string | null
   rejectReason: string | null
   publishedAt: Date | null
+  cityBroadcastRequested: boolean
   createdAt: Date
   _count: ClubNewsCountAggregateOutputType | null
   _min: ClubNewsMinAggregateOutputType | null
@@ -237,6 +244,7 @@ export type ClubNewsWhereInput = {
   moderatedById?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   rejectReason?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"ClubNews"> | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFilter<"ClubNews"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ClubNews"> | Date | string
   club?: Prisma.XOR<Prisma.ClubScalarRelationFilter, Prisma.ClubWhereInput>
   author?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
@@ -254,6 +262,7 @@ export type ClubNewsOrderByWithRelationInput = {
   moderatedById?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectReason?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cityBroadcastRequested?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   club?: Prisma.ClubOrderByWithRelationInput
   author?: Prisma.PlayerOrderByWithRelationInput
@@ -275,6 +284,7 @@ export type ClubNewsWhereUniqueInput = Prisma.AtLeast<{
   moderatedById?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   rejectReason?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"ClubNews"> | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFilter<"ClubNews"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ClubNews"> | Date | string
   club?: Prisma.XOR<Prisma.ClubScalarRelationFilter, Prisma.ClubWhereInput>
   author?: Prisma.XOR<Prisma.PlayerNullableScalarRelationFilter, Prisma.PlayerWhereInput> | null
@@ -292,6 +302,7 @@ export type ClubNewsOrderByWithAggregationInput = {
   moderatedById?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectReason?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cityBroadcastRequested?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.ClubNewsCountOrderByAggregateInput
   _max?: Prisma.ClubNewsMaxOrderByAggregateInput
@@ -313,6 +324,7 @@ export type ClubNewsScalarWhereWithAggregatesInput = {
   moderatedById?: Prisma.StringNullableWithAggregatesFilter<"ClubNews"> | string | null
   rejectReason?: Prisma.StringNullableWithAggregatesFilter<"ClubNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ClubNews"> | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolWithAggregatesFilter<"ClubNews"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ClubNews"> | Date | string
 }
 
@@ -326,6 +338,7 @@ export type ClubNewsCreateInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
   club: Prisma.ClubCreateNestedOneWithoutNewsInput
   author?: Prisma.PlayerCreateNestedOneWithoutClubNewsAuthoredInput
@@ -343,6 +356,7 @@ export type ClubNewsUncheckedCreateInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
 }
 
@@ -356,6 +370,7 @@ export type ClubNewsUpdateInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneRequiredWithoutNewsNestedInput
   author?: Prisma.PlayerUpdateOneWithoutClubNewsAuthoredNestedInput
@@ -373,6 +388,7 @@ export type ClubNewsUncheckedUpdateInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -388,6 +404,7 @@ export type ClubNewsCreateManyInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
 }
 
@@ -401,6 +418,7 @@ export type ClubNewsUpdateManyMutationInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -416,6 +434,7 @@ export type ClubNewsUncheckedUpdateManyInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -447,6 +466,7 @@ export type ClubNewsCountOrderByAggregateInput = {
   moderatedById?: Prisma.SortOrder
   rejectReason?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+  cityBroadcastRequested?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -462,6 +482,7 @@ export type ClubNewsMaxOrderByAggregateInput = {
   moderatedById?: Prisma.SortOrder
   rejectReason?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+  cityBroadcastRequested?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -477,6 +498,7 @@ export type ClubNewsMinOrderByAggregateInput = {
   moderatedById?: Prisma.SortOrder
   rejectReason?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+  cityBroadcastRequested?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -582,6 +604,7 @@ export type ClubNewsCreateWithoutClubInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
   author?: Prisma.PlayerCreateNestedOneWithoutClubNewsAuthoredInput
 }
@@ -597,6 +620,7 @@ export type ClubNewsUncheckedCreateWithoutClubInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
 }
 
@@ -641,6 +665,7 @@ export type ClubNewsScalarWhereInput = {
   moderatedById?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   rejectReason?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"ClubNews"> | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFilter<"ClubNews"> | boolean
   createdAt?: Prisma.DateTimeFilter<"ClubNews"> | Date | string
 }
 
@@ -654,6 +679,7 @@ export type ClubNewsCreateWithoutAuthorInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
   club: Prisma.ClubCreateNestedOneWithoutNewsInput
 }
@@ -669,6 +695,7 @@ export type ClubNewsUncheckedCreateWithoutAuthorInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
 }
 
@@ -709,6 +736,7 @@ export type ClubNewsCreateManyClubInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
 }
 
@@ -722,6 +750,7 @@ export type ClubNewsUpdateWithoutClubInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.PlayerUpdateOneWithoutClubNewsAuthoredNestedInput
 }
@@ -737,6 +766,7 @@ export type ClubNewsUncheckedUpdateWithoutClubInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -751,6 +781,7 @@ export type ClubNewsUncheckedUpdateManyWithoutClubInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -765,6 +796,7 @@ export type ClubNewsCreateManyAuthorInput = {
   moderatedById?: string | null
   rejectReason?: string | null
   publishedAt?: Date | string | null
+  cityBroadcastRequested?: boolean
   createdAt?: Date | string
 }
 
@@ -778,6 +810,7 @@ export type ClubNewsUpdateWithoutAuthorInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneRequiredWithoutNewsNestedInput
 }
@@ -793,6 +826,7 @@ export type ClubNewsUncheckedUpdateWithoutAuthorInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -807,6 +841,7 @@ export type ClubNewsUncheckedUpdateManyWithoutAuthorInput = {
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cityBroadcastRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -824,6 +859,7 @@ export type ClubNewsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   moderatedById?: boolean
   rejectReason?: boolean
   publishedAt?: boolean
+  cityBroadcastRequested?: boolean
   createdAt?: boolean
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   author?: boolean | Prisma.ClubNews$authorArgs<ExtArgs>
@@ -843,10 +879,11 @@ export type ClubNewsSelectScalar = {
   moderatedById?: boolean
   rejectReason?: boolean
   publishedAt?: boolean
+  cityBroadcastRequested?: boolean
   createdAt?: boolean
 }
 
-export type ClubNewsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "authorId" | "title" | "body" | "status" | "moderationToken" | "moderatedAt" | "moderatedById" | "rejectReason" | "publishedAt" | "createdAt", ExtArgs["result"]["clubNews"]>
+export type ClubNewsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "authorId" | "title" | "body" | "status" | "moderationToken" | "moderatedAt" | "moderatedById" | "rejectReason" | "publishedAt" | "cityBroadcastRequested" | "createdAt", ExtArgs["result"]["clubNews"]>
 export type ClubNewsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   author?: boolean | Prisma.ClubNews$authorArgs<ExtArgs>
@@ -870,6 +907,10 @@ export type $ClubNewsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     moderatedById: string | null
     rejectReason: string | null
     publishedAt: Date | null
+    /**
+     * * Запрос рассылки в мессенджеры игрокам города (платная опция, см. docs/MONETIZATION.md).
+     */
+    cityBroadcastRequested: boolean
     createdAt: Date
   }, ExtArgs["result"]["clubNews"]>
   composites: {}
@@ -1253,6 +1294,7 @@ export interface ClubNewsFieldRefs {
   readonly moderatedById: Prisma.FieldRef<"ClubNews", 'String'>
   readonly rejectReason: Prisma.FieldRef<"ClubNews", 'String'>
   readonly publishedAt: Prisma.FieldRef<"ClubNews", 'DateTime'>
+  readonly cityBroadcastRequested: Prisma.FieldRef<"ClubNews", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"ClubNews", 'DateTime'>
 }
     

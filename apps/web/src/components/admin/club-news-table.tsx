@@ -14,7 +14,8 @@ import {
 } from "@/components/admin/admin-sort-header";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { AsyncTextButton } from "@/components/ui/async-text-button";
-import { IDEA_STATUS_LABELS } from "@/lib/validators";
+import { clubNewsCityBroadcastAdminShort } from "@/lib/club-news-display";
+import { CLUB_NEWS_STATUS_LABELS } from "@/lib/validators";
 
 interface ClubNewsRow {
   id: string;
@@ -24,6 +25,7 @@ interface ClubNewsRow {
   rejectReason: string | null;
   createdAt: string;
   publishedAt: string | null;
+  cityBroadcastRequested: boolean;
   club: {
     id: string;
     name: string;
@@ -37,13 +39,13 @@ interface ClubNewsRow {
 }
 
 type SortKey = "createdAt" | "status" | "title" | "club";
-type StatusFilter = "all" | "PENDING" | "APPROVED" | "REJECTED";
+type StatusFilter = "all" | "PENDING" | "APPROVED" | "REJECTED" | "UNPUBLISHED";
 
 export function ClubNewsAdminTable() {
   const [rows, setRows] = useState<ClubNewsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("PENDING");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [rejectId, setRejectId] = useState<string | null>(null);
@@ -52,6 +54,10 @@ export function ClubNewsAdminTable() {
 
   const reload = useCallback(async () => {
     const res = await fetch("/api/admin/club-news");
+    if (!res.ok) {
+      setLoading(false);
+      return;
+    }
     const data = await res.json();
     setRows(Array.isArray(data) ? data : []);
     setLoading(false);
@@ -106,7 +112,14 @@ export function ClubNewsAdminTable() {
     }
   }
 
-  async function moderate(id: string, action: "approve" | "reject", reason?: string) {
+  async function moderate(
+    id: string,
+    action: "approve" | "reject" | "unpublish",
+    reason?: string,
+  ) {
+    if (action === "unpublish" && !confirm("Снять новость с публикации на сайте?")) {
+      return;
+    }
     setActingId(id);
     const res = await fetch(`/api/admin/club-news/${id}`, {
       method: "PATCH",
@@ -152,6 +165,7 @@ export function ClubNewsAdminTable() {
             { value: "PENDING", label: "На модерации" },
             { value: "APPROVED", label: "Опубликованы" },
             { value: "REJECTED", label: "Отклонены" },
+            { value: "UNPUBLISHED", label: "Сняты с публикации" },
           ]}
         />
       </AdminTableToolbar>
@@ -175,6 +189,7 @@ export function ClubNewsAdminTable() {
                 onSort={toggleSort}
               />
               <th className="px-4 py-3 font-medium">Автор</th>
+              <th className="px-4 py-3 font-medium">Рассылка</th>
               <AdminSortHeader
                 label="Статус"
                 sortKey="status"
@@ -219,9 +234,20 @@ export function ClubNewsAdminTable() {
                     : "—"}
                 </td>
                 <td className="px-4 py-3">
+                  {row.cityBroadcastRequested ? (
+                    <span className="inline-flex rounded bg-violet-500/15 px-2 py-0.5 text-xs font-medium text-violet-600 dark:text-violet-300">
+                      {clubNewsCityBroadcastAdminShort(true)}
+                    </span>
+                  ) : (
+                    <span className="admin-muted text-xs">
+                      {clubNewsCityBroadcastAdminShort(false)}
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3">
                   <StatusBadge
                     status={row.status}
-                    label={IDEA_STATUS_LABELS[row.status] ?? row.status}
+                    label={CLUB_NEWS_STATUS_LABELS[row.status] ?? row.status}
                   />
                 </td>
                 <td className="px-4 py-3 admin-muted">{formatAdminDate(row.createdAt)}</td>
@@ -265,12 +291,24 @@ export function ClubNewsAdminTable() {
                       )}
                     </div>
                   )}
+                  {row.status === "APPROVED" && (
+                    <div className="flex justify-end">
+                      <AsyncTextButton
+                        variant="red"
+                        loadingLabel="…"
+                        disabled={actingId !== null && actingId !== row.id}
+                        onClick={() => moderate(row.id, "unpublish")}
+                      >
+                        Снять с публикации
+                      </AsyncTextButton>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center admin-muted">
+                <td colSpan={7} className="px-4 py-10 text-center admin-muted">
                   Новостей нет
                 </td>
               </tr>

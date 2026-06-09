@@ -21,6 +21,7 @@ export const TournamentFormat = {
   FIXED_SWISS_32R4_1_3_mesto: 'FIXED_SWISS_32R4_1_3_mesto',
   FIXED_SWISS_32R8: 'FIXED_SWISS_32R8',
   FIXED_SWISS_32R8_2_3_mesta: 'FIXED_SWISS_32R8_2_3_mesta',
+  FIXED_SWISS_32R8_1_3_mesto: 'FIXED_SWISS_32R8_1_3_mesto',
   FIXED_SWISS_32R8_BRONZE: 'FIXED_SWISS_32R8_BRONZE',
   FIXED_SWISS_64: 'FIXED_SWISS_64',
   FIXED_SWISS_64_BRONZE: 'FIXED_SWISS_64_BRONZE',
@@ -106,7 +107,8 @@ export type LoginChallengeStatus = (typeof LoginChallengeStatus)[keyof typeof Lo
 export const IdeaStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED'
+  REJECTED: 'REJECTED',
+  UNPUBLISHED: 'UNPUBLISHED'
 } as const
 
 export type IdeaStatus = (typeof IdeaStatus)[keyof typeof IdeaStatus]

@@ -3,8 +3,9 @@ import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
 import {
   approveClubNewsByAdmin,
   rejectClubNewsByAdmin,
+  unpublishClubNewsByAdmin,
 } from "@/lib/club-news-moderation";
-import { ideaModerateSchema } from "@/lib/validators";
+import { clubNewsModerateSchema } from "@/lib/validators";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -12,12 +13,14 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const session = await requireSuperAdmin();
     const { id } = await params;
-    const data = ideaModerateSchema.parse(await request.json());
+    const data = clubNewsModerateSchema.parse(await request.json());
 
     const result =
       data.action === "approve"
         ? await approveClubNewsByAdmin(id, session.playerId)
-        : await rejectClubNewsByAdmin(id, session.playerId, data.rejectReason);
+        : data.action === "reject"
+          ? await rejectClubNewsByAdmin(id, session.playerId, data.rejectReason)
+          : await unpublishClubNewsByAdmin(id, session.playerId);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.message }, { status: 400 });

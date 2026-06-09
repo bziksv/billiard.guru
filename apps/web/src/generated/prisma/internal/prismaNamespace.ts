@@ -2347,6 +2347,7 @@ export const ClubNewsScalarFieldEnum = {
   moderatedById: 'moderatedById',
   rejectReason: 'rejectReason',
   publishedAt: 'publishedAt',
+  cityBroadcastRequested: 'cityBroadcastRequested',
   createdAt: 'createdAt'
 } as const
 

@@ -86,11 +86,13 @@ APP_VERSION=0.1.0
 
 ```bash
 cd ~/billiard.guru/setka
-chmod +x scripts/beget-setup.sh
+chmod +x scripts/beget-setup.sh scripts/beget-deploy.sh scripts/beget-rollback.sh
 ./scripts/beget-setup.sh
 ```
 
-Скрипт собирает Next.js (standalone), создаёт `~/billiard.guru/.htaccess`, симлинк `public_html` и **регистрирует Telegram webhook**.
+Скрипт собирает Next.js в **staging** (`apps/web/.next/standalone`), копирует в `~/billiard.guru/releases/<id>`, переключает symlink **`~/billiard.guru/current`**, создаёт `.htaccess`, `public_html` и **регистрирует Telegram webhook**.
+
+**Важно:** Passenger указывает на стабильный путь `~/billiard.guru/current`, а не на `.next/standalone` в git. Пока идёт `npm run build` (Next.js удаляет `.next/`), live-трафик обслуживает **предыдущий релиз**.
 
 ## 6. Telegram webhook
 
@@ -104,37 +106,79 @@ cd apps/web && npm run telegram:webhook
 
 ## Обновление после git push
 
+Рекомендуемый способ (pull + atomic deploy):
+
+```bash
+cd ~/billiard.guru/setka
+./scripts/beget-deploy.sh
+```
+
+Или вручную:
+
 ```bash
 cd ~/billiard.guru/setka
 git pull
 ./scripts/beget-setup.sh
 ```
 
+Быстрый повторный деплой без `npm install` (если зависимости не менялись):
+
+```bash
+BEGET_SKIP_INSTALL=1 ./scripts/beget-setup.sh
+```
+
+### Откат без пересборки
+
+Если после деплоя сайт отдаёт 5xx (Beget «A server error occurred», ERROR 1305321563):
+
+```bash
+cd ~/billiard.guru/setka
+./scripts/beget-rollback.sh
+```
+
+Конкретный релиз:
+
+```bash
+./scripts/beget-rollback.sh 20250608-143022-abc1234
+./scripts/beget-diagnose.sh   # список релизов
+```
+
+`beget-setup.sh` сам делает health-check после переключения; при неудаче откатывает на `previous`.
+
 ## Структура на сервере
 
 ```
 ~/billiard.guru/
-  .htaccess              # Passenger → server.js
-  public_html/           # symlink → .next/standalone/public
+  .htaccess              # PassengerAppRoot → ~/billiard.guru/current
+  current/               # symlink → releases/<id>  (live)
+  previous/              # symlink → предыдущий релиз (для отката)
+  releases/
+    20250608-143022-abc1234/
+      server.js, public/, RELEASE.json
+  public_html/           # symlink → current/public
   setka/                 # git-репозиторий
     apps/web/
       .env
-      .next/standalone/  # server.js, tmp/restart.txt
+      .next/standalone/  # staging сборки (не используется Passenger напрямую)
 ```
 
-Перезапуск без пересборки: `touch ~/billiard.guru/setka/apps/web/.next/standalone/tmp/restart.txt`
+Перезапуск без пересборки: `touch ~/billiard.guru/current/tmp/restart.txt`
 
 ## 403 Forbidden (Apache)
 
 Типичная ошибка: **«You don't have permission to access this resource»** — Apache не видит приложение Passenger, а не ошибка Next.js.
 
-### Почему «каждый раз» после git pull
+### Почему сайт падал во время деплоя (legacy layout)
+
+Раньше `PassengerAppRoot` указывал на `setka/apps/web/.next/standalone`. Next.js **удаляет `.next/`** в начале каждой сборки — на 2–5 минут prod ломался, даже если build потом проходил успешно.
+
+**С atomic releases:** Passenger всегда смотрит на `~/billiard.guru/current`. Сборка идёт в staging; переключение — только после успешного build + health-check.
+
+### Почему 403 после неудачной сборки
 
 1. `./scripts/beget-setup.sh` запускает `npm run build`
-2. Next.js **удаляет `.next/`** в начале сборки
-3. Если сборка **падает** (TypeScript, env) — каталог `standalone/` пропадает, а `public_html` указывает в никуда → **403**
-
-**С версии с `beget-verify.sh`:** перед build делается резервная копия standalone; при падении сборки скрипт **откатывает** предыдущую версию. В конце — автоматическая проверка HTTP.
+2. Если сборка **падает** до promote — `current` **не меняется**, сайт остаётся на старом релизе
+3. 403 возможен только если `current`/`public_html` битые или нет `.htaccess` — см. `beget-diagnose.sh`
 
 **Частые причины:**
 

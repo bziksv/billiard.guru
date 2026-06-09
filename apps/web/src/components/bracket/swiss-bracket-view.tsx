@@ -35,7 +35,7 @@ import {
   isFixedSwiss168MatchCount,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
-  isFixedSwissTs32R8ElimAtEighthMatchCount,
+  isFixedSwissTs32R8ElimAtEighthFamily,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -197,7 +197,7 @@ export function SwissBracketView({
     is32Grid &&
     (isFixedSwissTs32MatchCount(matches.length) ||
       isFixedSwissTs32BronzeMatchCount(matches.length) ||
-      isFixedSwissTs32R8ElimAtEighthMatchCount(
+      isFixedSwissTs32R8ElimAtEighthFamily(
         matches.length,
         bracketMaxRound,
       ));

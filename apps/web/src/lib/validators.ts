@@ -120,6 +120,8 @@ export const clubNewsSchema = z.object({
   title: z.string().min(2, "Минимум 2 символа").max(200),
   body: z.string().min(2, "Минимум 2 символа").max(10000),
   publishedAt: z.string().optional(),
+  /** Платная опция — пока игнорируется на сервере. */
+  cityBroadcastRequested: z.boolean().optional(),
 });
 
 export const playerRegisterSchema = z.object({
@@ -211,6 +213,7 @@ export const tournamentSchema = z.object({
     "FIXED_SWISS_32R4_1_3_mesto",
     "FIXED_SWISS_32R8",
     "FIXED_SWISS_32R8_2_3_mesta",
+    "FIXED_SWISS_32R8_1_3_mesto",
     "FIXED_SWISS_32R8_BRONZE",
     "FIXED_SWISS_64",
     "FIXED_SWISS_64_BRONZE",
@@ -252,6 +255,7 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_SWISS_32R4_1_3_mesto",
       "FIXED_SWISS_32R8",
       "FIXED_SWISS_32R8_2_3_mesta",
+      "FIXED_SWISS_32R8_1_3_mesto",
       "FIXED_SWISS_32R8_BRONZE",
       "FIXED_SWISS_64",
       "FIXED_SWISS_64_BRONZE",
@@ -381,6 +385,11 @@ export const ideaModerateSchema = z.object({
   rejectReason: z.string().max(500).optional(),
 });
 
+export const clubNewsModerateSchema = z.object({
+  action: z.enum(["approve", "reject", "unpublish"]),
+  rejectReason: z.string().max(500).optional(),
+});
+
 export const ideaVoteSchema = z.object({
   value: z.enum(["LIKE", "DISLIKE"]),
 });
@@ -487,6 +496,10 @@ export const FIXED_SWISS_32_FORMAT_LABEL =
 export const FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL =
   "Сетка на 32 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
 
+/** 32→16 (56): R8_2_3_mesta + матч проигравших полуфиналистов за 3–4 (#60). */
+export const FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL =
+  "Сетка на 32 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
+
 /** 32→16 (59 встреч) — #41–#44 1/8, нижняя тур 3–4, 1/4 с #53. */
 export const FIXED_SWISS_32R8_FORMAT_LABEL =
   "Сетка на 32 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
@@ -519,6 +532,7 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_SWISS_32R4_1_3_mesto: FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32R8: FIXED_SWISS_32R8_FORMAT_LABEL,
   FIXED_SWISS_32R8_2_3_mesta: FIXED_SWISS_32R8_FORMAT_LABEL,
+  FIXED_SWISS_32R8_1_3_mesto: FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32R8_BRONZE: FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_64: FIXED_SWISS_64_FORMAT_LABEL,
   FIXED_SWISS_64_BRONZE: FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
@@ -558,4 +572,8 @@ export const IDEA_STATUS_LABELS: Record<string, string> = {
   PENDING: "На модерации",
   APPROVED: "Опубликована",
   REJECTED: "Отклонена",
+  UNPUBLISHED: "Снята с публикации",
 };
+
+/** Подписи статусов новостей клуба (включая снятие с публикации). */
+export const CLUB_NEWS_STATUS_LABELS: Record<string, string> = IDEA_STATUS_LABELS;

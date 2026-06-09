@@ -94,6 +94,17 @@ export function getDefaultBracketParticipantRules(
         "Добавьте участников до 32 или смените формат.",
     };
   }
+  if (code === "FIXED_SWISS_32R8_1_3_mesto") {
+    return {
+      min: 32,
+      max: 32,
+      exact: 32,
+      label: "ровно 32",
+      hint:
+        "Сетка «до 2 поражений» на 32 участника — 56 встреч (55 + матч за 3–4 #60), oлимпийka с 1/8: проигравшие в 1/8 (#41–#44) сразу на места 9–12. " +
+        "Добавьте участников до 32 или смените формат.",
+    };
+  }
   if (FIXED_SWISS_32R8_FORMATS.has(code)) {
     const withBronze =
       code === "FIXED_SWISS_32R8_BRONZE" ||

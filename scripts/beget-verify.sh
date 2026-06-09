@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
-# Проверка billiard.guru после деплоя (403 = Passenger/standalone сломан).
+# Проверка billiard.guru после деплоя (403/5xx = Passenger/релиз сломан).
 # На сервере: cd ~/billiard.guru/setka && ./scripts/beget-verify.sh
 # Локально (prod URL): APP_URL=https://billiard.guru ./scripts/beget-verify.sh
 set -u
 
 SITE_ROOT="${SITE_ROOT:-$HOME/billiard.guru}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-WEB="$REPO_ROOT/apps/web"
-STANDALONE="$WEB/.next/standalone"
-HTACCESS="$SITE_ROOT/.htaccess"
-PUBLIC_HTML="$SITE_ROOT/public_html"
+# shellcheck source=beget-lib.sh
+source "$REPO_ROOT/scripts/beget-lib.sh"
+
+WEB="$BEGET_WEB"
+HTACCESS="$BEGET_HTACCESS"
+PUBLIC_HTML="$BEGET_PUBLIC_HTML"
 ENV_FILE="$WEB/.env"
 
 RED='\033[0;31m'
@@ -23,10 +25,7 @@ fail() { echo -e "${RED}✗${NC} $*"; failures=$((failures + 1)); }
 
 APP_URL_OVERRIDE="${APP_URL:-}"
 if [ -f "$ENV_FILE" ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . "$ENV_FILE"
-  set +a
+  beget_load_env "$ENV_FILE"
 fi
 if [ -n "$APP_URL_OVERRIDE" ]; then
   APP_URL="$APP_URL_OVERRIDE"
@@ -42,10 +41,12 @@ echo ""
 if [ -f "$HTACCESS" ]; then
   ok ".htaccess"
 
-  if [ ! -f "$STANDALONE/server.js" ]; then
-    fail "Нет $STANDALONE/server.js — сборка не завершилась"
+  if [ ! -L "$BEGET_CURRENT" ]; then
+    fail "Нет symlink current — запустите ./scripts/beget-setup.sh"
+  elif [ ! -f "$(beget_current_release_dir)/server.js" ]; then
+    fail "Нет server.js в current release"
   else
-    ok "standalone/server.js"
+    ok "current → $(beget_current_release_dir)"
   fi
 
   if [ ! -e "$PUBLIC_HTML" ]; then
@@ -58,15 +59,23 @@ if [ -f "$HTACCESS" ]; then
       ok "public_html → $target"
     fi
   else
-    fail "public_html не symlink — нужен ln -s на standalone/public"
+    fail "public_html не symlink — нужен ln -s на current/public"
   fi
 
-  if [ -f "$HTACCESS" ]; then
-    node_path="$(grep '^PassengerNodejs' "$HTACCESS" | awk '{print $2}')"
-    if [ -n "$node_path" ] && [ ! -x "$node_path" ]; then
-      fail "Node недоступен для Apache: $node_path"
-    elif [ -n "$node_path" ]; then
-      ok "Passenger Node: $node_path"
+  node_path="$(grep '^PassengerNodejs' "$HTACCESS" | awk '{print $2}')"
+  app_root="$(grep '^PassengerAppRoot' "$HTACCESS" | awk '{print $2}')"
+  if [ -n "$node_path" ] && [ ! -x "$node_path" ]; then
+    fail "Node недоступен для Apache: $node_path"
+  elif [ -n "$node_path" ]; then
+    ok "Passenger Node: $node_path"
+  fi
+  if [ -n "$app_root" ]; then
+    if [ "$app_root" = "$BEGET_CURRENT" ] || [ -L "$app_root" ]; then
+      ok "PassengerAppRoot: $app_root"
+    elif [ -d "$app_root" ] && [ -f "$app_root/server.js" ]; then
+      ok "PassengerAppRoot: $app_root (legacy — рекомендуется beget-setup.sh для atomic releases)"
+    else
+      fail "PassengerAppRoot не существует: $app_root"
     fi
   fi
 else
@@ -93,6 +102,7 @@ case "$http_code" in
   5*)
     fail "Ошибка сервера HTTP $http_code — смотрите логи Passenger"
     echo ""
+    echo "→ Быстрый откат: ./scripts/beget-rollback.sh"
     echo "→ Диагностика…"
     db_health="$(curl -sS "$CHECK_URL/api/v1/health/db" --max-time 15 2>/dev/null || true)"
     if [ -n "$db_health" ]; then

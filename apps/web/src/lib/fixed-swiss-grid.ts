@@ -3,6 +3,7 @@ import {
   buildFixedSwissTsTemplateForGridSize,
   buildFixedSwissTs32OutdatedTemplate,
   buildFixedSwissTs32R8ElimAtEighthTemplate,
+  buildFixedSwissTs32R8ElimAtEighthBronzeTemplate,
   fixedSwissTs32MatchNo,
   fixedSwissTs64MatchNo,
   fixedSwissTsBronzeMatchNoForHalf2,
@@ -10,6 +11,8 @@ import {
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32R8ElimAtEighthMatchCount,
+  isFixedSwissTs32R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs32R8ElimAtEighthFamily,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -19,7 +22,10 @@ export {
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32R8ElimAtEighthMatchCount,
+  isFixedSwissTs32R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs32R8ElimAtEighthFamily,
   buildFixedSwissTs32R8ElimAtEighthTemplate,
+  buildFixedSwissTs32R8ElimAtEighthBronzeTemplate,
   isFixedSwissTs64MatchCount,
   isFixedSwissTs64BronzeMatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -46,6 +52,7 @@ export function fixedSwissNominalGridSize(
     format === "FIXED_SWISS_32R4_1_3_mesto" ||
     format === "FIXED_SWISS_32R8" ||
     format === "FIXED_SWISS_32R8_2_3_mesta" ||
+    format === "FIXED_SWISS_32R8_1_3_mesto" ||
     format === "FIXED_SWISS_32R8_BRONZE" ||
     format === "FIXED_PAIR_SWISS_32" ||
     format === "FIXED_PAIR_SWISS_32_BRONZE"
@@ -499,6 +506,9 @@ export function buildFixedSwissTemplate(
     if (format === "FIXED_SWISS_32R8_2_3_mesta") {
       return buildFixedSwissTs32R8ElimAtEighthTemplate();
     }
+    if (format === "FIXED_SWISS_32R8_1_3_mesto") {
+      return buildFixedSwissTs32R8ElimAtEighthBronzeTemplate();
+    }
     const ts32Bronze =
       format === "FIXED_SWISS_32R8_BRONZE" ||
       format === "FIXED_SWISS_32R4_1_3_mesto" ||
@@ -720,6 +730,9 @@ export function fixedSwissMatchNo(
   if (isFixedSwissTs32MatchCount(matchCount)) {
     return fixedSwissTs32MatchNo(round, slot, false);
   }
+  if (isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
+    return fixedSwissTs32MatchNo(round, slot, true);
+  }
   if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)) {
     return fixedSwissTs32MatchNo(round, slot, false);
   }
@@ -772,7 +785,20 @@ export function fixedSwissProtocolPlace(
     if (isFixedSwissTs32BronzeMatchCount(matchCount) && matchNo === 60) {
       return protocolExact(3);
     }
+    if (
+      isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound) &&
+      matchNo === 60
+    ) {
+      return protocolExact(3);
+    }
     if (isFixedSwissTs32MatchCount(matchCount) && matchNo === 59) {
+      return protocolExact(1);
+    }
+    if (
+      (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+        isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) &&
+      matchNo === 59
+    ) {
       return protocolExact(1);
     }
     if (isFixedSwissTsBronzeMatchCount(matchCount) && matchNo === 28) {
@@ -795,6 +821,17 @@ export function fixedSwissProtocolPlace(
       matchNo,
       role,
       isFixedSwissTs32BronzeMatchCount(matchCount),
+    );
+  }
+
+  if (
+    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+    isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)
+  ) {
+    return fixedSwissProtocolPlace32R8Elim(
+      matchNo,
+      role,
+      isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound),
     );
   }
 
@@ -883,6 +920,31 @@ function fixedSwissProtocolPlace32(
   return null;
 }
 
+function fixedSwissProtocolPlace32R8Elim(
+  matchNo: number,
+  role: "winner" | "loser",
+  withBronze: boolean,
+): FixedSwissProtocolPlaceResult | null {
+  if (role === "winner") {
+    if (withBronze && matchNo === 60) return protocolExact(3);
+    if (matchNo === 59) return protocolExact(1);
+    return null;
+  }
+
+  if (withBronze && matchNo === 59) return protocolExact(2);
+  if (withBronze && matchNo === 60) return protocolExact(4);
+  if (!withBronze && matchNo === 59) return protocolExact(2);
+  if (!withBronze && (matchNo === 57 || matchNo === 58)) return protocolExact(3);
+  if (withBronze && (matchNo === 57 || matchNo === 58)) return null;
+
+  if (matchNo >= 41 && matchNo <= 44) return protocolRange(9, 12);
+  if (matchNo >= 53 && matchNo <= 56) return protocolRange(5, 8);
+  if (matchNo >= 45 && matchNo <= 48) return protocolRange(13, 16);
+  if (matchNo >= 33 && matchNo <= 40) return protocolRange(17, 24);
+  if (matchNo >= 17 && matchNo <= 24) return protocolRange(25, 32);
+  return null;
+}
+
 function fixedSwissProtocolPlaceForHalf2(
   matchNo: number,
   role: "winner" | "loser",
@@ -961,6 +1023,12 @@ export function getFixedSwissLinksForGrid(
   }
   if (gridSize === 32 && matchCount === 59) {
     return buildFixedSwissTsTemplateForGridSize(32, false).links;
+  }
+  if (
+    gridSize === 32 &&
+    isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount ?? 0, maxRound)
+  ) {
+    return buildFixedSwissTs32R8ElimAtEighthBronzeTemplate().links;
   }
   if (
     gridSize === 32 &&

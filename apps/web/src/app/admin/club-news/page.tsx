@@ -7,8 +7,8 @@ export default function AdminClubNewsPage() {
         <h1 className="admin-page-title">Новости клубов</h1>
         <p className="admin-page-lead mt-2 text-sm">
           Модерация публикаций от клубов. Новые новости приходят в Telegram с кнопками
-          «Одобрить» / «Отклонить». После одобрения новость появляется на странице клуба и в
-          ленте на главной.
+          «Одобрить» / «Отклонить». Колонка «Рассылка» — платная опция рассылки игрокам города
+          в мессенджеры (см. docs/MONETIZATION.md), пока недоступна.
         </p>
       </div>
       <ClubNewsAdminTable />

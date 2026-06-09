@@ -268,6 +268,30 @@ export async function processTelegramUpdate(
       }
       return;
     }
+    if (data.startsWith("cbk_a_") || data.startsWith("cbk_r_")) {
+      try {
+        const sourceMessage = update.callback_query.message
+          ? {
+              chatId: String(update.callback_query.message.chat.id),
+              messageId: update.callback_query.message.message_id,
+            }
+          : undefined;
+        const { handleClubBookingModerationCallback } = await import(
+          "@/lib/telegram-club-booking"
+        );
+        const handled = await handleClubBookingModerationCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+          sourceMessage,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Club booking moderation callback failed");
+        await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
+      }
+      return;
+    }
     if (data.startsWith("bk")) {
       try {
         const sourceMessage = update.callback_query.message

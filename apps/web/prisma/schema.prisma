@@ -27,6 +27,8 @@ enum TournamentFormat {
   FIXED_SWISS_32R8
   /** 32→16 (55): олимпийка с 1/8, вылет с 1/8 — места 9–12, без #49–#52 */
   FIXED_SWISS_32R8_2_3_mesta
+  /** 32→16 (56): копия R8_2_3_mesta + матч за 3–4 (#60) */
+  FIXED_SWISS_32R8_1_3_mesto
   /** 32→16 (60 встреч): 1/8 + матч за 3–4 (#60) */
   FIXED_SWISS_32R8_BRONZE
   /** 64→32 (111 встреч): эталонная сетка, олимпийка с 1/8 */
@@ -96,6 +98,7 @@ enum IdeaStatus {
   PENDING
   APPROVED
   REJECTED
+  UNPUBLISHED
 }
 
 enum IdeaVoteValue {
@@ -258,6 +261,8 @@ model ClubNews {
   moderatedById   String?    @map("moderated_by_id")
   rejectReason    String?    @map("reject_reason") @db.Text
   publishedAt     DateTime?  @map("published_at")
+  /** Запрос рассылки в мессенджеры игрокам города (платная опция, см. docs/MONETIZATION.md). */
+  cityBroadcastRequested Boolean @default(false) @map("city_broadcast_requested")
   createdAt       DateTime   @default(now()) @map("created_at")
 
   @@index([clubId, publishedAt])

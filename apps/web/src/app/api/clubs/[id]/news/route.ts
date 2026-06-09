@@ -14,6 +14,7 @@ function serializeNews(item: {
   rejectReason: string | null;
   publishedAt: Date | null;
   createdAt: Date;
+  cityBroadcastRequested: boolean;
 }) {
   return {
     id: item.id,
@@ -23,6 +24,7 @@ function serializeNews(item: {
     rejectReason: item.rejectReason,
     publishedAt: item.publishedAt?.toISOString() ?? null,
     createdAt: item.createdAt.toISOString(),
+    cityBroadcastRequested: item.cityBroadcastRequested,
   };
 }
 
@@ -80,24 +82,23 @@ export async function POST(
     }
 
     const data = clubNewsSchema.parse(await request.json());
-    const autoApprove = session.role === "SUPERADMIN";
     const item = await submitClubNewsForModeration({
       clubId: id,
       authorId: session.playerId,
       title: data.title,
       body: data.body,
-      autoApprove,
+      cityBroadcastRequested: data.cityBroadcastRequested,
     });
 
     await writeAuditLog({
       actorType: session.role === "SUPERADMIN" ? "admin" : "club",
       actorId: session.playerId,
-      action: autoApprove ? "club.news.create" : "club.news.submit",
+      action: "club.news.submit",
       entityType: "club_news",
       entityId: item.id,
       section: "news",
       clubId: id,
-      summary: autoApprove ? `Новость: ${item.title}` : `На модерацию: ${item.title}`,
+      summary: `На модерацию: ${item.title}`,
     });
 
     return NextResponse.json(serializeNews(item), { status: 201 });

@@ -7,6 +7,7 @@ import {
   clubNewsModerationKeyboard,
   sendTelegramMessage,
 } from "@/lib/telegram";
+import { getSuperadminTelegramIds } from "@/lib/telegram-admin-ids";
 
 function appUrl(path = "") {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
@@ -15,19 +16,6 @@ function appUrl(path = "") {
 
 function truncate(text: string, max: number) {
   return text.length > max ? `${text.slice(0, max)}…` : text;
-}
-
-async function getSuperadminTelegramIds(): Promise<string[]> {
-  const fromEnv = process.env.TELEGRAM_ADMIN_IDS?.split(",")
-    .map((id) => id.trim())
-    .filter(Boolean);
-  if (fromEnv?.length) return fromEnv;
-
-  const admins = await prisma.player.findMany({
-    where: { role: "SUPERADMIN", isVerified: true, telegramId: { not: null } },
-    select: { telegramId: true },
-  });
-  return admins.map((a) => a.telegramId!).filter(Boolean);
 }
 
 async function findSuperadminByTelegram(telegramId: string) {
@@ -53,19 +41,25 @@ async function notifyAdminsAboutPendingNews(newsId: string) {
   if (!item?.moderationToken) return;
 
   const adminIds = await getSuperadminTelegramIds();
+  if (adminIds.length === 0) {
+    logger.warn({ newsId }, "Club news moderation: no admin Telegram IDs configured");
+  }
   const link = appUrl("/admin/club-news");
   const authorLine = item.author
     ? `Отправил: ${item.author.lastName} ${item.author.firstName}`
     : "Автор не указан";
 
   for (const telegramId of adminIds) {
+    const broadcastLine = item.cityBroadcastRequested
+      ? "\n📣 <b>Рассылка по городу</b> — запрошена (платная опция)\n"
+      : "";
     await sendTelegramMessage(
       telegramId,
       `📰 <b>Новость клуба на модерации</b>\n\n` +
         `<b>${item.title}</b>\n\n` +
         `${truncate(item.body, 400)}\n\n` +
         `Клуб: ${item.club.name} (${item.club.city.nameRu})\n` +
-        `${authorLine}\n\n` +
+        `${authorLine}${broadcastLine}\n` +
         `Модерация: ${link}`,
       { replyMarkup: clubNewsModerationKeyboard(item.moderationToken) },
     );
@@ -103,7 +97,7 @@ export async function submitClubNewsForModeration(input: {
   authorId: string;
   title: string;
   body: string;
-  autoApprove?: boolean;
+  cityBroadcastRequested?: boolean;
 }) {
   const token = randomUUID();
   const item = await prisma.clubNews.create({
@@ -112,18 +106,17 @@ export async function submitClubNewsForModeration(input: {
       authorId: input.authorId,
       title: input.title.trim(),
       body: input.body.trim(),
-      status: input.autoApprove ? "APPROVED" : "PENDING",
-      moderationToken: input.autoApprove ? null : token,
-      publishedAt: input.autoApprove ? new Date() : null,
+      status: "PENDING",
+      moderationToken: token,
+      publishedAt: null,
+      cityBroadcastRequested: false,
     },
   });
 
-  if (!input.autoApprove) {
-    try {
-      await notifyAdminsAboutPendingNews(item.id);
-    } catch (error) {
-      logger.error({ error, newsId: item.id }, "Club news admin notify failed");
-    }
+  try {
+    await notifyAdminsAboutPendingNews(item.id);
+  } catch (error) {
+    logger.error({ error, newsId: item.id }, "Club news admin notify failed");
   }
 
   return item;
@@ -264,6 +257,58 @@ export async function rejectClubNewsByAdmin(
     throw new Error("Новость не найдена или уже обработана");
   }
   return rejectClubNews(item.moderationToken, moderatorId, rejectReason);
+}
+
+export async function unpublishClubNewsByAdmin(
+  newsId: string,
+  moderatorId: string,
+): Promise<{ ok: boolean; message: string }> {
+  const item = await prisma.clubNews.findUnique({ where: { id: newsId } });
+  if (!item) {
+    return { ok: false, message: "Новость не найдена." };
+  }
+  if (item.status !== "APPROVED") {
+    return { ok: false, message: "Снять с публикации можно только опубликованную новость." };
+  }
+
+  await prisma.clubNews.update({
+    where: { id: newsId },
+    data: {
+      status: "UNPUBLISHED",
+      publishedAt: null,
+      moderatedAt: new Date(),
+      moderatedById: moderatorId,
+    },
+  });
+
+  await writeAuditLog({
+    actorType: "admin",
+    actorId: moderatorId,
+    action: "club.news.unpublish",
+    entityType: "club_news",
+    entityId: item.id,
+    section: "news",
+    clubId: item.clubId,
+    summary: `Снято с публикации: ${item.title}`,
+  });
+
+  const full = await loadClubNews(item.id);
+  if (full) {
+    const recipients = new Set<string>();
+    if (full.club.telegramId) recipients.add(full.club.telegramId);
+    if (full.author?.telegramId) recipients.add(full.author.telegramId);
+    const text =
+      `📴 <b>Новость снята с публикации</b>\n\n` +
+      `«<b>${full.title}</b>» больше не отображается на сайте.`;
+    for (const telegramId of recipients) {
+      await sendTelegramMessage(telegramId, text);
+    }
+  }
+
+  return {
+    ok: true,
+    message: `📴 Новость «${item.title}» снята с публикации.`,
+  };
 }
 
 export async function handleClubNewsModerationCallback(

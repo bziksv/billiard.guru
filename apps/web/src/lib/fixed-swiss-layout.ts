@@ -23,6 +23,8 @@ import {
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32R8ElimAtEighthMatchCount,
+  isFixedSwissTs32R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs32R8ElimAtEighthFamily,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -239,7 +241,7 @@ function buildMatchNumbers(
     isFixedSwissTs64BronzeMatchCount(matchCount) ||
     isFixedSwissTs32MatchCount(matchCount) ||
     isFixedSwissTs32BronzeMatchCount(matchCount) ||
-    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)
+    isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRound)
   ) {
     for (const m of matches) {
       map.set(
@@ -344,7 +346,7 @@ export function fixedSwissMatchColForCount(
   if (
     isFixedSwissTs32MatchCount(matchCount) ||
     isFixedSwissTs32BronzeMatchCount(matchCount) ||
-    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)
+    isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRound)
   ) {
     return fixedSwissTs32MatchCol(round, slot);
   }
@@ -735,6 +737,9 @@ function buildTsPositions(
   }
   if (isFixedSwissTs32MatchCount(matchCount)) {
     return buildTsPositions32(matches, cardH);
+  }
+  if (isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
+    return buildTsPositions32R8ElimAtEighthBronze(matches, cardH);
   }
   if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)) {
     return buildTsPositions32R8ElimAtEighth(matches, cardH);
@@ -1327,6 +1332,31 @@ function buildTsPositions32R8ElimAtEighth(
   return positions;
 }
 
+/** TS 32→16 R8 elim (56): матч за 3–4 (#60) под финалом. */
+function buildTsPositions32R8ElimAtEighthBronze(
+  matches: BracketMatchView[],
+  cardH: number,
+): Map<string, SwissMatchPosition> {
+  const positions = buildTsPositions32R8ElimAtEighth(matches, cardH);
+  const byRoundSlot = new Map<string, BracketMatchView>();
+  for (const m of matches) {
+    byRoundSlot.set(`${m.round}:${m.slot}`, m);
+  }
+  const fin = byRoundSlot.get("7:1");
+  const bronze = byRoundSlot.get("7:2");
+  if (!fin || !bronze) return positions;
+  const finPos = positions.get(fin.id);
+  if (!finPos) return positions;
+  positions.set(bronze.id, {
+    col: finPos.col,
+    y:
+      finPos.y +
+      layoutMatchCardHeight(fin.id, cardH) +
+      FIXED_SWISS_BRONZE_BELOW_GAP,
+  });
+  return positions;
+}
+
 /** TS 60 встреч — матч за 3–4 под финалом. */
 function buildTsPositions32Bronze(
   matches: BracketMatchView[],
@@ -1830,7 +1860,7 @@ export function buildFixedSwissBracketLayout(
     isFixedSwissTsBronzeMatchCount(matchCount) ||
     isFixedSwissTs32MatchCount(matchCount) ||
     isFixedSwissTs32BronzeMatchCount(matchCount) ||
-    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRoundEarly) ||
+    isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRoundEarly) ||
     isFixedSwissTs64MatchCount(matchCount) ||
     isFixedSwissTs64BronzeMatchCount(matchCount) ||
     useTsLegacy29 ||
@@ -2320,7 +2350,7 @@ function isFixedSwissTs32CurrentGrid(
     matchCount !== undefined &&
     (isFixedSwissTs32MatchCount(matchCount) ||
       isFixedSwissTs32BronzeMatchCount(matchCount) ||
-      isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound))
+      isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRound))
   );
 }
 
@@ -3163,8 +3193,8 @@ export function fixedSwissTs32R8ElimPlacementByMatchNo(
   if (no >= 33 && no <= 40) return "место 17–24";
   if (no >= 45 && no <= 48) return "место 13–16";
   if (no >= 53 && no <= 56) return "место 5–8";
+  if (withBronze && (no === 57 || no === 58)) return "полуфинал";
   if (!withBronze && (no === 57 || no === 58)) return "3-е место";
-  if (no === 57 || no === 58) return "место 3–4";
   return null;
 }
 
@@ -3250,6 +3280,13 @@ export function fixedSwissPlacementLabel(
       matchNumber ??
       fixedSwissMatchNo(round, slot, matchCount ?? 0, maxRound);
     return fixedSwissTs32R8ElimPlacementByMatchNo(no, false);
+  }
+
+  if (isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount ?? 0, maxRound)) {
+    const no =
+      matchNumber ??
+      fixedSwissMatchNo(round, slot, matchCount ?? 0, maxRound);
+    return fixedSwissTs32R8ElimPlacementByMatchNo(no, true);
   }
 
   if (matchCount === 56 || matchCount === 63 || matchCount === 55) {
