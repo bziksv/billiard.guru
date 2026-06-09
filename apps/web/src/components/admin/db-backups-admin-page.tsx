@@ -166,7 +166,7 @@ function CronSetupBlock({
           <p className="admin-label-xs mb-2">Проверка вручную (SSH)</p>
           <p className="admin-muted mb-2 text-xs">
             После добавления секрета в .env перезапустите Passenger:{" "}
-            <code className="text-xs">touch …/standalone/tmp/restart.txt</code>
+            <code className="text-xs">touch ~/billiard.guru/current/tmp/restart.txt</code>
           </p>
           <pre className="admin-notify-pre overflow-x-auto rounded-lg p-3 text-xs">
             {`${setup.testCommandBeget}\n# или bash:\nchmod +x ${setup.cronScriptPath}\n${setup.testCommand}`}

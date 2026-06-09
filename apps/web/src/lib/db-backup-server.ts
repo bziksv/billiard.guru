@@ -16,38 +16,81 @@ export type { DbBackupEntry, DbBackupKind, DbBackupSettings } from "@/lib/db-bac
 const CONFIG_ID = "default";
 const BACKUP_FILE_RE = /^[\w-]+\.sql(\.gz)?$/;
 
-function resolveBackupDir(): string {
-  if (process.env.DB_BACKUP_DIR) {
-    return path.resolve(process.env.DB_BACKUP_DIR);
-  }
-  const cwd = process.cwd();
-  const candidates = [
-    path.join(cwd, "..", "..", "data", "db-backups"),
-    path.join(cwd, "..", "..", "..", "data", "db-backups"),
-    path.join(cwd, "data", "db-backups"),
-  ];
-  for (const dir of candidates) {
-    const resolved = path.resolve(dir);
-    if (resolved.includes(`${path.sep}setka${path.sep}data`)) {
-      return resolved;
-    }
-  }
-  return path.resolve(candidates[0]!);
-}
-
-async function resolveRepoRoot(): Promise<string> {
+/** Git-репозиторий setka (не ~/billiard.guru/current release). */
+function resolveRepoRootSync(): string {
   const fromEnv = process.env.SETKA_REPO_ROOT?.trim();
   if (fromEnv) {
     return path.resolve(fromEnv);
   }
 
-  const hits: string[] = [];
+  const cwd = path.resolve(process.cwd());
+  const home = process.env.HOME?.trim();
+
+  const candidates: string[] = [];
+
+  if (home) {
+    candidates.push(path.join(home, "setka"));
+    if (!home.endsWith(`${path.sep}setka`)) {
+      candidates.push(path.join(home, "billiard.guru", "setka"));
+    }
+  }
+
+  const currentIdx = cwd.indexOf(`${path.sep}current${path.sep}`);
+  if (currentIdx >= 0) {
+    candidates.push(path.join(cwd.slice(0, currentIdx), "setka"));
+  }
+
+  const setkaIdx = cwd.indexOf(`${path.sep}setka${path.sep}`);
+  if (setkaIdx >= 0) {
+    candidates.push(cwd.slice(0, setkaIdx + `${path.sep}setka`.length));
+  }
+
+  let dir = cwd;
+  for (let depth = 0; depth < 12; depth++) {
+    candidates.push(dir);
+    if (dir.endsWith(`${path.sep}billiard.guru`)) {
+      candidates.push(path.join(dir, "setka"));
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+
+  const seen = new Set<string>();
+  for (const candidate of candidates) {
+    const resolved = path.resolve(candidate);
+    if (seen.has(resolved)) continue;
+    seen.add(resolved);
+    if (resolved.endsWith(`${path.sep}setka`) || resolved.endsWith("/setka")) {
+      return resolved;
+    }
+  }
+
+  if (home?.includes("billiard.guru")) {
+    return path.join(home, "setka");
+  }
+  if (home) {
+    return path.join(home, "billiard.guru", "setka");
+  }
+
+  return path.resolve(cwd, "..", "..", "..");
+}
+
+async function resolveRepoRoot(): Promise<string> {
+  const preferred = resolveRepoRootSync();
+  try {
+    await fs.access(path.join(preferred, "scripts", "db-backup-cron.sh"), fs.constants.R_OK);
+    return preferred;
+  } catch {
+    // fall through
+  }
+
   let dir = path.resolve(process.cwd());
   for (let depth = 0; depth < 12; depth++) {
     const scriptPath = path.join(dir, "scripts", "db-backup-cron.sh");
     try {
       await fs.access(scriptPath, fs.constants.R_OK);
-      hits.push(dir);
+      return dir;
     } catch {
       // not here
     }
@@ -56,36 +99,67 @@ async function resolveRepoRoot(): Promise<string> {
     dir = parent;
   }
 
-  const setkaRoot = hits.find(
-    (d) => d.endsWith(`${path.sep}setka`) || d.endsWith("/setka"),
-  );
-  if (setkaRoot) {
-    return setkaRoot;
-  }
-
-  const backupDir = resolveBackupDir();
-  const dataMarker = `${path.sep}setka${path.sep}data${path.sep}db-backups`;
-  if (backupDir.includes(dataMarker) || backupDir.endsWith(`${path.sep}data${path.sep}db-backups`)) {
-    return path.resolve(backupDir, "..", "..");
-  }
-
-  if (hits.length > 0) {
-    return hits[hits.length - 1]!;
-  }
-
-  return path.resolve(process.cwd(), "..", "..");
+  return preferred;
 }
 
-function resolveCronLogPath(): string {
-  const home = process.env.HOME?.trim();
-  if (home) {
-    return path.join(home, "db-backup-cron.log");
+function backupDirCandidates(): string[] {
+  if (process.env.DB_BACKUP_DIR) {
+    return [path.resolve(process.env.DB_BACKUP_DIR)];
   }
-  return "~/db-backup-cron.log";
+
+  const repoRoot = resolveRepoRootSync();
+  const cwd = path.resolve(process.cwd());
+  const candidates = [
+    path.join(repoRoot, "data", "db-backups"),
+    path.join(cwd, "..", "..", "data", "db-backups"),
+    path.join(cwd, "..", "..", "..", "data", "db-backups"),
+    path.join(cwd, "data", "db-backups"),
+  ];
+
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const dir of candidates) {
+    const resolved = path.resolve(dir);
+    if (seen.has(resolved)) continue;
+    seen.add(resolved);
+    unique.push(resolved);
+  }
+  return unique;
+}
+
+async function countBackupFiles(dir: string): Promise<number> {
+  try {
+    const names = await fs.readdir(dir);
+    return names.filter((name) => BACKUP_FILE_RE.test(name)).length;
+  } catch {
+    return 0;
+  }
+}
+
+/** Каталог бэкапов: setka/data/db-backups; если старые лежат в release — подхватим их. */
+async function resolveBackupDir(): Promise<string> {
+  const candidates = backupDirCandidates();
+  const canonical = candidates[0]!;
+
+  let best = canonical;
+  let bestCount = -1;
+  for (const dir of candidates) {
+    const count = await countBackupFiles(dir);
+    if (count > bestCount) {
+      bestCount = count;
+      best = dir;
+    }
+  }
+  return best;
+}
+
+function resolveCronLogPath(repoRoot: string): string {
+  const siteRoot = path.dirname(repoRoot);
+  return path.join(siteRoot, "db-backup-cron.log");
 }
 
 async function ensureBackupDir(): Promise<string> {
-  const dir = resolveBackupDir();
+  const dir = await resolveBackupDir();
   await fs.mkdir(dir, { recursive: true });
   return dir;
 }
@@ -330,11 +404,12 @@ async function restoreSqlDump(filePath: string): Promise<void> {
 }
 
 export async function getDbBackupSettings(): Promise<DbBackupSettings> {
-  const [row, dumpBin, mysqlBin, repoRoot] = await Promise.all([
+  const [row, dumpBin, mysqlBin, repoRoot, backupDir] = await Promise.all([
     prisma.dbBackupConfig.findUnique({ where: { id: CONFIG_ID } }),
     resolveBinary(DUMP_BINARY_CANDIDATES),
     resolveBinary(MYSQL_BINARY_CANDIDATES),
     resolveRepoRoot(),
+    resolveBackupDir(),
   ]);
 
   const schedule = {
@@ -365,7 +440,7 @@ export async function getDbBackupSettings(): Promise<DbBackupSettings> {
     ...schedule,
     retainCount: row?.retainCount ?? 14,
     lastAutoBackupAt: row?.lastAutoBackupAt?.toISOString() ?? null,
-    backupDir: resolveBackupDir(),
+    backupDir,
     mysqldumpAvailable: Boolean(dumpBin),
     mysqlAvailable: Boolean(mysqlBin),
     cronSetup: buildDbBackupCronSetup(
@@ -374,7 +449,7 @@ export async function getDbBackupSettings(): Promise<DbBackupSettings> {
         envFilePath: path.join(repoRoot, "apps", "web", ".env"),
         cronScriptPath,
         cronPhpScriptPath,
-        logPath: resolveCronLogPath(),
+        logPath: resolveCronLogPath(repoRoot),
         scriptExists,
         phpScriptExists,
       },
@@ -444,7 +519,7 @@ async function resolveBackupFile(id: string): Promise<string> {
   if (!/^[\w-]+$/.test(id)) {
     throw new Error("Некорректный идентификатор бэкапа");
   }
-  const dir = resolveBackupDir();
+  const dir = await resolveBackupDir();
   for (const ext of [".sql", ".sql.gz"]) {
     const name = `${id}${ext}`;
     if (!BACKUP_FILE_RE.test(name)) continue;

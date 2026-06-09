@@ -1,9 +1,10 @@
 import { randomUUID } from "crypto";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
+import { resolveUploadsSubdir } from "@/lib/uploads-dir";
 
 export async function saveCoachPhotoFile(file: File): Promise<string> {
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", "coaches");
+  const uploadsDir = resolveUploadsSubdir("coaches");
   await mkdir(uploadsDir, { recursive: true });
   const ext = path.extname(file.name) || ".jpg";
   const filename = `${randomUUID()}${ext}`;

@@ -119,6 +119,19 @@ else
   warn "Нет $WEB/.env"
 fi
 
+if [ -d "$SITE_ROOT/shared/uploads" ]; then
+  ok "shared/uploads (persistent)"
+  if [ -L "$BEGET_CURRENT" ] && [ -d "$(beget_current_release_dir)/public" ]; then
+    if [ -L "$(beget_current_release_dir)/public/uploads" ]; then
+      ok "current/public/uploads → $(readlink -f "$(beget_current_release_dir)/public/uploads" 2>/dev/null || readlink "$(beget_current_release_dir)/public/uploads")"
+    elif [ -d "$(beget_current_release_dir)/public/uploads" ]; then
+      warn "public/uploads — каталог, не symlink на shared (./scripts/beget-fix-uploads.sh)"
+    fi
+  fi
+else
+  warn "Нет $SITE_ROOT/shared/uploads — фото могут теряться при deploy"
+fi
+
 echo ""
 echo "=== Права (Apache должен читать все каталоги в пути) ==="
 for dir in "$HOME" "$SITE_ROOT" "$BEGET_CURRENT" "$BEGET_RELEASES" "$SITE_ROOT/.node"; do

@@ -87,6 +87,9 @@ if grep -qE '@localhost(:3306)?/' "$WEB/.env" 2>/dev/null; then
   sed -i "s/@localhost:3306/@${BEGET_DB_HOST}:3306/g; s/@localhost\//@${BEGET_DB_HOST}:3306\//g" "$WEB/.env"
 fi
 
+echo "→ Пути prod (.env: SETKA_REPO_ROOT, DB_BACKUP_DIR, UPLOADS_DIR)…"
+beget_ensure_prod_env_paths
+
 beget_migrate_legacy_layout
 
 if [ -L "$BEGET_CURRENT" ]; then

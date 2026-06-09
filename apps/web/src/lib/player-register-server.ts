@@ -5,6 +5,7 @@ import { writeAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
 import { buildConfirmLink } from "@/lib/telegram";
 import { normalizePhoneForCity } from "@/lib/phone-server";
+import { resolveUploadsSubdir } from "@/lib/uploads-dir";
 import { playerRegisterSchema } from "@/lib/validators";
 
 export async function registerPlayerFromFormData(formData: FormData) {
@@ -33,7 +34,7 @@ export async function registerPlayerFromFormData(formData: FormData) {
   let photoUrl: string | null = null;
   const photo = formData.get("photo");
   if (photo instanceof File && photo.size > 0) {
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "players");
+    const uploadsDir = resolveUploadsSubdir("players");
     await mkdir(uploadsDir, { recursive: true });
     const ext = path.extname(photo.name) || ".jpg";
     const filename = `${confirmToken}${ext}`;

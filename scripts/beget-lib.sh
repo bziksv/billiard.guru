@@ -57,6 +57,73 @@ beget_current_release_dir() {
   return 1
 }
 
+BEGET_SHARED="$SITE_ROOT/shared"
+BEGET_SHARED_UPLOADS="$SITE_ROOT/shared/uploads"
+
+beget_ensure_shared_uploads() {
+  mkdir -p "$BEGET_SHARED_UPLOADS/clubs" "$BEGET_SHARED_UPLOADS/coaches" "$BEGET_SHARED_UPLOADS/players"
+  chmod -R a+rx "$BEGET_SHARED" 2>/dev/null || true
+}
+
+beget_migrate_uploads_to_shared() {
+  beget_ensure_shared_uploads
+  local src sub
+  local sources=()
+
+  sources+=("$BEGET_WEB/public/uploads")
+  sources+=("$BEGET_STANDALONE/public/uploads")
+
+  if [ -L "$BEGET_CURRENT" ]; then
+    sources+=("$(beget_current_release_dir)/public/uploads")
+  fi
+
+  if [ -d "$BEGET_RELEASES" ]; then
+    while IFS= read -r rel; do
+      [ -n "$rel" ] || continue
+      sources+=("$rel/public/uploads")
+    done < <(find "$BEGET_RELEASES" -mindepth 1 -maxdepth 1 -type d 2>/dev/null || true)
+  fi
+
+  for src in "${sources[@]}"; do
+    [ -e "$src" ] || continue
+    if [ -L "$src" ]; then
+      continue
+    fi
+    for sub in clubs coaches players; do
+      if [ -d "$src/$sub" ]; then
+        mkdir -p "$BEGET_SHARED_UPLOADS/$sub"
+        cp -an "$src/$sub/." "$BEGET_SHARED_UPLOADS/$sub/" 2>/dev/null || true
+      fi
+    done
+  done
+}
+
+beget_link_uploads_in_public() {
+  local public_dir="$1"
+  beget_ensure_shared_uploads
+  mkdir -p "$public_dir"
+  rm -rf "$public_dir/uploads"
+  ln -sfn "$BEGET_SHARED_UPLOADS" "$public_dir/uploads"
+}
+
+beget_env_set_if_missing() {
+  local key="$1"
+  local value="$2"
+  local file="$BEGET_WEB/.env"
+  [ -f "$file" ] || return 0
+  if grep -qE "^[[:space:]]*${key}=" "$file" 2>/dev/null; then
+    return 0
+  fi
+  echo "${key}=${value}" >> "$file"
+  echo "  ✓ .env: добавлен ${key}"
+}
+
+beget_ensure_prod_env_paths() {
+  beget_env_set_if_missing "SETKA_REPO_ROOT" "$BEGET_REPO_ROOT"
+  beget_env_set_if_missing "DB_BACKUP_DIR" "$BEGET_REPO_ROOT/data/db-backups"
+  beget_env_set_if_missing "UPLOADS_DIR" "$BEGET_SHARED_UPLOADS"
+}
+
 beget_write_passenger_start() {
   local target_dir="$1"
   # Без require("dotenv"): в releases/ нет доступа к node_modules репозитория.
@@ -101,9 +168,11 @@ EOF
 
 beget_prepare_standalone_staging() {
   local staging="$BEGET_STANDALONE"
+  beget_migrate_uploads_to_shared
   echo "→ Копируем static в standalone (staging)…"
   mkdir -p "$staging/.next"
   cp -r "$BEGET_WEB/public" "$staging/public"
+  beget_link_uploads_in_public "$staging/public"
   cp -r "$BEGET_WEB/.next/static" "$staging/.next/static"
   cp "$BEGET_WEB/.env" "$staging/.env"
   ln -sfn "$BEGET_WEB/.env" "$staging/.env.local"
@@ -157,6 +226,7 @@ beget_promote_staging_to_release() {
   rm -rf "$release_dir"
   cp -a "$BEGET_STANDALONE" "$release_dir"
   beget_write_passenger_start "$release_dir"
+  beget_link_uploads_in_public "$release_dir/public"
 
   local git_sha git_branch
   git_sha="$(git -C "$BEGET_REPO_ROOT" rev-parse HEAD 2>/dev/null || echo null)"

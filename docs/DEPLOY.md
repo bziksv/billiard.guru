@@ -152,15 +152,21 @@ cd ~/billiard.guru/setka
   .htaccess              # PassengerAppRoot → ~/billiard.guru/current
   current/               # symlink → releases/<id>  (live)
   previous/              # symlink → предыдущий релиз (для отката)
+  shared/
+    uploads/             # фото клубов/игроков (не в git, переживает deploy)
+      clubs/ coaches/ players/
   releases/
     20250608-143022-abc1234/
-      server.js, public/, RELEASE.json
+      server.js, public/uploads → ../../shared/uploads
   public_html/           # symlink → current/public
   setka/                 # git-репозиторий
     apps/web/
-      .env
-      .next/standalone/  # staging сборки (не используется Passenger напрямую)
+      .env               # SETKA_REPO_ROOT, DB_BACKUP_DIR, UPLOADS_DIR
+      data/db-backups/   # SQL-бэкапы
+      .next/standalone/  # staging сборки
 ```
+
+`beget-setup.sh` дописывает в `.env` (если ещё нет): `SETKA_REPO_ROOT`, `DB_BACKUP_DIR`, `UPLOADS_DIR`.
 
 Перезапуск без пересборки: `touch ~/billiard.guru/current/tmp/restart.txt`
 
