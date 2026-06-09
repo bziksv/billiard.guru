@@ -119,7 +119,7 @@ export async function loadHomePlayAnnouncements(geo: GeoSearchParams): Promise<{
 export async function loadHomeBracketFormats(): Promise<PublicBracketFormat[]> {
   const formats = await getPublicEnabledBracketFormats();
   const priority = (f: PublicBracketFormat) => {
-    const badge = f.seo.participantBadge;
+    const badge = f.seo?.participantBadge ?? "";
     if (badge.includes("16")) return 1;
     if (badge.includes("32")) return 2;
     if (badge.includes("64")) return 3;

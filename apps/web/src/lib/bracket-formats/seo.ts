@@ -93,6 +93,17 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
       "таблица турнира 32",
     ],
   },
+  FIXED_SWISS_32R8_1_3_mesto: {
+    code: "FIXED_SWISS_32R8_1_3_mesto",
+    slug: "setka-32-1-8-matc-za-3-4",
+    pageTitle: "Сетка на 32 с 1/8 и матчем за 3–4 место",
+    metaTitle: "Сетка на 32 (1/8) + матч за 3–4 | billiard.guru",
+    metaDescription:
+      "Турнирная таблица на 32: олимпийка с 1/8 (56 встреч) и отдельный матч #60 за 3–4 место. Демо на billiard.guru.",
+    lead: "Oлимпийka с 1/8 (55 основных встреч + матч #60) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
+    participantBadge: "32 человека",
+    keywords: ["сетка 32 бронза", "турнирная таблица 32", "матч за 3 место 1/8"],
+  },
   FIXED_SWISS_32R8_BRONZE: {
     code: "FIXED_SWISS_32R8_BRONZE",
     slug: "setka-32-chelovek-1-8-s-bronzoy",

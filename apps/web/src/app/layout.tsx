@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
@@ -34,13 +35,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{ __html: buildThemeInitScript() }}
-          suppressHydrationWarning
-        />
-      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <Script id="setka-theme-init" strategy="beforeInteractive">
+          {buildThemeInitScript()}
+        </Script>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
