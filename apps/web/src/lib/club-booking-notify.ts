@@ -14,6 +14,26 @@ function escapeHtml(text: string): string {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+function telegramContactHref(phone: string, telegramUsername?: string | null): string | null {
+  const username = telegramUsername?.trim().replace(/^@/, "");
+  if (username && /^[a-zA-Z][a-zA-Z0-9_]{4,31}$/.test(username)) {
+    return `https://t.me/${username}`;
+  }
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10) return null;
+  const normalized =
+    digits.startsWith("8") && digits.length === 11 ? `7${digits.slice(1)}` : digits;
+  return `https://t.me/+${normalized}`;
+}
+
+function formatPhoneLine(phone: string, telegramUsername?: string | null): string {
+  const tgHref = telegramContactHref(phone, telegramUsername);
+  if (!tgHref || phone === "—") return `📞 ${escapeHtml(phone)}`;
+  const username = telegramUsername?.trim().replace(/^@/, "");
+  const linkLabel = username ? `@${username}` : "Telegram";
+  return `📞 ${escapeHtml(phone)} · <a href="${tgHref}">${escapeHtml(linkLabel)}</a>`;
+}
+
 function buildBookingNotifyText(
   clubName: string,
   booking: {
@@ -22,7 +42,7 @@ function buildBookingNotifyText(
     floorItemId: string | null;
     startsAt: Date;
     endsAt: Date;
-    player: { firstName: string; lastName: string; phone: string } | null;
+    player: { firstName: string; lastName: string; phone: string; telegramUsername?: string | null } | null;
     guestName: string | null;
     guestPhone: string | null;
     playerNote: string | null;
@@ -42,7 +62,7 @@ function buildBookingNotifyText(
     `🎱 <b>Новая заявка на бронь</b> — ${escapeHtml(clubName)}`,
     "",
     `👤 ${escapeHtml(guest)}`,
-    `📞 ${escapeHtml(phone)}`,
+    formatPhoneLine(phone, booking.player?.telegramUsername),
     `🪑 ${escapeHtml(table.title)}`,
     table.hint ? `   ${escapeHtml(table.hint)}` : "",
     `🕐 ${escapeHtml(formatBookingRange(booking.startsAt, booking.endsAt))}`,
@@ -62,7 +82,7 @@ export async function notifyClubNewBooking(bookingId: string): Promise<void> {
     where: { id: bookingId },
     include: {
       club: { select: { id: true, name: true, floorPlan: true } },
-      player: { select: { firstName: true, lastName: true, phone: true } },
+      player: { select: { firstName: true, lastName: true, phone: true, telegramUsername: true } },
     },
   });
   if (!row || row.status !== "PENDING") return;
