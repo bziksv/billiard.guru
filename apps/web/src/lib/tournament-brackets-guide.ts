@@ -254,17 +254,16 @@ export const TOURNAMENT_BRACKETS_SECTIONS: GuideSection[] = [
   {
     id: "swiss-fixed-32",
     title: TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32!,
-    format: "FIXED_SWISS_32",
+    format: "FIXED_SWISS_32R4_2_3_mesta",
     paragraphs: [
       "Фиксированная швейцарская сетка на **32 участника**. **59 встреч**, **10 колонок**: нижняя ветка тур 1–4 слева, олимпийка с **1/8** (#41–#44), 1/4 с **#53**.",
       "Технический регламент (links, Y, SVG, нумерация): **docs/BRACKET_REFERENCE_32_16.md**. После обновления шаблона в коде — «Сформировать заново» в админке турнира.",
       `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_32}.`,
     ],
     bullets: [
-      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32}».`,
+      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32R4_2_3_mesta}».`,
       "Нижняя: #17–#24 → крест #33–#40 → тур 3 #48–#45 → тур 4 #52–#49.",
       "Верхняя: #25–#32 → 1/8 #41–#44 (парами) → 1/4 #53–#56 (рядом с 1/8 по Y).",
-      "Устаревшие сетки (55/56, 63/64 встреч) — пересоздать через «Сформировать заново».",
     ],
     examples: [
       {
@@ -289,12 +288,35 @@ export const TOURNAMENT_BRACKETS_SECTIONS: GuideSection[] = [
     paragraphs: [
       "Та же эталонная сетка 32→16 (59 встреч), что у FIXED_SWISS_32, плюс **#60** — матч проигравших полуфиналистов (#57 и #58) за 3–4 место.",
       "Матч **#60** отображается **в колонке «Финал» под финалом (#59)**, как #28 у формата 16→8 с бронзой.",
-      "Регламент сетки: docs/BRACKET_REFERENCE_32_16.md.",
       `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_32_BRONZE}.`,
     ],
     bullets: [
       `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32_BRONZE}».`,
       "После обоих полуфиналов проигравшие автоматически попадают в #60.",
+    ],
+  },
+  {
+    id: "swiss-fixed-32-r8",
+    title: TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32R8_2_3_mesta!,
+    format: "FIXED_SWISS_32R8_2_3_mesta",
+    paragraphs: [
+      "Сетка **FIXED_SWISS_32R8_2_3_mesta** — 59 встреч, oлимпийka с **1/8** (#41–#44), вылет с 1/8.",
+      `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_32}.`,
+    ],
+    bullets: [
+      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32R8_2_3_mesta}».`,
+    ],
+  },
+  {
+    id: "swiss-fixed-32-r8-bronze",
+    title: TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32R8_BRONZE!,
+    format: "FIXED_SWISS_32R8_BRONZE",
+    paragraphs: [
+      "Копия **FIXED_SWISS_32_BRONZE** — 60 встреч (#60 под финалом), подпись «с 1/8».",
+      `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_32_BRONZE}.`,
+    ],
+    bullets: [
+      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32R8_BRONZE}».`,
     ],
   },
   {

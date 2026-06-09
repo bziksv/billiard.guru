@@ -8,8 +8,8 @@ import {
   bracketViewRootClassName,
 } from "@/lib/bracket-canvas-class";
 import { cn } from "@/lib/cn";
+import { BracketMatchNumberRow } from "@/components/bracket/bracket-match-number-row";
 import type { BracketMatchView } from "@/lib/bracket-view";
-import { BracketStreamLink } from "@/components/bracket/bracket-stream-link";
 import { isMatchResolved } from "@/lib/match-result";
 import excelRef from "@/lib/excel-bracket-64-reference.json";
 import {
@@ -58,15 +58,17 @@ function ExcelMatchCard({
 
   const body = (
     <>
-      <div className="llb-bracket-match__meta flex items-center justify-between px-2 font-mono text-[11px] tabular-nums">
-        <span>#{refMatch.no}</span>
-        <span className="flex items-center gap-1">
-          {live?.streamUrl && <BracketStreamLink url={live.streamUrl} />}
-          {finished && (
+      <BracketMatchNumberRow
+        matchNumber={refMatch.no}
+        numberPrefix="#"
+        tableLabel={live?.tableLabel}
+        streamUrl={live?.streamUrl}
+        rightExtra={
+          finished ? (
             <span className="text-[10px] text-[var(--bracket-meta-text)]">✓</span>
-          )}
-        </span>
-      </div>
+          ) : undefined
+        }
+      />
       <div
         className={cn(
           "flex w-full items-center border-b border-[var(--bracket-row-border)] px-2 text-[12px]",

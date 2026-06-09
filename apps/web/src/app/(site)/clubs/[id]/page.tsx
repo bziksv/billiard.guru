@@ -18,6 +18,7 @@ import {
   tournamentListInclude,
   tournamentListOrderBy,
 } from "@/lib/public-queries";
+import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 
 function formatNewsDate(date: Date) {
@@ -50,6 +51,7 @@ export default async function ClubPage({
 
   if (!club) notFound();
 
+  const formatLabels = await getAllBracketFormatLabels();
   const player = await getCurrentPlayer();
   const mapLat = club.latitude ?? club.city.latitude;
   const mapLng = club.longitude ?? club.city.longitude;
@@ -185,7 +187,11 @@ export default async function ClubPage({
             <ul className="space-y-4">
               {upcoming.map((t) => (
                 <li key={t.id}>
-                  <TournamentCard tournament={t} href={`/tournaments/${t.id}`} compact />
+                  <TournamentCard
+                    tournament={{ ...t, formatLabel: formatLabels[t.format] }}
+                    href={`/tournaments/${t.id}`}
+                    compact
+                  />
                 </li>
               ))}
             </ul>
@@ -200,7 +206,11 @@ export default async function ClubPage({
             <ul className="space-y-4">
               {past.map((t) => (
                 <li key={t.id}>
-                  <TournamentCard tournament={t} href={`/tournaments/${t.id}`} compact />
+                  <TournamentCard
+                    tournament={{ ...t, formatLabel: formatLabels[t.format] }}
+                    href={`/tournaments/${t.id}`}
+                    compact
+                  />
                 </li>
               ))}
             </ul>

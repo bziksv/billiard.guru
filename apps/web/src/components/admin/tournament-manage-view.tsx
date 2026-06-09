@@ -5,6 +5,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { PlayerContactLinks } from "@/components/admin/player-contact-links";
 import { TournamentParticipantInfo } from "@/components/admin/tournament-participant-info";
 import {
+  buildMatchStartNowPayload,
   MatchResultModal,
   type MatchResultPayload,
 } from "@/components/bracket/match-result-modal";
@@ -41,6 +42,7 @@ import { mapBracketMatchesByExcelNo } from "@/lib/excel-bracket-match-map";
 import { ExcelBracketView } from "@/components/bracket/excel-bracket-view";
 import { BracketPresentationShell } from "@/components/bracket/bracket-presentation-shell";
 import { BracketScreenshotModal } from "@/components/bracket/bracket-screenshot-modal";
+import { BracketStreamLink } from "@/components/bracket/bracket-stream-link";
 import {
   captureBracketScreenshot,
   loadImagePreview,
@@ -62,9 +64,9 @@ import {
   canCancelRegistration,
   isTournamentRegistrationOpen,
 } from "@/lib/tournament-registration";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
   REGISTRATION_STATUS_LABELS,
-  TOURNAMENT_FORMAT_LABELS,
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 import { AdminHorizontalScroll } from "@/components/admin/admin-horizontal-scroll";
@@ -84,7 +86,12 @@ import {
   matchStageLabel,
   matchScoreLabel,
 } from "@/lib/tournament-match-schedule";
-import { resolveMatchStreamUrl, tournamentTableOptions } from "@/lib/tournament-stream";
+import {
+  resolveMatchStreamUrl,
+  resolveTableLabel,
+  tournamentTableOptions,
+  type TournamentTableOption,
+} from "@/lib/tournament-stream";
 
 type Team = AdminTournament["teams"][number] & TeamWithPlayers;
 type Match = AdminTournament["matches"][number];
@@ -249,7 +256,7 @@ function ManageTabButtons({
         onClick={() => onTabChange("protocol")}
         className={adminTabClass(tab === "protocol")}
       >
-        Итоговый протокол
+        Итоги
       </button>
       {showScreenshot && (
         <button
@@ -616,6 +623,11 @@ export function TournamentManageView({
           { tableIds: t.tableIds, tableStreams: t.tableStreams },
           t.club.floorPlan,
         ),
+        tableLabel: resolveTableLabel(
+          m.tableId ?? null,
+          t.club.floorPlan,
+          t.club.tableCounts,
+        ),
         team1: applyTournamentRatingsToTeam(m.team1, ratingSource, clubPlayerRatings),
         team2: applyTournamentRatingsToTeam(m.team2, ratingSource, clubPlayerRatings),
       })),
@@ -623,8 +635,13 @@ export function TournamentManageView({
   );
   const tournamentTables = useMemo(
     () =>
-      tournamentTableOptions(t.tableIds, t.club.floorPlan, t.club.tableCounts),
-    [t.tableIds, t.club.floorPlan, t.club.tableCounts],
+      tournamentTableOptions(
+        t.tableIds,
+        t.club.floorPlan,
+        t.club.tableCounts,
+        t.tableStreams,
+      ),
+    [t.tableIds, t.tableStreams, t.club.floorPlan, t.club.tableCounts],
   );
   const currentMatches = useMemo(
     () => filterCurrentMatches(bracketMatches),
@@ -724,7 +741,7 @@ export function TournamentManageView({
   const presentationContentIsBracket = tab === "bracket";
 
   const manageTabStrip = (
-    <AdminHorizontalScroll className="min-w-0 w-full sm:flex-1">
+    <AdminHorizontalScroll className="min-w-0 w-full">
       <div className="flex w-max items-center gap-2 pb-0.5">
         <div className="admin-tab-bar admin-tab-bar--nowrap">{manageTabButtons}</div>
         {bracketDisplayToggles}
@@ -737,7 +754,7 @@ export function TournamentManageView({
     <div
       className={
         embedded
-          ? "space-y-4"
+          ? "min-w-0 max-w-full space-y-4"
           : "rounded-xl border border-zinc-800 bg-zinc-950 p-4"
       }
     >
@@ -750,7 +767,7 @@ export function TournamentManageView({
           />
           <div className="text-sm text-zinc-400">
             <span>
-              {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
+              {tournamentFormatDisplayLabel(t)} · {t.club.name}
             </span>
             <TournamentRatingRulesSummary tournament={t} className="mt-1 block text-zinc-500" />
           </div>
@@ -773,9 +790,9 @@ export function TournamentManageView({
               {t.status === "ACTIVE" ? "Ведение турнира" : "Управление турниром"}
             </h2>
           )}
-          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
+          <div className="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
             {showTabBar && !editing ? (
-              manageTabStrip
+              <div className="min-w-0 flex-1 overflow-hidden">{manageTabStrip}</div>
             ) : (
               <div className="min-w-0 flex-1" />
             )}
@@ -1472,21 +1489,19 @@ function ParticipantsTab({
                 </div>
                 <div className="tournament-participant-card-actions">
                   <FeePaidCheckbox checked disabled onChange={async () => {}} />
-                  <div className="tournament-participant-card-buttons">
-                    <StatusBadge
-                      status={r.status}
-                      label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
-                    />
-                    {canModifyRegistrations && (
-                      <RegistrationActionButton
-                        variant="outline"
-                        loadingLabel="Снимаем…"
-                        onClick={() => onCancelRegistration(r.id)}
-                      >
-                        Снять
-                      </RegistrationActionButton>
-                    )}
-                  </div>
+                  <StatusBadge
+                    status={r.status}
+                    label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
+                  />
+                  {canModifyRegistrations && (
+                    <RegistrationActionButton
+                      variant="outline"
+                      loadingLabel="Снимаем…"
+                      onClick={() => onCancelRegistration(r.id)}
+                    >
+                      Снять
+                    </RegistrationActionButton>
+                  )}
                 </div>
               </li>
             ))}
@@ -1979,7 +1994,7 @@ function BracketTab({
   onDismissActionNotice?: () => void;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
-  tournamentTables?: { id: string; label: string }[];
+  tournamentTables?: TournamentTableOption[];
 }) {
   const dynamicSwiss = isDynamicSwissFormat(format);
   const excelRef = isExcelRef64Format(format);
@@ -2172,10 +2187,11 @@ function MatchesScheduleTab({
   matchNumbers: Map<string, number>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
-  tournamentTables?: { id: string; label: string }[];
+  tournamentTables?: TournamentTableOption[];
 }) {
   const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
   const [matchSaving, setMatchSaving] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -2203,6 +2219,18 @@ function MatchesScheduleTab({
     }
   }
 
+  async function handleStartNow(match: BracketMatchView) {
+    setStartError(null);
+    setMatchSaving(true);
+    try {
+      await onSaveMatchResult(buildMatchStartNowPayload(match.id));
+    } catch (e) {
+      setStartError(e instanceof Error ? e.message : "Не удалось начать встречу");
+    } finally {
+      setMatchSaving(false);
+    }
+  }
+
   const emptyHint =
     variant === "current"
       ? "Нет встреч в процессе. Начало фиксируется в карточке встречи на сетке."
@@ -2210,25 +2238,40 @@ function MatchesScheduleTab({
         ? "Нет готовых встреч — дождитесь соперников или сформируйте следующий тур."
         : "Пока нет завершённых встреч.";
   const showScore = variant === "current" || variant === "completed";
+  const showTable = variant === "current";
   const showElapsed = variant === "current";
   const showDuration = variant === "completed";
   const showHandicap = true;
+  const showStartAction = variant === "upcoming";
+  /** До старта колонки «Начало»/«Окончание» пустые — не занимаем ширину на узких экранах. */
+  const showScheduleTimes = variant !== "upcoming";
   const rowHint =
     variant === "completed"
       ? "Нажмите на строку, чтобы открыть карточку встречи, изменить данные или отменить результат."
-      : "Нажмите на строку, чтобы открыть карточку встречи и зафиксировать результат.";
+      : variant === "upcoming"
+        ? "«Начать сейчас» — старт и свободный стол без модалки. Строка — ручная настройка времени и стола."
+        : "Нажмите на строку, чтобы открыть карточку встречи и зафиксировать результат.";
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 max-w-full space-y-4">
+      {startError && (
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
+          {startError}
+        </p>
+      )}
       {matches.length === 0 ? (
         <p className="tournament-hint text-sm">{emptyHint}</p>
       ) : (
-        <div className="admin-table-wrap overflow-x-auto">
+        <div className="admin-table-wrap admin-table-wrap--scroll min-w-0 w-full max-w-full">
           <table
             className={cn(
               "w-full text-left text-sm",
               showHandicap
-                ? "min-w-[920px]"
+                ? showStartAction
+                  ? "min-w-[680px]"
+                  : showTable
+                    ? "min-w-[1000px]"
+                    : "min-w-[920px]"
                 : showDuration
                   ? "min-w-[800px]"
                   : "min-w-[720px]",
@@ -2245,16 +2288,29 @@ function MatchesScheduleTab({
                 {showHandicap && (
                   <th className="px-4 py-3 font-medium">Фора</th>
                 )}
+                {showTable && (
+                  <th className="px-4 py-3 font-medium">Стол</th>
+                )}
                 {showScore && (
                   <th className="px-4 py-3 font-medium">Счёт</th>
                 )}
                 {showElapsed && (
                   <th className="px-4 py-3 font-medium">Идёт</th>
                 )}
-                <th className="px-4 py-3 font-medium">Начало</th>
-                <th className="px-4 py-3 font-medium">Окончание</th>
+                {showScheduleTimes && (
+                  <th className="px-4 py-3 font-medium">Начало</th>
+                )}
+                {showScheduleTimes && (
+                  <th className="px-4 py-3 font-medium">Окончание</th>
+                )}
                 {showDuration && (
                   <th className="px-4 py-3 font-medium">Длительность</th>
+                )}
+                {showStartAction && (
+                  <th
+                    className="sticky right-0 z-10 bg-[var(--admin-thead-bg)] px-3 py-3 shadow-[-6px_0_10px_-6px_rgba(0,0,0,0.35)]"
+                    aria-label="Действия"
+                  />
                 )}
               </tr>
             </thead>
@@ -2262,8 +2318,11 @@ function MatchesScheduleTab({
               {matches.map((match) => (
                   <tr
                     key={match.id}
-                    className="admin-table-row cursor-pointer border-t border-[var(--admin-border)] hover:bg-zinc-800/40"
-                    onClick={() => setModalMatch(match)}
+                    className="group admin-table-row cursor-pointer border-t border-[var(--admin-border)] hover:bg-zinc-800/40"
+                    onClick={() => {
+                      setStartError(null);
+                      setModalMatch(match);
+                    }}
                   >
                     <td className="px-4 py-3 font-mono text-emerald-600 dark:text-emerald-400">
                       {matchNumbers.get(match.id) ?? "—"}
@@ -2276,8 +2335,10 @@ function MatchesScheduleTab({
                         matchNumbers.get(match.id),
                       )}
                     </td>
-                    <td className="px-4 py-3 font-medium">
-                      {matchParticipantsLabel(match)}
+                    <td className="max-w-[10rem] truncate px-4 py-3 font-medium sm:max-w-none">
+                      <span title={matchParticipantsLabel(match)}>
+                        {matchParticipantsLabel(match)}
+                      </span>
                     </td>
                     {showHandicap && (
                       <td className="px-4 py-3 font-mono text-xs tabular-nums tournament-participant-meta">
@@ -2292,6 +2353,16 @@ function MatchesScheduleTab({
                         {matchHandicapShortLabel(match, handicapHalfStep)}
                       </td>
                     )}
+                    {showTable && (
+                      <td className="px-4 py-3 text-sm">
+                        <span className="inline-flex min-w-0 items-center gap-1.5">
+                          <span className="truncate">{match.tableLabel ?? "—"}</span>
+                          {match.streamUrl && (
+                            <BracketStreamLink url={match.streamUrl} />
+                          )}
+                        </span>
+                      </td>
+                    )}
                     {showScore && (
                       <td className="px-4 py-3 font-mono">
                         {matchScoreLabel(match)}
@@ -2302,18 +2373,40 @@ function MatchesScheduleTab({
                         {formatMatchElapsedHm(match.startedAt, now) ?? "—"}
                       </td>
                     )}
-                    <td className="px-4 py-3 font-mono tournament-participant-meta">
-                      {formatMatchDateTime(match.startedAt)}
-                    </td>
-                    <td className="px-4 py-3 font-mono tournament-participant-meta">
-                      {match.finishedAt
-                        ? formatMatchDateTime(match.finishedAt)
-                        : "—"}
-                    </td>
+                    {showScheduleTimes && (
+                      <td className="px-4 py-3 font-mono tournament-participant-meta">
+                        {formatMatchDateTime(match.startedAt)}
+                      </td>
+                    )}
+                    {showScheduleTimes && (
+                      <td className="px-4 py-3 font-mono tournament-participant-meta">
+                        {match.finishedAt
+                          ? formatMatchDateTime(match.finishedAt)
+                          : "—"}
+                      </td>
+                    )}
                     {showDuration && (
                       <td className="px-4 py-3 font-mono tabular-nums tournament-participant-meta">
                         {formatMatchDurationHm(match.startedAt, match.finishedAt) ??
                           "—"}
+                      </td>
+                    )}
+                    {showStartAction && (
+                      <td
+                        className="sticky right-0 z-10 bg-[var(--admin-card-bg)] px-3 py-3 shadow-[-6px_0_10px_-6px_rgba(0,0,0,0.35)] group-hover:bg-[var(--admin-row-hover)]"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <AsyncButton
+                          disabled={matchSaving}
+                          loadingLabel="…"
+                          className="admin-btn admin-btn--primary whitespace-nowrap px-2.5 py-1.5 text-xs sm:px-3"
+                          onClick={async () => {
+                            await handleStartNow(match);
+                          }}
+                        >
+                          <span className="sm:hidden">Старт</span>
+                          <span className="hidden sm:inline">Начать сейчас</span>
+                        </AsyncButton>
                       </td>
                     )}
                   </tr>
@@ -2357,7 +2450,7 @@ function ProtocolTab({
     <div className="space-y-4">
       <div className="tournament-info-panel">
         <p>
-          {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
+          {tournamentFormatDisplayLabel(t)} · {t.club.name}
           {t.startsAt
             ? ` · ${new Date(t.startsAt).toLocaleString("ru-RU", {
                 day: "numeric",

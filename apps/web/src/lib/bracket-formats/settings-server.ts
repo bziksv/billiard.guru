@@ -109,6 +109,25 @@ export async function getAllBracketFormatLabels(): Promise<Record<string, string
   );
 }
 
+export async function withTournamentFormatLabel<T extends { format: string }>(
+  tournament: T,
+): Promise<T & { formatLabel: string }> {
+  return {
+    ...tournament,
+    formatLabel: await getBracketFormatLabel(tournament.format),
+  };
+}
+
+export async function withTournamentFormatLabels<T extends { format: string }>(
+  tournaments: T[],
+): Promise<(T & { formatLabel: string })[]> {
+  const labels = await getAllBracketFormatLabels();
+  return tournaments.map((t) => ({
+    ...t,
+    formatLabel: labels[t.format] ?? t.format,
+  }));
+}
+
 export async function getBracketFormatSettings(
   code: string,
 ): Promise<BracketFormatAdminSettings> {
@@ -184,6 +203,15 @@ export async function saveBracketFormatSettings(
     },
   });
   return rowToSettings(row);
+}
+
+/** Удалить строку настроек — формат остаётся в коде, применяются дефолты из каталога. */
+export async function deleteBracketFormatSettings(
+  formatCode: BracketFormatCode,
+): Promise<void> {
+  await prisma.bracketFormatConfig.deleteMany({
+    where: { formatCode },
+  });
 }
 
 /** @deprecated alias — проверка «можно выбрать в турнире» */

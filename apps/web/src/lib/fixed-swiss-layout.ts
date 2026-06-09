@@ -63,7 +63,8 @@ export function fixedSwissMatchCardHeight(
     (hasMatchNumber ? GRID_META_H : 0) +
     GRID_ROW_H * 2 +
     (hasHandicap ? FIXED_SWISS_COMPACT_ROW_H : 0) +
-    footerRowCount * FIXED_SWISS_COMPACT_ROW_H
+    footerRowCount * FIXED_SWISS_COMPACT_ROW_H +
+    CARD_LAYOUT_BUFFER
   );
 }
 
@@ -75,7 +76,10 @@ export const FIXED_SWISS_CARD_H =
 export const FIXED_SWISS_BRACKET_UNIT = FIXED_SWISS_CARD_H + 8;
 /** Верхний отступ карточки 1-го тура в ячейке сетки (px). */
 const FIXED_SWISS_ROUND1_Y_INSET = 4;
-const FIXED_SWISS_ROUND1_GAP = 4;
+/** Зазор между карточками 1-го тура (px). */
+const FIXED_SWISS_ROUND1_GAP = 8;
+/** Запас на border/subpixel в расчёте высоты карточки. */
+const CARD_LAYOUT_BUFFER = 4;
 
 let layoutCardHeights: Map<string, number> | undefined;
 let layoutRound1SlotY: Map<number, number> | undefined;
@@ -102,12 +106,15 @@ function layoutMatchCardHeight(matchId: string, fallback = FIXED_SWISS_CARD_H): 
   return layoutCardHeights?.get(matchId) ?? fallback;
 }
 
-function matchHasHandicap(match: BracketMatchView): boolean {
+function matchHasHandicap(
+  match: BracketMatchView,
+  halfStep = true,
+): boolean {
   if (!match.team1 || !match.team2) return false;
   const short = describeHandicapShort(
     Math.max(teamRating(match.team1), teamRating(match.team2)),
     Math.min(teamRating(match.team1), teamRating(match.team2)),
-    { halfStep: true },
+    { halfStep },
   );
   return Boolean(short);
 }
@@ -116,6 +123,7 @@ export type FixedSwissDisplayOpts = {
   showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
+  handicapHalfStep?: boolean;
 };
 
 function estimateFixedSwissFooterRowCount(
@@ -170,6 +178,7 @@ export function estimateFixedSwissCardHeight(
     showCardMatchNumber?: boolean;
     showCardHandicap?: boolean;
     showCardPlacement?: boolean;
+    handicapHalfStep?: boolean;
   },
 ): number {
   const matchesPerRound =
@@ -177,7 +186,8 @@ export function estimateFixedSwissCardHeight(
       ? inferFixedSwissGridSize(opts.matchCount) / 2
       : undefined;
   const hasHandicap =
-    opts?.showCardHandicap !== false && matchHasHandicap(match);
+    opts?.showCardHandicap !== false &&
+    matchHasHandicap(match, opts?.handicapHalfStep !== false);
   const hasMatchNumber = opts?.showCardMatchNumber !== false;
   return fixedSwissMatchCardHeight(
     hasHandicap,
@@ -464,7 +474,7 @@ function resolveRoundColumnCollisions(
           y = lastBottom + COL_COLLISION_GAP;
           positions.set(m.id, { ...pos, y });
         }
-        lastBottom = y + cardH;
+        lastBottom = y + layoutMatchCardHeight(m.id, cardH);
       }
     }
 
@@ -479,7 +489,38 @@ function resolveRoundColumnCollisions(
         y = lastBottom + COL_COLLISION_GAP;
         positions.set(m.id, { ...pos, y });
       }
-      lastBottom = y + cardH;
+      lastBottom = y + layoutMatchCardHeight(m.id, cardH);
+    }
+  }
+}
+
+function resolveAllColumnOverlaps(
+  positions: Map<string, SwissMatchPosition>,
+  cardHeights: Map<string, number>,
+  fallbackCardH: number,
+  gap = COL_COLLISION_GAP,
+) {
+  const byCol = new Map<number, string[]>();
+  for (const [id, pos] of positions) {
+    const list = byCol.get(pos.col) ?? [];
+    list.push(id);
+    byCol.set(pos.col, list);
+  }
+
+  for (const ids of byCol.values()) {
+    const sorted = [...ids].sort(
+      (a, b) => positions.get(a)!.y - positions.get(b)!.y,
+    );
+    let lastBottom = -Infinity;
+    for (const id of sorted) {
+      const pos = positions.get(id)!;
+      let y = pos.y;
+      if (y < lastBottom + gap) {
+        y = lastBottom + gap;
+        positions.set(id, { ...pos, y });
+      }
+      const h = cardHeights.get(id) ?? fallbackCardH;
+      lastBottom = y + h;
     }
   }
 }
@@ -1678,6 +1719,7 @@ export function buildFixedSwissBracketLayout(
         showCardMatchNumber: display?.showCardMatchNumber,
         showCardHandicap: display?.showCardHandicap,
         showCardPlacement: display?.showCardPlacement,
+        handicapHalfStep: display?.handicapHalfStep,
       }),
     );
   }
@@ -1716,13 +1758,15 @@ export function buildFixedSwissBracketLayout(
       ? build168Positions(matches, cardH)
       : buildClassicPositions(matches, matchesPerRound, maxRound, cardH);
 
+  resolveAllColumnOverlaps(positions, cardHeights, cardH, FIXED_SWISS_ROUND1_GAP);
+
   let minCol = 0;
   let maxCol = 0;
   let maxY = 0;
   for (const [id, pos] of positions) {
     minCol = Math.min(minCol, pos.col);
     maxCol = Math.max(maxCol, pos.col);
-    maxY = Math.max(maxY, pos.y + layoutMatchCardHeight(id, cardH));
+    maxY = Math.max(maxY, pos.y + (cardHeights.get(id) ?? cardH));
   }
 
   layoutCardHeights = undefined;
@@ -2919,9 +2963,8 @@ export function fixedSwissTs64PlacementByMatchNo(
   withBronze: boolean,
 ): string | null {
   if (withBronze && no === 120) return "матч за 3–4 место";
-  if (withBronze && (no === 117 || no === 118)) return "полуфинал";
   if (no === 119) return "место 1–2";
-  if (no === 117 || no === 118) return "место 3–4";
+  if (no === 117 || no === 118) return withBronze ? "полуфинал" : "3-е место";
   if (no >= 33 && no <= 48) return "место 49–64";
   if (no >= 65 && no <= 80) return "место 33–48";
   if (no >= 89 && no <= 96) return "место 25–32";
@@ -2943,6 +2986,7 @@ export function fixedSwissTs32PlacementByMatchNo(
   if (no >= 45 && no <= 48) return "место 13–16";
   if (no >= 49 && no <= 52) return "место 9–12";
   if (no >= 53 && no <= 56) return "место 5–8";
+  if (!withBronze && (no === 57 || no === 58)) return "3-е место";
   if (no === 57 || no === 58) return "место 3–4";
   return null;
 }

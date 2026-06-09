@@ -25,9 +25,9 @@ export function ManageShell({
   const activeClubId = clubIdFromPath(pathname) ?? clubs[0]!.id;
 
   return (
-    <div className="admin-app admin-shell flex h-screen overflow-hidden gap-4 p-4 lg:gap-6 lg:p-6">
+    <div className="admin-app admin-shell flex h-screen w-full min-w-0 overflow-hidden gap-4 p-4 lg:gap-6 lg:p-6">
       <ClubOwnerSidebar userName={userName} clubs={clubs} activeClubId={activeClubId} />
-      <main className="admin-main min-h-0 min-w-0 flex-1 overflow-y-auto">{children}</main>
+      <main className="admin-main min-h-0 min-w-0 w-full flex-1 overflow-x-hidden overflow-y-auto">{children}</main>
     </div>
   );
 }

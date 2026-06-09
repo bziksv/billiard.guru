@@ -63,6 +63,9 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [hideFormatOpen, setHideFormatOpen] = useState(false);
   const [hideFormatLoading, setHideFormatLoading] = useState(false);
+  const [deleteSettingsOpen, setDeleteSettingsOpen] = useState(false);
+  const [deleteSettingsLoading, setDeleteSettingsLoading] = useState(false);
+  const [deleteSettingsError, setDeleteSettingsError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch(`/api/admin/bracket-formats?format=${encodeURIComponent(formatCode)}`)
@@ -196,6 +199,26 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
     router.push("/admin/brackets");
   }
 
+  async function confirmDeleteFormatSettings() {
+    if (!format) return;
+    setDeleteSettingsLoading(true);
+    setDeleteSettingsError(null);
+    const res = await fetch("/api/admin/bracket-formats/settings", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ formatCode: format.code }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      setDeleteSettingsError(json.error ?? "Не удалось удалить настройки");
+      setDeleteSettingsLoading(false);
+      return;
+    }
+    setDeleteSettingsOpen(false);
+    setDeleteSettingsLoading(false);
+    router.push("/admin/brackets");
+  }
+
   if (loading) return <p className="admin-muted text-sm">Загрузка…</p>;
   if (error || !format) {
     return (
@@ -249,6 +272,16 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
               Убрать из списка типов
             </button>
           )}
+          <button
+            type="button"
+            className="admin-btn admin-btn--outline px-3 py-1.5 text-sm text-red-400"
+            onClick={() => {
+              setDeleteSettingsError(null);
+              setDeleteSettingsOpen(true);
+            }}
+          >
+            Удалить настройки
+          </button>
         </div>
         <div className="admin-card admin-inset mt-4 space-y-3 px-4 py-3">
           <label className="flex cursor-pointer items-center gap-3 text-sm">
@@ -471,6 +504,22 @@ export function BracketFormatDetailPage({ formatCode }: { formatCode: string }) 
         onClose={() => {
           if (hideFormatLoading) return;
           setHideFormatOpen(false);
+        }}
+      />
+
+      <ConfirmModal
+        open={deleteSettingsOpen}
+        title="Удалить настройки типа?"
+        description={`Сбросятся сохранённые настройки «${format.adminLabel}» (${format.code}): подпись, лимиты участников, флаги. Турниры и сетки не затрагиваются. Тип снова появится в списке и станет доступен для новых турниров.`}
+        confirmLabel="Да, удалить настройки"
+        variant="danger"
+        loading={deleteSettingsLoading}
+        error={deleteSettingsError}
+        onConfirm={confirmDeleteFormatSettings}
+        onClose={() => {
+          if (deleteSettingsLoading) return;
+          setDeleteSettingsOpen(false);
+          setDeleteSettingsError(null);
         }}
       />
 

@@ -1,16 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
+  buildOlympicBracketLayout,
   groupMatchesByRound,
-  olympicBracketHeight,
+  olympicConnectorY,
   olympicMatchFooterRows,
-  olympicMatchTop,
-  olympicStackedCardHeight,
-  OLYMPIC_BRACKET_UNIT,
-  OLYMPIC_CARD_H,
   OLYMPIC_LABEL_OFFSET,
   type BracketMatchView,
+  type OlympicDisplayOpts,
 } from "@/lib/bracket-view";
 import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
 import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center";
@@ -23,33 +21,10 @@ import {
   bracketViewRootClassName,
 } from "@/lib/bracket-canvas-class";
 
-const UNIT = OLYMPIC_BRACKET_UNIT;
-const CARD_H = OLYMPIC_CARD_H;
 const CARD_W = GRID_CARD_W;
 const COL_W = 248;
 const CARD_LEFT = (COL_W - CARD_W) / 2;
 const LABEL_OFFSET = OLYMPIC_LABEL_OFFSET;
-
-function matchCenterY(
-  round: number,
-  slot: number,
-  maxRound: number,
-  withBronzeMatch: boolean,
-): number {
-  const top = olympicMatchTop(
-    round,
-    slot,
-    maxRound,
-    UNIT,
-    CARD_H,
-    withBronzeMatch,
-  );
-  const cardH =
-    withBronzeMatch && round === maxRound
-      ? olympicStackedCardHeight()
-      : CARD_H;
-  return top + LABEL_OFFSET + cardH / 2;
-}
 
 function lineX(colIndex: number, side: "left" | "right") {
   const base = colIndex * COL_W + CARD_LEFT;
@@ -118,12 +93,64 @@ export function OlympicBracketView({
   }
 
   const rounds = groupMatchesByRound(matches);
+  const maxRound = rounds.length > 0 ? rounds[rounds.length - 1]!.round : 0;
+
+  const layout = useMemo(
+    () =>
+      maxRound > 0
+        ? buildOlympicBracketLayout(
+            matches,
+            matchNumbers ?? new Map(),
+            maxRound,
+            {
+              showCardMatchNumber,
+              showCardHandicap,
+              showCardPlacement: showCardPlacement && !!matchNumbers,
+              handicapHalfStep,
+              withBronzeMatch,
+            },
+          )
+        : { tops: new Map(), heights: new Map(), totalHeight: 0 },
+    [
+      matches,
+      matchNumbers,
+      maxRound,
+      showCardMatchNumber,
+      showCardHandicap,
+      showCardPlacement,
+      handicapHalfStep,
+      withBronzeMatch,
+    ],
+  );
+
+  const layoutOpts = useMemo(
+    (): OlympicDisplayOpts => ({
+      showCardMatchNumber,
+      showCardHandicap,
+      showCardPlacement: showCardPlacement && !!matchNumbers,
+      handicapHalfStep,
+      withBronzeMatch,
+    }),
+    [
+      showCardMatchNumber,
+      showCardHandicap,
+      showCardPlacement,
+      matchNumbers,
+      handicapHalfStep,
+      withBronzeMatch,
+    ],
+  );
+
+  const matchByKey = useMemo(() => {
+    const map = new Map<string, BracketMatchView>();
+    for (const m of matches) map.set(`${m.round}:${m.slot}`, m);
+    return map;
+  }, [matches]);
+
   if (rounds.length === 0) return null;
 
-  const maxRound = rounds[rounds.length - 1]!.round;
-  const totalHeight = olympicBracketHeight(maxRound, UNIT, withBronzeMatch);
   const canvasWidth = rounds.length * COL_W;
-  const canvasHeight = totalHeight + CARD_H + LABEL_OFFSET;
+  const canvasHeight = layout.totalHeight + LABEL_OFFSET + 8;
   const centerX = canvasWidth / 2;
 
   return (
@@ -152,11 +179,14 @@ export function OlympicBracketView({
             return Array.from({ length: slotsInRound }, (_, j) => {
               const slot = j + 1;
               const nextSlot = Math.ceil(slot / 2);
+              const from = matchByKey.get(`${round}:${slot}`);
+              const to = matchByKey.get(`${round + 1}:${nextSlot}`);
+              if (!from || !to) return null;
 
               const x1 = lineX(colIndex, "right");
-              const y1 = matchCenterY(round, slot, maxRound, withBronzeMatch);
+              const y1 = olympicConnectorY(from.id, layout, layoutOpts);
               const x2 = lineX(colIndex + 1, "left");
-              const y2 = matchCenterY(round + 1, nextSlot, maxRound, withBronzeMatch);
+              const y2 = olympicConnectorY(to.id, layout, layoutOpts);
               const midX = x1 + (x2 - x1) / 2;
 
               return (
@@ -174,7 +204,7 @@ export function OlympicBracketView({
           })}
         </svg>
 
-        {rounds.map(({ round, matches: roundMatches }) => (
+        {rounds.map(({ round }) => (
           <div
             key={round}
             className="pointer-events-none absolute top-0 z-20"
@@ -196,6 +226,7 @@ export function OlympicBracketView({
               bracketMatchHasPlayer(match, highlightedPlayerId);
             const dimmed = filterActive && !playerInMatch;
             const focused = filterActive && playerInMatch;
+            const cardTop = layout.tops.get(match.id) ?? 0;
 
             return (
             <div
@@ -207,15 +238,7 @@ export function OlympicBracketView({
               )}
               style={{
                 left: (round - 1) * COL_W + CARD_LEFT,
-                top:
-                  olympicMatchTop(
-                    match.round,
-                    match.slot,
-                    maxRound,
-                    UNIT,
-                    CARD_H,
-                    withBronzeMatch,
-                  ) + LABEL_OFFSET,
+                top: cardTop + LABEL_OFFSET,
               }}
             >
               <BracketMatchCard

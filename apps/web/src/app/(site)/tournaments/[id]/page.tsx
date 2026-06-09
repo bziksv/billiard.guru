@@ -23,10 +23,11 @@ import {
   tournamentRatingLimitMessage,
 } from "@/lib/tournament-rating-limit-server";
 import { formatRating } from "@/lib/rating";
-import { resolveMatchStreamUrl } from "@/lib/tournament-stream";
+import { resolveMatchStreamUrl, resolveTableLabel } from "@/lib/tournament-stream";
+import { getBracketFormatLabel } from "@/lib/bracket-formats/settings-server";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
   REGISTRATION_STATUS_LABELS,
-  TOURNAMENT_FORMAT_LABELS,
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 
@@ -97,6 +98,7 @@ export default async function TournamentPage({
   }
 
   const pair = isPairFormat(tournament.format);
+  const formatLabel = await getBracketFormatLabel(tournament.format);
   const streamContext = {
     tableIds: tournament.tableIds,
     tableStreams: tournament.tableStreams,
@@ -114,6 +116,7 @@ export default async function TournamentPage({
     finishedAt: m.finishedAt?.toISOString() ?? null,
     tableId: m.tableId,
     streamUrl: resolveMatchStreamUrl({ tableId: m.tableId }, streamContext, floorPlan),
+    tableLabel: resolveTableLabel(m.tableId, floorPlan, tournament.club.tableCounts),
     team1: m.team1,
     team2: m.team2,
   }));
@@ -161,7 +164,7 @@ export default async function TournamentPage({
             />
           </div>
           <p className="mt-3 text-zinc-400">
-            {TOURNAMENT_FORMAT_LABELS[tournament.format] ?? tournament.format}
+            {tournamentFormatDisplayLabel({ format: tournament.format, formatLabel })}
           </p>
           <p className="mt-1 text-sm text-zinc-500">
             <Link href={`/clubs/${tournament.club.id}`} className="hover:text-emerald-400">

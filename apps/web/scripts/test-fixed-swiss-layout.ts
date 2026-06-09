@@ -597,6 +597,34 @@ function mkGridTs32(): BracketMatchView[] {
 }
 
 assert.equal(buildFixedSwissTemplate(32).matches.length, 59);
+assert.equal(
+  buildFixedSwissTemplate(12, "FIXED_SWISS_32R4_2_3_mesta").matches.length,
+  59,
+  "FIXED_SWISS_32R4_2_3_mesta: та же сетка 59",
+);
+assert.equal(
+  buildFixedSwissTemplate(12, "FIXED_SWISS_32R4_1_3_mesto").matches.length,
+  60,
+);
+assert.equal(
+  buildFixedSwissTemplate(12, "FIXED_SWISS_32").matches.length,
+  59,
+  "legacy FIXED_SWISS_32 — та же сетка 59",
+);
+assert.equal(
+  buildFixedSwissTemplate(12, "FIXED_SWISS_32R8").matches.length,
+  59,
+  "legacy FIXED_SWISS_32R8: oлимпийka с 1/8",
+);
+assert.equal(
+  buildFixedSwissTemplate(12, "FIXED_SWISS_32R8_2_3_mesta").matches.length,
+  59,
+  "FIXED_SWISS_32R8_2_3_mesta: oлимпийka с 1/8, вылет с 1/8",
+);
+assert.equal(
+  buildFixedSwissTemplate(12, "FIXED_SWISS_32R8_BRONZE").matches.length,
+  60,
+);
 assert.equal(inferFixedSwissGridSize(59), 32);
 assert.equal(isFixedSwissTs32MatchCount(59), true);
 assert.equal(isOutdatedFixedSwiss32Bracket(55), true);
@@ -630,7 +658,10 @@ assert.equal(fixedSwissTs32PlacementByMatchNo(45, false), "место 13–16");
 assert.equal(fixedSwissTs32PlacementByMatchNo(50, false), "место 9–12");
 assert.equal(fixedSwissTs32PlacementByMatchNo(51, false), "место 9–12");
 assert.equal(fixedSwissTs32PlacementByMatchNo(53, false), "место 5–8");
-assert.equal(fixedSwissTs32PlacementByMatchNo(57, false), "место 3–4");
+assert.equal(fixedSwissTs32PlacementByMatchNo(57, false), "3-е место");
+assert.equal(fixedSwissTs32PlacementByMatchNo(58, false), "3-е место");
+assertProtocolPlace(57, "loser", 59, { place: 3 });
+assertProtocolPlace(58, "loser", 59, { place: 3 });
 
 {
   const links32 = buildFixedSwissTemplate(32).links;
@@ -913,11 +944,11 @@ assert.equal(isFixedSwissForkEdge(6, 7, 59), true);
 
 // --- 32→16 + бронза (60 встреч): #60 под финалом в col «Финал» ---
 function mkGridTs32Bronze(): BracketMatchView[] {
-  const template = buildFixedSwissTemplate(32, "FIXED_SWISS_32_BRONZE");
+  const template = buildFixedSwissTemplate(32, "FIXED_SWISS_32R8_BRONZE");
   return template.matches.map((m) => mkMatch(m.round, m.slot));
 }
 
-assert.equal(buildFixedSwissTemplate(32, "FIXED_SWISS_32_BRONZE").matches.length, 60);
+assert.equal(buildFixedSwissTemplate(32, "FIXED_SWISS_32R8_BRONZE").matches.length, 60);
 assert.equal(isFixedSwissTs32BronzeMatchCount(60), true);
 assert.equal(fixedSwissMatchNo(7, 1, 60), 59, "final #59");
 assert.equal(fixedSwissMatchNo(7, 2, 60), 60, "bronze #60");
@@ -931,7 +962,7 @@ assertProtocolPlace(45, "loser", 60, { place: 13, placeTo: 16 });
 assertProtocolPlace(33, "loser", 60, { place: 17, placeTo: 24 });
 assertProtocolPlace(17, "loser", 60, { place: 25, placeTo: 32 });
 {
-  const links60 = buildFixedSwissTemplate(32, "FIXED_SWISS_32_BRONZE").links;
+  const links60 = buildFixedSwissTemplate(32, "FIXED_SWISS_32R8_BRONZE").links;
   const semiLoss = links60.find(
     (l) => l.fromRound === 6 && l.fromSlot === 1 && l.kind === "loss",
   );
@@ -955,7 +986,7 @@ const compactNoMetaH = fixedSwissMatchCardHeight(false, 0, false);
   );
   assert.equal(
     compact2.y - compact1.y,
-    compactH + 4,
+    compactH + 8,
     "round 1 slots stack by compact card height",
   );
   assert.ok(
@@ -977,7 +1008,7 @@ const compactNoMetaH = fixedSwissMatchCardHeight(false, 0, false);
   );
   assert.equal(
     noMeta2.y - noMeta1.y,
-    compactNoMetaH + 4,
+    compactNoMetaH + 8,
     "round 1 slots stack by height without meta row",
   );
   assert.ok(
@@ -1327,8 +1358,8 @@ assert.equal(fixedSwissTs64PlacementByMatchNo(100, false), "место 17–24")
 assert.equal(fixedSwissTs64PlacementByMatchNo(105, false), "место 9–16");
 assert.equal(fixedSwissTs64PlacementByMatchNo(112, false), "место 9–16");
 assert.equal(fixedSwissTs64PlacementByMatchNo(113, false), "место 5–8");
-assert.equal(fixedSwissTs64PlacementByMatchNo(117, false), "место 3–4");
-assert.equal(fixedSwissTs64PlacementByMatchNo(118, false), "место 3–4");
+assert.equal(fixedSwissTs64PlacementByMatchNo(117, false), "3-е место");
+assert.equal(fixedSwissTs64PlacementByMatchNo(118, false), "3-е место");
 assert.equal(fixedSwissTs64PlacementByMatchNo(117, true), "полуфинал");
 assertProtocolPlace(119, "winner", MC64, { place: 1 });
 assertProtocolPlace(120, "winner", 116, { place: 3 });

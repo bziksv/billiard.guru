@@ -11,10 +11,8 @@ import { countConfirmedParticipants, type AdminTournament } from "@/lib/tourname
 import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
 import { useAdminTournamentBracketActions } from "@/lib/use-admin-tournament-bracket";
 import { bracketAdminStatusLabel } from "@/lib/tournament-bracket-admin";
-import {
-  TOURNAMENT_FORMAT_LABELS,
-  TOURNAMENT_STATUS_LABELS,
-} from "@/lib/validators";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
+import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 interface Club {
   id: string;
@@ -129,7 +127,7 @@ export default function AdminBracketTournamentPage() {
               />
             </div>
             <p className="mt-2 text-sm text-zinc-400">
-              {TOURNAMENT_FORMAT_LABELS[tournament.format]} · {tournament.club.name}
+              {tournamentFormatDisplayLabel(tournament)} · {tournament.club.name}
               {" · "}
               {confirmed} подтверждённых · {bracketAdminStatusLabel(tournament)}
             </p>

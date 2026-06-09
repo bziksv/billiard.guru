@@ -30,6 +30,8 @@ export function BracketScrollCenter({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const userAdjustedRef = useRef(false);
+  /** Автоцентрирование только при первом показе; смена высоты (галочки) не сбрасывает скролл. */
+  const hasAutoCenteredRef = useRef(false);
   const panRef = useRef({
     active: false,
     moved: false,
@@ -42,29 +44,42 @@ export function BracketScrollCenter({
 
   useEffect(() => {
     userAdjustedRef.current = false;
+    hasAutoCenteredRef.current = false;
   }, [centerX]);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
+    function clampScroll(node: HTMLDivElement) {
+      const maxScrollLeft = Math.max(0, node.scrollWidth - node.clientWidth);
+      if (node.scrollLeft > maxScrollLeft) {
+        node.scrollLeft = maxScrollLeft;
+      }
+      if (contentHeight != null) {
+        const maxScrollTop = Math.max(0, contentHeight - node.clientHeight);
+        if (node.scrollTop > maxScrollTop) {
+          node.scrollTop = maxScrollTop;
+        }
+      }
+    }
+
     function applyAutoScroll() {
       const node = ref.current;
       if (!node) return;
 
-      const content = node.firstElementChild as HTMLElement | null;
-      const contentWidth = content?.scrollWidth ?? content?.offsetWidth ?? 0;
-      const maxScroll = Math.max(0, node.scrollWidth - node.clientWidth);
-
-      if (node.scrollLeft > maxScroll) {
-        node.scrollLeft = maxScroll;
+      if (userAdjustedRef.current || hasAutoCenteredRef.current) {
+        clampScroll(node);
+        return;
       }
 
-      if (userAdjustedRef.current) return;
+      const content = node.firstElementChild as HTMLElement | null;
+      const contentWidth = content?.scrollWidth ?? content?.offsetWidth ?? 0;
+      const maxScrollLeft = Math.max(0, node.scrollWidth - node.clientWidth);
 
       if (contentWidth > node.clientWidth + 1) {
         node.scrollLeft = Math.min(
-          maxScroll,
+          maxScrollLeft,
           Math.max(0, centerX - node.clientWidth / 2),
         );
       } else {
@@ -76,6 +91,7 @@ export function BracketScrollCenter({
             ? 0
             : Math.max(0, (contentHeight - node.clientHeight) / 2);
       }
+      hasAutoCenteredRef.current = true;
     }
 
     applyAutoScroll();

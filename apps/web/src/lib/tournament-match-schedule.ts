@@ -1,4 +1,4 @@
-import type { BracketMatchView } from "@/lib/bracket-view";
+import { matchAutopassBye, type BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
 import { formatRating } from "@/lib/rating";
 import {
@@ -121,9 +121,15 @@ export function buildBracketMatchNumbers(
   return new Map(sorted.map((m, i) => [m.id, i + 1]));
 }
 
+function emptySlotLabel(match: BracketMatchView, slot: 1 | 2): string {
+  const { isBye, phantomRow } = matchAutopassBye(match);
+  if (isBye && phantomRow === slot) return "×";
+  return "—";
+}
+
 export function matchParticipantsLabel(match: BracketMatchView): string {
-  const left = match.team1 ? teamLabel(match.team1) : "—";
-  const right = match.team2 ? teamLabel(match.team2) : "—";
+  const left = match.team1 ? teamLabel(match.team1) : emptySlotLabel(match, 1);
+  const right = match.team2 ? teamLabel(match.team2) : emptySlotLabel(match, 2);
   return `${left} — ${right}`;
 }
 

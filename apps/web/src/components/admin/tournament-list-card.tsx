@@ -8,7 +8,8 @@ import {
   countPendingApplications,
   type AdminTournament,
 } from "@/lib/tournament-admin";
-import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
+import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { cn } from "@/lib/cn";
 
@@ -44,7 +45,7 @@ export function TournamentListCard({
             />
           </div>
           <p className="admin-text-secondary mt-1 text-sm">
-            {TOURNAMENT_FORMAT_LABELS[t.format]} · {t.club.name}
+            {tournamentFormatDisplayLabel(t)} · {t.club.name}
             {t.club.city?.nameRu ? ` · ${t.club.city.nameRu}` : ""}
           </p>
           {t.startsAt && (

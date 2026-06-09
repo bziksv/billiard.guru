@@ -30,6 +30,43 @@ function nextPowerOfTwo(n: number): number {
   return p;
 }
 
+/** Размер сетки по коду формата (32→16 всегда 32 слота, даже при 4–16 участниках). */
+export function fixedSwissNominalGridSize(
+  format: string | undefined,
+  participantCount: number,
+): number {
+  if (
+    format === "FIXED_SWISS_32" ||
+    format === "FIXED_SWISS_32_BRONZE" ||
+    format === "FIXED_SWISS_32R4_2_3_mesta" ||
+    format === "FIXED_SWISS_32R4_1_3_mesto" ||
+    format === "FIXED_SWISS_32R8" ||
+    format === "FIXED_SWISS_32R8_2_3_mesta" ||
+    format === "FIXED_SWISS_32R8_BRONZE" ||
+    format === "FIXED_PAIR_SWISS_32" ||
+    format === "FIXED_PAIR_SWISS_32_BRONZE"
+  ) {
+    return 32;
+  }
+  if (
+    format === "FIXED_SWISS_64" ||
+    format === "FIXED_SWISS_64_BRONZE" ||
+    format === "FIXED_PAIR_SWISS_64" ||
+    format === "FIXED_PAIR_SWISS_64_BRONZE"
+  ) {
+    return 64;
+  }
+  if (
+    format === "FIXED_SWISS" ||
+    format === "FIXED_PAIR_SWISS" ||
+    format === "FIXED_SWISS_16_BRONZE" ||
+    format === "FIXED_PAIR_SWISS_16_BRONZE"
+  ) {
+    return 16;
+  }
+  return nextPowerOfTwo(participantCount);
+}
+
 function slotParityTeam(slot: number): 1 | 2 {
   return slot % 2 === 1 ? 1 : 2;
 }
@@ -436,7 +473,7 @@ export function buildFixedSwissTemplate(
   participantCount: number,
   format?: string,
 ): FixedSwissTemplate {
-  const gridSize = nextPowerOfTwo(participantCount);
+  const gridSize = fixedSwissNominalGridSize(format, participantCount);
   if (gridSize < 4) {
     throw new Error("Фиксированная швейцарская сетка: минимум 4 участника");
   }
@@ -455,11 +492,22 @@ export function buildFixedSwissTemplate(
   }
 
   if (gridSize === 32) {
-    if (
+    const ts32Bronze =
+      format === "FIXED_SWISS_32R8_BRONZE" ||
+      format === "FIXED_SWISS_32R4_1_3_mesto" ||
       format === "FIXED_SWISS_32_BRONZE" ||
-      format === "FIXED_PAIR_SWISS_32_BRONZE"
-    ) {
+      format === "FIXED_PAIR_SWISS_32_BRONZE";
+    const ts32Base =
+      format === "FIXED_SWISS_32R8" ||
+      format === "FIXED_SWISS_32R8_2_3_mesta" ||
+      format === "FIXED_SWISS_32R4_2_3_mesta" ||
+      format === "FIXED_SWISS_32" ||
+      format === "FIXED_PAIR_SWISS_32";
+    if (ts32Bronze) {
       return buildFixedSwissTsTemplateForGridSize(32, true);
+    }
+    if (ts32Base) {
+      return buildFixedSwissTsTemplateForGridSize(32, false);
     }
     return buildFixedSwissTsTemplateForGridSize(32, false);
   }
@@ -792,8 +840,7 @@ function fixedSwissProtocolPlace64(
   if (withBronze && matchNo === 119) return protocolExact(2);
   if (withBronze && matchNo === 120) return protocolExact(4);
   if (!withBronze && matchNo === 119) return protocolExact(2);
-  if (!withBronze && matchNo === 117) return protocolExact(3);
-  if (!withBronze && matchNo === 118) return protocolExact(4);
+  if (!withBronze && (matchNo === 117 || matchNo === 118)) return protocolExact(3);
 
   if (matchNo >= 105 && matchNo <= 108) return protocolRange(5, 8);
   if (matchNo >= 97 && matchNo <= 104) return protocolRange(9, 16);
@@ -817,8 +864,7 @@ function fixedSwissProtocolPlace32(
   if (withBronze && matchNo === 59) return protocolExact(2);
   if (withBronze && matchNo === 60) return protocolExact(4);
   if (!withBronze && matchNo === 59) return protocolExact(2);
-  if (!withBronze && matchNo === 57) return protocolExact(3);
-  if (!withBronze && matchNo === 58) return protocolExact(4);
+  if (!withBronze && (matchNo === 57 || matchNo === 58)) return protocolExact(3);
 
   if (matchNo >= 53 && matchNo <= 56) return protocolRange(5, 8);
   if (matchNo >= 49 && matchNo <= 52) return protocolRange(9, 12);

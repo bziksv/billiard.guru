@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ComponentType } from "react";
+import { type ComponentType } from "react";
+import { useAdminSidebarCollapsed } from "@/hooks/use-admin-sidebar-collapsed";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import {
@@ -77,31 +78,28 @@ function NavLink({
 
 export function AdminSidebar({ userName }: { userName?: string }) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === "1") setCollapsed(true);
-    setReady(true);
-  }, []);
-
-  function toggleCollapsed() {
-    setCollapsed((value) => {
-      const next = !value;
-      localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
-      return next;
-    });
-  }
+  const { collapsed, narrow, ready, toggle } = useAdminSidebarCollapsed(STORAGE_KEY);
 
   return (
-    <aside
-      className={cn(
-        "admin-sidebar sticky top-4 flex h-[calc(100vh-2rem)] shrink-0 flex-col overflow-hidden rounded-xl border shadow-sm transition-[width] duration-200 ease-out lg:top-6 lg:h-[calc(100vh-3rem)]",
-        collapsed ? "w-[4.25rem]" : "w-60",
-        !ready && "w-60",
+    <>
+      {narrow && !collapsed && (
+        <button
+          type="button"
+          aria-label="Закрыть меню"
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={toggle}
+        />
       )}
-    >
+      <aside
+        className={cn(
+          "admin-sidebar flex shrink-0 flex-col overflow-hidden rounded-xl border shadow-sm transition-[width] duration-200 ease-out",
+          narrow && !collapsed
+            ? "fixed left-4 top-4 z-50 h-[calc(100vh-2rem)] w-60 shadow-lg"
+            : "sticky top-4 h-[calc(100vh-2rem)] lg:top-6 lg:h-[calc(100vh-3rem)]",
+          collapsed ? "w-[4.25rem]" : "w-60",
+          !ready && "w-60 max-md:w-[4.25rem]",
+        )}
+      >
       <div className={cn("admin-divider shrink-0 border-b p-3", collapsed && "flex justify-center")}>
         <Link
           href="/"
@@ -160,7 +158,7 @@ export function AdminSidebar({ userName }: { userName?: string }) {
 
         <button
           type="button"
-          onClick={toggleCollapsed}
+          onClick={toggle}
           title={collapsed ? "Развернуть меню" : "Свернуть меню"}
           className={cn(
             "admin-nav-muted flex w-full items-center rounded-lg text-sm transition-colors",
@@ -176,5 +174,6 @@ export function AdminSidebar({ userName }: { userName?: string }) {
         </button>
       </div>
     </aside>
+    </>
   );
 }

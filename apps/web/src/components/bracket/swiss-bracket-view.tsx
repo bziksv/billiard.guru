@@ -113,9 +113,10 @@ export function SwissBracketView({
             showCardMatchNumber,
             showCardHandicap,
             showCardPlacement,
+            handicapHalfStep,
           })
         : buildSwissBracketLayout(matches),
-    [fixedGrid, matches, showCardMatchNumber, showCardHandicap, showCardPlacement],
+    [fixedGrid, matches, showCardMatchNumber, showCardHandicap, showCardPlacement, handicapHalfStep],
   );
   const matchById = new Map(matches.map((m) => [m.id, m]));
   const fixedMaxRound =

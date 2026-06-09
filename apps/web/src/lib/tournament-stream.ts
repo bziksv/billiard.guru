@@ -81,6 +81,16 @@ export function resolveTableStreamUrl(
   return null;
 }
 
+export function resolveTableLabel(
+  tableId: string | null | undefined,
+  floorPlanRaw: unknown,
+  tableCountsRaw?: unknown,
+): string | null {
+  if (!tableId) return null;
+  const [label] = tournamentTableLabels([tableId], floorPlanRaw, tableCountsRaw ?? null);
+  return label ?? tableId;
+}
+
 export function resolveMatchStreamUrl(
   match: { tableId?: string | null },
   tournament: { tableStreams?: unknown; tableIds?: unknown },
@@ -89,17 +99,48 @@ export function resolveMatchStreamUrl(
   return resolveTableStreamUrl(match.tableId, tournament.tableStreams, floorPlanRaw);
 }
 
+export type TournamentTableOption = {
+  id: string;
+  label: string;
+  hasStream: boolean;
+};
+
 export function tournamentTableOptions(
   tableIdsRaw: unknown,
   floorPlanRaw: unknown,
   tableCountsRaw: unknown,
-): { id: string; label: string }[] {
+  tableStreamsRaw?: unknown,
+): TournamentTableOption[] {
   const ids = parseTournamentTableIds(tableIdsRaw);
   const labels = tournamentTableLabels(ids, floorPlanRaw, tableCountsRaw);
-  return ids.map((id, index) => ({ id, label: labels[index] ?? id }));
+  return ids.map((id, index) => ({
+    id,
+    label: labels[index] ?? id,
+    hasStream: resolveTableStreamUrl(id, tableStreamsRaw, floorPlanRaw) != null,
+  }));
 }
 
 type Db = Pick<PrismaClient, "tournament" | "tournamentMatch">;
+
+/** Встречи турнира, которые занимают стол (начаты, не завершены). */
+export async function listBusyTournamentTableIds(
+  db: Db,
+  tournamentId: string,
+  excludeMatchId?: string,
+): Promise<Set<string>> {
+  const busy = await db.tournamentMatch.findMany({
+    where: {
+      tournamentId,
+      ...(excludeMatchId ? { id: { not: excludeMatchId } } : {}),
+      tableId: { not: null },
+      startedAt: { not: null },
+      finishedAt: null,
+      status: { not: "FINISHED" },
+    },
+    select: { tableId: true },
+  });
+  return new Set(busy.map((row) => row.tableId).filter(Boolean) as string[]);
+}
 
 /** Первый свободный стол турнира (встреча начата, ещё не завершена). */
 export async function pickFreeTournamentTableId(
@@ -114,22 +155,11 @@ export async function pickFreeTournamentTableId(
   const tableIds = parseTournamentTableIds(tournament?.tableIds);
   if (tableIds.length === 0) return null;
 
-  const busy = await db.tournamentMatch.findMany({
-    where: {
-      tournamentId,
-      id: { not: excludeMatchId },
-      tableId: { not: null },
-      startedAt: { not: null },
-      finishedAt: null,
-      status: { not: "FINISHED" },
-    },
-    select: { tableId: true },
-  });
-  const busyIds = new Set(busy.map((row) => row.tableId).filter(Boolean) as string[]);
+  const busyIds = await listBusyTournamentTableIds(db, tournamentId, excludeMatchId);
   for (const id of tableIds) {
     if (!busyIds.has(id)) return id;
   }
-  return tableIds[0] ?? null;
+  return null;
 }
 
 export function tableStreamsToJson(

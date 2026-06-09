@@ -28,7 +28,8 @@ import {
   formatTournamentPlayerSelectLabel,
   playerExceedsTournamentRatingMax,
 } from "@/lib/tournament-rating-display";
-import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
+import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 interface Club {
   id: string;
@@ -511,7 +512,7 @@ export default function AdminTournamentManagePage() {
               />
             </div>
             <p className="mt-2 text-sm text-zinc-400">
-              {TOURNAMENT_FORMAT_LABELS[tournament.format]} · {tournament.club.name}
+              {tournamentFormatDisplayLabel(tournament)} · {tournament.club.name}
               {" · "}
               {confirmed} подтверждённых
             </p>

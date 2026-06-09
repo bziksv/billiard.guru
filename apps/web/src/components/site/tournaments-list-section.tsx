@@ -10,12 +10,24 @@ type TournamentListItem = Awaited<
   >
 >[number];
 
-function TournamentGrid({ tournaments }: { tournaments: TournamentListItem[] }) {
+function TournamentGrid({
+  tournaments,
+  formatLabels,
+}: {
+  tournaments: TournamentListItem[];
+  formatLabels: Record<string, string>;
+}) {
   return (
     <ul className="grid gap-4 lg:grid-cols-2">
       {tournaments.map((tournament) => (
         <li key={tournament.id}>
-          <TournamentCard tournament={tournament} href={`/tournaments/${tournament.id}`} />
+          <TournamentCard
+            tournament={{
+              ...tournament,
+              formatLabel: formatLabels[tournament.format],
+            }}
+            href={`/tournaments/${tournament.id}`}
+          />
         </li>
       ))}
     </ul>
@@ -27,11 +39,13 @@ export function TournamentsListSection({
   tab,
   subtitle,
   compactEmpty,
+  formatLabels,
 }: {
   tournaments: TournamentListItem[];
   tab: TournamentTab;
   subtitle?: string;
   compactEmpty?: boolean;
+  formatLabels: Record<string, string>;
 }) {
   const config = tournamentTabConfig(tab);
 
@@ -52,7 +66,7 @@ export function TournamentsListSection({
   return (
     <section className="space-y-4">
       {subtitle && <h2 className="site-page-subtitle">{subtitle}</h2>}
-      <TournamentGrid tournaments={tournaments} />
+      <TournamentGrid tournaments={tournaments} formatLabels={formatLabels} />
     </section>
   );
 }

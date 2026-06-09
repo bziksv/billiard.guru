@@ -13,6 +13,7 @@ import {
   validateTournamentTableStreams,
 } from "@/lib/tournament-stream";
 import { tournamentSchema } from "@/lib/validators";
+import { withTournamentFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { ZodError } from "zod";
 
 export async function GET() {
@@ -41,7 +42,7 @@ export async function GET() {
       },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(tournaments);
+    return NextResponse.json(await withTournamentFormatLabels(tournaments));
   } catch (error) {
     console.error("GET /api/tournaments failed:", error);
     return NextResponse.json(

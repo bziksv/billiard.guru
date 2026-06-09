@@ -10,7 +10,10 @@ export async function GET() {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
     }
     const options = await getBracketFormatOptionsForForms();
-    return NextResponse.json({ options });
+    return NextResponse.json(
+      { options },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     const res = authErrorResponse(error);
     if (res) return res;

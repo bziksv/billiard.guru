@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { formatStartsAt, isPairFormat } from "@/lib/public-display";
-import {
-  TOURNAMENT_FORMAT_LABELS,
-  TOURNAMENT_STATUS_LABELS,
-} from "@/lib/validators";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
+import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 type FeaturedTournament = {
   id: string;
   name: string;
   description?: string | null;
   format: string;
+  formatLabel?: string | null;
   status: string;
   startsAt: Date | null;
   club: {
@@ -52,7 +51,7 @@ export function HomeFeaturedTournament({
         />
       </div>
       <p className="home-card-body mt-4">
-        {TOURNAMENT_FORMAT_LABELS[tournament.format]} · {tournament.club.name}
+        {tournamentFormatDisplayLabel(tournament)} · {tournament.club.name}
       </p>
       <p className="home-card-muted mt-1 text-sm">
         {formatStartsAt(tournament.startsAt)} · {participants} участников · {location}

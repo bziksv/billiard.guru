@@ -8,7 +8,7 @@ import {
 import { teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
-import { BracketStreamLink } from "@/components/bracket/bracket-stream-link";
+import { BracketMatchNumberRow } from "@/components/bracket/bracket-match-number-row";
 import {
   isActiveBracketMatch,
   isMatchReadyForResult,
@@ -111,21 +111,21 @@ function TeamRow({
           data-bracket-interactive
           onClick={onMatchClick}
           className={rowClass}
-          style={{ height: GRID_ROW_H }}
+          style={{ height: GRID_ROW_H, minHeight: GRID_ROW_H, maxHeight: GRID_ROW_H }}
         >
           {content}
         </button>
       );
     }
     return (
-      <div className={rowClass} style={{ height: GRID_ROW_H }}>
+      <div className={rowClass} style={{ height: GRID_ROW_H, minHeight: GRID_ROW_H, maxHeight: GRID_ROW_H }}>
         {content}
       </div>
     );
   }
 
   return (
-    <div className={rowClass} style={{ height: GRID_ROW_H }}>
+    <div className={cn(rowClass, "shrink-0")} style={{ height: GRID_ROW_H, minHeight: GRID_ROW_H, maxHeight: GRID_ROW_H }}>
       {onPlayerClick && !empty ? (
         <button
           type="button"
@@ -198,7 +198,7 @@ function PairTeamRow({
   const rowClass = playerRowClass(isWinner, isLoser);
 
   return (
-    <div className={rowClass} style={{ height: GRID_ROW_H }}>
+    <div className={cn(rowClass, "shrink-0")} style={{ height: GRID_ROW_H, minHeight: GRID_ROW_H, maxHeight: GRID_ROW_H }}>
       <button
         type="button"
         data-bracket-interactive
@@ -556,34 +556,13 @@ export function LlbBracketMatch({
       }}
     >
       {showMatchNumberRow && (
-        <MatchArea
-          onMatchClick={openResult}
-          className={cn(
-            "llb-bracket-match__meta flex items-center border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px] text-[var(--bracket-meta-text)]",
-            isFixedSwissGrid ? "justify-center" : "justify-between",
-          )}
+        <BracketMatchNumberRow
+          matchNumber={matchNumber}
+          tableLabel={match.tableLabel}
+          streamUrl={match.streamUrl}
+          onClick={openResult}
           style={{ height: GRID_META_H }}
-        >
-          {!isFixedSwissGrid ? (
-            <>
-              <span className="tabular-nums">Тур {match.round}</span>
-              <span className="bracket-round-label font-semibold tabular-nums">
-                №{matchNumber}
-              </span>
-              <span className="tabular-nums text-[var(--bracket-meta-text)]">
-                сл.{match.slot}
-              </span>
-              {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
-            </>
-          ) : (
-            <>
-              <span className="bracket-round-label font-semibold tabular-nums">
-                №{matchNumber}
-              </span>
-              {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
-            </>
-          )}
-        </MatchArea>
+        />
       )}
 
       {match.team1?.player2 ? (
@@ -735,16 +714,16 @@ export function LlbBracketMatch({
                 style={{ height: footerRowH, maxHeight: footerRowH }}
               >
                 <span
-                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-left"
+                  className="flex min-h-0 min-w-0 items-center justify-center overflow-hidden border-r border-[var(--bracket-row-border)] px-1"
                   title={row.left}
                 >
-                  {row.left}
+                  <span className="truncate">{row.left}</span>
                 </span>
                 <span
-                  className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-l border-[var(--bracket-row-border)] px-1 text-left"
+                  className="flex min-h-0 min-w-0 items-center justify-end overflow-hidden px-1"
                   title={row.right}
                 >
-                  {row.right}
+                  <span className="min-w-0 truncate text-right">{row.right}</span>
                 </span>
               </div>
             ) : (

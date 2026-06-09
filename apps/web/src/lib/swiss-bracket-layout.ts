@@ -50,7 +50,7 @@ export type SwissBracketLayout = {
 export const GRID_COL_W = 280;
 export const GRID_CARD_W = 220;
 export const GRID_ROW_H = 28;
-export const GRID_META_H = 24;
+export const GRID_META_H = 28;
 export const GRID_FOOTER_H = 22;
 /** Высота одной строки подвала (место / переходы). */
 export const GRID_FOOTER_LINE_H = 12;

@@ -10,7 +10,7 @@ import {
 } from "@/components/admin/admin-table-toolbar";
 import { TournamentListCard } from "@/components/admin/tournament-list-card";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import { formatAdminDate } from "@/components/admin/admin-sort-header";
 import { StatusBadge } from "@/components/admin/status-badge";
 import type { AdminTournament } from "@/lib/tournament-admin";
@@ -431,11 +431,14 @@ export default function TournamentsPage() {
             placeholder="Описание турнира (формат игры, призовой фонд, правила…)"
             className="sm:col-span-2 w-full resize-y rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
           />
-          <input
-            name="startsAt"
-            type="datetime-local"
-            className="sm:col-span-2 w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
-          />
+          <label className="block sm:col-span-2">
+            <span className="mb-1 block text-xs text-zinc-500">Начало турнира</span>
+            <input
+              name="startsAt"
+              type="datetime-local"
+              className="w-full max-w-[17rem] rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            />
+          </label>
           {newClubId && (
             <div className="sm:col-span-2">
               <TournamentTablePicker
@@ -712,7 +715,7 @@ function FinishedTournamentRow({
         {t.club.city?.nameRu ?? "—"}
       </td>
       <td className="px-4 py-3 text-zinc-400">
-        {TOURNAMENT_FORMAT_LABELS[t.format] ?? t.format}
+        {tournamentFormatDisplayLabel(t) ?? t.format}
       </td>
       <td className="px-4 py-3 text-zinc-400">
         {t.startsAt ? formatAdminDate(t.startsAt) : "—"}

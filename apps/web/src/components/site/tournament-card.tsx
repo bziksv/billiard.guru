@@ -5,8 +5,8 @@ import {
   formatStartsAt,
   isPairFormat,
 } from "@/lib/public-display";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
-  TOURNAMENT_FORMAT_LABELS,
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 
@@ -15,6 +15,7 @@ type TournamentListItem = {
   name: string;
   description?: string | null;
   format: string;
+  formatLabel?: string | null;
   status: string;
   startsAt: Date | null;
   club: {
@@ -48,7 +49,7 @@ export function TournamentCard({
         />
       </div>
       <p className="home-card-muted mt-2 text-sm">
-        {TOURNAMENT_FORMAT_LABELS[t.format] ?? t.format}
+        {tournamentFormatDisplayLabel(t)}
         {" · "}
         {t.club.name}
       </p>

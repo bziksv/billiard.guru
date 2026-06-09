@@ -30,13 +30,10 @@ export function BracketFormatLanding({
     )?.examples?.find((e) => e.diagram)?.diagram ??
     null;
   const compactDemoMatches =
-    isLargeBracketDemo(demoMatches) && definition.pairing === "pair"
-      ? buildBracketFormatDemo("FIXED_PAIR_SWISS", "pair")
-      : isLargeBracketDemo(demoMatches)
-        ? buildBracketFormatDemo("FIXED_SWISS", "single")
-        : null;
-  const compactDemoFormat =
-    definition.pairing === "pair" ? "FIXED_PAIR_SWISS" : "FIXED_SWISS";
+    isLargeBracketDemo(demoMatches)
+      ? buildBracketFormatDemo("FIXED_SWISS_32R8_2_3_mesta", definition.pairing)
+      : null;
+  const compactDemoFormat = "FIXED_SWISS_32R8_2_3_mesta";
   const adminLabel = bracketFormatDisplayLabel(definition.code);
 
   return (

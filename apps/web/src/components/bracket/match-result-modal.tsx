@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   isMatchReadyForResult,
   matchAutopassBye,
@@ -15,6 +15,7 @@ import {
 } from "@/lib/match-result";
 import { teamLabel } from "@/lib/pair-tournament";
 import { cn } from "@/lib/cn";
+import type { TournamentTableOption } from "@/lib/tournament-stream";
 
 export interface MatchResultPayload {
   matchId: string;
@@ -38,8 +39,95 @@ function nowDatetimeLocal(): string {
   return toDatetimeLocal(new Date().toISOString());
 }
 
+/** Старт встречи без модалки: время «сейчас», стол — авто на сервере. */
+export function buildMatchStartNowPayload(matchId: string): MatchResultPayload {
+  return { matchId, startedAt: new Date().toISOString() };
+}
+
 function toIsoFromLocal(value: string): string {
   return new Date(value).toISOString();
+}
+
+function TableSelect({
+  value,
+  onChange,
+  tables,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  tables: TournamentTableOption[];
+}) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const options = useMemo(
+    () => [
+      { value: "", label: "Не выбран (авто)" },
+      ...tables.map((table) => ({
+        value: table.id,
+        label: `${table.label}${table.hasStream ? " (тв-стол)" : ""}`,
+      })),
+    ],
+    [tables],
+  );
+
+  const selected = options.find((option) => option.value === value) ?? options[0]!;
+
+  useEffect(() => {
+    function handleClick(event: MouseEvent) {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className="admin-input flex w-full items-center justify-between gap-2 px-2 py-2 text-left text-sm"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+      >
+        <span className="min-w-0 truncate">{selected.label}</span>
+        <span className="shrink-0 text-zinc-400" aria-hidden>
+          ▾
+        </span>
+      </button>
+      {open && (
+        <ul
+          role="listbox"
+          className="absolute z-[60] mt-1 max-h-48 w-full overflow-auto rounded-lg border py-1 shadow-xl"
+        >
+          {options.map((option) => (
+            <li key={option.value || "__auto"}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={option.value === value}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "w-full px-3 py-2 text-left text-sm",
+                  option.value === value
+                    ? "text-emerald-600 dark:text-emerald-400"
+                    : "text-[var(--admin-text-secondary)] hover:bg-[var(--admin-row-hover)]",
+                )}
+              >
+                {option.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
 
 /** Не отправляем null — иначе в БД сотрётся уже сохранённое время. */
@@ -83,7 +171,7 @@ export function MatchResultModal({
   matchNumber?: number;
   open: boolean;
   saving: boolean;
-  tournamentTables?: { id: string; label: string }[];
+  tournamentTables?: TournamentTableOption[];
   onClose: () => void;
   onSave: (payload: MatchResultPayload) => Promise<void>;
   onCancel?: (matchId: string) => Promise<void>;
@@ -144,7 +232,7 @@ export function MatchResultModal({
     const payload: MatchResultPayload = {
       matchId: match!.id,
       ...times,
-      tableId: tableId || null,
+      ...(tableId ? { tableId } : {}),
     };
     try {
       await onSave(payload);
@@ -184,7 +272,7 @@ export function MatchResultModal({
       matchId: match!.id,
       team1Score: parsed.s1,
       team2Score: parsed.s2,
-      tableId: tableId || null,
+      ...(tableId ? { tableId } : {}),
       ...times,
     };
     try {
@@ -255,7 +343,7 @@ export function MatchResultModal({
       winnerTeamId: winner,
       team1Score: s1,
       team2Score: s2,
-      tableId: tableId || null,
+      ...(tableId ? { tableId } : {}),
       ...times,
     };
 
@@ -305,7 +393,7 @@ export function MatchResultModal({
       onClick={onClose}
     >
       <div
-        className="bracket-modal-panel w-full max-w-lg overflow-hidden"
+        className="bracket-modal-panel w-full max-w-lg overflow-visible"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-labelledby="match-modal-title"
@@ -403,18 +491,11 @@ export function MatchResultModal({
           {tournamentTables.length > 0 && (
             <label className="block text-sm">
               <span className="admin-label-xs mb-1.5 block">Стол</span>
-              <select
+              <TableSelect
                 value={tableId}
-                onChange={(event) => setTableId(event.target.value)}
-                className="admin-input w-full px-2 py-2 text-sm"
-              >
-                <option value="">Не выбран</option>
-                {tournamentTables.map((table) => (
-                  <option key={table.id} value={table.id}>
-                    {table.label}
-                  </option>
-                ))}
-              </select>
+                onChange={setTableId}
+                tables={tournamentTables}
+              />
             </label>
           )}
 

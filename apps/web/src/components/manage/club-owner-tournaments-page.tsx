@@ -19,7 +19,8 @@ import {
   tournamentRatingSourceHint,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
-import { TOURNAMENT_FORMAT_LABELS, TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
+import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
 
 const CURRENT_STATUSES = new Set([
@@ -32,8 +33,11 @@ const CURRENT_STATUSES = new Set([
 export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   const { defaults: tournamentDefaults, ready: defaultsReady } =
     useTournamentDefaults();
-  const { options: formatOptions, loading: formatOptionsLoading } =
-    useBracketFormatOptions();
+  const {
+    options: formatOptions,
+    loading: formatOptionsLoading,
+    reload: reloadFormatOptions,
+  } = useBracketFormatOptions();
   const [tournaments, setTournaments] = useState<AdminTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [newFormat, setNewFormat] = useState("OLYMPIC");
@@ -52,6 +56,10 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   useEffect(() => {
     reloadTournaments().finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (tab === "create") reloadFormatOptions();
+  }, [tab, reloadFormatOptions]);
 
   useEffect(() => {
     if (defaultsReady) setRatingSource(tournamentDefaults.ratingSource);
@@ -174,7 +182,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
           <form
             key={defaultsReady ? "defaults-ready" : "defaults-loading"}
             onSubmit={createTournament}
-            className="grid max-w-3xl gap-3"
+            className="grid max-w-3xl gap-3 sm:grid-cols-2"
           >
             <input
               name="name"
@@ -203,9 +211,16 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               name="description"
               rows={4}
               placeholder="Описание турнира"
-              className="site-input w-full resize-y"
+              className="site-input w-full resize-y sm:col-span-2"
             />
-            <input name="startsAt" type="datetime-local" className="site-input w-full" />
+            <label className="block sm:col-span-2">
+              <span className="mb-1 block text-xs text-zinc-500">Начало турнира</span>
+              <input
+                name="startsAt"
+                type="datetime-local"
+                className="site-input w-full max-w-[17rem]"
+              />
+            </label>
             <div className="sm:col-span-2">
               <TournamentTablePicker
                 clubId={clubId}
@@ -354,7 +369,7 @@ function TournamentRow({
             />
           </div>
           <p className="mt-1 text-sm text-zinc-400">
-            {TOURNAMENT_FORMAT_LABELS[t.format]}
+            {tournamentFormatDisplayLabel(t)}
             {t.ratingMax != null && (
               <> · до {formatRating(t.ratingMax)} по рейтингу</>
             )}

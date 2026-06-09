@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FORMAT_OPTIONS } from "@/lib/bracket-formats/catalog";
 
 export type BracketFormatSelectOption = {
@@ -19,15 +19,22 @@ export function firstSelectableFormat(
 export function useBracketFormatOptions(
   /** Текущий формат турнира — оставить в списке даже если выключен */
   includeValue?: string,
-): { options: BracketFormatSelectOption[]; loading: boolean } {
+): {
+  options: BracketFormatSelectOption[];
+  loading: boolean;
+  reload: () => void;
+} {
   const [options, setOptions] = useState<BracketFormatSelectOption[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reloadToken, setReloadToken] = useState(0);
+
+  const reload = useCallback(() => setReloadToken((t) => t + 1), []);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
 
-    fetch("/api/bracket-formats/options")
+    fetch("/api/bracket-formats/options", { cache: "no-store" })
       .then(async (r) => {
         const json = await r.json();
         if (cancelled || !r.ok || !Array.isArray(json.options)) return;
@@ -46,7 +53,7 @@ export function useBracketFormatOptions(
     return () => {
       cancelled = true;
     };
-  }, [includeValue]);
+  }, [includeValue, reloadToken]);
 
-  return { options, loading };
+  return { options, loading, reload };
 }

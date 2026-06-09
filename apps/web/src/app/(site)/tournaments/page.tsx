@@ -12,6 +12,7 @@ import {
   tournamentGeoWhere,
   tournamentListInclude,
 } from "@/lib/public-queries";
+import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 import type { GeoSearchParams } from "@/lib/site";
 import { t } from "@/lib/site";
@@ -33,6 +34,7 @@ function TournamentsPageBody({
   nearbyTournaments,
   localSubtitle,
   nearbySubtitle,
+  formatLabels,
 }: {
   tab: ReturnType<typeof parseTournamentTab>;
   localTournaments: Awaited<
@@ -47,6 +49,7 @@ function TournamentsPageBody({
   >;
   localSubtitle?: string;
   nearbySubtitle?: string;
+  formatLabels: Record<string, string>;
 }) {
   const allTournaments = [...localTournaments, ...nearbyTournaments];
   const counts = countTournamentsByTab(allTournaments);
@@ -74,6 +77,7 @@ function TournamentsPageBody({
             tournaments={localFiltered}
             tab={tab}
             compactEmpty
+            formatLabels={formatLabels}
             subtitle={
               localSubtitle
                 ? `${localSubtitle}${localFiltered.length > 0 ? ` · ${localFiltered.length}` : ""}`
@@ -84,6 +88,7 @@ function TournamentsPageBody({
             <TournamentsListSection
               tournaments={nearbyFiltered}
               tab={tab}
+              formatLabels={formatLabels}
               subtitle={
                 nearbySubtitle ? `${nearbySubtitle} · ${nearbyFiltered.length}` : undefined
               }
@@ -91,7 +96,11 @@ function TournamentsPageBody({
           )}
         </div>
       ) : (
-        <TournamentsListSection tournaments={localFiltered} tab={tab} />
+        <TournamentsListSection
+          tournaments={localFiltered}
+          tab={tab}
+          formatLabels={formatLabels}
+        />
       )}
     </>
   );
@@ -104,6 +113,7 @@ export default async function TournamentsPage({
 }) {
   const rawParams = await searchParams;
   const tab = parseTournamentTab(rawParams.tab);
+  const formatLabels = await getAllBracketFormatLabels();
   const player = await getCurrentPlayer();
   const hasManualGeo = Boolean(rawParams.cityId || rawParams.countryId);
   const usePlayerSections = Boolean(player && !hasManualGeo);
@@ -150,6 +160,7 @@ export default async function TournamentsPage({
               tab={tab}
               localTournaments={localTournaments}
               nearbyTournaments={nearbyTournaments}
+              formatLabels={formatLabels}
               localSubtitle={`В вашем городе · ${player.city.nameRu}`}
               nearbySubtitle="Рядом · соседние города"
             />
@@ -184,6 +195,7 @@ export default async function TournamentsPage({
             tab={tab}
             localTournaments={tournaments}
             nearbyTournaments={[]}
+            formatLabels={formatLabels}
           />
         </Suspense>
       </PageMain>

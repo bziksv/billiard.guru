@@ -81,6 +81,8 @@ export interface AdminTournament {
   name: string;
   description?: string | null;
   format: string;
+  /** Подпись из /admin/brackets (если загружена с сервера) */
+  formatLabel?: string;
   status: string;
   clubId: string;
   ratingMax?: number | null;

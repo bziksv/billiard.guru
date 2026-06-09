@@ -37,13 +37,19 @@ export function isFixedSwiss64Format(format: string): boolean {
 
 export function isFixedSwiss32BronzeFormat(format: string): boolean {
   return (
-    format === "FIXED_SWISS_32_BRONZE" || format === "FIXED_PAIR_SWISS_32_BRONZE"
+    format === "FIXED_SWISS_32_BRONZE" ||
+    format === "FIXED_SWISS_32R4_1_3_mesto" ||
+    format === "FIXED_SWISS_32R8_BRONZE" ||
+    format === "FIXED_PAIR_SWISS_32_BRONZE"
   );
 }
 
 export function isFixedSwiss32Format(format: string): boolean {
   return (
     format === "FIXED_SWISS_32" ||
+    format === "FIXED_SWISS_32R4_2_3_mesta" ||
+    format === "FIXED_SWISS_32R8" ||
+    format === "FIXED_SWISS_32R8_2_3_mesta" ||
     format === "FIXED_PAIR_SWISS_32" ||
     isFixedSwiss32BronzeFormat(format)
   );
@@ -89,6 +95,11 @@ export function isSoloFormat(format: string): boolean {
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_32" ||
     format === "FIXED_SWISS_32_BRONZE" ||
+    format === "FIXED_SWISS_32R4_2_3_mesta" ||
+    format === "FIXED_SWISS_32R4_1_3_mesto" ||
+    format === "FIXED_SWISS_32R8" ||
+    format === "FIXED_SWISS_32R8_2_3_mesta" ||
+    format === "FIXED_SWISS_32R8_BRONZE" ||
     format === "FIXED_SWISS_64" ||
     format === "FIXED_SWISS_64_BRONZE" ||
     format === "EXCEL_REF_64" ||
@@ -246,9 +257,17 @@ export function buildSwissPairings(
   return result;
 }
 
-export function buildOlympicBracket(seededTeamIds: string[]): BracketMatchInput[] {
+export function buildOlympicBracket(
+  seededTeamIds: string[],
+  bracketSize?: number,
+): BracketMatchInput[] {
   const n = seededTeamIds.length;
-  const size = nextPowerOfTwo(n);
+  const size = bracketSize ?? nextPowerOfTwo(n);
+  if (size < n) {
+    throw new Error(
+      `Размер сетки ${size} меньше числа участников ${n}`,
+    );
+  }
   const order = bracketSeedOrder(size);
   const slots: (string | null)[] = order.map((seed) =>
     seed <= n ? seededTeamIds[seed - 1]! : null,

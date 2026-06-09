@@ -207,6 +207,11 @@ export const tournamentSchema = z.object({
     "FIXED_SWISS_16_BRONZE",
     "FIXED_SWISS_32",
     "FIXED_SWISS_32_BRONZE",
+    "FIXED_SWISS_32R4_2_3_mesta",
+    "FIXED_SWISS_32R4_1_3_mesto",
+    "FIXED_SWISS_32R8",
+    "FIXED_SWISS_32R8_2_3_mesta",
+    "FIXED_SWISS_32R8_BRONZE",
     "FIXED_SWISS_64",
     "FIXED_SWISS_64_BRONZE",
     "PAIR_OLYMPIC",
@@ -243,6 +248,11 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_SWISS_16_BRONZE",
       "FIXED_SWISS_32",
       "FIXED_SWISS_32_BRONZE",
+      "FIXED_SWISS_32R4_2_3_mesta",
+      "FIXED_SWISS_32R4_1_3_mesto",
+      "FIXED_SWISS_32R8",
+      "FIXED_SWISS_32R8_2_3_mesta",
+      "FIXED_SWISS_32R8_BRONZE",
       "FIXED_SWISS_64",
       "FIXED_SWISS_64_BRONZE",
       "PAIR_OLYMPIC",
@@ -465,12 +475,20 @@ export const FIXED_SWISS_64_BRONZE_FORMAT_LABEL =
 export const FIXED_SWISS_64_FORMAT_LABEL =
   "Сетка на 64 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
 
-/** 32→16 + матч проигравших полуфиналистов за 3–4 место (#60). */
+/** 32→16 (56): 1/4 + матч за 3–4. */
 export const FIXED_SWISS_32_BRONZE_FORMAT_LABEL =
+  "Сетка на 32 до 2 поражений, олимпийка с 1/4 с определением 3 и 4 места (доп.игра)";
+
+/** 32→16 (55/56): олимпийка с 1/4. */
+export const FIXED_SWISS_32_FORMAT_LABEL =
+  "Сетка на 32 до 2 поражений, олимпийка с 1/4 с двумя 3 местами";
+
+/** 32→16 (60): 1/8 + матч за 3–4 (#60). */
+export const FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL =
   "Сетка на 32 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
 
-/** 32→16 (59 встреч) — #41–#44 1/8, #45–#48 нижняя тур 3, #49–#52 тур 4, 1/4 с #53. */
-export const FIXED_SWISS_32_FORMAT_LABEL =
+/** 32→16 (59 встреч) — #41–#44 1/8, нижняя тур 3–4, 1/4 с #53. */
+export const FIXED_SWISS_32R8_FORMAT_LABEL =
   "Сетка на 32 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
 
 /** 16→8 (27 встреч, 7 колонок). */
@@ -479,7 +497,7 @@ export const FIXED_SWISS_16_8_FORMAT_LABEL =
 
 /** 16→8 + отдельный матч проигравших полуфиналистов за 3–4 место (#28). */
 export const FIXED_SWISS_16_BRONZE_FORMAT_LABEL =
-  "Сетка на 16 до 2 поражений, олимпийка с 1/4, с определением 3 и 4 места (доп.игра)";
+  "Сетка на 16 до 2 поражений, олимпийка с 1/4 с определением 3 и 4 места (доп.игра)";
 
 /** Одиночная олимпийская фикс. сетка (код OLYMPIC в Prisma). */
 export const OLYMPIC_SINGLE_FORMAT_LABEL =
@@ -497,6 +515,11 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_SWISS_16_BRONZE: FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32: FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_32_BRONZE: FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_32R4_2_3_mesta: FIXED_SWISS_32_FORMAT_LABEL,
+  FIXED_SWISS_32R4_1_3_mesto: FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_32R8: FIXED_SWISS_32R8_FORMAT_LABEL,
+  FIXED_SWISS_32R8_2_3_mesta: FIXED_SWISS_32R8_FORMAT_LABEL,
+  FIXED_SWISS_32R8_BRONZE: FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_64: FIXED_SWISS_64_FORMAT_LABEL,
   FIXED_SWISS_64_BRONZE: FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
   PAIR_OLYMPIC: "Парный (фикс. сетка)",

@@ -24,6 +24,14 @@ const FIXED_SWISS_64_FORMATS = new Set([
   "FIXED_PAIR_SWISS_64_BRONZE",
 ]);
 
+const FIXED_SWISS_32R8_FORMATS = new Set([
+  "FIXED_SWISS_32R8",
+  "FIXED_SWISS_32R8_2_3_mesta",
+  "FIXED_SWISS_32R8_BRONZE",
+  "FIXED_SWISS_32R4_2_3_mesta",
+  "FIXED_SWISS_32R4_1_3_mesto",
+]);
+
 const FIXED_SWISS_32_FORMATS = new Set([
   "FIXED_SWISS_32",
   "FIXED_SWISS_32_BRONZE",
@@ -76,9 +84,10 @@ export function getDefaultBracketParticipantRules(
           "Добавьте участников до 64 или смените формат.",
     };
   }
-  if (FIXED_SWISS_32_FORMATS.has(code)) {
+  if (FIXED_SWISS_32R8_FORMATS.has(code)) {
     const withBronze =
-      code === "FIXED_SWISS_32_BRONZE" || code === "FIXED_PAIR_SWISS_32_BRONZE";
+      code === "FIXED_SWISS_32R8_BRONZE" ||
+      code === "FIXED_SWISS_32R4_1_3_mesto";
     return {
       min: 32,
       max: 32,
@@ -88,6 +97,21 @@ export function getDefaultBracketParticipantRules(
         ? "Сетка «до 2 поражений» на 32 участника — 60 встреч (59 + матч за 3–4), нижняя тур 1–4, олимпийка с 1/8. " +
           "Добавьте участников до 32 или смените формат."
         : "Сетка «до 2 поражений» на 32 участника — 59 встреч, нижняя тур 1–4, олимпийка с 1/8. " +
+          "Добавьте участников до 32 или смените формат.",
+    };
+  }
+  if (FIXED_SWISS_32_FORMATS.has(code)) {
+    const withBronze =
+      code === "FIXED_SWISS_32_BRONZE" || code === "FIXED_PAIR_SWISS_32_BRONZE";
+    return {
+      min: 32,
+      max: 32,
+      exact: 32,
+      label: "ровно 32",
+      hint: withBronze
+        ? "Сетка «до 2 поражений» на 32 участника — 56 встреч (55 + матч за 3–4), олимпийка с 1/4. " +
+          "Добавьте участников до 32 или смените формат."
+        : "Сетка «до 2 поражений» на 32 участника — 59 встреч, нижняя тур 1–4, олимпийка с 1/4. " +
           "Добавьте участников до 32 или смените формат.",
     };
   }
@@ -242,7 +266,10 @@ export function isFixedSwiss64OnlyFormat(format: string): boolean {
 }
 
 export function isFixedSwiss32OnlyFormat(format: string): boolean {
-  return FIXED_SWISS_32_FORMATS.has(format);
+  return (
+    FIXED_SWISS_32_FORMATS.has(format) ||
+    FIXED_SWISS_32R8_FORMATS.has(format)
+  );
 }
 
 export function validateParticipantOverrides(

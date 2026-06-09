@@ -3,6 +3,7 @@ import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
 import { validateParticipantOverrides } from "@/lib/bracket-participant-rules";
 import { isBracketFormatCode } from "@/lib/bracket-formats/catalog";
 import {
+  deleteBracketFormatSettings,
   getAllBracketFormatSettings,
   saveBracketFormatSettings,
 } from "@/lib/bracket-formats/settings-server";
@@ -94,6 +95,31 @@ export async function PATCH(request: NextRequest) {
       ...participantPatch,
       ...labelPatch,
     });
+    const settings = await getAllBracketFormatSettings();
+    return NextResponse.json({ ok: true, settings });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Неверные данные" }, { status: 400 });
+    }
+    const res = authErrorResponse(error);
+    if (res) return res;
+    return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
+  }
+}
+
+const deleteSchema = z.object({
+  formatCode: z.string(),
+});
+
+export async function DELETE(request: NextRequest) {
+  try {
+    await requireSuperAdmin();
+    const body = deleteSchema.parse(await request.json());
+    if (!isBracketFormatCode(body.formatCode)) {
+      return NextResponse.json({ error: "Неизвестный формат сетки" }, { status: 400 });
+    }
+
+    await deleteBracketFormatSettings(body.formatCode);
     const settings = await getAllBracketFormatSettings();
     return NextResponse.json({ ok: true, settings });
   } catch (error) {

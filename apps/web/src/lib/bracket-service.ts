@@ -8,6 +8,7 @@ import {
 import {
   buildFixedSwissTemplate,
   findFixedSwissLink,
+  fixedSwissNominalGridSize,
   getFixedSwissLinksForMatchCount,
   type FixedSwissLink,
 } from "@/lib/fixed-swiss-grid";
@@ -20,7 +21,11 @@ import { getResolvedParticipantRules } from "@/lib/bracket-formats/settings-serv
 import { logger } from "@/lib/logger";
 import excelRef from "@/lib/excel-bracket-64-reference.json";
 import { notifyMatchStartScheduled } from "@/lib/match-start-notification";
-import { pickFreeTournamentTableId } from "@/lib/tournament-stream";
+import {
+  listBusyTournamentTableIds,
+  pickFreeTournamentTableId,
+} from "@/lib/tournament-stream";
+import { parseTournamentTableIds } from "@/lib/tournament-table-pick";
 import {
   buildOlympicBracket,
   buildOlympicBracketWithBronze,
@@ -1115,6 +1120,11 @@ async function seedTeamsForFixedSwiss(
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_32" ||
     format === "FIXED_SWISS_32_BRONZE" ||
+    format === "FIXED_SWISS_32R4_2_3_mesta" ||
+    format === "FIXED_SWISS_32R4_1_3_mesto" ||
+    format === "FIXED_SWISS_32R8" ||
+    format === "FIXED_SWISS_32R8_2_3_mesta" ||
+    format === "FIXED_SWISS_32R8_BRONZE" ||
     format === "FIXED_SWISS_64" ||
     format === "FIXED_SWISS_64_BRONZE" ||
     format === "EXCEL_REF_64"
@@ -1155,8 +1165,9 @@ export async function generateFixedSwissGrid(db: Db, tournamentId: string) {
 
   const seeded = await seedTeamsForFixedSwiss(db, tournamentId, tournament.format);
   await assertParticipantCountForFormat(tournament.format, seeded.length);
+  const gridSize = fixedSwissNominalGridSize(tournament.format, seeded.length);
   const template = buildFixedSwissTemplate(seeded.length, tournament.format);
-  const bracket = buildOlympicBracket(seeded.map((t) => t.id));
+  const bracket = buildOlympicBracket(seeded.map((t) => t.id), gridSize);
 
   const round1BySlot = new Map(
     bracket.filter((m) => m.round === 1).map((m) => [m.slot, m]),
@@ -1394,21 +1405,39 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
       : {};
 
   let tableId: string | null | undefined = undefined;
-  if (input.tableId !== undefined) {
+  const matchFinishing =
+    Boolean(input.winnerTeamId || (finishedAt !== undefined && finishedAt !== null)) &&
+    !match.finishedAt;
+  const matchStarting =
+    startedAt !== undefined && startedAt !== null && !match.startedAt;
+  const needsTableAssignment =
+    matchStarting ||
+    ((match.startedAt != null || (startedAt !== undefined && startedAt !== null)) &&
+      !match.tableId &&
+      !matchFinishing);
+
+  if (typeof input.tableId === "string" && input.tableId.length > 0) {
+    const allowedTableIds = parseTournamentTableIds(match.tournament.tableIds);
+    if (allowedTableIds.length > 0 && !allowedTableIds.includes(input.tableId)) {
+      throw new Error("Выбранный стол не входит в список турнира");
+    }
+    const busyIds = await listBusyTournamentTableIds(
+      db,
+      match.tournamentId,
+      match.id,
+    );
+    if (busyIds.has(input.tableId)) {
+      throw new Error("Этот стол уже занят другой текущей встречей");
+    }
     tableId = input.tableId;
-  } else if (
-    startedAt !== undefined &&
-    startedAt !== null &&
-    !match.tableId &&
-    !match.startedAt
-  ) {
+  } else if (needsTableAssignment) {
+    const allowedTableIds = parseTournamentTableIds(match.tournament.tableIds);
     tableId = await pickFreeTournamentTableId(db, match.tournamentId, match.id);
-  }
-  if (
-    (input.winnerTeamId || (finishedAt !== undefined && finishedAt !== null)) &&
-    !match.finishedAt
-  ) {
-    tableId = null;
+    if (matchStarting && allowedTableIds.length > 0 && !tableId) {
+      throw new Error(
+        `Все ${allowedTableIds.length} столов турнира заняты. Завершите одну из текущих встреч, чтобы начать новую.`,
+      );
+    }
   }
 
   await db.tournamentMatch.update({

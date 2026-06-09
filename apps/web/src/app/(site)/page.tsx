@@ -26,6 +26,7 @@ import {
   tournamentGeoWhere,
   tournamentListInclude,
 } from "@/lib/public-queries";
+import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 import { GeoSearchParams, hrefWithGeo, t } from "@/lib/site";
 
@@ -62,6 +63,7 @@ export default async function HomePage({
     news,
     playAnnouncements,
     bracketFormats,
+    formatLabels,
   ] = await Promise.all([
     prisma.tournament.findMany({
       where: tournamentGeoWhere(geo),
@@ -85,6 +87,7 @@ export default async function HomePage({
     loadHomeNews(geo),
     loadHomePlayAnnouncements(geo),
     loadHomeBracketFormats(),
+    getAllBracketFormatLabels(),
   ]);
 
   const hasGeo = Boolean(geo.cityId || geo.countryId);
@@ -130,14 +133,24 @@ export default async function HomePage({
             />
           ) : (
             <>
-              {featured && <HomeFeaturedTournament tournament={featured} />}
+              {featured && (
+                <HomeFeaturedTournament
+                  tournament={{
+                    ...featured,
+                    formatLabel: formatLabels[featured.format],
+                  }}
+                />
+              )}
               {restTournaments.length > 0 && (
                 <ul className="grid gap-4 md:grid-cols-2">
                   {restTournaments.map((tournament, i) => (
                     <li key={tournament.id}>
                       <HomeReveal delay={i * 80}>
                         <TournamentCard
-                          tournament={tournament}
+                          tournament={{
+                            ...tournament,
+                            formatLabel: formatLabels[tournament.format],
+                          }}
                           href={`/tournaments/${tournament.id}`}
                           compact
                         />

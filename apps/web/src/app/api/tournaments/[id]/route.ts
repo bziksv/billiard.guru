@@ -5,6 +5,7 @@ import {
   getBracketFormatSettings,
   getResolvedParticipantRules,
   isBracketFormatSelectable,
+  withTournamentFormatLabel,
 } from "@/lib/bracket-formats/settings-server";
 import { isPairFormat } from "@/lib/pair-tournament";
 import { prisma } from "@/lib/prisma";
@@ -40,7 +41,9 @@ export async function GET(
 
     const participantRules = await getResolvedParticipantRules(tournament.format);
 
-    return NextResponse.json({ ...tournament, participantRules });
+    return NextResponse.json(
+      await withTournamentFormatLabel({ ...tournament, participantRules }),
+    );
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
@@ -164,7 +167,7 @@ export async function PATCH(
       payload: data,
     });
 
-    return NextResponse.json(tournament);
+    return NextResponse.json(await withTournamentFormatLabel(tournament));
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

@@ -86,6 +86,9 @@ export function BracketsAdminPage() {
   const [showHiddenFormats, setShowHiddenFormats] = useState(false);
   const [hideFormatTarget, setHideFormatTarget] = useState<FormatRow | null>(null);
   const [hideFormatLoading, setHideFormatLoading] = useState(false);
+  const [deleteSettingsTarget, setDeleteSettingsTarget] = useState<FormatRow | null>(null);
+  const [deleteSettingsLoading, setDeleteSettingsLoading] = useState(false);
+  const [deleteSettingsError, setDeleteSettingsError] = useState<string | null>(null);
 
   const visibleFormats = formats.filter((f) => !f.hiddenInAdmin);
   const hiddenFormats = formats.filter((f) => f.hiddenInAdmin);
@@ -246,6 +249,26 @@ export function BracketsAdminPage() {
     setSavingLabelCode(null);
   }
 
+  async function confirmDeleteFormatSettings() {
+    if (!deleteSettingsTarget) return;
+    setDeleteSettingsLoading(true);
+    setDeleteSettingsError(null);
+    const res = await fetch("/api/admin/bracket-formats/settings", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ formatCode: deleteSettingsTarget.code }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      setDeleteSettingsError(json.error ?? "Не удалось удалить настройки");
+      setDeleteSettingsLoading(false);
+      return;
+    }
+    if (json.settings) applySettingsFromResponse(json.settings);
+    setDeleteSettingsTarget(null);
+    setDeleteSettingsLoading(false);
+  }
+
   if (loading) {
     return <p className="admin-muted text-sm">Загрузка…</p>;
   }
@@ -357,11 +380,15 @@ export function BracketsAdminPage() {
                   {!f.enabled && <span className="admin-notify-chip">выкл</span>}
                 </div>
               </div>
-              <Link
-                href={`/admin/brackets/formats/${f.code}`}
-                className="admin-bracket-format-card__body admin-card-interactive block"
-              >
-                <h2 className="admin-bracket-format-card__title">{f.adminLabel}</h2>
+              <div className="admin-bracket-format-card__body">
+                <h2 className="admin-bracket-format-card__title">
+                  <Link
+                    href={`/admin/brackets/formats/${f.code}`}
+                    className="admin-bracket-format-card__title-link"
+                  >
+                    {f.adminLabel}
+                  </Link>
+                </h2>
                 {f.maintenanceMode && f.enabled && (
                   <p className="admin-muted mt-1 text-xs">
                     Сетка на техобслуживании — для новых турниров недоступна.
@@ -392,10 +419,13 @@ export function BracketsAdminPage() {
                     </dd>
                   </div>
                 </dl>
-                <p className="admin-link mt-3 text-xs font-medium">
+                <Link
+                  href={`/admin/brackets/formats/${f.code}`}
+                  className="admin-link mt-3 inline-block text-xs font-medium"
+                >
                   Подробнее о формате →
-                </p>
-              </Link>
+                </Link>
+              </div>
               <BracketFormatLabelEditor
                 adminLabel={f.adminLabel}
                 catalogLabel={f.catalogAdminLabel}
@@ -415,13 +445,23 @@ export function BracketsAdminPage() {
                   patchFormatSettings(f.code, { resetParticipantLimits: true })
                 }
               />
-              <div className="border-t border-[var(--admin-border)] px-4 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--admin-border)] px-4 py-3">
                 <button
                   type="button"
                   className="text-xs text-red-400 hover:underline"
                   onClick={() => setHideFormatTarget(f)}
                 >
                   Убрать из списка типов
+                </button>
+                <button
+                  type="button"
+                  className="text-xs text-red-400/80 hover:underline"
+                  onClick={() => {
+                    setDeleteSettingsError(null);
+                    setDeleteSettingsTarget(f);
+                  }}
+                >
+                  Удалить настройки
                 </button>
               </div>
             </div>
@@ -443,18 +483,35 @@ export function BracketsAdminPage() {
                     key={f.code}
                     className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--admin-border)] px-3 py-2"
                   >
-                    <span className="text-[var(--admin-text)]">{f.adminLabel}</span>
-                    <button
-                      type="button"
-                      className="admin-btn admin-btn--outline px-2 py-1 text-xs"
-                      onClick={() =>
-                        patchFormatSettings(f.code, {
-                          hiddenInAdmin: false,
-                        })
-                      }
-                    >
-                      Вернуть в список
-                    </button>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[var(--admin-text)]">{f.adminLabel}</span>
+                      <span className="admin-muted ml-2 text-xs tabular-nums">
+                        · с сеткой: {f.tournamentCount}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--outline px-2 py-1 text-xs"
+                        onClick={() =>
+                          patchFormatSettings(f.code, {
+                            hiddenInAdmin: false,
+                          })
+                        }
+                      >
+                        Вернуть в список
+                      </button>
+                      <button
+                        type="button"
+                        className="text-xs text-red-400 hover:underline"
+                        onClick={() => {
+                          setDeleteSettingsError(null);
+                          setDeleteSettingsTarget(f);
+                        }}
+                      >
+                        Удалить настройки
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -559,6 +616,26 @@ export function BracketsAdminPage() {
         onClose={() => {
           if (hideFormatLoading) return;
           setHideFormatTarget(null);
+        }}
+      />
+
+      <ConfirmModal
+        open={deleteSettingsTarget !== null}
+        title="Удалить настройки типа?"
+        description={
+          deleteSettingsTarget
+            ? `Сбросятся сохранённые настройки «${deleteSettingsTarget.adminLabel}» (${deleteSettingsTarget.code}): подпись, лимиты участников, флаги включения и эталона. Турниры и их сетки не затрагиваются. Тип снова появится в списке и станет доступен для новых турниров (если не на техобслуживании в каталоге).`
+            : ""
+        }
+        confirmLabel="Да, удалить настройки"
+        variant="danger"
+        loading={deleteSettingsLoading}
+        error={deleteSettingsError}
+        onConfirm={confirmDeleteFormatSettings}
+        onClose={() => {
+          if (deleteSettingsLoading) return;
+          setDeleteSettingsTarget(null);
+          setDeleteSettingsError(null);
         }}
       />
 

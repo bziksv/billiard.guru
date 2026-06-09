@@ -8,7 +8,7 @@ import {
   type BracketCardFooterRow,
   type BracketMatchView,
 } from "@/lib/bracket-view";
-import { BracketStreamLink } from "@/components/bracket/bracket-stream-link";
+import { BracketMatchNumberRow } from "@/components/bracket/bracket-match-number-row";
 import { isMatchResolved } from "@/lib/match-result";
 import { GRID_FOOTER_LINE_H, GRID_META_H } from "@/lib/swiss-bracket-layout";
 import { cn } from "@/lib/cn";
@@ -139,16 +139,16 @@ function CardFooter({
         style={{ height: GRID_FOOTER_LINE_H, maxHeight: GRID_FOOTER_LINE_H }}
       >
         <span
-          className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap px-1 text-left text-[8.5px]"
+          className="flex min-h-0 min-w-0 items-center justify-center overflow-hidden border-r border-[var(--bracket-row-border)] px-1 text-[8.5px]"
           title={row.left}
         >
-          {row.left}
+          <span className="truncate">{row.left}</span>
         </span>
         <span
-          className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap border-l border-[var(--bracket-row-border)] px-1 text-left text-[8.5px]"
+          className="flex min-h-0 min-w-0 items-center justify-end overflow-hidden px-1 text-[8.5px]"
           title={row.right}
         >
-          {row.right}
+          <span className="min-w-0 truncate text-right">{row.right}</span>
         </span>
       </div>
     ) : (
@@ -169,7 +169,7 @@ function CardFooter({
         type="button"
         data-bracket-interactive
         onClick={onMatchClick}
-        className="bracket-match-meta bracket-match-meta--clickable shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] p-0 text-[var(--bracket-meta-text)]"
+        className="bracket-match-meta bracket-match-meta--footer bracket-match-meta--clickable shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] text-[var(--bracket-meta-text)]"
       >
         {content}
       </button>
@@ -177,7 +177,7 @@ function CardFooter({
   }
 
   return (
-    <div className="bracket-match-meta shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] p-0 text-[var(--bracket-meta-text)]">
+    <div className="bracket-match-meta bracket-match-meta--footer shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] text-[var(--bracket-meta-text)]">
       {content}
     </div>
   );
@@ -284,13 +284,16 @@ export function BracketMatchCard({
         )
       : null;
 
+  const showHandicapBlock =
+    showCardHandicap && handicap && handicap !== "Без форы" && handicapShort;
+
   const interactiveAdmin = Boolean(onMatchClick || onPlayerClick);
 
   return (
     <div
       className={cn(
         "bracket-match-card",
-        (!handicap || handicap === "Без форы") && !matchNumber && "bracket-match-card--compact",
+        !matchNumber && !showHandicapBlock && "bracket-match-card--compact",
         finished && winnerId && "bracket-match-card--finished",
         active && "bracket-match-card--active",
         interactiveAdmin && onMatchClick && "bracket-match-card--interactive",
@@ -298,32 +301,15 @@ export function BracketMatchCard({
       )}
       style={style}
     >
-      {matchNumber !== undefined &&
-        (openMatch ? (
-          <button
-            type="button"
-            data-bracket-interactive
-            onClick={openMatch}
-            className="llb-bracket-match__meta bracket-match-meta--clickable flex w-full items-center justify-center gap-1.5 border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
-            style={{ height: GRID_META_H }}
-            title="Результат встречи"
-          >
-            <span className="bracket-round-label font-semibold tabular-nums">
-              №{matchNumber}
-            </span>
-            {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
-          </button>
-        ) : (
-          <div
-            className="llb-bracket-match__meta flex items-center justify-center gap-1.5 border-b border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] px-2 text-[10px]"
-            style={{ height: GRID_META_H }}
-          >
-            <span className="bracket-round-label font-semibold tabular-nums">
-              №{matchNumber}
-            </span>
-            {match.streamUrl && <BracketStreamLink url={match.streamUrl} />}
-          </div>
-        ))}
+      {matchNumber !== undefined && (
+        <BracketMatchNumberRow
+          matchNumber={matchNumber}
+          tableLabel={match.tableLabel}
+          streamUrl={match.streamUrl}
+          onClick={openMatch}
+          style={{ height: GRID_META_H }}
+        />
+      )}
       <TeamLine
         team={soloSide === 2 ? null : match.team1}
         isWinner={team1Wins}
@@ -350,20 +336,16 @@ export function BracketMatchCard({
           type="button"
           data-bracket-interactive
           onClick={openMatch}
-          className="bracket-match-row bracket-match-row--empty flex w-full items-center justify-center text-[12px]"
-          style={{ height: 28 }}
+          className="bracket-match-row bracket-match-row--empty w-full text-[12px]"
         >
           {roundOneBye ? "×" : "Ожидание"}
         </button>
       ) : (
-        <div
-          className="bracket-match-row bracket-match-row--empty flex items-center justify-center text-[12px]"
-          style={{ height: 28 }}
-        >
+        <div className="bracket-match-row bracket-match-row--empty text-[12px]">
           {roundOneBye ? "×" : "Ожидание"}
         </div>
       )}
-      {showCardHandicap && handicap && handicap !== "Без форы" && handicapShort && (
+      {showHandicapBlock && (
         openMatch ? (
           <button
             type="button"

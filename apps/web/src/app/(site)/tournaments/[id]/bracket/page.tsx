@@ -9,12 +9,13 @@ import {
   PUBLIC_TOURNAMENT_STATUSES,
 } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
+import { getBracketFormatLabel } from "@/lib/bracket-formats/settings-server";
+import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
-  TOURNAMENT_FORMAT_LABELS,
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { resolveMatchStreamUrl } from "@/lib/tournament-stream";
+import { resolveMatchStreamUrl, resolveTableLabel } from "@/lib/tournament-stream";
 import { APP_NAME } from "@/lib/brand";
 
 export const metadata = {
@@ -57,6 +58,7 @@ export default async function TournamentBracketPage({
     notFound();
   }
 
+  const formatLabel = await getBracketFormatLabel(tournament.format);
   const streamContext = {
     tableIds: tournament.tableIds,
     tableStreams: tournament.tableStreams,
@@ -75,6 +77,7 @@ export default async function TournamentBracketPage({
     finishedAt: m.finishedAt?.toISOString() ?? null,
     tableId: m.tableId,
     streamUrl: resolveMatchStreamUrl({ tableId: m.tableId }, streamContext, floorPlan),
+    tableLabel: resolveTableLabel(m.tableId, floorPlan, tournament.club.tableCounts),
     team1: m.team1,
     team2: m.team2,
   }));
@@ -103,7 +106,7 @@ export default async function TournamentBracketPage({
             label={TOURNAMENT_STATUS_LABELS[tournament.status] ?? tournament.status}
           />
           <span className="text-zinc-400">
-            {TOURNAMENT_FORMAT_LABELS[tournament.format] ?? tournament.format}
+            {tournamentFormatDisplayLabel({ format: tournament.format, formatLabel })}
           </span>
           <span className="text-zinc-500">
             {tournament.club.name} · {formatStartsAt(tournament.startsAt)}
