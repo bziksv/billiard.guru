@@ -59,9 +59,42 @@ beget_current_release_dir() {
 
 beget_write_passenger_start() {
   local target_dir="$1"
+  # Без require("dotenv"): в releases/ нет доступа к node_modules репозитория.
   cat > "$target_dir/passenger-start.js" << 'EOF'
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, ".env") });
+const fs = require("fs");
+
+function loadEnvFile(filePath) {
+  let text;
+  try {
+    text = fs.readFileSync(filePath, "utf8");
+  } catch {
+    return;
+  }
+  for (const line of text.split("\n")) {
+    let trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    if (trimmed.startsWith("export ")) trimmed = trimmed.slice(7).trim();
+    const eq = trimmed.indexOf("=");
+    if (eq <= 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(key)) continue;
+    let val = trimmed.slice(eq + 1).trim();
+    if (
+      (val.startsWith('"') && val.endsWith('"')) ||
+      (val.startsWith("'") && val.endsWith("'"))
+    ) {
+      val = val.slice(1, -1);
+    }
+    if (process.env[key] === undefined) {
+      process.env[key] = val;
+    }
+  }
+}
+
+const dir = __dirname;
+loadEnvFile(path.join(dir, ".env"));
+loadEnvFile(path.join(dir, ".env.local"));
 require("./server.js");
 EOF
 }
@@ -123,6 +156,7 @@ beget_promote_staging_to_release() {
   echo "→ Релиз $release_id (staging → releases/)…"
   rm -rf "$release_dir"
   cp -a "$BEGET_STANDALONE" "$release_dir"
+  beget_write_passenger_start "$release_dir"
 
   local git_sha git_branch
   git_sha="$(git -C "$BEGET_REPO_ROOT" rev-parse HEAD 2>/dev/null || echo null)"

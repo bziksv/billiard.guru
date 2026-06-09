@@ -218,3 +218,28 @@ curl -s -o /dev/null -w "%{http_code}" -L https://billiard.guru/
 ```
 
 `beget-setup.sh` вызывает `beget-verify.sh` автоматически в конце.
+
+## 500 / «Cannot find module dotenv»
+
+Passenger не стартует, в логах:
+
+```
+Error: Cannot find module 'dotenv'
+Require stack: .../passenger-start.js
+```
+
+**Причина:** релиз в `~/billiard.guru/releases/` изолирован от `setka/apps/web/node_modules`. Старый `passenger-start.js` делал `require("dotenv")`, которого нет в traced `node_modules` standalone.
+
+**Быстро (без пересборки):**
+
+```bash
+cd ~/billiard.guru/setka
+git pull
+./scripts/beget-fix-passenger.sh
+```
+
+**Полный деплой:**
+
+```bash
+./scripts/beget-deploy.sh
+```
