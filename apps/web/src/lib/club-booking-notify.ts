@@ -48,7 +48,8 @@ function buildBookingNotifyText(
     `🕐 ${escapeHtml(formatBookingRange(booking.startsAt, booking.endsAt))}`,
     booking.playerNote ? `💬 ${escapeHtml(booking.playerNote)}` : "",
     "",
-    "🟢 свободен · 🟠 ожидает · 🔴 занят — на схеме ниже.",
+    "📅 На картинке — все брони на этот день и схема зала на время заявки.",
+    "★ — новая заявка · 🟢 свободен · 🟠 ожидает · 🔴 занят.",
     "Подтвердите кнопками или в разделе «Брони столов».",
   ]
     .filter(Boolean)

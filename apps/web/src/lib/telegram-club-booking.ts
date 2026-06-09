@@ -168,11 +168,8 @@ export async function handleClubBookingModerationCallback(
 export async function buildClubBookingFloorPlanPng(bookingId: string): Promise<Buffer | null> {
   const booking = await prisma.tableBooking.findUnique({
     where: { id: bookingId },
-    select: {
-      clubId: true,
-      tableFormat: true,
-      startsAt: true,
-      endsAt: true,
+    include: {
+      player: { select: { firstName: true, lastName: true } },
       club: { select: { floorPlan: true } },
     },
   });
@@ -181,43 +178,71 @@ export async function buildClubBookingFloorPlanPng(bookingId: string): Promise<B
   const floorPlan = parseFloorPlan(booking.club.floorPlan);
   if (!floorPlan) return null;
 
-  const rangeStart = new Date(booking.startsAt.getTime() - 24 * 60 * 60_000);
-  const rangeEnd = new Date(booking.endsAt.getTime() + 24 * 60 * 60_000);
+  const {
+    bookingCalendarDayKey,
+    dayBookingsQueryWindow,
+    formatDayOverviewLabel,
+    formatDayOverviewTimeRange,
+    renderDayOverviewPng,
+  } = await import("@/lib/floor-plan-day-overview");
+  const { floorPlanStatesAtSlot, floorTableLabel } = await import("@/lib/floor-plan-booking");
 
-  const existing = await prisma.tableBooking.findMany({
+  const { queryStart, queryEnd, dayKey } = dayBookingsQueryWindow(booking.startsAt);
+
+  const dayBookings = await prisma.tableBooking.findMany({
     where: {
       clubId: booking.clubId,
-      startsAt: { gte: rangeStart, lte: rangeEnd },
+      startsAt: { gte: queryStart, lte: queryEnd },
       status: { in: ["PENDING", "CONFIRMED"] },
     },
-    select: {
-      floorItemId: true,
-      tableFormat: true,
-      startsAt: true,
-      endsAt: true,
-      status: true,
-      playerId: true,
+    include: {
+      player: { select: { firstName: true, lastName: true } },
     },
+    orderBy: { startsAt: "asc" },
   });
 
-  const { floorTableAvailability } = await import("@/lib/floor-plan-booking");
-  const { renderFloorPlanPngForBooking } = await import("@/lib/floor-plan-image");
-  const tables = floorTableAvailability(
+  const sameDay = dayBookings.filter((b) => bookingCalendarDayKey(b.startsAt) === dayKey);
+
+  const slotExisting = dayBookings.map((b) => ({
+    floorItemId: b.floorItemId,
+    tableFormat: b.tableFormat,
+    startsAt: b.startsAt,
+    endsAt: b.endsAt,
+    status: b.status,
+    playerId: b.playerId,
+  }));
+
+  const tableStates = floorPlanStatesAtSlot(
     floorPlan,
-    booking.tableFormat as import("@/lib/club-table-formats").ClubTableFormatId,
     booking.startsAt,
     booking.endsAt,
-    existing,
+    slotExisting,
   );
 
+  const rows = sameDay.map((b) => ({
+    id: b.id,
+    startsAt: b.startsAt,
+    endsAt: b.endsAt,
+    tableFormat: b.tableFormat,
+    floorItemId: b.floorItemId,
+    floorTableLabel: floorTableLabel(floorPlan, b.floorItemId),
+    guestLabel: b.player
+      ? `${b.player.lastName} ${b.player.firstName}`.trim()
+      : b.guestName ?? "Гость",
+    status: b.status as "PENDING" | "CONFIRMED",
+    isNew: b.id === bookingId,
+  }));
+
   try {
-    return await renderFloorPlanPngForBooking(
-      booking.club.floorPlan,
-      booking.tableFormat as import("@/lib/club-table-formats").ClubTableFormatId,
-      tables,
-    );
+    return await renderDayOverviewPng(booking.club.floorPlan, {
+      dayLabel: formatDayOverviewLabel(booking.startsAt),
+      slotLabel: formatDayOverviewTimeRange(booking.startsAt, booking.endsAt),
+      bookings: rows,
+      tableStates,
+      highlightTableId: booking.floorItemId,
+    });
   } catch (err) {
-    logger.warn({ err, bookingId }, "Club booking floor plan PNG failed");
+    logger.warn({ err, bookingId }, "Club booking day overview PNG failed");
     return null;
   }
 }

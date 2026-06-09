@@ -93,6 +93,29 @@ export function floorTableAvailability(
   return rows;
 }
 
+/** Состояние всех столов на схеме в выбранный слот (все форматы). */
+export function floorPlanStatesAtSlot(
+  plan: ClubFloorPlan | null,
+  startsAt: Date,
+  endsAt: Date,
+  existing: ExistingBooking[],
+): Record<string, FloorTableStatus> {
+  if (!plan) return {};
+
+  const formats = new Set<ClubTableFormatId>();
+  for (const item of plan.items) {
+    if (item.kind === "table" && item.tableFormat) formats.add(item.tableFormat);
+  }
+
+  const merged: Record<string, FloorTableStatus> = {};
+  for (const format of formats) {
+    for (const row of floorTableAvailability(plan, format, startsAt, endsAt, existing)) {
+      merged[row.id] = row.status;
+    }
+  }
+  return merged;
+}
+
 /** Свободные столы на слот: по схеме минус «безымянные» брони без floorItemId. */
 export function countFreeFloorTables(
   plan: ClubFloorPlan | null,

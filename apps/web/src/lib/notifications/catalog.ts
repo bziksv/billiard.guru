@@ -275,7 +275,7 @@ export const NOTIFICATION_CATALOG = [
     trigger: "Создание брони игроком (POST /api/clubs/[id]/bookings, бот /book)",
     implementation: "club-booking-notify.ts → notifyClubNewBooking()",
     hasButtons: true,
-    examplePreview: "🎱 Новая заявка на бронь — имя, телефон, стол, время",
+    examplePreview: "🎱 Новая заявка — текст + расписание броней на день и схема зала",
     manageable: true,
     templatePlaceholders: ["clubName", "guest", "phone", "table", "tableHint", "time", "note"],
   },
