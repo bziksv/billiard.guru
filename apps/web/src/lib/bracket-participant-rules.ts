@@ -26,7 +26,6 @@ const FIXED_SWISS_64_FORMATS = new Set([
 
 const FIXED_SWISS_32R8_FORMATS = new Set([
   "FIXED_SWISS_32R8",
-  "FIXED_SWISS_32R8_2_3_mesta",
   "FIXED_SWISS_32R8_BRONZE",
   "FIXED_SWISS_32R4_2_3_mesta",
   "FIXED_SWISS_32R4_1_3_mesto",
@@ -82,6 +81,17 @@ export function getDefaultBracketParticipantRules(
           "Добавьте участников до 64 или смените формат."
         : "Сетка «до 2 поражений» на 64 участника — 119 встреч, нижняя тур 1–4, олимпийка с 1/8 (#105–#112→#113–#116). " +
           "Добавьте участников до 64 или смените формат.",
+    };
+  }
+  if (code === "FIXED_SWISS_32R8_2_3_mesta") {
+    return {
+      min: 32,
+      max: 32,
+      exact: 32,
+      label: "ровно 32",
+      hint:
+        "Сетка «до 2 поражений» на 32 участника — 55 встреч, oлимпийka с 1/8: проигравшие в 1/8 (#41–#44) сразу на места 9–12, без нижней тур 4. " +
+        "Добавьте участников до 32 или смените формат.",
     };
   }
   if (FIXED_SWISS_32R8_FORMATS.has(code)) {

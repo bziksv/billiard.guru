@@ -212,6 +212,67 @@ function buildFixedSwissTs32Template(withBronze = false): FixedSwissTemplate {
   };
 }
 
+/**
+ * 32→16 (55 встреч): как 59, но проигравшие 1/8 (#41–#44) сразу на места 9–12 —
+ * без нижней тур 4 (#49–#52). Нижняя тур 3 (#45–#48) → 1/4 напрямую.
+ * FIXED_SWISS_32R8_2_3_mesta.
+ */
+export function buildFixedSwissTs32R8ElimAtEighthTemplate(): FixedSwissTemplate {
+  const base = buildFixedSwissTs32Template(false);
+  const half1 = 8;
+  const half2 = 16;
+  const maxRound = 7;
+
+  const matches = base.matches.filter(
+    (m) => !(m.round === 3 && m.slot > half1 + half1 / 2),
+  );
+
+  const links: FixedSwissLink[] = base.links.filter((link) => {
+    if (link.kind === "loss" && link.fromRound === 3 && link.fromSlot >= 9 && link.fromSlot <= 12) {
+      return false;
+    }
+    if (link.fromRound === 4 && link.toRound === 3 && link.toSlot >= 13) {
+      return false;
+    }
+    return true;
+  });
+
+  const lowerTour3ToQuarter: Record<number, { toSlot: number; toTeam: 2 }> = {
+    1: { toSlot: 2, toTeam: 2 },
+    2: { toSlot: 1, toTeam: 2 },
+    3: { toSlot: 4, toTeam: 2 },
+    4: { toSlot: 3, toTeam: 2 },
+  };
+  for (let slot = 1; slot <= 4; slot++) {
+    const target = lowerTour3ToQuarter[slot]!;
+    links.push({
+      fromRound: 4,
+      fromSlot: slot,
+      kind: "win",
+      toRound: 5,
+      toSlot: target.toSlot,
+      toTeam: target.toTeam,
+    });
+  }
+
+  return {
+    gridSize: 32,
+    rounds: maxRound,
+    matchesPerRound: half2,
+    matches,
+    links,
+    variant: "ts3216r8elim",
+  };
+}
+
+/** 55 встреч / 7 туров — вылет с 1/8 (не путать с устаревшей 55/6). */
+export function isFixedSwissTs32R8ElimAtEighthMatchCount(
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  return matchCount === 55 && maxRound !== undefined && maxRound >= 7;
+}
+
 /** 64→32 эталон (119/120 встреч; legacy 115/116): см. docs/BRACKET_REFERENCE_64_32.md */
 function buildFixedSwissTs64Template(withBronze = false): FixedSwissTemplate {
   const gridSize = 64 as const;
@@ -1101,8 +1162,14 @@ export function isFixedSwissTs32BronzeMatchCount(matchCount: number): boolean {
   return matchCount === 60;
 }
 
-/** Устаревшие 32→16: 55/56 (без нижней тур 3–4), 63/64 (лишний 1/8 в R4). */
-export function isOutdatedFixedSwiss32Bracket(matchCount: number): boolean {
+/** Устаревшие 32→16: 55/56 (6 туров), 63/64 (лишний 1/8 в R4). Не путать с 55/7 (R8_2_3_mesta). */
+export function isOutdatedFixedSwiss32Bracket(
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)) {
+    return false;
+  }
   return (
     matchCount === 55 ||
     matchCount === 56 ||

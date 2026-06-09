@@ -30,6 +30,7 @@ import {
   handleIdeaModerationCallback,
   handleIdeaVoteCallback,
 } from "@/lib/idea-moderation";
+import { handleClubNewsModerationCallback } from "@/lib/club-news-moderation";
 import {
   handleTournamentApprovalCallback,
   handleTournamentApprovalMessage,
@@ -217,6 +218,19 @@ export async function processTelegramUpdate(
         if (handled) return;
       } catch (err) {
         logger.error({ err }, "Idea moderation callback failed");
+      }
+      return;
+    }
+    if (data.startsWith("clubnews_approve_") || data.startsWith("clubnews_reject_")) {
+      try {
+        const handled = await handleClubNewsModerationCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Club news moderation callback failed");
       }
       return;
     }

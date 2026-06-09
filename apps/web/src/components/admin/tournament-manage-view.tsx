@@ -1790,7 +1790,10 @@ function TournamentBracketSettings({
   const outdatedFixedSwiss32 =
     fixedSwiss &&
     bracketMatches.length > 0 &&
-    isOutdatedFixedSwiss32Bracket(bracketMatches.length);
+    isOutdatedFixedSwiss32Bracket(
+      bracketMatches.length,
+      Math.max(...bracketMatches.map((m) => m.round)),
+    );
 
   function closeConfirm() {
     if (confirmLoading) return;
@@ -2049,7 +2052,10 @@ function BracketTab({
   const outdatedFixedSwiss32 =
     fixedSwiss &&
     bracketMatches.length > 0 &&
-    isOutdatedFixedSwiss32Bracket(bracketMatches.length);
+    isOutdatedFixedSwiss32Bracket(
+      bracketMatches.length,
+      Math.max(...bracketMatches.map((m) => m.round)),
+    );
 
   function renderBracketView(presentation: boolean) {
     if (olympic) {

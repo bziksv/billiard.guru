@@ -3,12 +3,16 @@
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import { AsyncTextButton } from "@/components/ui/async-text-button";
+import { IDEA_STATUS_LABELS } from "@/lib/validators";
 
 interface ClubNewsItem {
   id: string;
   title: string;
   body: string;
-  publishedAt: string;
+  status: string;
+  rejectReason: string | null;
+  publishedAt: string | null;
+  createdAt: string;
 }
 
 function formatNewsDate(iso: string) {
@@ -17,6 +21,12 @@ function formatNewsDate(iso: string) {
     month: "long",
     year: "numeric",
   });
+}
+
+function statusBadgeClass(status: string) {
+  if (status === "APPROVED") return "bg-emerald-500/15 text-emerald-400";
+  if (status === "REJECTED") return "bg-red-500/15 text-red-400";
+  return "bg-amber-500/15 text-amber-400";
 }
 
 export function ClubNewsPanel({
@@ -60,13 +70,17 @@ export function ClubNewsPanel({
     const data = await res.json();
     setSaving(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось опубликовать");
+      setError(data.error ?? "Не удалось отправить");
       return;
     }
     setNews((prev) => [data, ...prev]);
     setTitle("");
     setBody("");
-    setMessage("Новость опубликована");
+    setMessage(
+      data.status === "APPROVED"
+        ? "Новость опубликована"
+        : "Отправлено на модерацию — появится на сайте после одобления администратором",
+    );
   }
 
   async function deleteNews(newsId: string) {
@@ -78,8 +92,10 @@ export function ClubNewsPanel({
 
   if (loading) return <p className="text-sm text-zinc-500">Загрузка…</p>;
 
+  const pendingCount = news.filter((n) => n.status === "PENDING").length;
+
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Новости клуба</h1>
@@ -94,7 +110,13 @@ export function ClubNewsPanel({
       </div>
 
       <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-        <h2 className="font-semibold">Новая публикация</h2>
+        <div>
+          <h2 className="font-semibold">Новая публикация</h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Новости проходят модерацию перед публикацией на сайте. Обычно это занимает немного
+            времени.
+          </p>
+        </div>
         <form onSubmit={addNews} className="space-y-3">
           <input
             value={title}
@@ -107,7 +129,7 @@ export function ClubNewsPanel({
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Текст новости"
-            rows={5}
+            rows={6}
             className="site-input w-full"
             required
           />
@@ -118,24 +140,43 @@ export function ClubNewsPanel({
             disabled={saving}
             className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500 disabled:opacity-50"
           >
-            {saving ? "Публикация…" : "Опубликовать"}
+            {saving ? "Отправка…" : "Отправить на модерацию"}
           </button>
         </form>
       </section>
 
       <section className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-950 p-6">
-        <h2 className="font-semibold">Опубликованные ({news.length})</h2>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-semibold">Все публикации ({news.length})</h2>
+          {pendingCount > 0 && (
+            <span className="text-sm text-amber-400">На модерации: {pendingCount}</span>
+          )}
+        </div>
         {news.length === 0 ? (
           <p className="text-sm text-zinc-500">Новостей пока нет.</p>
         ) : (
-          <ul className="space-y-3">
+          <ul className="grid gap-3 lg:grid-cols-2">
             {news.map((item) => (
               <li key={item.id} className="rounded-lg border border-zinc-800 p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <time className="text-xs text-zinc-500">{formatNewsDate(item.publishedAt)}</time>
-                    <p className="mt-1 font-medium">{item.title}</p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${statusBadgeClass(item.status)}`}
+                      >
+                        {IDEA_STATUS_LABELS[item.status] ?? item.status}
+                      </span>
+                      <time className="text-xs text-zinc-500">
+                        {formatNewsDate(item.publishedAt ?? item.createdAt)}
+                      </time>
+                    </div>
+                    <p className="mt-2 font-medium">{item.title}</p>
                     <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-400">{item.body}</p>
+                    {item.rejectReason && (
+                      <p className="mt-2 text-sm text-red-400/90">
+                        Причина отклонения: {item.rejectReason}
+                      </p>
+                    )}
                   </div>
                   <AsyncTextButton
                     variant="red"

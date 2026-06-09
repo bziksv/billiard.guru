@@ -37,7 +37,10 @@ function clubNewsGeoWhere(geo: GeoSearchParams) {
 /** Новости клубов из БД (ClubNews) */
 export async function loadHomeNews(geo: GeoSearchParams): Promise<HomeNewsItem[]> {
   const rows = await prisma.clubNews.findMany({
-    where: clubNewsGeoWhere(geo),
+    where: {
+      status: "APPROVED",
+      ...clubNewsGeoWhere(geo),
+    },
     include: {
       club: {
         include: { city: { include: { country: true } } },
@@ -54,7 +57,7 @@ export async function loadHomeNews(geo: GeoSearchParams): Promise<HomeNewsItem[]
     authorType: "club" as const,
     authorName: row.club.name,
     city: row.club.city.nameRu,
-    date: formatNewsDate(row.publishedAt),
+    date: formatNewsDate(row.publishedAt ?? row.createdAt),
     href: `/clubs/${row.clubId}#club-news`,
   }));
 }

@@ -1,9 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getSession } from "@/lib/auth";
+import { authErrorResponse, getCurrentPlayer, getSession } from "@/lib/auth";
+import { submitClubNewsForModeration } from "@/lib/club-news-moderation";
 import { writeAuditLog } from "@/lib/audit";
-import { requireClubManageAccess } from "@/lib/club-manage";
+import { playerCanManageClub } from "@/lib/club-staff";
 import { prisma } from "@/lib/prisma";
 import { clubNewsSchema } from "@/lib/validators";
+
+function serializeNews(item: {
+  id: string;
+  title: string;
+  body: string;
+  status: string;
+  rejectReason: string | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+}) {
+  return {
+    id: item.id,
+    title: item.title,
+    body: item.body,
+    status: item.status,
+    rejectReason: item.rejectReason,
+    publishedAt: item.publishedAt?.toISOString() ?? null,
+    createdAt: item.createdAt.toISOString(),
+  };
+}
+
+async function viewerCanManageClub(clubId: string): Promise<boolean> {
+  const session = await getSession();
+  if (!session) return false;
+  if (session.role === "SUPERADMIN") return true;
+  const club = await prisma.club.findUnique({ where: { id: clubId } });
+  const player = await getCurrentPlayer();
+  if (!club || !player) return false;
+  return playerCanManageClub(club, player);
+}
 
 export async function GET(
   _request: NextRequest,
@@ -15,11 +46,17 @@ export async function GET(
     return NextResponse.json({ error: "Клуб не найден" }, { status: 404 });
   }
 
+  const canManage = await viewerCanManageClub(id);
+
   const news = await prisma.clubNews.findMany({
-    where: { clubId: id },
-    orderBy: { publishedAt: "desc" },
+    where: {
+      clubId: id,
+      ...(canManage ? {} : { status: "APPROVED" }),
+    },
+    orderBy: [{ createdAt: "desc" }],
   });
-  return NextResponse.json(news);
+
+  return NextResponse.json(news.map(serializeNews));
 }
 
 export async function POST(
@@ -28,35 +65,42 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    await requireClubManageAccess(id);
     const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ error: "Не авторизован" }, { status: 401 });
+    }
+    const canManage = await viewerCanManageClub(id);
+    if (!canManage) {
+      return NextResponse.json({ error: "Нет доступа" }, { status: 403 });
+    }
+
     const club = await prisma.club.findUnique({ where: { id }, select: { id: true } });
     if (!club) {
       return NextResponse.json({ error: "Клуб не найден" }, { status: 404 });
     }
 
     const data = clubNewsSchema.parse(await request.json());
-    const item = await prisma.clubNews.create({
-      data: {
-        clubId: id,
-        title: data.title,
-        body: data.body,
-        ...(data.publishedAt && { publishedAt: new Date(data.publishedAt) }),
-      },
+    const autoApprove = session.role === "SUPERADMIN";
+    const item = await submitClubNewsForModeration({
+      clubId: id,
+      authorId: session.playerId,
+      title: data.title,
+      body: data.body,
+      autoApprove,
     });
 
     await writeAuditLog({
-      actorType: session?.role === "SUPERADMIN" ? "admin" : "club",
-      actorId: session!.playerId,
-      action: "club.news.create",
+      actorType: session.role === "SUPERADMIN" ? "admin" : "club",
+      actorId: session.playerId,
+      action: autoApprove ? "club.news.create" : "club.news.submit",
       entityType: "club_news",
       entityId: item.id,
       section: "news",
       clubId: id,
-      summary: `Новость: ${item.title}`,
+      summary: autoApprove ? `Новость: ${item.title}` : `На модерацию: ${item.title}`,
     });
 
-    return NextResponse.json(item, { status: 201 });
+    return NextResponse.json(serializeNews(item), { status: 201 });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

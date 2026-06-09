@@ -22,6 +22,7 @@ import {
   fixedSwissTs64OlympicToQuarterTarget,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
+  isFixedSwissTs32R8ElimAtEighthMatchCount,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -237,7 +238,8 @@ function buildMatchNumbers(
     isFixedSwissTs64MatchCount(matchCount) ||
     isFixedSwissTs64BronzeMatchCount(matchCount) ||
     isFixedSwissTs32MatchCount(matchCount) ||
-    isFixedSwissTs32BronzeMatchCount(matchCount)
+    isFixedSwissTs32BronzeMatchCount(matchCount) ||
+    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)
   ) {
     for (const m of matches) {
       map.set(
@@ -339,7 +341,11 @@ export function fixedSwissMatchColForCount(
   matchCount: number,
   maxRound?: number,
 ): number {
-  if (isFixedSwissTs32MatchCount(matchCount) || isFixedSwissTs32BronzeMatchCount(matchCount)) {
+  if (
+    isFixedSwissTs32MatchCount(matchCount) ||
+    isFixedSwissTs32BronzeMatchCount(matchCount) ||
+    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)
+  ) {
     return fixedSwissTs32MatchCol(round, slot);
   }
   if (isFixedSwissTs64MatchCount(matchCount) || isFixedSwissTs64BronzeMatchCount(matchCount)) {
@@ -729,6 +735,9 @@ function buildTsPositions(
   }
   if (isFixedSwissTs32MatchCount(matchCount)) {
     return buildTsPositions32(matches, cardH);
+  }
+  if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)) {
+    return buildTsPositions32R8ElimAtEighth(matches, cardH);
   }
   if (isFixedSwissTs64BronzeMatchCount(matchCount)) {
     return buildTsPositions64Bronze(matches, cardH);
@@ -1160,6 +1169,131 @@ function buildTsPositions32(
     positions,
     slotY,
     lowerTour4Ids,
+    cardH,
+    COL_COLLISION_GAP,
+  );
+
+  const quarterIds: string[] = [];
+  for (let slot = 1; slot <= 4; slot++) {
+    const olympicSlot = half1 + slot;
+    const y = yAt(3, olympicSlot, slotY);
+    slotY.set(`5:${slot}`, y);
+    const quarter = byRoundSlot.get(`5:${slot}`);
+    if (quarter) {
+      positions.set(quarter.id, { col: 3, y });
+      quarterIds.push(quarter.id);
+    }
+  }
+
+  const semi1Y = centerBetweenParents(yAt(5, 1, slotY), yAt(5, 2, slotY), cardH);
+  slotY.set(`6:1`, semi1Y);
+  const semi1 = byRoundSlot.get("6:1");
+  if (semi1) positions.set(semi1.id, { col: 4, y: semi1Y });
+
+  const semi2Y = centerBetweenParents(yAt(5, 3, slotY), yAt(5, 4, slotY), cardH);
+  slotY.set(`6:2`, semi2Y);
+  const semi2 = byRoundSlot.get("6:2");
+  if (semi2) positions.set(semi2.id, { col: 4, y: semi2Y });
+
+  const finalY = centerBetweenParents(yAt(6, 1, slotY), yAt(6, 2, slotY), cardH);
+  const fin = byRoundSlot.get("7:1");
+  if (fin) positions.set(fin.id, { col: 5, y: finalY });
+
+  return positions;
+}
+
+/** TS 32→16 (55 встреч): без нижней тур 4 — вылет с 1/8 на места 9–12. */
+function buildTsPositions32R8ElimAtEighth(
+  matches: BracketMatchView[],
+  cardH: number,
+): Map<string, SwissMatchPosition> {
+  const half1 = 8;
+  const positions = new Map<string, SwissMatchPosition>();
+  const byRoundSlot = new Map<string, BracketMatchView>();
+  for (const m of matches) {
+    byRoundSlot.set(`${m.round}:${m.slot}`, m);
+  }
+
+  const slotY = new Map<string, number>();
+  const unit = FIXED_SWISS_BRACKET_UNIT;
+
+  for (let slot = 1; slot <= 16; slot++) {
+    const y = fixedSwissRound1SlotY(slot, unit);
+    slotY.set(`1:${slot}`, y);
+    const m = byRoundSlot.get(`1:${slot}`);
+    if (m) positions.set(m.id, { col: 0, y });
+  }
+
+  for (let slot = 1; slot <= half1; slot++) {
+    const y = centerBetweenParents(
+      yAt(1, 2 * slot - 1, slotY),
+      yAt(1, 2 * slot, slotY),
+      cardH,
+    );
+    slotY.set(`2:${slot}`, y);
+    slotY.set(`2:${slot + half1}`, y);
+    const lower = byRoundSlot.get(`2:${slot}`);
+    if (lower) positions.set(lower.id, { col: -1, y });
+    const upper = byRoundSlot.get(`2:${slot + half1}`);
+    if (upper) positions.set(upper.id, { col: 1, y });
+  }
+
+  const crossIds: string[] = [];
+  for (let k = 1; k <= half1; k++) {
+    const crossY = yAt(2, k, slotY);
+    slotY.set(`3:${k}`, crossY);
+    const cross = byRoundSlot.get(`3:${k}`);
+    if (cross) {
+      positions.set(cross.id, { col: -2, y: crossY });
+      crossIds.push(cross.id);
+    }
+  }
+
+  for (let k = 1; k <= half1 / 2; k++) {
+    const slotA = half1 + 2 * k - 1;
+    const slotB = half1 + 2 * k;
+    const olympicSlot = half1 + k;
+    const olympicY = centerBetweenParents(
+      yAt(2, slotA, slotY),
+      yAt(2, slotB, slotY),
+      cardH,
+    );
+    slotY.set(`3:${olympicSlot}`, olympicY);
+    const olympic = byRoundSlot.get(`3:${olympicSlot}`);
+    if (olympic) positions.set(olympic.id, { col: 2, y: olympicY });
+  }
+
+  const olympic18Ids = matches
+    .filter((m) => m.round === 3 && m.slot > half1 && m.slot <= half1 + half1 / 2)
+    .map((m) => m.id);
+  resolveFixedColCollisions(
+    positions,
+    slotY,
+    olympic18Ids,
+    cardH,
+    COL_COLLISION_GAP,
+  );
+  resolveFixedColCollisions(positions, slotY, crossIds, cardH, COL_COLLISION_GAP);
+
+  const lowerTour3Ids: string[] = [];
+  for (let slot = 1; slot <= 4; slot++) {
+    const crossA = 2 * slot - 1;
+    const y = centerBetweenParents(
+      yAt(3, crossA, slotY),
+      yAt(3, crossA + 1, slotY),
+      cardH,
+    );
+    slotY.set(`4:${slot}`, y);
+    const lowerR3 = byRoundSlot.get(`4:${slot}`);
+    if (lowerR3) {
+      positions.set(lowerR3.id, { col: -3, y });
+      lowerTour3Ids.push(lowerR3.id);
+    }
+  }
+  resolveFixedColCollisions(
+    positions,
+    slotY,
+    lowerTour3Ids,
     cardH,
     COL_COLLISION_GAP,
   );
@@ -1696,6 +1830,7 @@ export function buildFixedSwissBracketLayout(
     isFixedSwissTsBronzeMatchCount(matchCount) ||
     isFixedSwissTs32MatchCount(matchCount) ||
     isFixedSwissTs32BronzeMatchCount(matchCount) ||
+    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRoundEarly) ||
     isFixedSwissTs64MatchCount(matchCount) ||
     isFixedSwissTs64BronzeMatchCount(matchCount) ||
     useTsLegacy29 ||
@@ -2177,11 +2312,15 @@ export function isFixedSwissRound23Edge(
   return fromRound === 2 && toRound === 3;
 }
 
-function isFixedSwissTs32CurrentGrid(matchCount?: number): boolean {
+function isFixedSwissTs32CurrentGrid(
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
   return (
     matchCount !== undefined &&
     (isFixedSwissTs32MatchCount(matchCount) ||
-      isFixedSwissTs32BronzeMatchCount(matchCount))
+      isFixedSwissTs32BronzeMatchCount(matchCount) ||
+      isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound))
   );
 }
 
@@ -2193,20 +2332,30 @@ function isFixedSwissTs64CurrentGrid(matchCount?: number): boolean {
   );
 }
 
-function isFixedSwissTsLargeCurrentGrid(matchCount?: number): boolean {
-  return isFixedSwissTs32CurrentGrid(matchCount) || isFixedSwissTs64CurrentGrid(matchCount);
+function isFixedSwissTsLargeCurrentGrid(
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  return (
+    isFixedSwissTs32CurrentGrid(matchCount, maxRound) ||
+    isFixedSwissTs64CurrentGrid(matchCount)
+  );
 }
 
-function half1ForLargeGrid(matchCount?: number): number {
+function half1ForLargeGrid(matchCount?: number, maxRound?: number): number {
   if (isFixedSwissTs64CurrentGrid(matchCount)) return 16;
-  if (isFixedSwissTs32CurrentGrid(matchCount)) return 8;
+  if (isFixedSwissTs32CurrentGrid(matchCount, maxRound)) return 8;
   return 4;
 }
 
-function isFixedSwissTs32AnyGrid(matchCount?: number): boolean {
+function isFixedSwissTs32AnyGrid(
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
   return (
-    isFixedSwissTs32CurrentGrid(matchCount) ||
-    (matchCount !== undefined && isOutdatedFixedSwiss32Bracket(matchCount))
+    isFixedSwissTs32CurrentGrid(matchCount, maxRound) ||
+    (matchCount !== undefined &&
+      isOutdatedFixedSwiss32Bracket(matchCount, maxRound))
   );
 }
 
@@ -2224,15 +2373,16 @@ export function isFixedSwissQuarterSemiForkEdge(
   toRound: number,
   matchCount?: number,
   fromSlot?: number,
+  maxRound?: number,
 ): boolean {
   if (fromRound === 3 && toRound === 4) {
-    const half1 = half1ForLargeGrid(matchCount);
+    const half1 = half1ForLargeGrid(matchCount, maxRound);
     return fromSlot == null || fromSlot <= half1;
   }
   if (isFixedSwissTs64CurrentGrid(matchCount)) {
     return false;
   }
-  if (isFixedSwissTs32CurrentGrid(matchCount)) {
+  if (isFixedSwissTs32CurrentGrid(matchCount, maxRound)) {
     return false;
   }
   return fromRound === 3 && toRound === 5;
@@ -2242,8 +2392,9 @@ export function isFixedSwissSemiFinalForkEdge(
   fromRound: number,
   toRound: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
-  if (isFixedSwissTsLargeCurrentGrid(matchCount)) {
+  if (isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) {
     if (isFixedSwissTs64CurrentGrid(matchCount)) {
       return (
         (fromRound === 5 && toRound === 3) ||
@@ -2256,7 +2407,7 @@ export function isFixedSwissSemiFinalForkEdge(
       (fromRound === 6 && toRound === 7)
     );
   }
-  if (isFixedSwissTs32AnyGrid(matchCount)) {
+  if (isFixedSwissTs32AnyGrid(matchCount, maxRound)) {
     return (
       (fromRound === 4 && toRound === 5) ||
       (fromRound === 5 && toRound === 6)
@@ -2290,6 +2441,7 @@ export function isFixedSwissForkEdge(
   matchCount?: number,
   fromSlot?: number,
   toSlot?: number,
+  maxRound?: number,
 ): boolean {
   return (
     isFixedSwissRound12Edge(fromRound, toRound) ||
@@ -2299,9 +2451,16 @@ export function isFixedSwissForkEdge(
       fromSlot,
       toSlot,
       matchCount,
+      maxRound,
     ) ||
-    isFixedSwissQuarterSemiForkEdge(fromRound, toRound, matchCount, fromSlot) ||
-    isFixedSwissSemiFinalForkEdge(fromRound, toRound, matchCount)
+    isFixedSwissQuarterSemiForkEdge(
+      fromRound,
+      toRound,
+      matchCount,
+      fromSlot,
+      maxRound,
+    ) ||
+    isFixedSwissSemiFinalForkEdge(fromRound, toRound, matchCount, maxRound)
   );
 }
 
@@ -2409,9 +2568,10 @@ export function isFixedSwissQuarterSemiWinEdge(
   toRound: number,
   toSlot: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
-  const half1 = half1ForLargeGrid(matchCount);
-  const olympicToRound = isFixedSwissTsLargeCurrentGrid(matchCount) ? 5 : 4;
+  const half1 = half1ForLargeGrid(matchCount, maxRound);
+  const olympicToRound = isFixedSwissTsLargeCurrentGrid(matchCount, maxRound) ? 5 : 4;
   if (isFixedSwissTs64CurrentGrid(matchCount)) {
     if (fromRound !== 3 || toRound !== 5) return false;
     const target = fixedSwissTs64OlympicToQuarterTarget(fromSlot);
@@ -2419,7 +2579,7 @@ export function isFixedSwissQuarterSemiWinEdge(
   }
   if (fromRound !== 3 || toRound !== olympicToRound) return false;
   if (fromSlot < half1 + 1 || fromSlot > half1 * 2) return false;
-  if (isFixedSwissTs32CurrentGrid(matchCount)) {
+  if (isFixedSwissTs32CurrentGrid(matchCount, maxRound)) {
     const target = fixedSwissTs32OlympicToQuarterTarget(fromSlot);
     return target?.toSlot === toSlot;
   }
@@ -2434,10 +2594,11 @@ export function isFixedSwissCrossToLowerWinEdge(
   toRound: number,
   toSlot: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
-  if (!isFixedSwissTsLargeCurrentGrid(matchCount)) return false;
+  if (!isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) return false;
   if (fromRound !== 3 || toRound !== 4) return false;
-  const half1 = half1ForLargeGrid(matchCount);
+  const half1 = half1ForLargeGrid(matchCount, maxRound);
   if (fromSlot < 1 || fromSlot > half1) return false;
   return toSlot === Math.ceil(fromSlot / 2);
 }
@@ -2449,12 +2610,13 @@ export function isFixedSwissLowerTour3To4WinEdge(
   toRound: number,
   toSlot: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
-  if (!isFixedSwissTsLargeCurrentGrid(matchCount)) return false;
+  if (!isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) return false;
   if (fromRound !== 4 || toRound !== 3) return false;
-  const half1 = half1ForLargeGrid(matchCount);
+  const half1 = half1ForLargeGrid(matchCount, maxRound);
   const lowerTour4Start = half1 + half1 / 2 + 1;
-  if (isFixedSwissTs32CurrentGrid(matchCount)) {
+  if (isFixedSwissTs32CurrentGrid(matchCount, maxRound)) {
     for (let slot = 1; slot <= half1 / 2; slot++) {
       if (fromSlot === slot && toSlot === lowerTour4Start + slot - 1) return true;
     }
@@ -2532,8 +2694,9 @@ export function isFixedSwissSemiFinalWinEdge(
   toRound: number,
   toSlot: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
-  if (isFixedSwissTsLargeCurrentGrid(matchCount)) {
+  if (isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) {
     if (isFixedSwissTs64CurrentGrid(matchCount)) {
       if (isFixedSwissTs64EighthToQuarterWinEdge(
         fromRound,
@@ -2557,7 +2720,7 @@ export function isFixedSwissSemiFinalWinEdge(
     }
     return false;
   }
-  if (isFixedSwissTs32AnyGrid(matchCount)) {
+  if (isFixedSwissTs32AnyGrid(matchCount, maxRound)) {
     if (fromRound === 4 && toRound === 5) {
       return toSlot === Math.ceil(fromSlot / 2);
     }
@@ -2589,12 +2752,17 @@ export function isFixedSwissR23Upper18ForkEdge(
   fromSlot?: number,
   toSlot?: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
-  if (fromSlot == null || toSlot == null || !isFixedSwissTsLargeCurrentGrid(matchCount)) {
+  if (
+    fromSlot == null ||
+    toSlot == null ||
+    !isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)
+  ) {
     return false;
   }
   if (fromRound !== 2 || toRound !== 3) return false;
-  const half1 = half1ForLargeGrid(matchCount);
+  const half1 = half1ForLargeGrid(matchCount, maxRound);
   if (fromSlot <= half1) return false;
   for (let k = 1; k <= half1 / 2; k++) {
     const olympicSlot = isFixedSwissTs64CurrentGrid(matchCount)
@@ -2617,10 +2785,11 @@ export function isFixedSwissShortAdjacentWinEdge(
   toRound: number,
   toSlot: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
   if (fromRound !== 2 || toRound !== 3) return false;
-  if (isFixedSwissTsLargeCurrentGrid(matchCount)) {
-    const half1 = half1ForLargeGrid(matchCount);
+  if (isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) {
+    const half1 = half1ForLargeGrid(matchCount, maxRound);
     if (isFixedSwissTs64CurrentGrid(matchCount)) {
       return (
         (fromSlot === toSlot && fromSlot >= 1 && fromSlot <= half1 / 2) ||
@@ -2631,7 +2800,7 @@ export function isFixedSwissShortAdjacentWinEdge(
     }
     return fromSlot === toSlot && fromSlot >= 1 && fromSlot <= half1;
   }
-  if (matchCount !== undefined && isOutdatedFixedSwiss32Bracket(matchCount)) {
+  if (matchCount !== undefined && isOutdatedFixedSwiss32Bracket(matchCount, maxRound)) {
     const half1 = 8;
     for (let k = 1; k <= half1 / 2; k++) {
       const slotA = half1 + 2 * k - 1;
@@ -2665,6 +2834,7 @@ export function shouldDrawFixedSwissWinEdge(
   fromSlot?: number,
   toSlot?: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
   const isWinLike = edgeKind === "win" || edgeKind === "bye";
   if (!isWinLike) return false;
@@ -2690,6 +2860,7 @@ export function shouldDrawFixedSwissWinEdge(
       fromSlot,
       toSlot,
       matchCount,
+      maxRound,
     ) &&
     fromCol === 1 &&
     toCol === 2
@@ -2705,6 +2876,7 @@ export function shouldDrawFixedSwissWinEdge(
       toRound,
       toSlot,
       matchCount,
+      maxRound,
     ) &&
     isFixedSwissAdjacentWinEdge(fromCol, toCol)
   ) {
@@ -2719,6 +2891,7 @@ export function shouldDrawFixedSwissWinEdge(
       toRound,
       toSlot,
       matchCount,
+      maxRound,
     ) ||
       isFixedSwissTs64BridgeToLowerTour3WinEdge(
         fromRound,
@@ -2741,6 +2914,7 @@ export function shouldDrawFixedSwissWinEdge(
       toRound,
       toSlot,
       matchCount,
+      maxRound,
     ) &&
     fromCol === -3 &&
     toCol === -4
@@ -2756,11 +2930,14 @@ export function shouldDrawFixedSwissWinEdge(
       toRound,
       toSlot,
       matchCount,
+      maxRound,
     ) &&
     fromCol === 2 &&
     toCol === 3 &&
-    (!isFixedSwissTsLargeCurrentGrid(matchCount) ||
-      (isFixedSwissTs32CurrentGrid(matchCount) && fromSlot >= 9 && fromSlot <= 12) ||
+    (!isFixedSwissTsLargeCurrentGrid(matchCount, maxRound) ||
+      (isFixedSwissTs32CurrentGrid(matchCount, maxRound) &&
+        fromSlot >= 9 &&
+        fromSlot <= 12) ||
       (isFixedSwissTs64CurrentGrid(matchCount) &&
         ((fromSlot >= 21 && fromSlot <= 24) ||
           (fromSlot >= 33 && fromSlot <= 36))))
@@ -2821,6 +2998,7 @@ export function shouldDrawFixedSwissWinEdge(
       toRound,
       toSlot,
       matchCount,
+      maxRound,
     ) &&
     ((fromCol === 3 && toCol === 4) || (fromCol === 4 && toCol === 5) || (fromCol === 5 && toCol === 6))
   ) {
@@ -2974,6 +3152,22 @@ export function fixedSwissTs64PlacementByMatchNo(
   return null;
 }
 
+export function fixedSwissTs32R8ElimPlacementByMatchNo(
+  no: number,
+  withBronze: boolean,
+): string | null {
+  if (withBronze && no === 60) return "матч за 3–4 место";
+  if (no === 59) return "место 1–2";
+  if (no >= 41 && no <= 44) return "место 9–12";
+  if (no >= 17 && no <= 24) return "место 25–32";
+  if (no >= 33 && no <= 40) return "место 17–24";
+  if (no >= 45 && no <= 48) return "место 13–16";
+  if (no >= 53 && no <= 56) return "место 5–8";
+  if (!withBronze && (no === 57 || no === 58)) return "3-е место";
+  if (no === 57 || no === 58) return "место 3–4";
+  return null;
+}
+
 export function fixedSwissTs32PlacementByMatchNo(
   no: number,
   withBronze: boolean,
@@ -3051,7 +3245,14 @@ export function fixedSwissPlacementLabel(
     return fixedSwissTs32PlacementByMatchNo(no, false);
   }
 
-  if (matchCount === 56 || matchCount === 55 || matchCount === 63) {
+  if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount ?? 0, maxRound)) {
+    const no =
+      matchNumber ??
+      fixedSwissMatchNo(round, slot, matchCount ?? 0, maxRound);
+    return fixedSwissTs32R8ElimPlacementByMatchNo(no, false);
+  }
+
+  if (matchCount === 56 || matchCount === 63 || matchCount === 55) {
     const no =
       matchNumber ??
       fixedSwissMatchNo(round, slot, matchCount, maxRound);

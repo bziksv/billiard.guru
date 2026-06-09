@@ -52,6 +52,17 @@ export function ideaModerationKeyboard(token: string) {
   };
 }
 
+export function clubNewsModerationKeyboard(token: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: "✅ Одобрить", callback_data: `clubnews_approve_${token}` },
+        { text: "❌ Отклонить", callback_data: `clubnews_reject_${token}` },
+      ],
+    ],
+  };
+}
+
 export function ideaVoteKeyboard(ideaId: string) {
   return {
     inline_keyboard: [

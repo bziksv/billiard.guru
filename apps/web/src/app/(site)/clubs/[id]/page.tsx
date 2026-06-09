@@ -40,7 +40,11 @@ export default async function ClubPage({
     where: { id },
     include: {
       city: { include: { country: true } },
-      news: { orderBy: { publishedAt: "desc" }, take: 20 },
+      news: {
+        where: { status: "APPROVED" },
+        orderBy: { publishedAt: "desc" },
+        take: 20,
+      },
       tournaments: {
         where: { status: { in: [...PUBLIC_TOURNAMENT_STATUSES] } },
         include: tournamentListInclude,
@@ -166,7 +170,7 @@ export default async function ClubPage({
                 <li key={item.id}>
                   <SiteCard>
                     <time className="home-card-muted text-xs">
-                      {formatNewsDate(item.publishedAt)}
+                      {formatNewsDate(item.publishedAt ?? item.createdAt)}
                     </time>
                     <h3 className="home-card-title mt-1 text-lg font-semibold">{item.title}</h3>
                     <p className="home-card-body mt-2 whitespace-pre-wrap text-sm leading-relaxed">

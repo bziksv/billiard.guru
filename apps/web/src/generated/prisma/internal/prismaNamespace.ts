@@ -2338,8 +2338,14 @@ export type TableBookingScalarFieldEnum = (typeof TableBookingScalarFieldEnum)[k
 export const ClubNewsScalarFieldEnum = {
   id: 'id',
   clubId: 'clubId',
+  authorId: 'authorId',
   title: 'title',
   body: 'body',
+  status: 'status',
+  moderationToken: 'moderationToken',
+  moderatedAt: 'moderatedAt',
+  moderatedById: 'moderatedById',
+  rejectReason: 'rejectReason',
   publishedAt: 'publishedAt',
   createdAt: 'createdAt'
 } as const
@@ -2797,8 +2803,12 @@ export type TableBookingOrderByRelevanceFieldEnum = (typeof TableBookingOrderByR
 export const ClubNewsOrderByRelevanceFieldEnum = {
   id: 'id',
   clubId: 'clubId',
+  authorId: 'authorId',
   title: 'title',
-  body: 'body'
+  body: 'body',
+  moderationToken: 'moderationToken',
+  moderatedById: 'moderatedById',
+  rejectReason: 'rejectReason'
 } as const
 
 export type ClubNewsOrderByRelevanceFieldEnum = (typeof ClubNewsOrderByRelevanceFieldEnum)[keyof typeof ClubNewsOrderByRelevanceFieldEnum]
@@ -3104,6 +3114,13 @@ export type EnumRegistrationStatusFieldRefInput<$PrismaModel> = FieldRefInputTyp
 
 
 /**
+ * Reference to a field of type 'IdeaStatus'
+ */
+export type EnumIdeaStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IdeaStatus'>
+    
+
+
+/**
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
@@ -3149,13 +3166,6 @@ export type EnumRegistrationSourceFieldRefInput<$PrismaModel> = FieldRefInputTyp
  * Reference to a field of type 'MatchStatus'
  */
 export type EnumMatchStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MatchStatus'>
-    
-
-
-/**
- * Reference to a field of type 'IdeaStatus'
- */
-export type EnumIdeaStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IdeaStatus'>
     
 
 

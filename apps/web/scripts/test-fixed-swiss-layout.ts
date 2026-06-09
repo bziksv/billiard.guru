@@ -618,8 +618,14 @@ assert.equal(
 );
 assert.equal(
   buildFixedSwissTemplate(12, "FIXED_SWISS_32R8_2_3_mesta").matches.length,
-  59,
-  "FIXED_SWISS_32R8_2_3_mesta: oлимпийka с 1/8, вылет с 1/8",
+  55,
+  "FIXED_SWISS_32R8_2_3_mesta: 1/8, вылет с 1/8 на места 9–12",
+);
+const r8ElimLinks = buildFixedSwissTemplate(12, "FIXED_SWISS_32R8_2_3_mesta").links;
+assert.equal(
+  r8ElimLinks.some((l) => l.kind === "loss" && l.fromRound === 3 && l.fromSlot === 9),
+  false,
+  "R8_2_3: нет loss с 1/8 в нижнюю ветку",
 );
 assert.equal(
   buildFixedSwissTemplate(12, "FIXED_SWISS_32R8_BRONZE").matches.length,
@@ -628,6 +634,51 @@ assert.equal(
 assert.equal(inferFixedSwissGridSize(59), 32);
 assert.equal(isFixedSwissTs32MatchCount(59), true);
 assert.equal(isOutdatedFixedSwiss32Bracket(55), true);
+assert.equal(isOutdatedFixedSwiss32Bracket(55, 7), false);
+assert.equal(
+  fixedSwissPlacementLabel(3, 9, 6, 16, 55, 41),
+  null,
+  "R8_2_3: maxRound 6 не должен показывать место на 1/8",
+);
+assert.equal(
+  fixedSwissPlacementLabel(3, 9, 7, 16, 55, 41),
+  "место 9–12",
+  "R8_2_3: maxRound 7 — вылет с 1/8",
+);
+assert.equal(fixedSwissMatchNo(3, 9, 55, 7), 41, "R8_2_3: #41 на 1/8");
+// --- 32→16 R8 elim (55/7): SVG линии как у 59 ---
+const MC55R8 = 55;
+const MR7 = 7;
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 9, 1, MC55R8, MR7),
+  true,
+  "R8 #41 → #53",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(4, 5, 6, 7, "win", 1, 1, MC55R8, MR7),
+  true,
+  "R8 #57 → #59",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 6, "win", 3, 2, MC55R8, MR7),
+  true,
+  "R8 #55 → #58",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 6, "win", 4, 2, MC55R8, MR7),
+  true,
+  "R8 #56 → #58",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, -2, 2, 3, "win", 8, 1, MC55R8, MR7),
+  true,
+  "R8 #24 → #33",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 1, 1, MC55R8, MR7),
+  true,
+  "R8 #33 → #45",
+);
 assert.equal(isOutdatedFixedSwiss32Bracket(63), true);
 assert.equal(fixedSwissMatchNo(2, 1, 59), 17, "lower tour 1 starts #17");
 assert.equal(fixedSwissMatchNo(2, 9, 59), 25, "upper tour 1 starts #25");

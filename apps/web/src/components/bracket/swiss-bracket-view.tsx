@@ -35,6 +35,7 @@ import {
   isFixedSwiss168MatchCount,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
+  isFixedSwissTs32R8ElimAtEighthMatchCount,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -158,6 +159,8 @@ export function SwissBracketView({
   };
 
   const trunkMatchCount = matches.length;
+  const bracketMaxRound =
+    matches.length > 0 ? Math.max(...matches.map((m) => m.round)) : undefined;
   const r12TrunkY =
     fixedGrid && useFixed168
       ? fixedSwissForkTrunkYByTarget(
@@ -193,14 +196,19 @@ export function SwissBracketView({
   const is32Current =
     is32Grid &&
     (isFixedSwissTs32MatchCount(matches.length) ||
-      isFixedSwissTs32BronzeMatchCount(matches.length));
+      isFixedSwissTs32BronzeMatchCount(matches.length) ||
+      isFixedSwissTs32R8ElimAtEighthMatchCount(
+        matches.length,
+        bracketMaxRound,
+      ));
   const is64Current =
     is64Grid &&
     (isFixedSwissTs64MatchCount(matches.length) ||
       isFixedSwissTs64BronzeMatchCount(matches.length));
   const isLargeCurrent = is32Current || is64Current;
   const is32Outdated =
-    is32Grid && isOutdatedFixedSwiss32Bracket(matches.length);
+    is32Grid &&
+    isOutdatedFixedSwiss32Bracket(matches.length, bracketMaxRound);
   const r23TrunkY =
     is32Outdated || isLargeCurrent
       ? fixedSwissForkTrunkYByTarget(
@@ -395,6 +403,7 @@ export function SwissBracketView({
                     matches.length,
                     fromMatch.slot,
                     toMatch.slot,
+                    bracketMaxRound,
                   ) ||
                   isFixedSwissUpperOlympicForkEdge(
                     fromMatch.round,
@@ -440,6 +449,7 @@ export function SwissBracketView({
                     fromMatch.slot,
                     toMatch.slot,
                     matches.length,
+                    bracketMaxRound,
                   )
                 ) {
                   return null;

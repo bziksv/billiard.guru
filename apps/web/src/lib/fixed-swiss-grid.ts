@@ -2,12 +2,14 @@ import type { BracketMatchInput } from "@/lib/pair-tournament";
 import {
   buildFixedSwissTsTemplateForGridSize,
   buildFixedSwissTs32OutdatedTemplate,
+  buildFixedSwissTs32R8ElimAtEighthTemplate,
   fixedSwissTs32MatchNo,
   fixedSwissTs64MatchNo,
   fixedSwissTsBronzeMatchNoForHalf2,
   fixedSwissTsMatchNoForHalf2,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
+  isFixedSwissTs32R8ElimAtEighthMatchCount,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -16,6 +18,8 @@ import {
 export {
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32BronzeMatchCount,
+  isFixedSwissTs32R8ElimAtEighthMatchCount,
+  buildFixedSwissTs32R8ElimAtEighthTemplate,
   isFixedSwissTs64MatchCount,
   isFixedSwissTs64BronzeMatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -492,6 +496,9 @@ export function buildFixedSwissTemplate(
   }
 
   if (gridSize === 32) {
+    if (format === "FIXED_SWISS_32R8_2_3_mesta") {
+      return buildFixedSwissTs32R8ElimAtEighthTemplate();
+    }
     const ts32Bronze =
       format === "FIXED_SWISS_32R8_BRONZE" ||
       format === "FIXED_SWISS_32R4_1_3_mesto" ||
@@ -499,7 +506,6 @@ export function buildFixedSwissTemplate(
       format === "FIXED_PAIR_SWISS_32_BRONZE";
     const ts32Base =
       format === "FIXED_SWISS_32R8" ||
-      format === "FIXED_SWISS_32R8_2_3_mesta" ||
       format === "FIXED_SWISS_32R4_2_3_mesta" ||
       format === "FIXED_SWISS_32" ||
       format === "FIXED_PAIR_SWISS_32";
@@ -714,7 +720,10 @@ export function fixedSwissMatchNo(
   if (isFixedSwissTs32MatchCount(matchCount)) {
     return fixedSwissTs32MatchNo(round, slot, false);
   }
-  if (isOutdatedFixedSwiss32Bracket(matchCount)) {
+  if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)) {
+    return fixedSwissTs32MatchNo(round, slot, false);
+  }
+  if (isOutdatedFixedSwiss32Bracket(matchCount, maxRound)) {
     return fixedSwissTsMatchNoForHalf2(round, slot, 16);
   }
   if (isFixedSwissTsBronzeMatchCount(matchCount)) {
@@ -952,6 +961,12 @@ export function getFixedSwissLinksForGrid(
   }
   if (gridSize === 32 && matchCount === 59) {
     return buildFixedSwissTsTemplateForGridSize(32, false).links;
+  }
+  if (
+    gridSize === 32 &&
+    isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount ?? 0, maxRound)
+  ) {
+    return buildFixedSwissTs32R8ElimAtEighthTemplate().links;
   }
   if (gridSize === 32 && isOutdatedFixedSwiss32Bracket(matchCount ?? 0)) {
     return buildFixedSwissTs32OutdatedTemplate(matchCount === 56 || matchCount === 64).links;

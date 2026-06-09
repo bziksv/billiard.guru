@@ -465,7 +465,7 @@ export function LlbBracketMatch({
           (isFixedSwissTsLegacy27SixRound(matchCount, 6) ? 6 : 5)
         : isFixedSwiss168LegacyMatchCount(matchCount, bracketMaxRound)
           ? bracketMaxRound || 5
-          : Math.log2(gridSize) + 1
+          : Math.max(bracketMaxRound, Math.log2(gridSize) + 1)
     : bracketMaxRound || 1;
   const bracketCol = isFixedSwissGrid
     ? fixedSwissMatchColForCount(match.round, match.slot, matchCount, maxRound)
@@ -485,12 +485,19 @@ export function LlbBracketMatch({
         ? `автопроход на #${winnerToNo}`
         : `победитель на #${winnerToNo}`
       : null;
+  const terminalLoserPlacement =
+    finished &&
+    loserToNo === undefined &&
+    placement != null &&
+    placement.startsWith("место ");
   const loserLine =
     showCardPlacement && loserToNo !== undefined
       ? roundOneBye && phantomRow
         ? `× на #${loserToNo}`
         : `проигравший на #${loserToNo}`
-      : null;
+      : terminalLoserPlacement
+        ? placement
+        : null;
 
   type FooterRow =
     | { kind: "text"; text: string }
@@ -500,7 +507,7 @@ export function LlbBracketMatch({
 
   if (showCardPlacement) {
     if (winnerLine && loserLine) {
-      if (placement) {
+      if (placement && !terminalLoserPlacement) {
         footerRows.push({ kind: "text", text: placement });
       }
       const dest = fixedSwissDestSplit(bracketCol, loserLine, winnerLine);

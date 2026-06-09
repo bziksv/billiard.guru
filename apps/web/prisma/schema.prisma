@@ -25,7 +25,7 @@ enum TournamentFormat {
   FIXED_SWISS_32R4_1_3_mesto
   /** 32→16 (59 встреч): олимпийка с 1/8 */
   FIXED_SWISS_32R8
-  /** 32→16 (59): олимпийка с 1/8, вылет с 1/8 (#41–#44) */
+  /** 32→16 (55): олимпийка с 1/8, вылет с 1/8 — места 9–12, без #49–#52 */
   FIXED_SWISS_32R8_2_3_mesta
   /** 32→16 (60 встреч): 1/8 + матч за 3–4 (#60) */
   FIXED_SWISS_32R8_BRONZE
@@ -245,15 +245,23 @@ model TableBooking {
 }
 
 model ClubNews {
-  id          String   @id @default(cuid())
-  clubId      String   @map("club_id")
-  club        Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
-  title       String
-  body        String   @db.Text
-  publishedAt DateTime @default(now()) @map("published_at")
-  createdAt   DateTime @default(now()) @map("created_at")
+  id              String     @id @default(cuid())
+  clubId          String     @map("club_id")
+  club            Club       @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  authorId        String?    @map("author_id")
+  author          Player?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  title           String
+  body            String     @db.Text
+  status          IdeaStatus @default(APPROVED)
+  moderationToken String?    @unique @map("moderation_token")
+  moderatedAt     DateTime?  @map("moderated_at")
+  moderatedById   String?    @map("moderated_by_id")
+  rejectReason    String?    @map("reject_reason") @db.Text
+  publishedAt     DateTime?  @map("published_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
 
   @@index([clubId, publishedAt])
+  @@index([status, createdAt])
   @@map("club_news")
 }
 
@@ -291,6 +299,7 @@ model Player {
   loginChallenges LoginChallenge[]
   ideas                Idea[]
   ideaVotes            IdeaVote[]
+  clubNewsAuthored     ClubNews[]
   playListings         PlayListing[]
   playListingResponses PlayListingResponse[]
   tableBookings        TableBooking[]

@@ -300,7 +300,7 @@ export const TOURNAMENT_BRACKETS_SECTIONS: GuideSection[] = [
     title: TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_32R8_2_3_mesta!,
     format: "FIXED_SWISS_32R8_2_3_mesta",
     paragraphs: [
-      "Сетка **FIXED_SWISS_32R8_2_3_mesta** — 59 встреч, oлимпийka с **1/8** (#41–#44), вылет с 1/8.",
+      "Сетка **FIXED_SWISS_32R8_2_3_mesta** — **55 встреч**, oлимпийka с **1/8** (#41–#44): проигравшие в 1/8 сразу на **места 9–12**, без нижней тур 4 (#49–#52).",
       `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_32}.`,
     ],
     bullets: [

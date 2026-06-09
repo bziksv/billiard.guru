@@ -100,6 +100,17 @@ export function IconIdeas({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function IconNews({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <path d="M4 5h16v14H4z" />
+      <path d="M8 9h8" />
+      <path d="M8 13h8" />
+      <path d="M8 17h5" />
+    </svg>
+  );
+}
+
 export function IconBookings({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
@@ -125,17 +136,6 @@ export function IconFloorPlan({ className = "h-5 w-5" }: IconProps) {
       <rect x="7" y="13" width="3" height="3" rx="0.5" />
       <rect x="12" y="13" width="5" height="3" rx="0.5" />
       <circle cx="17" cy="16" r="1.25" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
-export function IconNews({ className = "h-5 w-5" }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
-      <path d="M4 5h16v14H4z" />
-      <path d="M8 9h8" />
-      <path d="M8 13h8" />
-      <path d="M8 17h5" />
     </svg>
   );
 }

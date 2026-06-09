@@ -109,7 +109,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     pairing: "single",
     layout: "swiss_fixed",
     shortDescription:
-      "59 встреч, 10 колонок — олимпийка с 1/8 (#41–#44), вылет с 1/8; проигравшие полуфиналисты делят 3-е место.",
+      "55 встреч, 9 колонок — олимпийка с 1/8 (#41–#44): проигравшие сразу на места 9–12, без #49–#52; полуфиналисты делят 3-е.",
     guideSectionId: "swiss-fixed-32-r8",
     docPaths: [
       "docs/BRACKET_REFERENCE_32_16.md",

@@ -670,10 +670,6 @@ export type IdeaUncheckedUpdateManyWithoutAuthorNestedInput = {
   deleteMany?: Prisma.IdeaScalarWhereInput | Prisma.IdeaScalarWhereInput[]
 }
 
-export type EnumIdeaStatusFieldUpdateOperationsInput = {
-  set?: $Enums.IdeaStatus
-}
-
 export type IdeaCreateNestedOneWithoutVotesInput = {
   create?: Prisma.XOR<Prisma.IdeaCreateWithoutVotesInput, Prisma.IdeaUncheckedCreateWithoutVotesInput>
   connectOrCreate?: Prisma.IdeaCreateOrConnectWithoutVotesInput
