@@ -102,21 +102,39 @@ async function resolveRepoRoot(): Promise<string> {
   return preferred;
 }
 
-function backupDirCandidates(): string[] {
-  if (process.env.DB_BACKUP_DIR) {
-    return [path.resolve(process.env.DB_BACKUP_DIR)];
+/** Единый каталог для новых бэкапов (из .env или setka/data/db-backups). */
+function canonicalBackupDir(): string {
+  const fromEnv = process.env.DB_BACKUP_DIR?.trim();
+  if (fromEnv) {
+    return path.resolve(fromEnv);
   }
+  return path.join(resolveRepoRootSync(), "data", "db-backups");
+}
 
+async function discoverLegacyBackupDirs(): Promise<string[]> {
   const repoRoot = resolveRepoRootSync();
+  const siteRoot = path.dirname(repoRoot);
   const cwd = path.resolve(process.cwd());
+  const canonical = canonicalBackupDir();
+
   const candidates = [
-    path.join(repoRoot, "data", "db-backups"),
+    path.join(cwd, "data", "db-backups"),
     path.join(cwd, "..", "..", "data", "db-backups"),
     path.join(cwd, "..", "..", "..", "data", "db-backups"),
-    path.join(cwd, "data", "db-backups"),
+    path.join(repoRoot, "apps", "web", ".next", "standalone", "data", "db-backups"),
   ];
 
-  const seen = new Set<string>();
+  const releasesRoot = path.join(siteRoot, "releases");
+  try {
+    const names = await fs.readdir(releasesRoot);
+    for (const name of names) {
+      candidates.push(path.join(releasesRoot, name, "data", "db-backups"));
+    }
+  } catch {
+    // no releases dir
+  }
+
+  const seen = new Set<string>([canonical]);
   const unique: string[] = [];
   for (const dir of candidates) {
     const resolved = path.resolve(dir);
@@ -127,30 +145,40 @@ function backupDirCandidates(): string[] {
   return unique;
 }
 
-async function countBackupFiles(dir: string): Promise<number> {
-  try {
-    const names = await fs.readdir(dir);
-    return names.filter((name) => BACKUP_FILE_RE.test(name)).length;
-  } catch {
-    return 0;
-  }
-}
+/** Перенос .sql из старых каталогов (releases/current) в canonical. */
+export async function migrateBackupsToCanonical(): Promise<number> {
+  const canonical = canonicalBackupDir();
+  await fs.mkdir(canonical, { recursive: true });
 
-/** Каталог бэкапов: setka/data/db-backups; если старые лежат в release — подхватим их. */
-async function resolveBackupDir(): Promise<string> {
-  const candidates = backupDirCandidates();
-  const canonical = candidates[0]!;
-
-  let best = canonical;
-  let bestCount = -1;
-  for (const dir of candidates) {
-    const count = await countBackupFiles(dir);
-    if (count > bestCount) {
-      bestCount = count;
-      best = dir;
+  let copied = 0;
+  for (const dir of await discoverLegacyBackupDirs()) {
+    let names: string[];
+    try {
+      names = await fs.readdir(dir);
+    } catch {
+      continue;
+    }
+    for (const name of names) {
+      if (!BACKUP_FILE_RE.test(name)) continue;
+      const src = path.join(dir, name);
+      const dest = path.join(canonical, name);
+      try {
+        const st = await fs.stat(src);
+        if (!st.isFile()) continue;
+        await fs.access(dest);
+        continue;
+      } catch {
+        // dest missing — copy
+      }
+      try {
+        await fs.copyFile(src, dest);
+        copied++;
+      } catch {
+        // permissions or disk
+      }
     }
   }
-  return best;
+  return copied;
 }
 
 function resolveCronLogPath(repoRoot: string): string {
@@ -159,7 +187,7 @@ function resolveCronLogPath(repoRoot: string): string {
 }
 
 async function ensureBackupDir(): Promise<string> {
-  const dir = await resolveBackupDir();
+  const dir = canonicalBackupDir();
   await fs.mkdir(dir, { recursive: true });
   return dir;
 }
@@ -404,12 +432,13 @@ async function restoreSqlDump(filePath: string): Promise<void> {
 }
 
 export async function getDbBackupSettings(): Promise<DbBackupSettings> {
-  const [row, dumpBin, mysqlBin, repoRoot, backupDir] = await Promise.all([
+  await migrateBackupsToCanonical();
+
+  const [row, dumpBin, mysqlBin, repoRoot] = await Promise.all([
     prisma.dbBackupConfig.findUnique({ where: { id: CONFIG_ID } }),
     resolveBinary(DUMP_BINARY_CANDIDATES),
     resolveBinary(MYSQL_BINARY_CANDIDATES),
     resolveRepoRoot(),
-    resolveBackupDir(),
   ]);
 
   const schedule = {
@@ -440,7 +469,7 @@ export async function getDbBackupSettings(): Promise<DbBackupSettings> {
     ...schedule,
     retainCount: row?.retainCount ?? 14,
     lastAutoBackupAt: row?.lastAutoBackupAt?.toISOString() ?? null,
-    backupDir,
+    backupDir: canonicalBackupDir(),
     mysqldumpAvailable: Boolean(dumpBin),
     mysqlAvailable: Boolean(mysqlBin),
     cronSetup: buildDbBackupCronSetup(
@@ -490,9 +519,15 @@ export async function saveDbBackupSettings(data: {
 }
 
 export async function listDbBackups(): Promise<DbBackupEntry[]> {
-  const dir = await ensureBackupDir();
+  await migrateBackupsToCanonical();
+  const dir = canonicalBackupDir();
   const db = parseDatabaseUrl(getDatabaseUrlFromEnv());
-  const names = await fs.readdir(dir);
+  let names: string[];
+  try {
+    names = await fs.readdir(dir);
+  } catch {
+    return [];
+  }
   const entries: DbBackupEntry[] = [];
 
   for (const name of names) {
@@ -519,16 +554,19 @@ async function resolveBackupFile(id: string): Promise<string> {
   if (!/^[\w-]+$/.test(id)) {
     throw new Error("Некорректный идентификатор бэкапа");
   }
-  const dir = await resolveBackupDir();
-  for (const ext of [".sql", ".sql.gz"]) {
-    const name = `${id}${ext}`;
-    if (!BACKUP_FILE_RE.test(name)) continue;
-    const full = path.join(dir, name);
-    try {
-      await fs.access(full);
-      return full;
-    } catch {
-      // try next
+  await migrateBackupsToCanonical();
+  const dirs = [canonicalBackupDir(), ...(await discoverLegacyBackupDirs())];
+  for (const dir of dirs) {
+    for (const ext of [".sql", ".sql.gz"]) {
+      const name = `${id}${ext}`;
+      if (!BACKUP_FILE_RE.test(name)) continue;
+      const full = path.join(dir, name);
+      try {
+        await fs.access(full);
+        return full;
+      } catch {
+        // try next
+      }
     }
   }
   throw new Error("Бэкап не найден");
