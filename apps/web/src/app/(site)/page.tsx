@@ -109,8 +109,9 @@ export default async function HomePage({
       <HomeSection
         id="news"
         eyebrow="Лента"
-        title="Новости клубов"
-        lead="Анонсы турниров, акций и событий — клубы публикуют в профиле, здесь показываются свежие записи вашего региона."
+        title="Новости"
+        lead="Анонсы billiard.guru и события клубов вашего региона — турниры, акции, обновления платформы."
+        action={{ href: hrefWithGeo("/news", geo), label: "Все новости" }}
       >
         <HomeReveal>
           <HomeNewsGrid items={news} />

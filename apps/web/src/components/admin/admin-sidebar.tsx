@@ -38,6 +38,7 @@ const NAV: {
   { href: "/admin/brackets", label: "Сетки", icon: IconBrackets },
   { href: "/admin/notifications", label: "Уведомления", icon: IconNotifications },
   { href: "/admin/club-news", label: "Новости клубов", icon: IconNews },
+  { href: "/admin/site-news", label: "Новости сервиса", icon: IconNews },
   { href: "/admin/ideas", label: "Идеи", icon: IconIdeas },
   { href: "/admin/handicap", label: "Фора и расчёт", icon: IconHandicap },
   { href: "/admin/db-backups", label: "Бэкап БД", icon: IconDatabaseBackup },

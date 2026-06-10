@@ -4,7 +4,7 @@ export type HomeNewsItem = {
   id: string;
   title: string;
   excerpt: string;
-  authorType: "club" | "player";
+  authorType: "club" | "player" | "service";
   authorName: string;
   city: string;
   date: string;

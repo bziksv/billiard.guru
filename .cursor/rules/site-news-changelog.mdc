@@ -1,0 +1,50 @@
+---
+description: После нового функционала — черновик новости сервиса (SiteNews), без публикации
+alwaysApply: true
+---
+
+# Новости сервиса после внедрения функционала
+
+После **заметной для пользователей** фичи (UI, API, бот, админка) — добавь **черновик** новости сервиса. Пользователь сам опубликует её в `/admin/site-news`.
+
+## Обязательно
+
+1. **Черновик, не публикация:** `status: "UNPUBLISHED"`, `publishedAt: null`.
+2. **Не вызывать** `createSiteNews`, `POST /api/admin/site-news` и seed с `status: "APPROVED"` — они сразу публикуют на главной и `/news`.
+3. **Только SiteNews** (новости billiard.guru), не ClubNews.
+4. В конце задачи **кратко сообщи**: заголовок черновика и что он ждёт публикации в админке.
+
+## Когда писать
+
+- Новый раздел, заметное улучшение UX, Telegram-уведомление, формат сетки, брони и т.п.
+- Мелкий рефакторинг, багфикс без изменения поведения для пользователя — **не нужно**.
+
+## Текст
+
+- Язык: **русский**, тон как в `apps/web/scripts/seed-site-news-changelog.ts`.
+- Заголовок — коротко, по делу (что появилось).
+- Тело: 2–5 абзацев или буллеты «что можно делать»; без технического жаргона (Prisma, API routes).
+
+## Как создать черновик
+
+Через Prisma (скрипт или разовый `tsx` в `apps/web/scripts/`), **не** через админский POST:
+
+```typescript
+await prisma.siteNews.create({
+  data: {
+    title: "…",
+    body: "…".trim(),
+    status: "UNPUBLISHED",
+    publishedAt: null,
+    authorId: admin?.id ?? null, // SUPERADMIN, если есть
+  },
+});
+```
+
+Пример запуска: `cd apps/web && npx tsx scripts/…`.
+
+## Публикация — только пользователь
+
+Агент **не** нажимает «Опубликовать» и **не** ставит `APPROVED` / `publishedAt`. Активация: `/admin/site-news` → «Снова на сайте» (`republishSiteNews`).
+
+На сайте видны только `status: "APPROVED"` (`loadNewsFeed`, `getPublishedSiteNews`).

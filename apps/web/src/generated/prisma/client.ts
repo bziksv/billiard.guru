@@ -72,6 +72,11 @@ export type TableBooking = Prisma.TableBookingModel
  */
 export type ClubNews = Prisma.ClubNewsModel
 /**
+ * Model SiteNews
+ * * Новости платформы billiard.guru (не привязаны к клубу).
+ */
+export type SiteNews = Prisma.SiteNewsModel
+/**
  * Model Player
  * 
  */

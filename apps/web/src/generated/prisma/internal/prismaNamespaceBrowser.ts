@@ -57,6 +57,7 @@ export const ModelName = {
   ClubStaff: 'ClubStaff',
   TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
+  SiteNews: 'SiteNews',
   Player: 'Player',
   PlayerNotificationPreference: 'PlayerNotificationPreference',
   CoachRating: 'CoachRating',
@@ -197,6 +198,19 @@ export const ClubNewsScalarFieldEnum = {
 } as const
 
 export type ClubNewsScalarFieldEnum = (typeof ClubNewsScalarFieldEnum)[keyof typeof ClubNewsScalarFieldEnum]
+
+
+export const SiteNewsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  authorId: 'authorId',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SiteNewsScalarFieldEnum = (typeof SiteNewsScalarFieldEnum)[keyof typeof SiteNewsScalarFieldEnum]
 
 
 export const PlayerScalarFieldEnum = {
@@ -658,6 +672,16 @@ export const ClubNewsOrderByRelevanceFieldEnum = {
 } as const
 
 export type ClubNewsOrderByRelevanceFieldEnum = (typeof ClubNewsOrderByRelevanceFieldEnum)[keyof typeof ClubNewsOrderByRelevanceFieldEnum]
+
+
+export const SiteNewsOrderByRelevanceFieldEnum = {
+  id: 'id',
+  title: 'title',
+  body: 'body',
+  authorId: 'authorId'
+} as const
+
+export type SiteNewsOrderByRelevanceFieldEnum = (typeof SiteNewsOrderByRelevanceFieldEnum)[keyof typeof SiteNewsOrderByRelevanceFieldEnum]
 
 
 export const PlayerOrderByRelevanceFieldEnum = {

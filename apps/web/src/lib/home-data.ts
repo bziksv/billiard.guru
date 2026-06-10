@@ -1,5 +1,6 @@
 import type { PublicBracketFormat } from "@/lib/bracket-formats/public-formats";
 import { getPublicEnabledBracketFormats } from "@/lib/bracket-formats/public-formats";
+import { APP_NAME } from "@/lib/brand";
 import type { HomeAnnouncement, HomeNewsItem } from "@/lib/home-content";
 import {
   clubGeoWhere,
@@ -34,32 +35,87 @@ function clubNewsGeoWhere(geo: GeoSearchParams) {
   };
 }
 
-/** Новости клубов из БД (ClubNews) */
-export async function loadHomeNews(geo: GeoSearchParams): Promise<HomeNewsItem[]> {
-  const rows = await prisma.clubNews.findMany({
-    where: {
-      status: "APPROVED",
-      ...clubNewsGeoWhere(geo),
-    },
-    include: {
-      club: {
-        include: { city: { include: { country: true } } },
-      },
-    },
-    orderBy: { publishedAt: "desc" },
-    take: 6,
-  });
-
-  return rows.map((row) => ({
+function mapSiteNewsRow(row: {
+  id: string;
+  title: string;
+  body: string;
+  publishedAt: Date | null;
+  createdAt: Date;
+}): HomeNewsItem & { sortAt: number } {
+  return {
     id: row.id,
     title: row.title,
     excerpt: excerpt(row.body),
-    authorType: "club" as const,
+    authorType: "service",
+    authorName: APP_NAME,
+    city: "Вся сеть",
+    date: formatNewsDate(row.publishedAt ?? row.createdAt),
+    href: `/news/${row.id}`,
+    sortAt: (row.publishedAt ?? row.createdAt).getTime(),
+  };
+}
+
+function mapClubNewsRow(row: {
+  id: string;
+  title: string;
+  body: string;
+  clubId: string;
+  publishedAt: Date | null;
+  createdAt: Date;
+  club: { name: string; city: { nameRu: string } };
+}): HomeNewsItem & { sortAt: number } {
+  return {
+    id: row.id,
+    title: row.title,
+    excerpt: excerpt(row.body),
+    authorType: "club",
     authorName: row.club.name,
     city: row.club.city.nameRu,
     date: formatNewsDate(row.publishedAt ?? row.createdAt),
     href: `/clubs/${row.clubId}#club-news`,
-  }));
+    sortAt: (row.publishedAt ?? row.createdAt).getTime(),
+  };
+}
+
+/** Новости сервиса + клубов. limit — сколько вернуть после сортировки (для главной — 6). */
+export async function loadNewsFeed(
+  geo: GeoSearchParams,
+  options?: { limit?: number },
+): Promise<HomeNewsItem[]> {
+  const fetchCap = options?.limit ? 50 : 100;
+
+  const [siteRows, clubRows] = await Promise.all([
+    prisma.siteNews.findMany({
+      where: { status: "APPROVED" },
+      orderBy: { publishedAt: "desc" },
+      take: fetchCap,
+    }),
+    prisma.clubNews.findMany({
+      where: {
+        status: "APPROVED",
+        ...clubNewsGeoWhere(geo),
+      },
+      include: {
+        club: {
+          include: { city: { include: { country: true } } },
+        },
+      },
+      orderBy: { publishedAt: "desc" },
+      take: fetchCap,
+    }),
+  ]);
+
+  const merged = [...siteRows.map(mapSiteNewsRow), ...clubRows.map(mapClubNewsRow)].sort(
+    (a, b) => b.sortAt - a.sortAt,
+  );
+
+  const slice = options?.limit ? merged.slice(0, options.limit) : merged;
+  return slice.map(({ sortAt: _ignored, ...item }) => item);
+}
+
+/** Превью на главной — 6 последних */
+export async function loadHomeNews(geo: GeoSearchParams): Promise<HomeNewsItem[]> {
+  return loadNewsFeed(geo, { limit: 6 });
 }
 
 type PlayListingRow = Awaited<

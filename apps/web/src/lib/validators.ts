@@ -124,6 +124,15 @@ export const clubNewsSchema = z.object({
   cityBroadcastRequested: z.boolean().optional(),
 });
 
+export const siteNewsSchema = z.object({
+  title: z.string().min(2, "Минимум 2 символа").max(200),
+  body: z.string().min(2, "Минимум 2 символа").max(10000),
+});
+
+export const siteNewsActionSchema = z.object({
+  action: z.enum(["unpublish", "republish"]),
+});
+
 export const playerRegisterSchema = z.object({
   firstName: z.string().min(2, "Минимум 2 символа"),
   lastName: z.string().min(2, "Минимум 2 символа"),

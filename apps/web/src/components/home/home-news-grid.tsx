@@ -1,7 +1,15 @@
 import Link from "next/link";
 import type { HomeNewsItem } from "@/lib/home-content";
+import { APP_NAME } from "@/lib/brand";
 
 function AuthorBadge({ type }: { type: HomeNewsItem["authorType"] }) {
+  if (type === "service") {
+    return (
+      <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-violet-700 dark:border-violet-900/50 dark:bg-violet-950/40 dark:text-violet-300">
+        Сервис
+      </span>
+    );
+  }
   return (
     <span
       className={
@@ -61,8 +69,7 @@ export function HomeNewsGrid({ items }: { items: HomeNewsItem[] }) {
       <div className="home-content-card rounded-2xl px-6 py-12 text-center">
         <p className="home-card-title font-medium">Новостей пока нет</p>
         <p className="home-card-body mx-auto mt-2 max-w-md text-sm leading-relaxed">
-          Клубы публикуют анонсы турниров и акций в своём профиле — они появятся здесь, когда
-          появятся в вашем регионе.
+          Здесь появляются новости {APP_NAME} и анонсы клубов вашего региона.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link href="/clubs" className="site-btn-secondary">

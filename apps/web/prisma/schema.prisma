@@ -270,6 +270,21 @@ model ClubNews {
   @@map("club_news")
 }
 
+/** Новости платформы billiard.guru (не привязаны к клубу). */
+model SiteNews {
+  id          String     @id @default(cuid())
+  title       String
+  body        String     @db.Text
+  status      IdeaStatus @default(APPROVED)
+  authorId    String?    @map("author_id")
+  author      Player?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  publishedAt DateTime?  @map("published_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  @@index([status, publishedAt])
+  @@map("site_news")
+}
+
 model Player {
   id               String   @id @default(cuid())
   firstName        String   @map("first_name")
@@ -305,6 +320,7 @@ model Player {
   ideas                Idea[]
   ideaVotes            IdeaVote[]
   clubNewsAuthored     ClubNews[]
+  siteNewsAuthored     SiteNews[]
   playListings         PlayListing[]
   playListingResponses PlayListingResponse[]
   tableBookings        TableBooking[]

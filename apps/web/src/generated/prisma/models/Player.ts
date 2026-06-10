@@ -374,6 +374,7 @@ export type PlayerWhereInput = {
   ideas?: Prisma.IdeaListRelationFilter
   ideaVotes?: Prisma.IdeaVoteListRelationFilter
   clubNewsAuthored?: Prisma.ClubNewsListRelationFilter
+  siteNewsAuthored?: Prisma.SiteNewsListRelationFilter
   playListings?: Prisma.PlayListingListRelationFilter
   playListingResponses?: Prisma.PlayListingResponseListRelationFilter
   tableBookings?: Prisma.TableBookingListRelationFilter
@@ -417,6 +418,7 @@ export type PlayerOrderByWithRelationInput = {
   ideas?: Prisma.IdeaOrderByRelationAggregateInput
   ideaVotes?: Prisma.IdeaVoteOrderByRelationAggregateInput
   clubNewsAuthored?: Prisma.ClubNewsOrderByRelationAggregateInput
+  siteNewsAuthored?: Prisma.SiteNewsOrderByRelationAggregateInput
   playListings?: Prisma.PlayListingOrderByRelationAggregateInput
   playListingResponses?: Prisma.PlayListingResponseOrderByRelationAggregateInput
   tableBookings?: Prisma.TableBookingOrderByRelationAggregateInput
@@ -464,6 +466,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   ideas?: Prisma.IdeaListRelationFilter
   ideaVotes?: Prisma.IdeaVoteListRelationFilter
   clubNewsAuthored?: Prisma.ClubNewsListRelationFilter
+  siteNewsAuthored?: Prisma.SiteNewsListRelationFilter
   playListings?: Prisma.PlayListingListRelationFilter
   playListingResponses?: Prisma.PlayListingResponseListRelationFilter
   tableBookings?: Prisma.TableBookingListRelationFilter
@@ -566,6 +569,7 @@ export type PlayerCreateInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -608,6 +612,7 @@ export type PlayerUncheckedCreateInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -650,6 +655,7 @@ export type PlayerUpdateInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -692,6 +698,7 @@ export type PlayerUncheckedUpdateInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -980,6 +987,22 @@ export type PlayerUpdateOneWithoutClubNewsAuthoredNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutClubNewsAuthoredInput, Prisma.PlayerUpdateWithoutClubNewsAuthoredInput>, Prisma.PlayerUncheckedUpdateWithoutClubNewsAuthoredInput>
 }
 
+export type PlayerCreateNestedOneWithoutSiteNewsAuthoredInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutSiteNewsAuthoredInput, Prisma.PlayerUncheckedCreateWithoutSiteNewsAuthoredInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutSiteNewsAuthoredInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneWithoutSiteNewsAuthoredNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutSiteNewsAuthoredInput, Prisma.PlayerUncheckedCreateWithoutSiteNewsAuthoredInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutSiteNewsAuthoredInput
+  upsert?: Prisma.PlayerUpsertWithoutSiteNewsAuthoredInput
+  disconnect?: Prisma.PlayerWhereInput | boolean
+  delete?: Prisma.PlayerWhereInput | boolean
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutSiteNewsAuthoredInput, Prisma.PlayerUpdateWithoutSiteNewsAuthoredInput>, Prisma.PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput>
+}
+
 export type FloatFieldUpdateOperationsInput = {
   set?: number
   increment?: number
@@ -1208,6 +1231,7 @@ export type PlayerCreateWithoutCityInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -1249,6 +1273,7 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -1346,6 +1371,7 @@ export type PlayerCreateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -1387,6 +1413,7 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -1444,6 +1471,7 @@ export type PlayerUpdateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -1485,6 +1513,7 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -1526,6 +1555,7 @@ export type PlayerCreateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
@@ -1567,6 +1597,7 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
@@ -1624,6 +1655,7 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
@@ -1665,6 +1697,7 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
@@ -1705,6 +1738,7 @@ export type PlayerCreateWithoutClubNewsAuthoredInput = {
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -1746,6 +1780,7 @@ export type PlayerUncheckedCreateWithoutClubNewsAuthoredInput = {
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -1803,6 +1838,7 @@ export type PlayerUpdateWithoutClubNewsAuthoredInput = {
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -1844,6 +1880,191 @@ export type PlayerUncheckedUpdateWithoutClubNewsAuthoredInput = {
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
+  playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerCreateWithoutSiteNewsAuthoredInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+  clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
+  playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutSiteNewsAuthoredInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  about?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+  clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
+  playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutSiteNewsAuthoredInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutSiteNewsAuthoredInput, Prisma.PlayerUncheckedCreateWithoutSiteNewsAuthoredInput>
+}
+
+export type PlayerUpsertWithoutSiteNewsAuthoredInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutSiteNewsAuthoredInput, Prisma.PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutSiteNewsAuthoredInput, Prisma.PlayerUncheckedCreateWithoutSiteNewsAuthoredInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutSiteNewsAuthoredInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutSiteNewsAuthoredInput, Prisma.PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput>
+}
+
+export type PlayerUpdateWithoutSiteNewsAuthoredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+  clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
+  playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+  clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -1886,6 +2107,7 @@ export type PlayerCreateWithoutNotificationPreferencesInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -1927,6 +2149,7 @@ export type PlayerUncheckedCreateWithoutNotificationPreferencesInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -1984,6 +2207,7 @@ export type PlayerUpdateWithoutNotificationPreferencesInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -2025,6 +2249,7 @@ export type PlayerUncheckedUpdateWithoutNotificationPreferencesInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -2066,6 +2291,7 @@ export type PlayerCreateWithoutCoachReviewsReceivedInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -2107,6 +2333,7 @@ export type PlayerUncheckedCreateWithoutCoachReviewsReceivedInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -2153,6 +2380,7 @@ export type PlayerCreateWithoutCoachReviewsGivenInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -2194,6 +2422,7 @@ export type PlayerUncheckedCreateWithoutCoachReviewsGivenInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -2251,6 +2480,7 @@ export type PlayerUpdateWithoutCoachReviewsReceivedInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -2292,6 +2522,7 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -2344,6 +2575,7 @@ export type PlayerUpdateWithoutCoachReviewsGivenInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -2385,6 +2617,7 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsGivenInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -2425,6 +2658,7 @@ export type PlayerCreateWithoutClubRatingsInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -2466,6 +2700,7 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -2523,6 +2758,7 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -2564,6 +2800,7 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -2605,6 +2842,7 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -2646,6 +2884,7 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -2703,6 +2942,7 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -2744,6 +2984,7 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -2785,6 +3026,7 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -2826,6 +3068,7 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -2872,6 +3115,7 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -2913,6 +3157,7 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -2970,6 +3215,7 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -3011,6 +3257,7 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -3063,6 +3310,7 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -3104,6 +3352,7 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -3145,6 +3394,7 @@ export type PlayerCreateWithoutRegistrationsInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -3186,6 +3436,7 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -3243,6 +3494,7 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -3284,6 +3536,7 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -3325,6 +3578,7 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -3366,6 +3620,7 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -3423,6 +3678,7 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -3464,6 +3720,7 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -3505,6 +3762,7 @@ export type PlayerCreateWithoutIdeasInput = {
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -3546,6 +3804,7 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -3603,6 +3862,7 @@ export type PlayerUpdateWithoutIdeasInput = {
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -3644,6 +3904,7 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -3685,6 +3946,7 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
@@ -3726,6 +3988,7 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
@@ -3783,6 +4046,7 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -3824,6 +4088,7 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -3866,6 +4131,7 @@ export type PlayerCreateWithoutPlayListingsInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
@@ -3907,6 +4173,7 @@ export type PlayerUncheckedCreateWithoutPlayListingsInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
@@ -3964,6 +4231,7 @@ export type PlayerUpdateWithoutPlayListingsInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
@@ -4005,6 +4273,7 @@ export type PlayerUncheckedUpdateWithoutPlayListingsInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
@@ -4046,6 +4315,7 @@ export type PlayerCreateWithoutPlayListingResponsesInput = {
   ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
   tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
@@ -4087,6 +4357,7 @@ export type PlayerUncheckedCreateWithoutPlayListingResponsesInput = {
   ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
   ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
   playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
   tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
   clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
@@ -4144,6 +4415,7 @@ export type PlayerUpdateWithoutPlayListingResponsesInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
@@ -4185,6 +4457,7 @@ export type PlayerUncheckedUpdateWithoutPlayListingResponsesInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
   clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
@@ -4250,6 +4523,7 @@ export type PlayerUpdateWithoutCityInput = {
   ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
@@ -4291,6 +4565,7 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
   ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
   clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
   playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
   playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
   tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
@@ -4340,6 +4615,7 @@ export type PlayerCountOutputType = {
   ideas: number
   ideaVotes: number
   clubNewsAuthored: number
+  siteNewsAuthored: number
   playListings: number
   playListingResponses: number
   tableBookings: number
@@ -4359,6 +4635,7 @@ export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   ideas?: boolean | PlayerCountOutputTypeCountIdeasArgs
   ideaVotes?: boolean | PlayerCountOutputTypeCountIdeaVotesArgs
   clubNewsAuthored?: boolean | PlayerCountOutputTypeCountClubNewsAuthoredArgs
+  siteNewsAuthored?: boolean | PlayerCountOutputTypeCountSiteNewsAuthoredArgs
   playListings?: boolean | PlayerCountOutputTypeCountPlayListingsArgs
   playListingResponses?: boolean | PlayerCountOutputTypeCountPlayListingResponsesArgs
   tableBookings?: boolean | PlayerCountOutputTypeCountTableBookingsArgs
@@ -4439,6 +4716,13 @@ export type PlayerCountOutputTypeCountIdeaVotesArgs<ExtArgs extends runtime.Type
  */
 export type PlayerCountOutputTypeCountClubNewsAuthoredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ClubNewsWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountSiteNewsAuthoredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SiteNewsWhereInput
 }
 
 /**
@@ -4525,6 +4809,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   ideas?: boolean | Prisma.Player$ideasArgs<ExtArgs>
   ideaVotes?: boolean | Prisma.Player$ideaVotesArgs<ExtArgs>
   clubNewsAuthored?: boolean | Prisma.Player$clubNewsAuthoredArgs<ExtArgs>
+  siteNewsAuthored?: boolean | Prisma.Player$siteNewsAuthoredArgs<ExtArgs>
   playListings?: boolean | Prisma.Player$playListingsArgs<ExtArgs>
   playListingResponses?: boolean | Prisma.Player$playListingResponsesArgs<ExtArgs>
   tableBookings?: boolean | Prisma.Player$tableBookingsArgs<ExtArgs>
@@ -4575,6 +4860,7 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   ideas?: boolean | Prisma.Player$ideasArgs<ExtArgs>
   ideaVotes?: boolean | Prisma.Player$ideaVotesArgs<ExtArgs>
   clubNewsAuthored?: boolean | Prisma.Player$clubNewsAuthoredArgs<ExtArgs>
+  siteNewsAuthored?: boolean | Prisma.Player$siteNewsAuthoredArgs<ExtArgs>
   playListings?: boolean | Prisma.Player$playListingsArgs<ExtArgs>
   playListingResponses?: boolean | Prisma.Player$playListingResponsesArgs<ExtArgs>
   tableBookings?: boolean | Prisma.Player$tableBookingsArgs<ExtArgs>
@@ -4598,6 +4884,7 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     ideas: Prisma.$IdeaPayload<ExtArgs>[]
     ideaVotes: Prisma.$IdeaVotePayload<ExtArgs>[]
     clubNewsAuthored: Prisma.$ClubNewsPayload<ExtArgs>[]
+    siteNewsAuthored: Prisma.$SiteNewsPayload<ExtArgs>[]
     playListings: Prisma.$PlayListingPayload<ExtArgs>[]
     playListingResponses: Prisma.$PlayListingResponsePayload<ExtArgs>[]
     tableBookings: Prisma.$TableBookingPayload<ExtArgs>[]
@@ -4980,6 +5267,7 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   ideas<T extends Prisma.Player$ideasArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$ideasArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ideaVotes<T extends Prisma.Player$ideaVotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$ideaVotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IdeaVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clubNewsAuthored<T extends Prisma.Player$clubNewsAuthoredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$clubNewsAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClubNewsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  siteNewsAuthored<T extends Prisma.Player$siteNewsAuthoredArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$siteNewsAuthoredArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteNewsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   playListings<T extends Prisma.Player$playListingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$playListingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayListingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   playListingResponses<T extends Prisma.Player$playListingResponsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$playListingResponsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayListingResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tableBookings<T extends Prisma.Player$tableBookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$tableBookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TableBookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -5600,6 +5888,30 @@ export type Player$clubNewsAuthoredArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.ClubNewsScalarFieldEnum | Prisma.ClubNewsScalarFieldEnum[]
+}
+
+/**
+ * Player.siteNewsAuthored
+ */
+export type Player$siteNewsAuthoredArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SiteNews
+   */
+  select?: Prisma.SiteNewsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SiteNews
+   */
+  omit?: Prisma.SiteNewsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SiteNewsInclude<ExtArgs> | null
+  where?: Prisma.SiteNewsWhereInput
+  orderBy?: Prisma.SiteNewsOrderByWithRelationInput | Prisma.SiteNewsOrderByWithRelationInput[]
+  cursor?: Prisma.SiteNewsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SiteNewsScalarFieldEnum | Prisma.SiteNewsScalarFieldEnum[]
 }
 
 /**

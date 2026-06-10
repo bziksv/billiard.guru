@@ -390,6 +390,7 @@ export const ModelName = {
   ClubStaff: 'ClubStaff',
   TableBooking: 'TableBooking',
   ClubNews: 'ClubNews',
+  SiteNews: 'SiteNews',
   Player: 'Player',
   PlayerNotificationPreference: 'PlayerNotificationPreference',
   CoachRating: 'CoachRating',
@@ -426,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "player" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "dbBackupConfig" | "telegramDeliveryLog"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "siteNews" | "player" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "dbBackupConfig" | "telegramDeliveryLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -823,6 +824,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.ClubNewsCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.ClubNewsCountAggregateOutputType> | number
+        }
+      }
+    }
+    SiteNews: {
+      payload: Prisma.$SiteNewsPayload<ExtArgs>
+      fields: Prisma.SiteNewsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SiteNewsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SiteNewsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload>
+        }
+        findFirst: {
+          args: Prisma.SiteNewsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SiteNewsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload>
+        }
+        findMany: {
+          args: Prisma.SiteNewsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload>[]
+        }
+        create: {
+          args: Prisma.SiteNewsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload>
+        }
+        createMany: {
+          args: Prisma.SiteNewsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.SiteNewsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload>
+        }
+        update: {
+          args: Prisma.SiteNewsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload>
+        }
+        deleteMany: {
+          args: Prisma.SiteNewsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SiteNewsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.SiteNewsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteNewsPayload>
+        }
+        aggregate: {
+          args: Prisma.SiteNewsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSiteNews>
+        }
+        groupBy: {
+          args: Prisma.SiteNewsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteNewsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SiteNewsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteNewsCountAggregateOutputType> | number
         }
       }
     }
@@ -2354,6 +2421,19 @@ export const ClubNewsScalarFieldEnum = {
 export type ClubNewsScalarFieldEnum = (typeof ClubNewsScalarFieldEnum)[keyof typeof ClubNewsScalarFieldEnum]
 
 
+export const SiteNewsScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  body: 'body',
+  status: 'status',
+  authorId: 'authorId',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type SiteNewsScalarFieldEnum = (typeof SiteNewsScalarFieldEnum)[keyof typeof SiteNewsScalarFieldEnum]
+
+
 export const PlayerScalarFieldEnum = {
   id: 'id',
   firstName: 'firstName',
@@ -2813,6 +2893,16 @@ export const ClubNewsOrderByRelevanceFieldEnum = {
 } as const
 
 export type ClubNewsOrderByRelevanceFieldEnum = (typeof ClubNewsOrderByRelevanceFieldEnum)[keyof typeof ClubNewsOrderByRelevanceFieldEnum]
+
+
+export const SiteNewsOrderByRelevanceFieldEnum = {
+  id: 'id',
+  title: 'title',
+  body: 'body',
+  authorId: 'authorId'
+} as const
+
+export type SiteNewsOrderByRelevanceFieldEnum = (typeof SiteNewsOrderByRelevanceFieldEnum)[keyof typeof SiteNewsOrderByRelevanceFieldEnum]
 
 
 export const PlayerOrderByRelevanceFieldEnum = {
@@ -3320,6 +3410,7 @@ export type GlobalOmitConfig = {
   clubStaff?: Prisma.ClubStaffOmit
   tableBooking?: Prisma.TableBookingOmit
   clubNews?: Prisma.ClubNewsOmit
+  siteNews?: Prisma.SiteNewsOmit
   player?: Prisma.PlayerOmit
   playerNotificationPreference?: Prisma.PlayerNotificationPreferenceOmit
   coachRating?: Prisma.CoachRatingOmit
