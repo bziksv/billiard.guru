@@ -55,16 +55,7 @@ export default async function HomePage({
     player?.city.countryId,
   );
 
-  const [
-    localTournaments,
-    clubs,
-    topPlayers,
-    stats,
-    news,
-    playAnnouncements,
-    bracketFormats,
-    formatLabels,
-  ] = await Promise.all([
+  const [localTournaments, clubs, topPlayers, playAnnouncements] = await Promise.all([
     prisma.tournament.findMany({
       where: tournamentGeoWhere(geo),
       include: tournamentListInclude,
@@ -83,9 +74,12 @@ export default async function HomePage({
       orderBy: [{ rating: "desc" }, { lastName: "asc" }],
       take: 8,
     }),
+    loadHomePlayAnnouncements(geo),
+  ]);
+
+  const [stats, news, bracketFormats, formatLabels] = await Promise.all([
     loadHomeStats(),
     loadHomeNews(geo),
-    loadHomePlayAnnouncements(geo),
     loadHomeBracketFormats(),
     getAllBracketFormatLabels(),
   ]);

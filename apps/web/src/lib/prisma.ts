@@ -9,13 +9,15 @@ function parseDatabaseUrl(raw: string) {
   const url = new URL(normalized);
   // Beget: localhost = Unix socket; 127.0.0.1 = TCP (часто недоступен из Passenger)
   const host = url.hostname;
+  const isDev = process.env.NODE_ENV !== "production";
   return {
     host,
     port: url.port ? Number(url.port) : 3306,
     user: decodeURIComponent(url.username),
     password: decodeURIComponent(url.password),
     database: url.pathname.replace(/^\//, ""),
-    connectionLimit: 5,
+    // Главная и др. страницы шлют 10+ параллельных запросов; при limit=5 — pool timeout и 500.
+    connectionLimit: isDev ? 15 : 10,
     connectTimeout: 10_000,
     allowPublicKeyRetrieval: true,
   };
