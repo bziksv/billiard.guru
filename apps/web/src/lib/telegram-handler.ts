@@ -449,9 +449,17 @@ export async function processTelegramUpdate(
     return;
   }
 
-  // /start — клуб, игрок или новый пользователь
+  // /start — игрок, клуб или новый пользователь
   if (text.startsWith("/start") || text === "/start") {
     try {
+      const verifiedPlayer = await prisma.player.findFirst({
+        where: { telegramId, isVerified: true },
+      });
+      if (verifiedPlayer) {
+        await sendVerifiedWelcome(telegramId, verifiedPlayer);
+        return;
+      }
+
       const club = await prisma.club.findFirst({
         where: { telegramId, isVerified: true },
       });
@@ -461,14 +469,6 @@ export async function processTelegramUpdate(
           `🏢 <b>${club.name}</b>\n\nВыберите «${BOT_MENU_CLUB_POKATAT}» для откликов на объявления.`,
           { replyMarkup: clubPokatatMenuKeyboard() },
         );
-        return;
-      }
-
-      const verifiedPlayer = await prisma.player.findFirst({
-        where: { telegramId, isVerified: true },
-      });
-      if (verifiedPlayer) {
-        await sendVerifiedWelcome(telegramId, verifiedPlayer);
         return;
       }
     } catch (err) {
