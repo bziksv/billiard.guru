@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { writeAuditLog } from "@/lib/audit";
+import { auditPlayListingStatusLabel } from "@/lib/audit-display";
 import { authErrorResponse, getSession } from "@/lib/auth";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import { serializePlayListing } from "@/lib/play-listing-server";
@@ -50,7 +51,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       actorId: session.playerId,
       section: "pokatat",
       clubId,
-      summary: `Статус: ${data.status}`,
+      summary: `Статус: ${auditPlayListingStatusLabel(data.status)}`,
       payload: data,
     });
 

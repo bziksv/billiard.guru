@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { AUDIT_RETENTION_DAYS, AUDIT_ACTION_LABELS, AUDIT_SECTION_LABELS, inferAuditSection, type AuditSectionId } from "@/lib/audit-sections";
+import { humanizeAuditSummary } from "@/lib/audit-display";
 import {
   augmentAuditChangeEntry,
   diffFloorPlanAuditLines,
@@ -109,16 +110,22 @@ export async function GET(request: NextRequest) {
             if (lines.length > 0) entry.diff = lines;
           }
 
-          changeMap[k] = entry;
+          changeMap[k] = {
+            ...entry,
+            from: humanizeAuditSummary(entry.from) ?? entry.from,
+            to: humanizeAuditSummary(entry.to) ?? entry.to,
+          };
         }
       }
 
-      const details =
+      const detailsRaw =
         Object.keys(changeMap).length > 0
           ? formatAuditChanges(changeMap)
           : row.summary && row.summary !== "Изменения в профиле"
             ? row.summary
             : null;
+
+      const details = detailsRaw ? humanizeAuditSummary(detailsRaw) : null;
 
       return {
         id: row.id,
@@ -127,7 +134,7 @@ export async function GET(request: NextRequest) {
         actorLabel,
         action: row.action,
         actionLabel: typeof actionLabel === "string" ? actionLabel : row.action,
-        summary: row.summary,
+        summary: humanizeAuditSummary(row.summary),
         details,
         changes: Object.keys(changeMap).length > 0 ? changeMap : null,
       };

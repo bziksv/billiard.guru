@@ -1,4 +1,5 @@
 import { writeAuditLog } from "@/lib/audit";
+import { auditBookingStatusSummary } from "@/lib/audit-display";
 import { clubOwnedByPlayer } from "@/lib/club-access";
 import { isClubStaffMember } from "@/lib/club-staff";
 import { logger } from "@/lib/logger";
@@ -118,7 +119,7 @@ export async function applyClubBookingStatusFromTelegram(
     entityId: bookingId,
     section: "bookings",
     clubId: booking.clubId,
-    summary: `Статус брони из Telegram: ${status}`,
+    summary: auditBookingStatusSummary(status, "telegram"),
   });
 
   if (status === "CONFIRMED") {

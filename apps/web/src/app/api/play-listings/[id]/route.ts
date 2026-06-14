@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { auditPlayListingStatusLabel } from "@/lib/audit-display";
 import { writeAuditLog } from "@/lib/audit";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { logger } from "@/lib/logger";
@@ -106,7 +107,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       entityId: id,
       actorType: "player",
       actorId: player.id,
-      summary: `Статус: ${data.status}`,
+      summary: `Статус: ${auditPlayListingStatusLabel(updated.status)}`,
       payload: data,
     });
 

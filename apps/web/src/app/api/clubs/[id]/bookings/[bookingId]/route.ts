@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
+import { auditBookingStatusSummary } from "@/lib/audit-display";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import {
@@ -98,7 +99,7 @@ export async function PATCH(
       section: "bookings",
       clubId,
       summary: status
-        ? `Статус брони: ${status}`
+        ? auditBookingStatusSummary(status)
         : "Обновлена заметка клуба",
     });
 

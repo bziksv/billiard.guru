@@ -35,8 +35,12 @@ function readStoredTheme(): Theme {
   return THEME_DEFAULT;
 }
 
+function defaultResolvedTheme(): ResolvedTheme {
+  return THEME_DEFAULT === "dark" ? "dark" : "light";
+}
+
 function systemTheme(): ResolvedTheme {
-  if (typeof window === "undefined") return "dark";
+  if (typeof window === "undefined") return defaultResolvedTheme();
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
@@ -71,7 +75,7 @@ function applyTheme(theme: Theme, disableTransition: boolean) {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(THEME_DEFAULT);
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("dark");
+  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(defaultResolvedTheme);
 
   useEffect(() => {
     const stored = readStoredTheme();

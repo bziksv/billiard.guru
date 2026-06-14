@@ -10,8 +10,7 @@ html {
   }
 }
 
-/* ── Dark theme (default) ── */
-:root,
+/* ── Dark theme ── */
 html.dark {
   color-scheme: dark;
   --bg-base: #09090b;
@@ -99,7 +98,8 @@ html.dark {
   --badge-muted-fg: #a1a1aa;
 }
 
-/* ── Light theme ── */
+/* ── Light theme (default) ── */
+:root,
 html.light {
   color-scheme: light;
   --bg-base: #fafafa;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { writeAuditLog } from "@/lib/audit";
+import { auditPlayListingResponseStatusLabel } from "@/lib/audit-display";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
@@ -61,7 +62,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       entityId: listingId,
       actorType: "player",
       actorId: player.id,
-      summary: `Отклик → ${data.status}`,
+      summary: `Отклик → ${auditPlayListingResponseStatusLabel(data.status)}`,
       payload: { responseId, status: data.status },
     });
 

@@ -250,6 +250,16 @@ export async function startBookingClubList(
   await replyOrEdit(telegramId, text, { inline_keyboard: rows }, sourceMessage);
 }
 
+/** Склонение «N столов в клубе» для кнопок бронирования. */
+function tablesInClubButtonLabel(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod100 >= 11 && mod100 <= 14) return `${count} столов в клубе`;
+  if (mod10 === 1) return `${count} стол в клубе`;
+  if (mod10 >= 2 && mod10 <= 4) return `${count} стола в клубе`;
+  return `${count} столов в клубе`;
+}
+
 async function showFormatStep(
   telegramId: string,
   club: ClubRow,
@@ -269,7 +279,7 @@ async function showFormatStep(
 
   const rows: InlineButton[][] = formats.map((f) => [
     {
-      text: `${f.label} (${f.count})`,
+      text: `${f.label} (${tablesInClubButtonLabel(f.count)})`,
       callback_data: `bk2_${club.id}_${fmtCode(f.id)}`,
     },
   ]);
@@ -279,7 +289,7 @@ async function showFormatStep(
 
   await replyOrEdit(
     telegramId,
-    `📅 <b>${escapeHtml(club.name)}</b>\n\nВыберите формат стола:${noteBlock}`,
+    `<b>${escapeHtml(club.name)}</b>\n\nВыберите тип бильярдного стола:${noteBlock}`,
     { inline_keyboard: rows },
     sourceMessage,
   );

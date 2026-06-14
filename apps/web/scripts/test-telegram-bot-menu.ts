@@ -15,6 +15,8 @@ assert.equal(parseBotMenuAction("/profile"), "profile");
 assert.equal(parseBotMenuAction(BOT_MENU_TOURNAMENTS), "tournaments");
 assert.equal(parseBotMenuAction("/tournaments@BilliardGuruBot"), "tournaments");
 assert.equal(parseBotMenuAction(BOT_MENU_BOOKINGS), "bookings");
+assert.equal(parseBotMenuAction("/book"), "bookings");
+assert.equal(parseBotMenuAction("📅 Забронировать"), "bookings");
 assert.equal(parseBotMenuAction(BOT_MENU_POKATAT), "pokatat");
 assert.equal(parseBotMenuAction(BOT_MENU_CLUB_POKATAT), "club_pokatat");
 assert.equal(parseBotMenuAction(BOT_MENU_NOTIFICATIONS), "notifications");

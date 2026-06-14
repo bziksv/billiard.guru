@@ -1,6 +1,7 @@
 "use client";
 
 import { useTheme } from "@/components/theme/theme-provider";
+import { THEME_DEFAULT } from "@/lib/theme-script";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 
@@ -53,7 +54,7 @@ export function ThemeToggle({
 
   useEffect(() => setMounted(true), []);
 
-  const isDark = mounted ? resolvedTheme === "dark" : true;
+  const isDark = mounted ? resolvedTheme === "dark" : THEME_DEFAULT === "dark";
 
   function toggleTheme() {
     setTheme(isDark ? "light" : "dark");
@@ -78,7 +79,11 @@ export function ThemeToggle({
         aria-label="Тема"
         disabled
       >
-        <IconMoon className="h-5 w-5 opacity-50" />
+        {THEME_DEFAULT === "dark" ? (
+          <IconMoon className="h-5 w-5 opacity-50" />
+        ) : (
+          <IconSun className="h-5 w-5 opacity-50" />
+        )}
       </button>
     );
   }

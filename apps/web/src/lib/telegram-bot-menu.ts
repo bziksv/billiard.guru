@@ -1,7 +1,4 @@
-import {
-  loadBookableClubsInCity,
-  startBookingClubList,
-} from "@/lib/telegram-bot-booking";
+import { loadBookableClubsInCity } from "@/lib/telegram-bot-booking";
 import {
   BOT_MENU_CLUB_POKATAT,
   startClubPokatatMenu,
@@ -34,8 +31,10 @@ import type { Player, City, Country } from "@/generated/prisma/client";
 
 export const BOT_MENU_PROFILE = "👤 Мой Профиль";
 export const BOT_MENU_TOURNAMENTS = "🏆 Мои турниры";
-export const BOT_MENU_BOOKINGS = "🎱 Мои брони";
-export const BOT_MENU_BOOK = "📅 Забронировать";
+export const BOT_MENU_BOOKINGS = "🎱 Мои брони / Забронировать";
+/** Старые подписи кнопок — распознаём до обновления клавиатуры. */
+export const BOT_MENU_BOOKINGS_LEGACY = "🎱 Мои брони";
+export const BOT_MENU_BOOK_LEGACY = "📅 Забронировать";
 export const BOT_MENU_NOTIFICATIONS = "🔔 Уведомления";
 export { BOT_MENU_POKATAT, BOT_MENU_CLUB_POKATAT };
 
@@ -45,7 +44,6 @@ export type BotMenuAction =
   | "profile"
   | "tournaments"
   | "bookings"
-  | "book"
   | "pokatat"
   | "club_pokatat"
   | "notifications";
@@ -74,7 +72,7 @@ export function mainMenuKeyboard() {
   return {
     keyboard: [
       [{ text: BOT_MENU_PROFILE }, { text: BOT_MENU_TOURNAMENTS }],
-      [{ text: BOT_MENU_BOOKINGS }, { text: BOT_MENU_BOOK }],
+      [{ text: BOT_MENU_BOOKINGS }],
       [{ text: BOT_MENU_POKATAT }],
       [{ text: BOT_MENU_NOTIFICATIONS }],
     ],
@@ -87,7 +85,7 @@ export function mainMenuKeyboard() {
 export async function buildMainMenuKeyboard(telegramId: string) {
   const rows: { text: string }[][] = [
     [{ text: BOT_MENU_PROFILE }, { text: BOT_MENU_TOURNAMENTS }],
-    [{ text: BOT_MENU_BOOKINGS }, { text: BOT_MENU_BOOK }],
+    [{ text: BOT_MENU_BOOKINGS }],
     [{ text: BOT_MENU_POKATAT }],
   ];
   if (await telegramUserHasClubPokatatAccess(telegramId)) {
@@ -154,24 +152,14 @@ export function parseBotMenuAction(text: string): BotMenuAction | null {
   }
   if (
     trimmed === BOT_MENU_BOOKINGS ||
+    trimmed === BOT_MENU_BOOKINGS_LEGACY ||
+    trimmed === BOT_MENU_BOOK_LEGACY ||
     trimmed === "/bookings" ||
-    trimmed.startsWith("/bookings@")
-  ) {
-    return "bookings";
-  }
-  if (
-    trimmed === BOT_MENU_NOTIFICATIONS ||
-    trimmed === "/notifications" ||
-    trimmed.startsWith("/notifications@")
-  ) {
-    return "notifications";
-  }
-  if (
-    trimmed === BOT_MENU_BOOK ||
+    trimmed.startsWith("/bookings@") ||
     trimmed === "/book" ||
     trimmed.startsWith("/book@")
   ) {
-    return "book";
+    return "bookings";
   }
   if (
     trimmed === BOT_MENU_POKATAT ||
@@ -182,6 +170,13 @@ export function parseBotMenuAction(text: string): BotMenuAction | null {
   }
   if (trimmed === BOT_MENU_CLUB_POKATAT || trimmed === "/club_pokatat") {
     return "club_pokatat";
+  }
+  if (
+    trimmed === BOT_MENU_NOTIFICATIONS ||
+    trimmed === "/notifications" ||
+    trimmed.startsWith("/notifications@")
+  ) {
+    return "notifications";
   }
   return null;
 }
@@ -373,8 +368,6 @@ export async function handleBotMenuAction(
       return handleMyTournaments(telegramId);
     case "bookings":
       return handleMyBookings(telegramId);
-    case "book":
-      return startBookingClubList(telegramId);
     case "pokatat":
       return handlePlayerPokatatMenu(telegramId);
     case "club_pokatat":

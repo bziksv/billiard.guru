@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
+import { auditTableFormatLabel } from "@/lib/audit-display";
 import { authErrorResponse } from "@/lib/auth";
 import { validateClubManageBooking } from "@/lib/club-bookings-manage";
 import { requireClubManageAccess } from "@/lib/club-manage";
@@ -190,7 +191,7 @@ export async function POST(
       summary:
         data.kind === "BLOCK"
           ? "Блокировка слота"
-          : `Ручная бронь · ${booking.tableFormat}`,
+          : `Ручная бронь · ${auditTableFormatLabel(booking.tableFormat)}`,
     });
 
     return NextResponse.json(booking, { status: 201 });
