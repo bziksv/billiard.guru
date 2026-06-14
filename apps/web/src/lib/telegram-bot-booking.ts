@@ -254,6 +254,7 @@ async function showFormatStep(
   telegramId: string,
   club: ClubRow,
   sourceMessage?: { chatId: string; messageId: number },
+  note?: string,
 ) {
   const formats = clubBookingFormatEntries(club.tableCounts, club.floorPlan);
   if (formats.length === 0) {
@@ -274,12 +275,45 @@ async function showFormatStep(
   ]);
   rows.push([{ text: "← К клубам", callback_data: "bk0" }]);
 
+  const noteBlock = note ? `\n\n${note}` : "";
+
   await replyOrEdit(
     telegramId,
-    `📅 <b>${escapeHtml(club.name)}</b>\n\nВыберите формат стола:`,
+    `📅 <b>${escapeHtml(club.name)}</b>\n\nВыберите формат стола:${noteBlock}`,
     { inline_keyboard: rows },
     sourceMessage,
   );
+}
+
+export async function startBookingForClub(telegramId: string, clubId: string) {
+  const player = await findVerifiedPlayer(telegramId);
+  if (!player) {
+    await sendTelegramMessage(
+      telegramId,
+      "❌ Для бронирования нужен профиль на billiard.guru.\n\nПодтвердите номер через /start, затем снова откройте ссылку клуба.",
+    );
+    return;
+  }
+
+  const club = await prisma.club.findFirst({
+    where: { id: clubId, bookingEnabled: true, isVerified: true },
+    select: clubSelect,
+  });
+
+  if (!club) {
+    await sendTelegramMessage(
+      telegramId,
+      "❌ Клуб недоступен для бронирования.\n\nВозможно, бронирование отключено или клуб ещё не подтверждён.",
+    );
+    return;
+  }
+
+  const note =
+    club.cityId !== player.cityId
+      ? "<i>Клуб в другом городе — бронирование по прямой ссылке.</i>"
+      : undefined;
+
+  await showFormatStep(telegramId, club, undefined, note);
 }
 
 async function showDateStep(
@@ -695,7 +729,7 @@ export async function handleBookingCallback(
       const [, clubId, code] = data.split("_");
       const format = code ? parseFmtCode(code) : null;
       const club = clubId ? await loadClubById(clubId) : null;
-      if (!club || !format || club.cityId !== player.cityId) {
+      if (!club || !format || !club.bookingEnabled) {
         await answerCallbackQuery(callbackQueryId, "Ошибка");
         return true;
       }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SectionLogsButton } from "@/components/audit/section-logs-button";
 import { ClubBookingsManager } from "@/components/club/club-bookings-manager";
+import { ClubTelegramBookingLink } from "@/components/site/club-telegram-booking-link";
 
 export function ClubBookingSettingsEditor({
   clubId,
@@ -83,6 +84,8 @@ export function ClubBookingSettingsEditor({
       </div>
 
       <ClubBookingsManager clubId={clubId} />
+
+      {bookingEnabled && <ClubTelegramBookingLink clubId={clubId} />}
 
       <details className="admin-card group">
         <summary className="cursor-pointer list-none px-6 py-4 font-semibold marker:content-none [&::-webkit-details-marker]:hidden">

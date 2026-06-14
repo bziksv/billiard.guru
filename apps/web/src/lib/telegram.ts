@@ -1,4 +1,5 @@
 import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
+import { buildBookClubLink } from "@/lib/telegram-booking-link";
 import {
   pruneTelegramDeliveryLogs,
   writeTelegramDeliveryLog,
@@ -11,6 +12,13 @@ export function buildConfirmLink(token: string): string {
 
 export function parseConfirmToken(text: string): string | null {
   const match = text.match(/confirm_([a-f0-9-]+)/i);
+  return match?.[1] ?? null;
+}
+
+export { buildBookClubLink };
+
+export function parseBookClubStartParam(text: string): string | null {
+  const match = text.match(/(?:^|\s)book_([a-z0-9]+)/i);
   return match?.[1] ?? null;
 }
 

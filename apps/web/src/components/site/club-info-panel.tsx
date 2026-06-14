@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { ClubBookingScrollButton } from "@/components/site/club-booking-scroll-button";
+import { ClubTelegramBookingLink } from "@/components/site/club-telegram-booking-link";
 import { ClubScheduleDisplay } from "@/components/site/club-schedule-display";
 import { SiteCard } from "@/components/site/site-card";
 import { PhoneLink, TelegramLink } from "@/lib/contact-links";
@@ -20,6 +21,7 @@ type ClubInfoPanelProps = {
   tableCount?: number | null;
   tableCounts?: unknown;
   bookingEnabled?: boolean;
+  clubId?: string;
 };
 
 function PanelSection({
@@ -68,6 +70,7 @@ export function ClubInfoPanel({
   tableCount,
   tableCounts: tableCountsRaw,
   bookingEnabled,
+  clubId,
 }: ClubInfoPanelProps) {
   const tableCounts = parseClubTableCounts(tableCountsRaw);
   const countsTotal = clubTableCountsTotal(tableCounts);
@@ -96,7 +99,12 @@ export function ClubInfoPanel({
         </div>
       )}
 
-      {bookingEnabled && <ClubBookingScrollButton />}
+      {bookingEnabled && (
+        <>
+          <ClubBookingScrollButton />
+          {clubId && <ClubTelegramBookingLink clubId={clubId} compact />}
+        </>
+      )}
 
       {hasTables && (
         <PanelSection title="Столы">

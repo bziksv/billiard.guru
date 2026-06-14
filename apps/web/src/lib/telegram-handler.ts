@@ -5,6 +5,7 @@ import type { Club, Player } from "@/generated/prisma/client";
 import {
   contactRequestKeyboard,
   parseConfirmToken,
+  parseBookClubStartParam,
   removeKeyboard,
   sendTelegramMessage,
   answerCallbackQuery,
@@ -398,6 +399,21 @@ export async function processTelegramUpdate(
       await sendTelegramMessage(
         telegramId,
         "⚠️ Сервер временно недоступен. Попробуйте через минуту или нажмите /start",
+      );
+    }
+    return;
+  }
+
+  const bookClubId = parseBookClubStartParam(text);
+  if (bookClubId) {
+    try {
+      const { startBookingForClub } = await import("@/lib/telegram-bot-booking");
+      await startBookingForClub(telegramId, bookClubId);
+    } catch (err) {
+      logger.error({ err, bookClubId }, "Book club deep link failed");
+      await sendTelegramMessage(
+        telegramId,
+        "⚠️ Не удалось открыть бронирование. Попробуйте позже или /book",
       );
     }
     return;

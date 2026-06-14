@@ -127,6 +127,7 @@ export default async function ClubPage({
             tableCount={club.tableCount}
             tableCounts={club.tableCounts}
             bookingEnabled={club.bookingEnabled}
+            clubId={club.id}
           />
         </div>
 
