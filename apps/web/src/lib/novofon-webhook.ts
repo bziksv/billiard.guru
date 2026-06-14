@@ -13,10 +13,13 @@ const CALLER_KEYS = [
   "contact_phone_number",
   "caller_number",
   "caller_id",
+  "calling_number",
   "numa",
   "from",
   "phone",
   "contact",
+  "clid",
+  "ani",
 ] as const;
 
 const CALLED_KEYS = [
@@ -27,13 +30,15 @@ const CALLED_KEYS = [
   "destination",
 ] as const;
 
-function flattenParams(input: unknown): ParamBag {
-  if (!input || typeof input !== "object") return {};
-  const bag: ParamBag = {};
+function flattenParams(input: unknown, bag: ParamBag = {}, depth = 0): ParamBag {
+  if (!input || typeof input !== "object" || depth > 4) return bag;
   for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
     if (value == null) continue;
+    const k = key.toLowerCase();
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-      bag[key.toLowerCase()] = String(value);
+      bag[k] = String(value);
+    } else if (typeof value === "object") {
+      flattenParams(value, bag, depth + 1);
     }
   }
   return bag;
@@ -50,10 +55,6 @@ export function parseNovofonWebhookParams(
 
   if (body && typeof body === "object") {
     Object.assign(bag, flattenParams(body));
-    const nested = (body as Record<string, unknown>).data;
-    if (nested && typeof nested === "object") {
-      Object.assign(bag, flattenParams(nested));
-    }
   }
 
   return bag;

@@ -19,6 +19,20 @@ async function cancelPendingChallenges(playerId: string) {
 }
 
 export async function createLoginChallenge(playerId: string, telegramId: string) {
+  const existing = await prisma.loginChallenge.findFirst({
+    where: {
+      playerId,
+      status: "PENDING",
+      method: "TELEGRAM",
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  // Не слать повторное сообщение в Telegram при обновлении страницы /login
+  if (existing && Date.now() - existing.createdAt.getTime() < 2 * 60 * 1000) {
+    return { token: existing.token, expiresAt: existing.expiresAt };
+  }
+
   const token = randomUUID();
   const expiresAt = new Date(Date.now() + CHALLENGE_TTL_MS);
 
@@ -56,12 +70,12 @@ export async function confirmCallLoginChallenge(
   const pending = await prisma.loginChallenge.findMany({
     where: {
       status: "PENDING",
-      method: "CALL",
+      method: { in: ["CALL", "TELEGRAM"] },
       expiresAt: { gt: new Date() },
     },
     include: { player: true },
     orderBy: { createdAt: "desc" },
-    take: 20,
+    take: 30,
   });
 
   const { phonesMatchE164 } = await import("@/lib/phone-match");
@@ -80,7 +94,10 @@ export async function confirmCallLoginChallenge(
       action: "auth.login.confirm_call",
       entityType: "login_challenge",
       entityId: challenge.id,
-      summary: "Вход подтверждён звонком",
+      summary:
+        challenge.method === "CALL"
+          ? "Вход подтверждён звонком"
+          : "Вход подтверждён входящим звонком (сессия Telegram)",
     });
 
     return { ok: true, message: "Call login confirmed" };

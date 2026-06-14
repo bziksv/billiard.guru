@@ -65,7 +65,10 @@ async function handle(request: NextRequest) {
     });
   }
 
-  return NextResponse.json({ ok: result.ok });
+  return NextResponse.json({
+    ok: result.ok,
+    ...(result.ok ? {} : { reason: result.message }),
+  });
 }
 
 export async function GET(request: NextRequest) {

@@ -397,14 +397,21 @@ function LoginForm() {
           </p>
           {callAuthEnabled && callNumber && (
             <div className="border-t border-emerald-200/80 pt-3 dark:border-emerald-900/50">
-              <p className="text-xs text-[var(--text-muted)]">Или подтвердите звонком:</p>
+              <p className="text-xs text-[var(--text-muted)]">
+                Или позвоните с телефона, который вводили — звонок сбросится сам:
+              </p>
+              <p className="mt-1 text-center text-lg font-bold tabular-nums text-[var(--text-primary)]">
+                <a href={`tel:+${callNumber.replace(/\D/g, "")}`} className="hover:underline">
+                  {callNumber}
+                </a>
+              </p>
               <button
                 type="button"
                 disabled={loading}
                 onClick={() => void switchToCallAuth()}
-                className="mt-2 text-sm font-medium text-emerald-800 underline hover:text-emerald-950 disabled:opacity-50 dark:text-emerald-300"
+                className="mt-2 w-full text-center text-xs text-emerald-800 underline hover:text-emerald-950 disabled:opacity-50 dark:text-emerald-300"
               >
-                Позвонить на {callNumber}
+                Обновить ожидание звонка
               </button>
             </div>
           )}
