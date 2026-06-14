@@ -2,17 +2,28 @@ import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
 import { normalizePhone } from "@/lib/phone";
 import { normalizePhoneForCity } from "@/lib/phone-server";
-import { createLoginChallenge } from "@/lib/login-challenge";
+import { createLoginChallenge, createCallLoginChallenge } from "@/lib/login-challenge";
 import { buildConfirmLink } from "@/lib/telegram";
 import { writeAuditLog } from "@/lib/audit";
 import { playerRegisterSchema } from "@/lib/validators";
+import {
+  getNovofonVerifyNumberDisplay,
+  isNovofonCallAuthConfigured,
+  isNovofonCallAuthEnabled,
+} from "@/lib/novofon-config";
 
 export type AuthStartResult =
   | {
       mode: "login";
+      authMethod: "telegram" | "call";
       challengeToken: string;
       expiresAt: string;
       message: string;
+      callAuth?: {
+        available: boolean;
+        enabled: boolean;
+        callNumber: string | null;
+      };
     }
   | {
       mode: "confirm";
@@ -53,9 +64,33 @@ export async function resolveAuthByPhone(
     return {
       result: {
         mode: "login",
+        authMethod: "telegram",
         challengeToken: token,
         expiresAt: expiresAt.toISOString(),
         message: "Подтвердите вход в Telegram",
+        callAuth: {
+          available: isNovofonCallAuthConfigured(),
+          enabled: isNovofonCallAuthEnabled(),
+          callNumber: getNovofonVerifyNumberDisplay(),
+        },
+      },
+    };
+  }
+
+  if (player.isVerified && isNovofonCallAuthEnabled()) {
+    const { token, expiresAt } = await createCallLoginChallenge(player.id);
+    return {
+      result: {
+        mode: "login",
+        authMethod: "call",
+        challengeToken: token,
+        expiresAt: expiresAt.toISOString(),
+        message: "Позвоните на указанный номер с телефона, который вводили",
+        callAuth: {
+          available: true,
+          enabled: true,
+          callNumber: getNovofonVerifyNumberDisplay(),
+        },
       },
     };
   }

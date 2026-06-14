@@ -28,6 +28,7 @@ export type LoginChallengeMinAggregateOutputType = {
   id: string | null
   token: string | null
   playerId: string | null
+  method: $Enums.LoginChallengeMethod | null
   status: $Enums.LoginChallengeStatus | null
   expiresAt: Date | null
   createdAt: Date | null
@@ -38,6 +39,7 @@ export type LoginChallengeMaxAggregateOutputType = {
   id: string | null
   token: string | null
   playerId: string | null
+  method: $Enums.LoginChallengeMethod | null
   status: $Enums.LoginChallengeStatus | null
   expiresAt: Date | null
   createdAt: Date | null
@@ -48,6 +50,7 @@ export type LoginChallengeCountAggregateOutputType = {
   id: number
   token: number
   playerId: number
+  method: number
   status: number
   expiresAt: number
   createdAt: number
@@ -60,6 +63,7 @@ export type LoginChallengeMinAggregateInputType = {
   id?: true
   token?: true
   playerId?: true
+  method?: true
   status?: true
   expiresAt?: true
   createdAt?: true
@@ -70,6 +74,7 @@ export type LoginChallengeMaxAggregateInputType = {
   id?: true
   token?: true
   playerId?: true
+  method?: true
   status?: true
   expiresAt?: true
   createdAt?: true
@@ -80,6 +85,7 @@ export type LoginChallengeCountAggregateInputType = {
   id?: true
   token?: true
   playerId?: true
+  method?: true
   status?: true
   expiresAt?: true
   createdAt?: true
@@ -163,6 +169,7 @@ export type LoginChallengeGroupByOutputType = {
   id: string
   token: string
   playerId: string
+  method: $Enums.LoginChallengeMethod
   status: $Enums.LoginChallengeStatus
   expiresAt: Date
   createdAt: Date
@@ -194,6 +201,7 @@ export type LoginChallengeWhereInput = {
   id?: Prisma.StringFilter<"LoginChallenge"> | string
   token?: Prisma.StringFilter<"LoginChallenge"> | string
   playerId?: Prisma.StringFilter<"LoginChallenge"> | string
+  method?: Prisma.EnumLoginChallengeMethodFilter<"LoginChallenge"> | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFilter<"LoginChallenge"> | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFilter<"LoginChallenge"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"LoginChallenge"> | Date | string
@@ -205,6 +213,7 @@ export type LoginChallengeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   token?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  method?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -220,6 +229,7 @@ export type LoginChallengeWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.LoginChallengeWhereInput[]
   NOT?: Prisma.LoginChallengeWhereInput | Prisma.LoginChallengeWhereInput[]
   playerId?: Prisma.StringFilter<"LoginChallenge"> | string
+  method?: Prisma.EnumLoginChallengeMethodFilter<"LoginChallenge"> | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFilter<"LoginChallenge"> | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFilter<"LoginChallenge"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"LoginChallenge"> | Date | string
@@ -231,6 +241,7 @@ export type LoginChallengeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   token?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  method?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -247,6 +258,7 @@ export type LoginChallengeScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"LoginChallenge"> | string
   token?: Prisma.StringWithAggregatesFilter<"LoginChallenge"> | string
   playerId?: Prisma.StringWithAggregatesFilter<"LoginChallenge"> | string
+  method?: Prisma.EnumLoginChallengeMethodWithAggregatesFilter<"LoginChallenge"> | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusWithAggregatesFilter<"LoginChallenge"> | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeWithAggregatesFilter<"LoginChallenge"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"LoginChallenge"> | Date | string
@@ -256,6 +268,7 @@ export type LoginChallengeScalarWhereWithAggregatesInput = {
 export type LoginChallengeCreateInput = {
   id?: string
   token: string
+  method?: $Enums.LoginChallengeMethod
   status?: $Enums.LoginChallengeStatus
   expiresAt: Date | string
   createdAt?: Date | string
@@ -267,6 +280,7 @@ export type LoginChallengeUncheckedCreateInput = {
   id?: string
   token: string
   playerId: string
+  method?: $Enums.LoginChallengeMethod
   status?: $Enums.LoginChallengeStatus
   expiresAt: Date | string
   createdAt?: Date | string
@@ -276,6 +290,7 @@ export type LoginChallengeUncheckedCreateInput = {
 export type LoginChallengeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
+  method?: Prisma.EnumLoginChallengeMethodFieldUpdateOperationsInput | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFieldUpdateOperationsInput | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -287,6 +302,7 @@ export type LoginChallengeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
+  method?: Prisma.EnumLoginChallengeMethodFieldUpdateOperationsInput | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFieldUpdateOperationsInput | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -297,6 +313,7 @@ export type LoginChallengeCreateManyInput = {
   id?: string
   token: string
   playerId: string
+  method?: $Enums.LoginChallengeMethod
   status?: $Enums.LoginChallengeStatus
   expiresAt: Date | string
   createdAt?: Date | string
@@ -306,6 +323,7 @@ export type LoginChallengeCreateManyInput = {
 export type LoginChallengeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
+  method?: Prisma.EnumLoginChallengeMethodFieldUpdateOperationsInput | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFieldUpdateOperationsInput | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -316,6 +334,7 @@ export type LoginChallengeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
+  method?: Prisma.EnumLoginChallengeMethodFieldUpdateOperationsInput | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFieldUpdateOperationsInput | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -342,6 +361,7 @@ export type LoginChallengeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   token?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  method?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -352,6 +372,7 @@ export type LoginChallengeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   token?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  method?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -362,6 +383,7 @@ export type LoginChallengeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   token?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
+  method?: Prisma.SortOrder
   status?: Prisma.SortOrder
   expiresAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -410,6 +432,10 @@ export type LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput = {
   deleteMany?: Prisma.LoginChallengeScalarWhereInput | Prisma.LoginChallengeScalarWhereInput[]
 }
 
+export type EnumLoginChallengeMethodFieldUpdateOperationsInput = {
+  set?: $Enums.LoginChallengeMethod
+}
+
 export type EnumLoginChallengeStatusFieldUpdateOperationsInput = {
   set?: $Enums.LoginChallengeStatus
 }
@@ -417,6 +443,7 @@ export type EnumLoginChallengeStatusFieldUpdateOperationsInput = {
 export type LoginChallengeCreateWithoutPlayerInput = {
   id?: string
   token: string
+  method?: $Enums.LoginChallengeMethod
   status?: $Enums.LoginChallengeStatus
   expiresAt: Date | string
   createdAt?: Date | string
@@ -426,6 +453,7 @@ export type LoginChallengeCreateWithoutPlayerInput = {
 export type LoginChallengeUncheckedCreateWithoutPlayerInput = {
   id?: string
   token: string
+  method?: $Enums.LoginChallengeMethod
   status?: $Enums.LoginChallengeStatus
   expiresAt: Date | string
   createdAt?: Date | string
@@ -465,6 +493,7 @@ export type LoginChallengeScalarWhereInput = {
   id?: Prisma.StringFilter<"LoginChallenge"> | string
   token?: Prisma.StringFilter<"LoginChallenge"> | string
   playerId?: Prisma.StringFilter<"LoginChallenge"> | string
+  method?: Prisma.EnumLoginChallengeMethodFilter<"LoginChallenge"> | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFilter<"LoginChallenge"> | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFilter<"LoginChallenge"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"LoginChallenge"> | Date | string
@@ -474,6 +503,7 @@ export type LoginChallengeScalarWhereInput = {
 export type LoginChallengeCreateManyPlayerInput = {
   id?: string
   token: string
+  method?: $Enums.LoginChallengeMethod
   status?: $Enums.LoginChallengeStatus
   expiresAt: Date | string
   createdAt?: Date | string
@@ -483,6 +513,7 @@ export type LoginChallengeCreateManyPlayerInput = {
 export type LoginChallengeUpdateWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
+  method?: Prisma.EnumLoginChallengeMethodFieldUpdateOperationsInput | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFieldUpdateOperationsInput | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -492,6 +523,7 @@ export type LoginChallengeUpdateWithoutPlayerInput = {
 export type LoginChallengeUncheckedUpdateWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
+  method?: Prisma.EnumLoginChallengeMethodFieldUpdateOperationsInput | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFieldUpdateOperationsInput | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -501,6 +533,7 @@ export type LoginChallengeUncheckedUpdateWithoutPlayerInput = {
 export type LoginChallengeUncheckedUpdateManyWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   token?: Prisma.StringFieldUpdateOperationsInput | string
+  method?: Prisma.EnumLoginChallengeMethodFieldUpdateOperationsInput | $Enums.LoginChallengeMethod
   status?: Prisma.EnumLoginChallengeStatusFieldUpdateOperationsInput | $Enums.LoginChallengeStatus
   expiresAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -513,6 +546,7 @@ export type LoginChallengeSelect<ExtArgs extends runtime.Types.Extensions.Intern
   id?: boolean
   token?: boolean
   playerId?: boolean
+  method?: boolean
   status?: boolean
   expiresAt?: boolean
   createdAt?: boolean
@@ -526,13 +560,14 @@ export type LoginChallengeSelectScalar = {
   id?: boolean
   token?: boolean
   playerId?: boolean
+  method?: boolean
   status?: boolean
   expiresAt?: boolean
   createdAt?: boolean
   confirmedAt?: boolean
 }
 
-export type LoginChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "token" | "playerId" | "status" | "expiresAt" | "createdAt" | "confirmedAt", ExtArgs["result"]["loginChallenge"]>
+export type LoginChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "token" | "playerId" | "method" | "status" | "expiresAt" | "createdAt" | "confirmedAt", ExtArgs["result"]["loginChallenge"]>
 export type LoginChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
 }
@@ -546,6 +581,7 @@ export type $LoginChallengePayload<ExtArgs extends runtime.Types.Extensions.Inte
     id: string
     token: string
     playerId: string
+    method: $Enums.LoginChallengeMethod
     status: $Enums.LoginChallengeStatus
     expiresAt: Date
     createdAt: Date
@@ -923,6 +959,7 @@ export interface LoginChallengeFieldRefs {
   readonly id: Prisma.FieldRef<"LoginChallenge", 'String'>
   readonly token: Prisma.FieldRef<"LoginChallenge", 'String'>
   readonly playerId: Prisma.FieldRef<"LoginChallenge", 'String'>
+  readonly method: Prisma.FieldRef<"LoginChallenge", 'LoginChallengeMethod'>
   readonly status: Prisma.FieldRef<"LoginChallenge", 'LoginChallengeStatus'>
   readonly expiresAt: Prisma.FieldRef<"LoginChallenge", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"LoginChallenge", 'DateTime'>

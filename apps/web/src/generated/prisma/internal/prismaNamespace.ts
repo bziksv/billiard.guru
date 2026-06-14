@@ -2502,6 +2502,7 @@ export const LoginChallengeScalarFieldEnum = {
   id: 'id',
   token: 'token',
   playerId: 'playerId',
+  method: 'method',
   status: 'status',
   expiresAt: 'expiresAt',
   createdAt: 'createdAt',
@@ -3215,6 +3216,13 @@ export type EnumIdeaStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$Prism
  * Reference to a field of type 'UserRole'
  */
 export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+/**
+ * Reference to a field of type 'LoginChallengeMethod'
+ */
+export type EnumLoginChallengeMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LoginChallengeMethod'>
     
 
 

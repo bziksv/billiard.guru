@@ -87,10 +87,10 @@ export async function republishSiteNews(id: string, actorId: string) {
     return { ok: false as const, message: "Новость уже опубликована" };
   }
 
-  const now = new Date();
+  const publishedAt = item.publishedAt ?? new Date();
   await prisma.siteNews.update({
     where: { id },
-    data: { status: "APPROVED", publishedAt: now },
+    data: { status: "APPROVED", publishedAt },
   });
 
   await writeAuditLog({

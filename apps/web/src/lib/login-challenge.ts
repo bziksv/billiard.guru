@@ -11,12 +11,21 @@ import { writeAuditLog } from "@/lib/audit";
 
 const CHALLENGE_TTL_MS = 5 * 60 * 1000;
 
+async function cancelPendingChallenges(playerId: string) {
+  await prisma.loginChallenge.updateMany({
+    where: { playerId, status: "PENDING" },
+    data: { status: "CANCELLED" },
+  });
+}
+
 export async function createLoginChallenge(playerId: string, telegramId: string) {
   const token = randomUUID();
   const expiresAt = new Date(Date.now() + CHALLENGE_TTL_MS);
 
+  await cancelPendingChallenges(playerId);
+
   await prisma.loginChallenge.create({
-    data: { token, playerId, expiresAt },
+    data: { token, playerId, expiresAt, method: "TELEGRAM" },
   });
 
   await sendTelegramMessage(
@@ -26,6 +35,58 @@ export async function createLoginChallenge(playerId: string, telegramId: string)
   );
 
   return { token, expiresAt };
+}
+
+export async function createCallLoginChallenge(playerId: string) {
+  const token = randomUUID();
+  const expiresAt = new Date(Date.now() + CHALLENGE_TTL_MS);
+
+  await cancelPendingChallenges(playerId);
+
+  await prisma.loginChallenge.create({
+    data: { token, playerId, expiresAt, method: "CALL" },
+  });
+
+  return { token, expiresAt };
+}
+
+export async function confirmCallLoginChallenge(
+  callerPhoneRaw: string,
+): Promise<{ ok: boolean; message: string }> {
+  const pending = await prisma.loginChallenge.findMany({
+    where: {
+      status: "PENDING",
+      method: "CALL",
+      expiresAt: { gt: new Date() },
+    },
+    include: { player: true },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
+
+  const { phonesMatchE164 } = await import("@/lib/phone-match");
+
+  for (const challenge of pending) {
+    if (!phonesMatchE164(callerPhoneRaw, challenge.player.phone)) continue;
+
+    await prisma.loginChallenge.update({
+      where: { id: challenge.id },
+      data: { status: "CONFIRMED", confirmedAt: new Date() },
+    });
+
+    await writeAuditLog({
+      actorType: "player",
+      actorId: challenge.playerId,
+      action: "auth.login.confirm_call",
+      entityType: "login_challenge",
+      entityId: challenge.id,
+      summary: "Вход подтверждён звонком",
+    });
+
+    return { ok: true, message: "Call login confirmed" };
+  }
+
+  return { ok: false, message: "No matching pending call login" };
 }
 
 async function getPendingChallenge(token: string) {
@@ -112,7 +173,11 @@ export async function completeLoginChallenge(token: string) {
     throw new Error("Время входа истекло");
   }
   if (challenge.status !== "CONFIRMED") {
-    throw new Error("Подтвердите вход в Telegram");
+    const hint =
+      challenge.method === "CALL"
+        ? "Позвоните на указанный номер с телефона, который вводили"
+        : "Подтвердите вход в Telegram";
+    throw new Error(hint);
   }
 
   const sessionToken = createSessionToken(challenge.playerId, challenge.player.role);
@@ -142,9 +207,9 @@ export async function getLoginChallengeStatus(token: string) {
       where: { id: challenge.id },
       data: { status: "EXPIRED" },
     });
-    return { status: "EXPIRED" as const };
+    return { status: "EXPIRED" as const, method: challenge.method };
   }
-  return { status: challenge.status };
+  return { status: challenge.status, method: challenge.method };
 }
 
 export async function handleLoginTelegramMessage(

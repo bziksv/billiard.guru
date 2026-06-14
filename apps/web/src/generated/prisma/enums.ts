@@ -104,6 +104,14 @@ export const LoginChallengeStatus = {
 export type LoginChallengeStatus = (typeof LoginChallengeStatus)[keyof typeof LoginChallengeStatus]
 
 
+export const LoginChallengeMethod = {
+  TELEGRAM: 'TELEGRAM',
+  CALL: 'CALL'
+} as const
+
+export type LoginChallengeMethod = (typeof LoginChallengeMethod)[keyof typeof LoginChallengeMethod]
+
+
 export const IdeaStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',

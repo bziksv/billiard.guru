@@ -281,6 +281,7 @@ export const LoginChallengeScalarFieldEnum = {
   id: 'id',
   token: 'token',
   playerId: 'playerId',
+  method: 'method',
   status: 'status',
   expiresAt: 'expiresAt',
   createdAt: 'createdAt',

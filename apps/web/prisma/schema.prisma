@@ -94,6 +94,11 @@ enum LoginChallengeStatus {
   EXPIRED
 }
 
+enum LoginChallengeMethod {
+  TELEGRAM
+  CALL
+}
+
 enum IdeaStatus {
   PENDING
   APPROVED
@@ -380,11 +385,13 @@ model LoginChallenge {
   token       String               @unique
   playerId    String               @map("player_id")
   player      Player               @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  method      LoginChallengeMethod @default(TELEGRAM)
   status      LoginChallengeStatus @default(PENDING)
   expiresAt   DateTime             @map("expires_at")
   createdAt   DateTime             @default(now()) @map("created_at")
   confirmedAt DateTime?            @map("confirmed_at")
 
+  @@index([status, method, expiresAt])
   @@map("login_challenges")
 }
 

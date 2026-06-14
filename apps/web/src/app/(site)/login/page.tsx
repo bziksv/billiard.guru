@@ -11,6 +11,7 @@ import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
 import { TelegramLink } from "@/lib/contact-links";
 
 type Step = "phone" | "register" | "confirm" | "login";
+type AuthMethod = "telegram" | "call";
 
 const authPanelClass =
   "rounded-xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900/60 dark:bg-emerald-950/30";
@@ -32,6 +33,9 @@ function LoginForm() {
   const [info, setInfo] = useState<string | null>(null);
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
+  const [authMethod, setAuthMethod] = useState<AuthMethod>("telegram");
+  const [callNumber, setCallNumber] = useState<string | null>(null);
+  const [callAuthEnabled, setCallAuthEnabled] = useState(false);
   const [polling, setPolling] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
 
@@ -113,7 +117,11 @@ function LoginForm() {
 
       if (data.mode === "login") {
         setStep("login");
+        setAuthMethod(data.authMethod === "call" ? "call" : "telegram");
+        setCallNumber(data.callAuth?.callNumber ?? null);
+        setCallAuthEnabled(Boolean(data.callAuth?.enabled));
         setChallengeToken(data.challengeToken);
+        setInfo(data.message ?? null);
         return;
       }
 
@@ -173,9 +181,41 @@ function LoginForm() {
     }
   }
 
+  async function switchToCallAuth() {
+    if (!phoneValid) return;
+    setLoading(true);
+    setError(null);
+    setInfo(null);
+    try {
+      const res = await fetch("/api/auth/start-call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+        signal: AbortSignal.timeout(20_000),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Не удалось начать вход звонком");
+        return;
+      }
+      setAuthMethod("call");
+      setCallNumber(data.callNumber ?? null);
+      setChallengeToken(data.challengeToken);
+      setInfo(data.message ?? null);
+      setStep("login");
+    } catch {
+      setError("Сервер не ответил. Попробуйте позже.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   function resetToPhone() {
     setStep("phone");
     setChallengeToken(null);
+    setAuthMethod("telegram");
+    setCallNumber(null);
+    setCallAuthEnabled(false);
     setConfirmLink(null);
     setPolling(false);
     setError(null);
@@ -186,8 +226,8 @@ function LoginForm() {
     <div className="site-card mx-auto w-full max-w-md p-8">
       <h1 className="text-2xl font-bold text-[var(--text-primary)]">Вход и регистрация</h1>
       <p className="mt-2 text-sm text-[var(--text-secondary)]">
-        Один номер телефона: если вы уже в базе — вход через Telegram; если нет — короткая
-        регистрация и подтверждение в боте{" "}
+        Один номер телефона: если вы уже в базе — вход через Telegram (основной способ) или коротким
+        звонком; если нет — регистрация и подтверждение в боте{" "}
         <TelegramLink
           username={TELEGRAM_BOT_USERNAME}
           className="font-medium text-emerald-700 underline dark:text-emerald-400"
@@ -310,7 +350,42 @@ function LoginForm() {
         </div>
       )}
 
-      {step === "login" && (
+      {step === "login" && authMethod === "call" && (
+        <div className={`mt-6 ${authPanelClass} space-y-3`}>
+          {info && <p className="text-sm text-emerald-800 dark:text-emerald-300">{info}</p>}
+          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+            {polling
+              ? "Ждём ваш звонок…"
+              : "Позвоните на номер ниже с телефона, который указали"}
+          </p>
+          {callNumber ? (
+            <p className="text-center text-2xl font-bold tracking-wide text-[var(--text-primary)] tabular-nums">
+              <a href={`tel:+${callNumber.replace(/\D/g, "")}`} className="hover:underline">
+                {callNumber}
+              </a>
+            </p>
+          ) : (
+            <p className="text-sm text-amber-800 dark:text-amber-300">
+              Номер для звонка пока не активирован. Используйте Telegram.
+            </p>
+          )}
+          <ol className="list-decimal space-y-1 pl-4 text-xs text-zinc-600 dark:text-zinc-300">
+            <li>Наберите номер с телефона {phone ? `(${phone})` : "из профиля"}</li>
+            <li>Дождитесь сброса — разговор не нужен</li>
+            <li>Страница войдёт автоматически</li>
+          </ol>
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+          <button
+            type="button"
+            onClick={resetToPhone}
+            className="pt-1 text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]"
+          >
+            Отменить
+          </button>
+        </div>
+      )}
+
+      {step === "login" && authMethod === "telegram" && (
         <div className={`mt-6 ${authPanelClass} space-y-3`}>
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
             {polling
@@ -320,6 +395,20 @@ function LoginForm() {
           <p className="text-xs text-[var(--text-muted)]">
             Сообщение отправлено на привязанный аккаунт.
           </p>
+          {callAuthEnabled && callNumber && (
+            <div className="border-t border-emerald-200/80 pt-3 dark:border-emerald-900/50">
+              <p className="text-xs text-[var(--text-muted)]">Или подтвердите звонком:</p>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={() => void switchToCallAuth()}
+                className="mt-2 text-sm font-medium text-emerald-800 underline hover:text-emerald-950 disabled:opacity-50 dark:text-emerald-300"
+              >
+                Позвонить на {callNumber}
+              </button>
+            </div>
+          )}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
             type="button"
             onClick={resetToPhone}

@@ -375,11 +375,28 @@ export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
 }
 
+export type EnumLoginChallengeMethodFilter<$PrismaModel = never> = {
+  equals?: $Enums.LoginChallengeMethod | Prisma.EnumLoginChallengeMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.LoginChallengeMethod[]
+  notIn?: $Enums.LoginChallengeMethod[]
+  not?: Prisma.NestedEnumLoginChallengeMethodFilter<$PrismaModel> | $Enums.LoginChallengeMethod
+}
+
 export type EnumLoginChallengeStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.LoginChallengeStatus | Prisma.EnumLoginChallengeStatusFieldRefInput<$PrismaModel>
   in?: $Enums.LoginChallengeStatus[]
   notIn?: $Enums.LoginChallengeStatus[]
   not?: Prisma.NestedEnumLoginChallengeStatusFilter<$PrismaModel> | $Enums.LoginChallengeStatus
+}
+
+export type EnumLoginChallengeMethodWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LoginChallengeMethod | Prisma.EnumLoginChallengeMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.LoginChallengeMethod[]
+  notIn?: $Enums.LoginChallengeMethod[]
+  not?: Prisma.NestedEnumLoginChallengeMethodWithAggregatesFilter<$PrismaModel> | $Enums.LoginChallengeMethod
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLoginChallengeMethodFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLoginChallengeMethodFilter<$PrismaModel>
 }
 
 export type EnumLoginChallengeStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -955,11 +972,28 @@ export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
 }
 
+export type NestedEnumLoginChallengeMethodFilter<$PrismaModel = never> = {
+  equals?: $Enums.LoginChallengeMethod | Prisma.EnumLoginChallengeMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.LoginChallengeMethod[]
+  notIn?: $Enums.LoginChallengeMethod[]
+  not?: Prisma.NestedEnumLoginChallengeMethodFilter<$PrismaModel> | $Enums.LoginChallengeMethod
+}
+
 export type NestedEnumLoginChallengeStatusFilter<$PrismaModel = never> = {
   equals?: $Enums.LoginChallengeStatus | Prisma.EnumLoginChallengeStatusFieldRefInput<$PrismaModel>
   in?: $Enums.LoginChallengeStatus[]
   notIn?: $Enums.LoginChallengeStatus[]
   not?: Prisma.NestedEnumLoginChallengeStatusFilter<$PrismaModel> | $Enums.LoginChallengeStatus
+}
+
+export type NestedEnumLoginChallengeMethodWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.LoginChallengeMethod | Prisma.EnumLoginChallengeMethodFieldRefInput<$PrismaModel>
+  in?: $Enums.LoginChallengeMethod[]
+  notIn?: $Enums.LoginChallengeMethod[]
+  not?: Prisma.NestedEnumLoginChallengeMethodWithAggregatesFilter<$PrismaModel> | $Enums.LoginChallengeMethod
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumLoginChallengeMethodFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumLoginChallengeMethodFilter<$PrismaModel>
 }
 
 export type NestedEnumLoginChallengeStatusWithAggregatesFilter<$PrismaModel = never> = {

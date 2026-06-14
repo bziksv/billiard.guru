@@ -85,14 +85,14 @@ const DRAFTS: NewsDraft[] = [
 Найти её: на странице клуба на billiard.guru и в кабинете в разделе «Брони столов».`,
   },
   {
-    suggestDate: "2026-06-16",
+    suggestDate: "2026-06-14T18:00:00+03:00",
     title: "Сайт по умолчанию открывается в светлой теме",
     body: `Первый раз зашли на billiard.guru — увидите светлое оформление. Так страницы читаются при дневном свете и на телефоне на улице.
 
 Тёмная тема никуда не делась: переключатель в шапке сайта, в админке и в кабинете клуба. Если уже выбирали тему раньше — сохранится ваш выбор.`,
   },
   {
-    suggestDate: "2026-06-17",
+    suggestDate: "2026-06-15T18:00:00+03:00",
     title: "В боте понятнее, какой стол и сколько их свободно",
     body: `Подправили тексты при бронировании в @BilliardGuruBot:
 
@@ -134,21 +134,24 @@ async function main() {
 
   let created = 0;
   for (const item of DRAFTS) {
+    const publishedAt = new Date(
+      item.suggestDate.includes("T") ? item.suggestDate : `${item.suggestDate}T12:00:00+03:00`,
+    );
     await prisma.siteNews.create({
       data: {
         title: item.title,
         body: item.body.trim(),
         status: "UNPUBLISHED",
-        publishedAt: null,
+        publishedAt,
         authorId: admin?.id ?? null,
       },
     });
     created++;
-    console.log(`✓ черновик (${item.suggestDate}) — ${item.title}`);
+    console.log(`✓ черновик (${publishedAt.toISOString().slice(0, 10)}) — ${item.title}`);
   }
 
   console.log(`\nГотово: ${created} черновиков. Публикация: /admin/site-news`);
-  console.log("Рекомендуемые даты публикации указаны в suggestDate (9–17 июня).");
+  console.log("Даты 9–15 июня уже проставлены — при «Снова на сайте» сохранятся.");
 }
 
 main()
