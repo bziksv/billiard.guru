@@ -83,8 +83,15 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
         setGuideOpen(false);
       }
     }
+    function onScroll() {
+      setGuideOpen(false);
+    }
     document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    return () => {
+      document.removeEventListener("mousedown", onClickOutside);
+      window.removeEventListener("scroll", onScroll, true);
+    };
   }, []);
 
   useEffect(() => {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/cn";
 import { t } from "@/lib/site";
@@ -40,7 +40,6 @@ export function UserMenu({
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const ignoreOutsideRef = useRef(false);
   const initial = firstName[0]?.toUpperCase() ?? "?";
@@ -49,29 +48,17 @@ export function UserMenu({
 
   useEffect(() => setMounted(true), []);
 
-  const updatePosition = useCallback(() => {
-    const el = ref.current;
-    if (!el || isMobile) return;
-    const rect = el.getBoundingClientRect();
-    setMenuPos({
-      top: rect.bottom + 6,
-      right: Math.max(8, window.innerWidth - rect.right),
-    });
-  }, [isMobile]);
-
-  useLayoutEffect(() => {
-    if (!open || isMobile) return;
-    updatePosition();
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
-    return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
-    };
-  }, [open, isMobile, updatePosition]);
-
   useEffect(() => {
     if (!open) return;
+    function onScroll() {
+      setOpen(false);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    return () => window.removeEventListener("scroll", onScroll, true);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || !isMobile) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     function onEscape(e: KeyboardEvent) {
@@ -82,7 +69,7 @@ export function UserMenu({
       document.body.style.overflow = prev;
       document.removeEventListener("keydown", onEscape);
     };
-  }, [open]);
+  }, [open, isMobile]);
 
   useEffect(() => {
     if (!open || isMobile) return;
@@ -128,53 +115,49 @@ export function UserMenu({
   }
 
   const desktopMenu =
-    mounted && open && !isMobile && menuPos
-      ? createPortal(
-          <div
-            id="site-user-menu-popover"
-            className="site-popover site-user-popover fixed min-w-[11rem]"
-            style={{ top: menuPos.top, right: menuPos.right }}
-            role="menu"
+    open && !isMobile ? (
+      <div
+        id="site-user-menu-popover"
+        className="site-popover site-user-popover absolute right-0 top-full z-[9997] mt-1.5 min-w-[11rem]"
+        role="menu"
+      >
+        <Link href="/cabinet" onClick={close} className="site-popover-item" role="menuitem">
+          {t("nav.cabinet")}
+        </Link>
+        {manageHref && (
+          <Link
+            href={manageHref}
+            onClick={close}
+            className="site-popover-item site-popover-item-active"
+            role="menuitem"
           >
-            <Link href="/cabinet" onClick={close} className="site-popover-item" role="menuitem">
-              {t("nav.cabinet")}
-            </Link>
-            {manageHref && (
-              <Link
-                href={manageHref}
-                onClick={close}
-                className="site-popover-item site-popover-item-active"
-                role="menuitem"
-              >
-                Управление клубом
-              </Link>
-            )}
-            {isAdmin && (
-              <Link
-                href="/admin"
-                onClick={close}
-                className="site-popover-item site-popover-item-active"
-                role="menuitem"
-              >
-                {t("nav.admin")}
-              </Link>
-            )}
-            <button
-              type="button"
-              onClick={logout}
-              disabled={loggingOut}
-              role="menuitem"
-              className="site-popover-item inline-flex w-full items-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loggingOut && (
-                <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              )}
-              {loggingOut ? "Выход…" : t("nav.logout")}
-            </button>
-          </div>,
-          document.body,
-        )
-      : null;
+            Управление клубом
+          </Link>
+        )}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            onClick={close}
+            className="site-popover-item site-popover-item-active"
+            role="menuitem"
+          >
+            {t("nav.admin")}
+          </Link>
+        )}
+        <button
+          type="button"
+          onClick={logout}
+          disabled={loggingOut}
+          role="menuitem"
+          className="site-popover-item inline-flex w-full items-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loggingOut && (
+            <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          )}
+          {loggingOut ? "Выход…" : t("nav.logout")}
+        </button>
+      </div>
+    ) : null;
 
   const mobileMenu =
     mounted && open && isMobile
@@ -245,7 +228,7 @@ export function UserMenu({
 
   return (
     <>
-      <div ref={ref} className="site-header-user shrink-0">
+      <div ref={ref} className="site-header-user relative shrink-0">
         <button
           type="button"
           onClick={(e) => {
@@ -266,8 +249,8 @@ export function UserMenu({
             ▾
           </span>
         </button>
+        {desktopMenu}
       </div>
-      {desktopMenu}
       {mobileMenu}
     </>
   );
