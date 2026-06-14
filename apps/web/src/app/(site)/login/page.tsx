@@ -9,6 +9,7 @@ import { SiteContainer } from "@/components/site/site-container";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
 import { TelegramLink } from "@/lib/contact-links";
+import { formatPhoneDisplay } from "@/lib/phone";
 
 type Step = "phone" | "register" | "confirm" | "login" | "telegram_nudge";
 type AuthMethod = "telegram" | "call";
@@ -295,6 +296,7 @@ function LoginForm() {
   }
 
   const botLink = confirmLink ?? `https://t.me/${TELEGRAM_BOT_USERNAME}`;
+  const phoneDisplay = phone ? formatPhoneDisplay(phone, countryName) : null;
 
   return (
     <div className="site-card mx-auto w-full max-w-md p-8">
@@ -310,7 +312,8 @@ function LoginForm() {
             username={TELEGRAM_BOT_USERNAME}
             className="font-medium text-emerald-700 underline dark:text-emerald-400"
           />{" "}
-          для уведомлений о турнирах.
+          для уведомлений о турнирах, проведения турниров, управления клубом, своей анкеты и
+          поиска партнёров для игры.
         </li>
         <li>
           <span className="font-medium text-[var(--text-primary)]">Уже регистрировались:</span>{" "}
@@ -443,18 +446,26 @@ function LoginForm() {
                 : "Позвоните на номер ниже для входа"}
           </p>
           {callNumber ? (
-            <p className="text-center text-2xl font-bold tracking-wide text-[var(--text-primary)] tabular-nums">
-              <a href={`tel:+${callNumber.replace(/\D/g, "")}`} className="hover:underline">
-                {callNumber}
-              </a>
-            </p>
+            <>
+              {phoneDisplay && (
+                <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                  Звоните <span className="font-medium text-[var(--text-primary)]">с номера {phoneDisplay}</span>{" "}
+                  — он должен совпасть с тем, что вы вводили.
+                </p>
+              )}
+              <p className="text-xs text-[var(--text-muted)]">Наберите короткий номер:</p>
+              <p className="text-center text-2xl font-bold tracking-wide text-[var(--text-primary)] tabular-nums">
+                <a href={`tel:+${callNumber.replace(/\D/g, "")}`} className="hover:underline">
+                  {callNumber}
+                </a>
+              </p>
+            </>
           ) : (
             <p className="text-sm text-amber-800 dark:text-amber-300">
               Номер для звонка пока не активирован. Используйте Telegram.
             </p>
           )}
           <ol className="list-decimal space-y-1 pl-4 text-xs text-zinc-600 dark:text-zinc-300">
-            <li>Звоните с того же номера, который вводили выше</li>
             <li>Дождитесь сброса — разговаривать не нужно</li>
             <li>
               {authFlow === "register"
@@ -525,8 +536,8 @@ function LoginForm() {
               username={TELEGRAM_BOT_USERNAME}
               className="font-medium text-emerald-700 underline dark:text-emerald-400"
             />{" "}
-            — так вы будете получать уведомления о турнирах, записях и других событиях на
-            billiard.guru.
+            — так вы будете получать уведомления о турнирах, проводить турниры, управлять клубом,
+            анкетой и искать партнёров для игры на billiard.guru.
           </p>
           <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-600 dark:text-zinc-300">
             <li>
