@@ -17,9 +17,60 @@ export function parseConfirmToken(text: string): string | null {
 
 export { buildBookClubLink };
 
+const CUID_PATTERN = /^c[a-z0-9]{10,}$/i;
+
+function parseBookClubPayload(payload: string): string | null {
+  const p = payload.trim();
+  if (!p) return null;
+
+  if (p.startsWith("book_")) {
+    const id = p.slice(5);
+    return CUID_PATTERN.test(id) ? id : null;
+  }
+  if (p.startsWith("bc_")) {
+    const id = p.slice(3);
+    return CUID_PATTERN.test(id) ? id : null;
+  }
+  // b{clubId} — основной формат ссылки (clubId уже начинается с c)
+  if (p.startsWith("b") && p.length > 20 && CUID_PATTERN.test(p.slice(1))) {
+    return p.slice(1);
+  }
+  if (CUID_PATTERN.test(p)) {
+    return p;
+  }
+  return null;
+}
+
+/** Параметр из /start payload или ?start= в ссылке t.me */
+export function parseBookClubDeepLink(text: string): string | null {
+  const trimmed = text.trim();
+
+  const startMatch = trimmed.match(/^\/start(?:@[\w]+)?(?:\s+(.+))?$/i);
+  if (startMatch?.[1]) {
+    const id = parseBookClubPayload(startMatch[1]);
+    if (id) return id;
+  }
+
+  const urlMatch = trimmed.match(
+    /(?:^|\s)(?:https?:\/\/)?t\.me\/\w+\?start=([^\s&]+)/i,
+  );
+  if (urlMatch?.[1]) {
+    const decoded = decodeURIComponent(urlMatch[1].replace(/\+/g, " "));
+    const id = parseBookClubPayload(decoded);
+    if (id) return id;
+  }
+
+  const looseMatch = trimmed.match(/(?:^|\s)(?:book_|bc_)([a-z0-9]+)/i);
+  if (looseMatch?.[1] && CUID_PATTERN.test(looseMatch[1])) {
+    return looseMatch[1];
+  }
+
+  return null;
+}
+
+/** @deprecated use parseBookClubDeepLink */
 export function parseBookClubStartParam(text: string): string | null {
-  const match = text.match(/(?:^|\s)book_([a-z0-9]+)/i);
-  return match?.[1] ?? null;
+  return parseBookClubDeepLink(text);
 }
 
 export function parseLoginToken(text: string): string | null {

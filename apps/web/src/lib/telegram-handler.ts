@@ -5,7 +5,7 @@ import type { Club, Player } from "@/generated/prisma/client";
 import {
   contactRequestKeyboard,
   parseConfirmToken,
-  parseBookClubStartParam,
+  parseBookClubDeepLink,
   removeKeyboard,
   sendTelegramMessage,
   answerCallbackQuery,
@@ -404,7 +404,7 @@ export async function processTelegramUpdate(
     return;
   }
 
-  const bookClubId = parseBookClubStartParam(text);
+  const bookClubId = parseBookClubDeepLink(text);
   if (bookClubId) {
     try {
       const { startBookingForClub } = await import("@/lib/telegram-bot-booking");

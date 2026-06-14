@@ -21,6 +21,7 @@ import {
   answerCallbackQuery,
   contactRequestKeyboard,
   editTelegramMessage,
+  parseBookClubDeepLink,
   sendTelegramMessage,
 } from "@/lib/telegram";
 import {
@@ -134,6 +135,8 @@ function bookingsInlineKeyboard(clubs: { id: string; name: string }[]) {
 }
 
 export function parseBotMenuAction(text: string): BotMenuAction | null {
+  if (parseBookClubDeepLink(text)) return null;
+
   const trimmed = text.trim();
   if (
     trimmed === BOT_MENU_PROFILE ||

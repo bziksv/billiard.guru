@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { buildBookClubLink } from "@/lib/telegram-booking-link";
+import { buildBookClubLink, TELEGRAM_BOOKING_LINK_HINT } from "@/lib/telegram-booking-link";
 
 export function ClubTelegramBookingLink({
   clubId,
@@ -43,6 +43,7 @@ export function ClubTelegramBookingLink({
         <p className="text-sm font-medium">Ссылка для Telegram</p>
         <p className="mt-1 text-xs text-[var(--text-muted)]">
           Игрок сразу попадёт к бронированию в вашем клубе — без выбора из списка.
+          {` ${TELEGRAM_BOOKING_LINK_HINT}`}
         </p>
       </div>
       <code className="block break-all rounded-lg bg-[var(--surface)] px-3 py-2 text-xs">
