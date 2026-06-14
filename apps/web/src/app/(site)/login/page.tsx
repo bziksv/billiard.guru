@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, Suspense, useEffect, useState } from "react";
+import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { CitySelect } from "@/components/admin/city-select";
 import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { SiteContainer } from "@/components/site/site-container";
@@ -10,11 +10,21 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
 import { TelegramLink } from "@/lib/contact-links";
 
-type Step = "phone" | "register" | "confirm" | "login";
+type Step = "phone" | "register" | "confirm" | "login" | "telegram_nudge";
 type AuthMethod = "telegram" | "call";
+type AuthFlow = "login" | "register";
 
 const authPanelClass =
   "rounded-xl border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-900/60 dark:bg-emerald-950/30";
+
+type CallLoginPayload = {
+  challengeToken: string;
+  callNumber?: string | null;
+  message?: string | null;
+  confirmLink?: string | null;
+  flow?: AuthFlow;
+  callAuthEnabled?: boolean;
+};
 
 function LoginForm() {
   const router = useRouter();
@@ -34,10 +44,42 @@ function LoginForm() {
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
   const [challengeToken, setChallengeToken] = useState<string | null>(null);
   const [authMethod, setAuthMethod] = useState<AuthMethod>("telegram");
+  const [authFlow, setAuthFlow] = useState<AuthFlow>("login");
   const [callNumber, setCallNumber] = useState<string | null>(null);
   const [callAuthEnabled, setCallAuthEnabled] = useState(false);
   const [polling, setPolling] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
+
+  const finishSession = useCallback(
+    (result: { role?: string; needsTelegram?: boolean }) => {
+      if (result.needsTelegram) {
+        setStep("telegram_nudge");
+        setChallengeToken(null);
+        setPolling(false);
+        return;
+      }
+      router.push(
+        result.role === "SUPERADMIN" && next.startsWith("/admin")
+          ? next
+          : next.startsWith("/admin")
+            ? "/cabinet"
+            : next || "/cabinet",
+      );
+      router.refresh();
+    },
+    [next, router],
+  );
+
+  const applyCallLogin = useCallback((data: CallLoginPayload) => {
+    setStep("login");
+    setAuthMethod("call");
+    setCallNumber(data.callNumber ?? null);
+    setCallAuthEnabled(Boolean(data.callAuthEnabled ?? true));
+    setChallengeToken(data.challengeToken);
+    setInfo(data.message ?? null);
+    if (data.confirmLink) setConfirmLink(data.confirmLink);
+    if (data.flow) setAuthFlow(data.flow);
+  }, []);
 
   useEffect(() => {
     if (!challengeToken) return;
@@ -63,14 +105,7 @@ function LoginForm() {
           setStep("phone");
           return;
         }
-        router.push(
-          result.role === "SUPERADMIN" && next.startsWith("/admin")
-            ? next
-            : next.startsWith("/admin")
-              ? "/cabinet"
-              : next || "/cabinet",
-        );
-        router.refresh();
+        finishSession(result);
       }
 
       if (data.status === "CANCELLED" || data.status === "EXPIRED") {
@@ -85,7 +120,7 @@ function LoginForm() {
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [challengeToken, next, router]);
+  }, [challengeToken, finishSession]);
 
   async function startAuth(e?: FormEvent) {
     e?.preventDefault();
@@ -116,23 +151,38 @@ function LoginForm() {
       }
 
       if (data.mode === "login") {
+        setAuthFlow(data.flow === "register" ? "register" : "login");
+        if (data.authMethod === "call") {
+          applyCallLogin({
+            challengeToken: data.challengeToken,
+            callNumber: data.callAuth?.callNumber ?? null,
+            message: data.message,
+            confirmLink: data.confirmLink,
+            flow: data.flow,
+            callAuthEnabled: data.callAuth?.enabled,
+          });
+          return;
+        }
         setStep("login");
-        setAuthMethod(data.authMethod === "call" ? "call" : "telegram");
+        setAuthMethod("telegram");
         setCallNumber(data.callAuth?.callNumber ?? null);
         setCallAuthEnabled(Boolean(data.callAuth?.enabled));
         setChallengeToken(data.challengeToken);
         setInfo(data.message ?? null);
+        if (data.confirmLink) setConfirmLink(data.confirmLink);
         return;
       }
 
       if (data.mode === "confirm") {
         setStep("confirm");
+        setAuthFlow("register");
         setConfirmLink(data.confirmLink);
         setInfo(data.message);
         return;
       }
 
       setStep("register");
+      setAuthFlow("register");
       setInfo(data.message);
     } catch {
       setError("Сервер не ответил. Попробуйте позже.");
@@ -171,7 +221,22 @@ function LoginForm() {
         setError(data.error ?? "Ошибка регистрации");
         return;
       }
+
+      if (data.mode === "login" && data.authMethod === "call") {
+        setAuthFlow("register");
+        applyCallLogin({
+          challengeToken: data.challengeToken,
+          callNumber: data.callAuth?.callNumber ?? null,
+          message: data.message,
+          confirmLink: data.confirmLink,
+          flow: "register",
+          callAuthEnabled: data.callAuth?.enabled,
+        });
+        return;
+      }
+
       setStep("confirm");
+      setAuthFlow("register");
       setConfirmLink(data.confirmLink);
       setInfo(data.message);
     } catch {
@@ -198,11 +263,12 @@ function LoginForm() {
         setError(data.error ?? "Не удалось начать вход звонком");
         return;
       }
-      setAuthMethod("call");
-      setCallNumber(data.callNumber ?? null);
-      setChallengeToken(data.challengeToken);
-      setInfo(data.message ?? null);
-      setStep("login");
+      applyCallLogin({
+        challengeToken: data.challengeToken,
+        callNumber: data.callNumber,
+        message: data.message,
+        flow: authFlow,
+      });
     } catch {
       setError("Сервер не ответил. Попробуйте позже.");
     } finally {
@@ -214,6 +280,7 @@ function LoginForm() {
     setStep("phone");
     setChallengeToken(null);
     setAuthMethod("telegram");
+    setAuthFlow("login");
     setCallNumber(null);
     setCallAuthEnabled(false);
     setConfirmLink(null);
@@ -222,18 +289,34 @@ function LoginForm() {
     setInfo(null);
   }
 
+  function goToCabinet() {
+    router.push(next.startsWith("/admin") ? "/cabinet" : next || "/cabinet");
+    router.refresh();
+  }
+
+  const botLink = confirmLink ?? `https://t.me/${TELEGRAM_BOT_USERNAME}`;
+
   return (
     <div className="site-card mx-auto w-full max-w-md p-8">
       <h1 className="text-2xl font-bold text-[var(--text-primary)]">Вход и регистрация</h1>
       <p className="mt-2 text-sm text-[var(--text-secondary)]">
-        Один номер телефона: если вы уже в базе — вход через Telegram (основной способ) или коротким
-        звонком; если нет — регистрация и подтверждение в боте{" "}
-        <TelegramLink
-          username={TELEGRAM_BOT_USERNAME}
-          className="font-medium text-emerald-700 underline dark:text-emerald-400"
-        />
-        .
+        Введите номер телефона — мы проверим, есть ли вы в базе.
       </p>
+      <ul className="mt-2 space-y-1 text-sm text-[var(--text-secondary)]">
+        <li>
+          <span className="font-medium text-[var(--text-primary)]">Новый пользователь:</span>{" "}
+          заполните профиль, подтвердите номер коротким звонком, затем подключите бота{" "}
+          <TelegramLink
+            username={TELEGRAM_BOT_USERNAME}
+            className="font-medium text-emerald-700 underline dark:text-emerald-400"
+          />{" "}
+          для уведомлений о турнирах.
+        </li>
+        <li>
+          <span className="font-medium text-[var(--text-primary)]">Уже регистрировались:</span>{" "}
+          вход через Telegram или тем же коротким звонком.
+        </li>
+      </ul>
 
       {step === "phone" && (
         <form onSubmit={startAuth} className="mt-6 space-y-4">
@@ -265,7 +348,6 @@ function LoginForm() {
       {step === "register" && (
         <form onSubmit={submitRegister} className="mt-6 space-y-4">
           {info && <p className="text-sm text-emerald-800 dark:text-emerald-300/90">{info}</p>}
-          <p className="text-xs text-[var(--text-muted)] tabular-nums">{phone}</p>
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-sm">
               <span className="mb-1 block text-[var(--text-secondary)]">Фамилия</span>
@@ -320,7 +402,7 @@ function LoginForm() {
             <li>
               Откройте{" "}
               <a
-                href={confirmLink ?? `https://t.me/${TELEGRAM_BOT_USERNAME}`}
+                href={botLink}
                 target="_blank"
                 rel="noreferrer"
                 className="font-medium text-emerald-700 underline dark:text-emerald-400"
@@ -356,7 +438,9 @@ function LoginForm() {
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
             {polling
               ? "Ждём ваш звонок…"
-              : "Позвоните на номер ниже с телефона, который указали"}
+              : authFlow === "register"
+                ? "Подтвердите номер коротким звонком"
+                : "Позвоните на номер ниже для входа"}
           </p>
           {callNumber ? (
             <p className="text-center text-2xl font-bold tracking-wide text-[var(--text-primary)] tabular-nums">
@@ -370,9 +454,13 @@ function LoginForm() {
             </p>
           )}
           <ol className="list-decimal space-y-1 pl-4 text-xs text-zinc-600 dark:text-zinc-300">
-            <li>Наберите номер с телефона {phone ? `(${phone})` : "из профиля"}</li>
-            <li>Дождитесь сброса — разговор не нужен</li>
-            <li>Страница войдёт автоматически</li>
+            <li>Звоните с того же номера, который вводили выше</li>
+            <li>Дождитесь сброса — разговаривать не нужно</li>
+            <li>
+              {authFlow === "register"
+                ? "После звонка предложим подключить Telegram для уведомлений"
+                : "Страница войдёт автоматически"}
+            </li>
           </ol>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
@@ -422,6 +510,49 @@ function LoginForm() {
             className="pt-1 text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]"
           >
             Отменить
+          </button>
+        </div>
+      )}
+
+      {step === "telegram_nudge" && (
+        <div className={`mt-6 ${authPanelClass} space-y-4`}>
+          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
+            {authFlow === "register" ? "Регистрация завершена!" : "Вход выполнен!"}
+          </p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-300">
+            Подключите бота{" "}
+            <TelegramLink
+              username={TELEGRAM_BOT_USERNAME}
+              className="font-medium text-emerald-700 underline dark:text-emerald-400"
+            />{" "}
+            — так вы будете получать уведомления о турнирах, записях и других событиях на
+            billiard.guru.
+          </p>
+          <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-600 dark:text-zinc-300">
+            <li>
+              Откройте{" "}
+              <a
+                href={botLink}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-emerald-700 underline dark:text-emerald-400"
+              >
+                бота в Telegram
+              </a>
+            </li>
+            <li>Нажмите Start или «Поделиться контактом»</li>
+            <li>Можно сделать это позже — вход уже активен</li>
+          </ol>
+          <a
+            href={botLink}
+            target="_blank"
+            rel="noreferrer"
+            className="site-btn-primary block w-full text-center"
+          >
+            Открыть бота
+          </a>
+          <button type="button" onClick={goToCabinet} className="site-btn-secondary w-full">
+            Позже — в кабинет
           </button>
         </div>
       )}

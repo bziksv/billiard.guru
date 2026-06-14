@@ -8,11 +8,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Нет токена" }, { status: 400 });
     }
 
-    const { cookie, player } = await completeLoginChallenge(challengeToken);
+    const { cookie, player, needsTelegram } = await completeLoginChallenge(challengeToken);
 
     const response = NextResponse.json({
       ok: true,
       role: player.role,
+      needsTelegram,
       player: {
         id: player.id,
         firstName: player.firstName,

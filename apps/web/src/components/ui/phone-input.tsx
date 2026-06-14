@@ -102,14 +102,14 @@ export function PhoneInput({
       )}
       {countryName && !showError && !showSuccess && (
         <p className="mt-1 text-xs text-zinc-500">
-          Можно без кода — подставим автоматически · {getPhoneExample(countryName)}
+          Введите номер без кода страны — код подставим автоматически
         </p>
       )}
       {showError && result.error && (
         <p className="mt-1 text-xs text-red-400">{result.error}</p>
       )}
       {showSuccess && (
-        <p className="mt-1 text-xs text-emerald-400/80">{result.e164}</p>
+        <p className="mt-1 text-xs text-emerald-400/80">Номер принят</p>
       )}
     </div>
   );

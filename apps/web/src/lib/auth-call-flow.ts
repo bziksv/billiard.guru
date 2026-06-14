@@ -38,13 +38,6 @@ export async function startCallAuthByPhone(
   if (!player) {
     return { error: "Номер не найден. Сначала зарегистрируйтесь.", status: 404 };
   }
-  if (!player.isVerified) {
-    return {
-      error: "Подтвердите профиль в Telegram, затем можно входить звонком.",
-      status: 400,
-    };
-  }
-
   const callNumber = getNovofonVerifyNumberDisplay();
   if (!callNumber) {
     return { error: "Номер для звонка не настроен.", status: 503 };

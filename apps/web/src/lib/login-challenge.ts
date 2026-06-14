@@ -88,6 +88,21 @@ export async function confirmCallLoginChallenge(
       data: { status: "CONFIRMED", confirmedAt: new Date() },
     });
 
+    if (!challenge.player.isVerified) {
+      await prisma.player.update({
+        where: { id: challenge.playerId },
+        data: { isVerified: true },
+      });
+      await writeAuditLog({
+        actorType: "player",
+        actorId: challenge.playerId,
+        action: "player.verify_call",
+        entityType: "player",
+        entityId: challenge.playerId,
+        summary: "Номер подтверждён звонком при регистрации",
+      });
+    }
+
     await writeAuditLog({
       actorType: "player",
       actorId: challenge.playerId,
@@ -197,11 +212,15 @@ export async function completeLoginChallenge(token: string) {
     throw new Error(hint);
   }
 
-  const sessionToken = createSessionToken(challenge.playerId, challenge.player.role);
+  const player = await prisma.player.findUniqueOrThrow({
+    where: { id: challenge.playerId },
+  });
+
+  const sessionToken = createSessionToken(player.id, player.role);
 
   await writeAuditLog({
     actorType: "player",
-    actorId: challenge.playerId,
+    actorId: player.id,
     action: "auth.login.complete",
     entityType: "login_challenge",
     entityId: challenge.id,
@@ -209,8 +228,9 @@ export async function completeLoginChallenge(token: string) {
 
   return {
     sessionToken,
-    player: challenge.player,
+    player,
     cookie: sessionCookieOptions(sessionToken),
+    needsTelegram: !player.telegramId,
   };
 }
 

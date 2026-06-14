@@ -19,6 +19,8 @@ export type AuthStartResult =
       challengeToken: string;
       expiresAt: string;
       message: string;
+      flow?: "register" | "login";
+      confirmLink?: string;
       callAuth?: {
         available: boolean;
         enabled: boolean;
@@ -35,6 +37,39 @@ export type AuthStartResult =
       phone: string;
       message: string;
     };
+
+async function ensureConfirmToken(playerId: string, existing: string | null) {
+  const confirmToken = existing ?? randomUUID();
+  if (!existing) {
+    await prisma.player.update({
+      where: { id: playerId },
+      data: { confirmToken },
+    });
+  }
+  return confirmToken;
+}
+
+async function buildCallVerifyResult(
+  playerId: string,
+  confirmToken: string,
+  message: string,
+): Promise<Extract<AuthStartResult, { mode: "login" }>> {
+  const { token, expiresAt } = await createCallLoginChallenge(playerId);
+  return {
+    mode: "login",
+    authMethod: "call",
+    flow: "register",
+    challengeToken: token,
+    expiresAt: expiresAt.toISOString(),
+    message,
+    confirmLink: buildConfirmLink(confirmToken),
+    callAuth: {
+      available: true,
+      enabled: true,
+      callNumber: getNovofonVerifyNumberDisplay(),
+    },
+  };
+}
 
 export async function resolveAuthByPhone(
   phoneRaw: string,
@@ -54,7 +89,7 @@ export async function resolveAuthByPhone(
       result: {
         mode: "register",
         phone: normalized.e164,
-        message: "Заполните имя и город — затем подтвердите профиль в Telegram.",
+        message: "Заполните имя и город — дальше подтвердите номер коротким звонком.",
       },
     };
   }
@@ -65,6 +100,7 @@ export async function resolveAuthByPhone(
       result: {
         mode: "login",
         authMethod: "telegram",
+        flow: "login",
         challengeToken: token,
         expiresAt: expiresAt.toISOString(),
         message: "Подтвердите вход в Telegram",
@@ -83,9 +119,10 @@ export async function resolveAuthByPhone(
       result: {
         mode: "login",
         authMethod: "call",
+        flow: "login",
         challengeToken: token,
         expiresAt: expiresAt.toISOString(),
-        message: "Позвоните на указанный номер с телефона, который вводили",
+        message: "Позвоните на указанный номер — звонок сбросится автоматически",
         callAuth: {
           available: true,
           enabled: true,
@@ -95,13 +132,16 @@ export async function resolveAuthByPhone(
     };
   }
 
-  let confirmToken = player.confirmToken;
-  if (!confirmToken) {
-    confirmToken = randomUUID();
-    await prisma.player.update({
-      where: { id: player.id },
-      data: { confirmToken },
-    });
+  const confirmToken = await ensureConfirmToken(player.id, player.confirmToken);
+
+  if (isNovofonCallAuthEnabled()) {
+    return {
+      result: await buildCallVerifyResult(
+        player.id,
+        confirmToken,
+        "Позвоните на указанный номер с телефона, который вводили — так мы подтвердим регистрацию.",
+      ),
+    };
   }
 
   return {
@@ -110,7 +150,7 @@ export async function resolveAuthByPhone(
       confirmLink: buildConfirmLink(confirmToken),
       message: player.isVerified
         ? "Привяжите Telegram для входа на сайт."
-        : "Подтвердите регистрацию в Telegram (кнопка «Поделиться контактом» или ссылка ниже).",
+        : "Подтвердите регистрацию в Telegram (кнопка «Поделиться контактом»).",
     },
   };
 }
@@ -159,11 +199,22 @@ export async function registerPlayerByPhone(input: {
         confirmToken,
       },
     });
+
+    if (isNovofonCallAuthEnabled()) {
+      return {
+        result: await buildCallVerifyResult(
+          existing.id,
+          confirmToken,
+          "Позвоните на указанный номер — так мы подтвердим ваш номер.",
+        ),
+      };
+    }
+
     return {
       result: {
         mode: "confirm" as const,
         confirmLink: buildConfirmLink(confirmToken),
-        message: "Подтвердите профиль в Telegram.",
+        message: "Откройте Telegram и подтвердите регистрацию.",
       },
     };
   }
@@ -191,6 +242,16 @@ export async function registerPlayerByPhone(input: {
     entityId: player.id,
     summary: "Самостоятельная регистрация на сайте",
   });
+
+  if (isNovofonCallAuthEnabled()) {
+    return {
+      result: await buildCallVerifyResult(
+        player.id,
+        confirmToken,
+        "Позвоните на указанный номер — так мы подтвердим ваш номер.",
+      ),
+    };
+  }
 
   return {
     result: {
