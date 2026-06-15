@@ -26,6 +26,7 @@ import {
   fixedSwissMatchCardHeight,
   shouldDrawFixedSwissLossEdge,
   shouldDrawFixedSwissWinEdge,
+  isFixedSwissQuarterSemiWinEdge,
   isFixedSwissRound12Edge,
   isFixedSwissRound23Edge,
   isFixedSwissForkEdge,
@@ -118,9 +119,73 @@ assert.equal(
   buildFixedSwissTemplate(16, "FIXED_SWISS_16_BRONZE").matches.length,
   28,
 );
+assert.equal(
+  buildFixedSwissTemplate(16, "FIXED_SWISS_16R4_1_3_mesto").matches.length,
+  28,
+  "FIXED_SWISS_16R4_1_3_mesto: та же сетка 28",
+);
+assert.equal(
+  buildFixedSwissTemplate(16, "FIXED_SWISS_16R4_2_3_mesta").matches.length,
+  27,
+  "FIXED_SWISS_16R4_2_3_mesta: та же сетка 27",
+);
+assert.equal(
+  buildFixedSwissTemplate(8, "FIXED_SWISS_8R4_1_3_mesto").matches.length,
+  14,
+  "FIXED_SWISS_8R4_1_3_mesto: 14 встреч",
+);
+assert.equal(inferFixedSwissGridSize(14), 8);
+assert.equal(inferFixedSwissGridSize(13), 8);
+assert.equal(isFixedSwissTsBronzeMatchCount(14), true);
+assert.equal(fixedSwissMatchNo(4, 2, 14, 4), 14, "#14 bronze");
+assert.equal(fixedSwissMatchNo(4, 1, 14, 4), 13, "#13 final");
+assert.equal(
+  isFixedSwissQuarterSemiWinEdge(3, 3, 4, 1, 14, 4),
+  true,
+  "8→4: #11 → #13",
+);
+assert.equal(
+  isFixedSwissQuarterSemiWinEdge(3, 4, 4, 1, 14, 4),
+  true,
+  "8→4: #12 → #13",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 4, "win", 3, 1, 14, 4),
+  true,
+  "8→4 SVG: #11 → #13",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 4, "win", 4, 1, 14, 4),
+  true,
+  "8→4 SVG: #12 → #13",
+);
+{
+  const links8bronze = buildFixedSwissTemplate(
+    8,
+    "FIXED_SWISS_8R4_1_3_mesto",
+  ).links.filter((l) => l.kind === "loss" && l.toRound === 4 && l.toSlot === 2);
+  assert.equal(links8bronze.length, 2, "8→4 bronze: два loss → #14");
+  assert.equal(
+    fixedSwissMatchNo(links8bronze[0]!.fromRound, links8bronze[0]!.fromSlot, 14, 4),
+    11,
+    "8→4: #11 loser → #14",
+  );
+  assert.equal(
+    fixedSwissMatchNo(links8bronze[1]!.fromRound, links8bronze[1]!.fromSlot, 14, 4),
+    12,
+    "8→4: #12 loser → #14",
+  );
+}
+assertProtocolPlace(13, "loser", 14, { place: 2 }, 4);
+assertProtocolPlace(14, "winner", 14, { place: 3 }, 4);
+assertProtocolPlace(14, "loser", 14, { place: 4 }, 4);
+assertProtocolPlace(11, "loser", 14, null, 4);
+assertProtocolPlace(12, "loser", 14, null, 4);
 assert.equal(buildFixedSwissTsBronzeTemplate().matches.length, 28);
 assert.equal(inferFixedSwissGridSize(27), 16);
 assert.equal(inferFixedSwissGridSize(28), 16);
+assert.equal(fixedSwissProtocolPlace(25, "loser", 27, 5)?.place, 3);
+assert.equal(fixedSwissProtocolPlace(26, "loser", 27, 5)?.place, 3);
 assert.equal(isFixedSwissTsBronzeMatchCount(28), true);
 assert.equal(isFixedSwiss168MatchCount(28), true);
 assert.equal(isFixedSwissTsMatchCount(27), true);
@@ -227,12 +292,12 @@ assert.equal(layoutTs.matchNumbers.get("r4s1"), 25);
 assert.equal(layoutTs.matchNumbers.get("r5s1"), 27);
 assert.equal(
   fixedSwissPlacementLabel(4, 1, 5, 8, 27),
-  "место 3–4",
+  "3-е место",
   "semi #25 by round/slot",
 );
 assert.equal(
   fixedSwissPlacementLabel(4, 1, 6, 8, 27, 25),
-  "место 3–4",
+  "3-е место",
   "card #25 must not map to legacy #23 when maxRound is 6",
 );
 assert.equal(fixedSwissPlacementLabel(3, 5, 5, 8, 27, 21), "место 5–8");
@@ -240,7 +305,7 @@ assert.equal(fixedSwissPlacementLabel(3, 5, 5, 8, 27, 21), "место 5–8");
 assertProtocolPlace(27, "winner", 27, { place: 1 }, 5);
 assertProtocolPlace(27, "loser", 27, { place: 2 }, 5);
 assertProtocolPlace(25, "loser", 27, { place: 3 }, 5);
-assertProtocolPlace(26, "loser", 27, { place: 4 }, 5);
+assertProtocolPlace(26, "loser", 27, { place: 3 }, 5);
 assertProtocolPlace(21, "loser", 27, { place: 5, placeTo: 8 }, 5);
 assertProtocolPlace(17, "loser", 27, { place: 9, placeTo: 12 }, 5);
 assertProtocolPlace(13, "loser", 27, { place: 13, placeTo: 16 }, 5);
@@ -2236,5 +2301,44 @@ assert.equal(
     "#18 row 2: × from R1 bye",
   );
 }
+
+// --- 64→32 R8 elim (111/112) ---
+assert.equal(
+  buildFixedSwissTemplate(64, "FIXED_SWISS_64R8_1_3_mesto").matches.length,
+  112,
+  "FIXED_SWISS_64R8_1_3_mesto: 111 + матч за 3–4",
+);
+const r64R8Links = buildFixedSwissTemplate(64, "FIXED_SWISS_64R8_1_3_mesto").links;
+assert.equal(
+  r64R8Links.some(
+    (l) => l.kind === "loss" && l.fromRound === 3 && l.fromSlot === 21,
+  ),
+  false,
+  "64R8: нет loss с 1/8 в нижнюю ветку",
+);
+assert.equal(
+  r64R8Links.some(
+    (l) => l.fromRound === 4 && l.toRound === 5 && l.fromSlot === 1,
+  ),
+  true,
+  "64R8: нижняя тур 3 → 1/4 напрямую",
+);
+assert.equal(
+  buildFixedSwissTemplate(64, "FIXED_SWISS_64R8_1_3_mesto").matches.filter(
+    (m) => m.round === 3,
+  ).length,
+  28,
+  "64R8: R3 без нижней тур 4 (28 слотов)",
+);
+assertProtocolPlace(85, "loser", 112, { place: 17, placeTo: 24 }, 7);
+assertProtocolPlace(120, "winner", 112, { place: 3 }, 7);
+assertProtocolPlace(120, "loser", 112, { place: 4 }, 7);
+assert.equal(
+  fixedSwissPlacementLabel(3, 21, 7, 32, 112, 85),
+  "место 17–24",
+  "64R8: вылет с 1/8",
+);
+assert.equal(fixedSwissMatchNo(7, 1, 112, 7), 119, "64R8: финал #119");
+assert.equal(fixedSwissMatchNo(7, 2, 112, 7), 120, "64R8: бронза #120");
 
 console.log("fixed swiss layout tests passed");

@@ -15,6 +15,12 @@ enum TournamentFormat {
   FIXED_SWISS
   /** 16→8 (27+1 встреч): эталон TS + матч за 3–4 (#28) */
   FIXED_SWISS_16_BRONZE
+  /** 16→8 (28): копия 16_BRONZE, подпись 1/4 + доп.игра */
+  FIXED_SWISS_16R4_1_3_mesto
+  /** 16→8 (27): копия FIXED_SWISS, подпись 1/4, два 3-их */
+  FIXED_SWISS_16R4_2_3_mesta
+  /** 8→4 (13+1): oлимпийka с 1/4 + матч за 3–4 (#14) */
+  FIXED_SWISS_8R4_1_3_mesto
   /** 32→16 (59/60): олимпийка с 1/4 */
   FIXED_SWISS_32
   /** 32→16 (60): 1/4 + матч за 3–4 */
@@ -31,6 +37,8 @@ enum TournamentFormat {
   FIXED_SWISS_32R8_1_3_mesto
   /** 32→16 (60 встреч): 1/8 + матч за 3–4 (#60) */
   FIXED_SWISS_32R8_BRONZE
+  /** 64→32 (112): R8 elim + матч за 3–4 (#120) */
+  FIXED_SWISS_64R8_1_3_mesto
   /** 64→32 (111 встреч): эталонная сетка, олимпийка с 1/8 */
   FIXED_SWISS_64
   /** 64→32 (112 встреч): эталон + матч за 3–4 (#112 под финалом) */
@@ -40,6 +48,9 @@ enum TournamentFormat {
   PAIR_SWISS
   FIXED_PAIR_SWISS
   FIXED_PAIR_SWISS_16_BRONZE
+  FIXED_PAIR_SWISS_16R4_1_3_mesto
+  FIXED_PAIR_SWISS_16R4_2_3_mesto
+  FIXED_PAIR_SWISS_8R4_1_3_mesto
   FIXED_PAIR_SWISS_32
   FIXED_PAIR_SWISS_32_BRONZE
   FIXED_PAIR_SWISS_64

@@ -1,8 +1,10 @@
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "@/generated/prisma/client";
+import { warnIfDevelopmentUsesProductionDatabase } from "@/lib/database-url-guard";
 import { ensureDatabaseUrlFromEnvFile } from "@/lib/ensure-database-url";
 
 ensureDatabaseUrlFromEnvFile();
+warnIfDevelopmentUsesProductionDatabase();
 
 function parseDatabaseUrl(raw: string) {
   const normalized = raw.replace(/^mysql:\/\//, "mariadb://");

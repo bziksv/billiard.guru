@@ -23,6 +23,8 @@ export type BracketMatchView = {
 export type SwissStandingView = BracketTeamView & {
   swissPoints: number;
   seed?: number | null;
+  place?: number | null;
+  placeTo?: number | null;
 };
 
 /** Автопроход (×): только 1-й тур, один участник без пары. Иначе — «ожидание». */

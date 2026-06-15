@@ -1,9 +1,13 @@
 import {
+  FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_16_8_FORMAT_LABEL,
+  FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32R8_FORMAT_LABEL,
+  FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
 } from "@/lib/validators";
@@ -12,11 +16,15 @@ import {
 export type BracketFormatCode =
   | "OLYMPIC"
   | "OLYMPIC_1L_BRONZE"
+  | "FIXED_SWISS_8R4_1_3_mesto"
+  | "FIXED_SWISS_16R4_2_3_mesta"
+  | "FIXED_SWISS_16R4_1_3_mesto"
   | "FIXED_SWISS_32R4_2_3_mesta"
   | "FIXED_SWISS_32R4_1_3_mesto"
   | "FIXED_SWISS_32R8_2_3_mesta"
   | "FIXED_SWISS_32R8_1_3_mesto"
-  | "FIXED_SWISS_32R8_BRONZE";
+  | "FIXED_SWISS_32R8_BRONZE"
+  | "FIXED_SWISS_64R8_1_3_mesto";
 
 export interface BracketFormatDefinition {
   code: BracketFormatCode;
@@ -52,6 +60,12 @@ const TS32_R8_ELIM_BRONZE_IMPL = [
   "swiss-bracket-view.tsx",
 ] as const;
 
+const TS64_R8_ELIM_BRONZE_IMPL = [
+  "fixed-swiss-ts-grid.ts — buildFixedSwissTs64R8ElimAtEighthBronzeTemplate()",
+  "fixed-swiss-layout.ts — buildTsPositions64R8ElimAtEighthBronze",
+  "swiss-bracket-view.tsx",
+] as const;
+
 /**
  * Реестр типов сеток. Новый формат → запись здесь → появится в /admin/brackets и в FORMAT_OPTIONS.
  */
@@ -81,6 +95,57 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
       "bracket-service.ts — routeOlympicSemiLoserToBronze",
       "olympic-bracket-view.tsx",
     ],
+  },
+  {
+    code: "FIXED_SWISS_8R4_1_3_mesto",
+    adminLabel: FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    isReference: true,
+    shortDescription:
+      "Копия 16R4_1_3 на 8 участников — 14 встреч (13 + #14 за 3–4), олимпийка с 1/4.",
+    guideSectionId: "swiss-fixed-bronze",
+    docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
+    implementation: [
+      "fixed-swiss-ts-grid.ts — buildFixedSwissTsTemplateForGridSize(8, true)",
+      "fixed-swiss-layout.ts — buildTsPositionsBronzeForHalf2(half2=4)",
+      "swiss-bracket-view.tsx",
+    ],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_SWISS_16R4_2_3_mesta",
+    adminLabel: FIXED_SWISS_16_8_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    isReference: true,
+    shortDescription:
+      "Копия FIXED_SWISS (27 встреч) — та же сетка 16→8, oлимпийka с 1/4, проигравшие полуфиналисты делят 3-е место без доп. игры.",
+    guideSectionId: "swiss-fixed",
+    docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
+    implementation: [
+      "fixed-swiss-ts-grid.ts — buildFixedSwissTsTemplateForGridSize(16, false)",
+      "fixed-swiss-layout.ts — buildTsPositions16",
+      "swiss-bracket-view.tsx",
+    ],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_SWISS_16R4_1_3_mesto",
+    adminLabel: FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    isReference: true,
+    shortDescription:
+      "Копия FIXED_SWISS_16_BRONZE (28 встреч) — та же сетка 16→8, oлимпийka с 1/4 + матч #28 за 3–4.",
+    guideSectionId: "swiss-fixed-bronze",
+    docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
+    implementation: [
+      "fixed-swiss-ts-grid.ts — buildFixedSwissTsTemplateForGridSize(16, true)",
+      "fixed-swiss-layout.ts — buildTsPositions16Bronze",
+      "swiss-bracket-view.tsx",
+    ],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
   },
   {
     code: "FIXED_SWISS_32R4_2_3_mesta",
@@ -151,6 +216,18 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     guideSectionId: "swiss-fixed-32-r8-bronze",
     docPaths: ["docs/BRACKET_REFERENCE_32_16.md"],
     implementation: [...TS32_R8_BRONZE_IMPL],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_SWISS_64R8_1_3_mesto",
+    adminLabel: FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    shortDescription:
+      "112 встреч — копия R8 elim (111) + #120: матч проигравших полуфиналистов под финалом; вылет с 1/8 (#81–#88) на места 17–24.",
+    guideSectionId: "swiss-fixed-64-r8-1-3",
+    docPaths: ["docs/BRACKET_REFERENCE_64_32.md"],
+    implementation: [...TS64_R8_ELIM_BRONZE_IMPL],
     testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
   },
 ];

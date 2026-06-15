@@ -65,12 +65,12 @@ export function GeoFilterBar({
 
   if (variant === "inline") {
     return (
-      <div className="geo-filter-inline">
+      <div className="geo-filter-inline w-full md:w-auto">
         <span className="geo-filter-inline-label">{t("geo.region")}</span>
         <select
           value={countryId}
           onChange={(e) => apply(e.target.value, "")}
-          className="site-input geo-filter-inline-select"
+          className="site-input geo-filter-inline-select min-w-0 flex-1 md:flex-none md:max-w-[9rem]"
           aria-label={t("geo.country")}
         >
           <option value="">{t("geo.all")}</option>
@@ -83,7 +83,7 @@ export function GeoFilterBar({
         <select
           value={cityId}
           onChange={(e) => apply(countryId, e.target.value)}
-          className="site-input geo-filter-inline-select"
+          className="site-input geo-filter-inline-select min-w-0 flex-1 md:flex-none md:max-w-[9rem]"
           aria-label={t("geo.city")}
           disabled={!countryId}
         >

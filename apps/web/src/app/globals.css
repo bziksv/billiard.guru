@@ -2759,7 +2759,7 @@ html.light .home-player-card:hover {
 .geo-filter-inline {
   display: flex;
   flex-shrink: 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.375rem;
 }

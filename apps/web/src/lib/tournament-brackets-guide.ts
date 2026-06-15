@@ -174,7 +174,7 @@ export const TOURNAMENT_BRACKETS_SECTIONS: GuideSection[] = [
       `Парный аналог — FIXED_PAIR_SWISS, см. раздел «${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS}».`,
     ],
     bullets: [
-      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS}».`,
+      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS}» или «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_16R4_2_3_mesta}».`,
       "15 участников → сетка на 16 (один bye в 1-м туре).",
       "После результата победитель и проигравший сразу попадают в указанные # слоты — без кнопки «следующий тур».",
     ],
@@ -238,7 +238,7 @@ export const TOURNAMENT_BRACKETS_SECTIONS: GuideSection[] = [
       `Парный аналог — ${TOURNAMENT_FORMAT_LABELS.FIXED_PAIR_SWISS_16_BRONZE}.`,
     ],
     bullets: [
-      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_16_BRONZE}».`,
+      `Формат в админке: «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_16_BRONZE}», «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_16R4_1_3_mesto}» или «${TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_8R4_1_3_mesto}».`,
       "После обоих полуфиналов проигравшие автоматически попадают в #28; финал #27 можно провести параллельно.",
       "Минимум 4 участника (полуфиналы + матч за 3–4).",
     ],
@@ -544,6 +544,20 @@ E/F vs …        B vs D`,
           "Да, все #",
           "Нет",
           "16→8, олимп. 1/4, два 3-их",
+        ],
+        [
+          TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_8R4_1_3_mesto!,
+          "FIXED_SWISS_8R4_1_3_mesto / FIXED_PAIR_SWISS_8R4_1_3_mesto",
+          "Да, 14 #",
+          "Нет",
+          "8→4, oлимп. 1/4 + доп.игра",
+        ],
+        [
+          TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_16R4_2_3_mesta!,
+          "FIXED_SWISS_16R4_2_3_mesta / FIXED_PAIR_SWISS_16R4_2_3_mesto",
+          "Да, 27 #",
+          "Нет",
+          "16→8, oлимп. 1/4, два 3-их",
         ],
         [
           TOURNAMENT_FORMAT_LABELS.FIXED_SWISS_16_BRONZE!,

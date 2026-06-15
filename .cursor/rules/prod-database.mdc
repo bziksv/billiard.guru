@@ -1,0 +1,24 @@
+# Боевая БД и локальная разработка
+
+## Правило
+
+**Локальный dev не должен писать в prod MySQL**, если на billiard.guru ещё не задеплоен код с теми же изменениями схемы (enum, поля Prisma).
+
+Иначе: новое значение `TournamentFormat` в БД → старый Prisma client на сервере → 500 на `/`, `/tournaments`.
+
+## DATABASE_URL
+
+- Локально: `mysql://setka:setka@localhost:3306/setka` (см. `apps/web/.env.example`)
+- Prod: только на Beget в `~/billiard.guru/apps/web/.env`
+- При старте dev с `beget.tech` / `billiard.guru` в URL — предупреждение в консоли (`database-url-guard.ts`)
+- Осознанно prod из dev: `ALLOW_PRODUCTION_DATABASE=1` (не отключать guard без причины)
+
+## Порядок при новом формате сетки
+
+1. Закоммитить schema + generated Prisma + код
+2. `./scripts/beget-setup.sh` на сервере (успешный `npm run build`)
+3. Только после этого — создавать/менять турниры с новым форматом (локально или в админке)
+
+## Устойчивость публичного сайта
+
+Публичные страницы читают турниры через `findPublicTournamentsList` / `findPublicTournamentById` (`tournament-public-read.ts`): при несовпадении enum — raw SQL fallback, сайт не падает целиком (старый билд может не показывать сетку нового формата, но главная жива).

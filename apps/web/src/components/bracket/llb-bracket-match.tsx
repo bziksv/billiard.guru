@@ -460,9 +460,16 @@ export function LlbBracketMatch({
   const maxRound = isFixedSwissGrid
     ? isFixedSwissTsLegacy29MatchCount(matchCount)
       ? bracketMaxRound || 6
-      : matchCount === 27 || matchCount === 28
+      : matchCount === 27 ||
+          matchCount === 28 ||
+          matchCount === 13 ||
+          matchCount === 14
         ? bracketMaxRound ||
-          (isFixedSwissTsLegacy27SixRound(matchCount, 6) ? 6 : 5)
+          (matchCount === 13 || matchCount === 14
+            ? 4
+            : isFixedSwissTsLegacy27SixRound(matchCount, 6)
+              ? 6
+              : 5)
         : isFixedSwiss168LegacyMatchCount(matchCount, bracketMaxRound)
           ? bracketMaxRound || 5
           : Math.max(bracketMaxRound, Math.log2(gridSize) + 1)

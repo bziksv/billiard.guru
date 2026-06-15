@@ -141,6 +141,7 @@ export function canFinishTournament(t: AdminTournament): boolean {
 }
 
 export interface TournamentStandingRow {
+  teamId?: string;
   place: number | null;
   /** Верхняя граница диапазона мест (если отличается от place). */
   placeTo?: number | null;
@@ -193,6 +194,7 @@ function standingFromTeam(
 ): TournamentStandingRow {
   const full = teamForProtocol(t, team);
   return {
+    teamId: team.id,
     place,
     placeTo: placeTo ?? null,
     label: teamLabel(full as TeamWithPlayers),

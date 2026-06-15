@@ -23,9 +23,8 @@ import {
   clubGeoWhere,
   clubListInclude,
   playerGeoWhere,
-  tournamentGeoWhere,
-  tournamentListInclude,
 } from "@/lib/public-queries";
+import { findPublicTournamentsList } from "@/lib/tournament-public-read";
 import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 import { GeoSearchParams, hrefWithGeo, t } from "@/lib/site";
@@ -56,12 +55,7 @@ export default async function HomePage({
   );
 
   const [localTournaments, clubs, topPlayers, playAnnouncements] = await Promise.all([
-    prisma.tournament.findMany({
-      where: tournamentGeoWhere(geo),
-      include: tournamentListInclude,
-      orderBy: [{ startsAt: "asc" }, { createdAt: "desc" }],
-      take: 4,
-    }),
+    findPublicTournamentsList({ geo, take: 4 }),
     prisma.club.findMany({
       where: { ...clubGeoWhere(geo), isVerified: true },
       include: clubListInclude,

@@ -52,8 +52,9 @@ function HomeStickyNavInner({
       style={stickyTop != null ? { top: stickyTop } : undefined}
       aria-label="Навигация по разделам главной"
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:px-6">
-        <div className="flex min-w-0 flex-1 gap-1 overflow-x-auto scrollbar-none">
+      <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-2.5 sm:px-6 md:flex-row md:flex-wrap md:items-center md:gap-x-3 md:gap-y-2">
+        {/* Якоря по секциям — на мобильном лишние: лента и так скроллится, разделы есть в шапке */}
+        <div className="hidden min-w-0 flex-1 gap-1 overflow-x-auto scrollbar-none md:flex">
           {LINKS.map((link) => (
             <a
               key={link.href}

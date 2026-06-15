@@ -3,7 +3,7 @@ import {
   countActiveTournamentSlots,
   validateCanAddParticipants,
 } from "@/lib/tournament-participant-limit";
-import { validateBracketParticipantCount } from "@/lib/bracket-participant-rules";
+import { validateFormatChangeParticipantCount } from "@/lib/bracket-participant-rules";
 import { prisma } from "@/lib/prisma";
 
 export async function getTournamentParticipantContext(tournamentId: string) {
@@ -46,10 +46,8 @@ export async function assertTournamentFitsFormat(
 
   const rules = await getResolvedParticipantRules(format);
   const count = countActiveTournamentSlots({ ...tournament, format });
-  const check = validateBracketParticipantCount(format, count, rules);
+  const check = validateFormatChangeParticipantCount(format, count, rules);
   if (!check.ok) {
-    throw new Error(
-      `Нельзя выбрать эту сетку: ${check.error.replace("формата", "сетки")}`,
-    );
+    throw new Error(`Нельзя выбрать эту сетку: ${check.error}`);
   }
 }

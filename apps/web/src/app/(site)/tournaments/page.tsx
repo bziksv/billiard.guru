@@ -8,10 +8,8 @@ import { getCurrentPlayer } from "@/lib/auth";
 import { getNearbyCityIds, NOTIFY_RADIUS_KM } from "@/lib/geo";
 import {
   resolveGeoForPlayer,
-  tournamentCityIdsWhere,
-  tournamentGeoWhere,
-  tournamentListInclude,
 } from "@/lib/public-queries";
+import { findPublicTournamentsList, type PublicTournamentListItem } from "@/lib/tournament-public-read";
 import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 import type { GeoSearchParams } from "@/lib/site";
@@ -37,16 +35,8 @@ function TournamentsPageBody({
   formatLabels,
 }: {
   tab: ReturnType<typeof parseTournamentTab>;
-  localTournaments: Awaited<
-    ReturnType<
-      typeof prisma.tournament.findMany<{ include: typeof tournamentListInclude }>
-    >
-  >;
-  nearbyTournaments: Awaited<
-    ReturnType<
-      typeof prisma.tournament.findMany<{ include: typeof tournamentListInclude }>
-    >
-  >;
+  localTournaments: PublicTournamentListItem[];
+  nearbyTournaments: PublicTournamentListItem[];
   localSubtitle?: string;
   nearbySubtitle?: string;
   formatLabels: Record<string, string>;
@@ -133,15 +123,9 @@ export default async function TournamentsPage({
     ).filter((id) => id !== player.cityId);
 
     const [localTournaments, nearbyTournaments] = await Promise.all([
-      prisma.tournament.findMany({
-        where: tournamentGeoWhere({ cityId: player.cityId }),
-        include: tournamentListInclude,
-      }),
+      findPublicTournamentsList({ geo: { cityId: player.cityId } }),
       nearbyCityIds.length > 0
-        ? prisma.tournament.findMany({
-            where: tournamentCityIdsWhere(nearbyCityIds),
-            include: tournamentListInclude,
-          })
+        ? findPublicTournamentsList({ cityIds: nearbyCityIds })
         : Promise.resolve([]),
     ]);
 
@@ -175,10 +159,7 @@ export default async function TournamentsPage({
     player?.cityId,
     player?.city.countryId,
   );
-  const tournaments = await prisma.tournament.findMany({
-    where: tournamentGeoWhere(geo),
-    include: tournamentListInclude,
-  });
+  const tournaments = await findPublicTournamentsList({ geo });
 
   return (
     <>

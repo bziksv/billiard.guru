@@ -8,8 +8,11 @@ import {
   formatStartsAt,
   PUBLIC_TOURNAMENT_STATUSES,
 } from "@/lib/public-display";
-import { prisma } from "@/lib/prisma";
+import { findPublicTournamentById } from "@/lib/tournament-public-read";
 import { getBracketFormatLabel } from "@/lib/bracket-formats/settings-server";
+import { computeTournamentStandings } from "@/lib/tournament-admin";
+import type { AdminTournament } from "@/lib/tournament-admin";
+import { isFixedSwissFormat } from "@/lib/pair-tournament";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
   TOURNAMENT_STATUS_LABELS,
@@ -29,23 +32,20 @@ export default async function TournamentBracketPage({
 }) {
   const { id } = await params;
 
-  const tournament = await prisma.tournament.findUnique({
-    where: { id },
-    include: {
-      club: { include: { city: { include: { country: true } } } },
-      teams: {
-        where: { status: "CONFIRMED" },
-        include: { player1: true, player2: true },
-        orderBy: [{ swissPoints: "desc" }, { seed: "asc" }],
+  const tournament = await findPublicTournamentById(id, {
+    club: { include: { city: { include: { country: true } } } },
+    teams: {
+      where: { status: "CONFIRMED" },
+      include: { player1: true, player2: true },
+      orderBy: [{ swissPoints: "desc" }, { seed: "asc" }],
+    },
+    matches: {
+      include: {
+        team1: { include: { player1: true, player2: true } },
+        team2: { include: { player1: true, player2: true } },
+        winnerTeam: { include: { player1: true, player2: true } },
       },
-      matches: {
-        include: {
-          team1: { include: { player1: true, player2: true } },
-          team2: { include: { player1: true, player2: true } },
-          winnerTeam: { include: { player1: true, player2: true } },
-        },
-        orderBy: [{ round: "asc" }, { slot: "asc" }],
-      },
+      orderBy: [{ round: "asc" }, { slot: "asc" }],
     },
   });
 
@@ -82,10 +82,35 @@ export default async function TournamentBracketPage({
     team2: m.team2,
   }));
 
-  const standings: SwissStandingView[] = tournament.teams.map((t) => ({
-    ...t,
-    swissPoints: t.swissPoints,
-  }));
+  const standings: SwissStandingView[] = (() => {
+    const base: SwissStandingView[] = tournament.teams.map((t) => ({
+      ...t,
+      swissPoints: t.swissPoints,
+    }));
+    if (!isFixedSwissFormat(tournament.format) || tournament.matches.length === 0) {
+      return base;
+    }
+    const adminInput = {
+      ...tournament,
+      registrations: [],
+    } as AdminTournament;
+    const placeByTeamId = new Map(
+      computeTournamentStandings(adminInput)
+        .filter((row) => row.teamId && row.place != null)
+        .map((row) => [row.teamId!, { place: row.place, placeTo: row.placeTo ?? null }]),
+    );
+    return base
+      .map((team) => {
+        const p = placeByTeamId.get(team.id);
+        return p ? { ...team, place: p.place, placeTo: p.placeTo } : team;
+      })
+      .sort((a, b) => {
+        if (a.place != null && b.place != null) return a.place - b.place;
+        if (a.place != null) return -1;
+        if (b.place != null) return 1;
+        return b.swissPoints - a.swissPoints;
+      });
+  })();
 
   const bracketUrl = `/tournaments/${tournament.id}/bracket`;
 

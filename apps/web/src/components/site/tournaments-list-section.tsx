@@ -1,14 +1,9 @@
 import { EmptyState } from "@/components/site/site-card";
 import { TournamentCard } from "@/components/site/tournament-card";
 import { tournamentTabConfig, type TournamentTab } from "@/lib/tournament-tabs";
-import type { tournamentListInclude } from "@/lib/public-queries";
-import type { prisma } from "@/lib/prisma";
+import type { PublicTournamentListItem } from "@/lib/tournament-public-read";
 
-type TournamentListItem = Awaited<
-  ReturnType<
-    typeof prisma.tournament.findMany<{ include: typeof tournamentListInclude }>
-  >
->[number];
+type TournamentListItem = PublicTournamentListItem;
 
 function TournamentGrid({
   tournaments,

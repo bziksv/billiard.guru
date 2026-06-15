@@ -1,10 +1,14 @@
 import type { BracketFormatCode } from "@/lib/bracket-formats/catalog";
 import {
+  FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_16_8_FORMAT_LABEL,
+  FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32R8_FORMAT_LABEL,
+  FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
 } from "@/lib/validators";
@@ -115,6 +119,50 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     participantBadge: "32 человека",
     keywords: ["сетка 32 бронза", "турнирная таблица 32", "матч за 3 место"],
   },
+  FIXED_SWISS_64R8_1_3_mesto: {
+    code: "FIXED_SWISS_64R8_1_3_mesto",
+    slug: "setka-64-1-8-matc-za-3-4",
+    pageTitle: "Сетка на 64 с 1/8 и матчем за 3–4 место",
+    metaTitle: "Сетка на 64 (1/8) + матч за 3–4 | billiard.guru",
+    metaDescription:
+      "Турнирная таблица на 64: oлимпийka с 1/8 (111 встреч) и отдельный матч #120 за 3–4 место. Демо на billiard.guru.",
+    lead: "Oлимпийka с 1/8 на 64 участника (111 основных встреч + матч #120) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
+    participantBadge: "64 человека",
+    keywords: ["сетка 64 бронза", "турнирная таблица 64", "матч за 3 место 1/8"],
+  },
+  FIXED_SWISS_8R4_1_3_mesto: {
+    code: "FIXED_SWISS_8R4_1_3_mesto",
+    slug: "setka-8-chelovek-1-4-s-bronzoy",
+    pageTitle: "Сетка на 8 человека с 1/4 и матчем за 3–4 место",
+    metaTitle: "Сетка на 8 человека (1/4) + матч за 3–4 | billiard.guru",
+    metaDescription:
+      "Турнирная таблица на 8 с oлимпийкой с 1/4 и матчем за бронзу (#14). Демо 14 встреч на billiard.guru.",
+    lead: "Сетка 8→4 (13+1 встреч) с oлимпийкой с 1/4 плюс матч #14 за 3–4 между проигравшими полуфиналистами.",
+    participantBadge: "8 человек",
+    keywords: ["сетка 8 бронза", "турнирная таблица 8", "матч за 3 место"],
+  },
+  FIXED_SWISS_16R4_2_3_mesta: {
+    code: "FIXED_SWISS_16R4_2_3_mesta",
+    slug: "setka-16-chelovek-1-4",
+    pageTitle: "Турнирная сетка на 16 человека — oлимпийka с 1/4",
+    metaTitle: "Турнирная сетка на 16 человека — до 2 поражений, 1/4 | billiard.guru",
+    metaDescription:
+      "Турнирная таблица на 16 с oлимпийкой с 1/4: 27 встреч, проигравшие полуфиналисты делят 3-е место. Демо на billiard.guru.",
+    lead: "Сетка 16→8 (27 встреч) с oлимпийкой с 1/4 — проигравшие полуфиналисты получают 3-е место без дополнительной игры.",
+    participantBadge: "16 человек",
+    keywords: ["сетка 16", "турнирная таблица 16", "олимпийка 1/4"],
+  },
+  FIXED_SWISS_16R4_1_3_mesto: {
+    code: "FIXED_SWISS_16R4_1_3_mesto",
+    slug: "setka-16-chelovek-1-4-s-bronzoy",
+    pageTitle: "Сетка на 16 человека с 1/4 и матчем за 3–4 место",
+    metaTitle: "Сетка на 16 человека (1/4) + матч за 3–4 | billiard.guru",
+    metaDescription:
+      "Турнирная таблица на 16 с oлимпийкой с 1/4 и матчем за бронзу (#28). Демо 28 встреч на billiard.guru.",
+    lead: "Сетка 16→8 (27+1 встреч) с oлимпийкой с 1/4 плюс матч #28 за 3–4 между проигравшими полуфиналистами.",
+    participantBadge: "16 человек",
+    keywords: ["сетка 16 бронза", "турнирная таблица 16", "матч за 3 место"],
+  },
 };
 
 const slugToSeo = new Map(
@@ -136,11 +184,15 @@ export function getAllBracketFormatSeoSlugs(): string[] {
 export function bracketFormatDisplayLabel(code: BracketFormatCode): string {
   if (code === "OLYMPIC") return OLYMPIC_SINGLE_FORMAT_LABEL;
   if (code === "OLYMPIC_1L_BRONZE") return OLYMPIC_1L_BRONZE_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_8R4_1_3_mesto") return FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_16R4_2_3_mesta") return FIXED_SWISS_16_8_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_16R4_1_3_mesto") return FIXED_SWISS_16_BRONZE_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R4_2_3_mesta") return FIXED_SWISS_32_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R4_1_3_mesto") return FIXED_SWISS_32_BRONZE_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R8_2_3_mesta") return FIXED_SWISS_32R8_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R8_1_3_mesto") return FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R8_BRONZE") return FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_64R8_1_3_mesto") return FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL;
   return code;
 }
 

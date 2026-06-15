@@ -16,6 +16,7 @@ import {
   teamLabel,
 } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
+import { findPublicTournamentById } from "@/lib/tournament-public-read";
 import { formatRatingRange } from "@/lib/play-listing-display";
 import {
   getEffectivePlayerRatingForTournament,
@@ -63,28 +64,25 @@ export default async function TournamentPage({
 }) {
   const { id } = await params;
 
-  const tournament = await prisma.tournament.findUnique({
-    where: { id },
-    include: {
-      club: { include: { city: { include: { country: true } } } },
-      registrations: {
-        where: { status: "CONFIRMED" },
-        include: { player: true },
-        orderBy: { createdAt: "asc" },
+  const tournament = await findPublicTournamentById(id, {
+    club: { include: { city: { include: { country: true } } } },
+    registrations: {
+      where: { status: "CONFIRMED" },
+      include: { player: true },
+      orderBy: { createdAt: "asc" },
+    },
+    teams: {
+      where: { status: "CONFIRMED" },
+      include: { player1: true, player2: true },
+      orderBy: [{ swissPoints: "desc" }, { seed: "asc" }],
+    },
+    matches: {
+      include: {
+        team1: { include: { player1: true, player2: true } },
+        team2: { include: { player1: true, player2: true } },
+        winnerTeam: { include: { player1: true, player2: true } },
       },
-      teams: {
-        where: { status: "CONFIRMED" },
-        include: { player1: true, player2: true },
-        orderBy: [{ swissPoints: "desc" }, { seed: "asc" }],
-      },
-      matches: {
-        include: {
-          team1: { include: { player1: true, player2: true } },
-          team2: { include: { player1: true, player2: true } },
-          winnerTeam: { include: { player1: true, player2: true } },
-        },
-        orderBy: [{ round: "asc" }, { slot: "asc" }],
-      },
+      orderBy: [{ round: "asc" }, { slot: "asc" }],
     },
   });
 

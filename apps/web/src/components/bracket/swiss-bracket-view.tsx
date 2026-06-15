@@ -10,6 +10,7 @@ import { LlbBracketMatch } from "@/components/bracket/llb-bracket-match";
 import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center";
 import { bracketMatchHasPlayer } from "@/lib/bracket-display";
 import { teamLabel } from "@/lib/pair-tournament";
+import { formatTournamentStandingPlace } from "@/lib/tournament-admin";
 import { cn } from "@/lib/cn";
 import type { TeamPlayer } from "@/lib/pair-tournament";
 import {
@@ -36,6 +37,7 @@ import {
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32R8ElimAtEighthFamily,
+  isFixedSwissTs64R8ElimAtEighthFamily,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -204,7 +206,11 @@ export function SwissBracketView({
   const is64Current =
     is64Grid &&
     (isFixedSwissTs64MatchCount(matches.length) ||
-      isFixedSwissTs64BronzeMatchCount(matches.length));
+      isFixedSwissTs64BronzeMatchCount(matches.length) ||
+      isFixedSwissTs64R8ElimAtEighthFamily(
+        matches.length,
+        bracketMaxRound,
+      ));
   const isLargeCurrent = is32Current || is64Current;
   const is32Outdated =
     is32Grid &&
@@ -315,19 +321,38 @@ export function SwissBracketView({
           </h3>
           <ol className="flex flex-wrap gap-x-6 gap-y-1 rounded-lg border border-zinc-800 bg-zinc-950/80 px-4 py-3">
             {[...standings]
-              .sort((a, b) => b.swissPoints - a.swissPoints)
-              .map((team, index) => (
+              .sort((a, b) => {
+                if (a.place != null && b.place != null) return a.place - b.place;
+                if (a.place != null) return -1;
+                if (b.place != null) return 1;
+                return b.swissPoints - a.swissPoints;
+              })
+              .map((team, index) => {
+                const placeLabel =
+                  team.place != null
+                    ? formatTournamentStandingPlace({
+                        place: team.place,
+                        placeTo: team.placeTo ?? null,
+                        label: "",
+                        city: "",
+                        rating: 0,
+                      })
+                    : String(index + 1);
+                return (
                 <li
                   key={team.id}
                   className="flex items-center gap-2 text-sm text-zinc-300"
                 >
-                  <span className="text-zinc-600">{index + 1}.</span>
+                  <span className="text-zinc-600">{placeLabel}.</span>
                   <span>{teamLabel(team)}</span>
-                  <span className="font-mono text-emerald-400">
-                    {team.swissPoints}
-                  </span>
+                  {!fixedGrid && (
+                    <span className="font-mono text-emerald-400">
+                      {team.swissPoints}
+                    </span>
+                  )}
                 </li>
-              ))}
+              );
+              })}
           </ol>
         </section>
       )}

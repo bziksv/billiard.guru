@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { Prisma } from "@/generated/prisma/client";
 import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import {
@@ -20,6 +21,15 @@ import {
 } from "@/lib/tournament-manage";
 import { assertTournamentFitsFormat } from "@/lib/tournament-participant-limit-server";
 import { reopenTournamentIfBracketEmpty } from "@/lib/tournament-registration-server";
+import {
+  sanitizeTournamentTableStreams,
+  tableStreamsToJson,
+  validateTournamentTableStreams,
+} from "@/lib/tournament-stream";
+import {
+  parseTournamentTableIds,
+  validateTournamentTableIds,
+} from "@/lib/tournament-table-pick";
 import { tournamentUpdateSchema } from "@/lib/validators";
 
 export async function GET(
@@ -126,6 +136,52 @@ export async function PATCH(
       }
     }
 
+    const currentForTables =
+      data.tableIds !== undefined || data.tableStreams !== undefined
+        ? await prisma.tournament.findUnique({
+            where: { id },
+            include: { club: { select: { floorPlan: true, tableCounts: true } } },
+          })
+        : null;
+
+    let tableIdsUpdate: string[] | undefined;
+    let tableStreamsUpdate: ReturnType<typeof tableStreamsToJson> | undefined;
+    let removedTableIds: string[] = [];
+
+    if (data.tableIds !== undefined || data.tableStreams !== undefined) {
+      if (!currentForTables) {
+        return NextResponse.json({ error: "Турнир не найден" }, { status: 404 });
+      }
+      const nextTableIds =
+        data.tableIds ?? parseTournamentTableIds(currentForTables.tableIds);
+      const tableError = validateTournamentTableIds(
+        nextTableIds,
+        currentForTables.club.floorPlan,
+        currentForTables.club.tableCounts,
+      );
+      if (tableError) {
+        return NextResponse.json({ error: tableError }, { status: 400 });
+      }
+      const streamsError = validateTournamentTableStreams(
+        nextTableIds,
+        data.tableStreams ??
+          (currentForTables.tableStreams as Record<string, string> | undefined),
+      );
+      if (streamsError) {
+        return NextResponse.json({ error: streamsError }, { status: 400 });
+      }
+      const sanitizedStreams = sanitizeTournamentTableStreams(
+        nextTableIds,
+        data.tableStreams ?? currentForTables.tableStreams,
+      );
+      tableIdsUpdate = nextTableIds;
+      tableStreamsUpdate = tableStreamsToJson(sanitizedStreams);
+      if (data.tableIds !== undefined) {
+        const prevIds = parseTournamentTableIds(currentForTables.tableIds);
+        removedTableIds = prevIds.filter((tid) => !nextTableIds.includes(tid));
+      }
+    }
+
     const tournament = await prisma.tournament.update({
       where: { id },
       data: {
@@ -149,9 +205,24 @@ export async function PATCH(
         ...(data.suppressNotifications !== undefined && {
           suppressNotifications: data.suppressNotifications,
         }),
-      },
+        ...(tableIdsUpdate !== undefined && { tableIds: tableIdsUpdate }),
+        ...(tableIdsUpdate !== undefined || data.tableStreams !== undefined
+          ? { tableStreams: tableStreamsUpdate ?? null }
+          : {}),
+      } as Prisma.TournamentUncheckedUpdateInput,
       include: tournamentAdminInclude,
     });
+
+    if (removedTableIds.length > 0) {
+      await prisma.tournamentMatch.updateMany({
+        where: {
+          tournamentId: id,
+          tableId: { in: removedTableIds },
+          status: { not: "FINISHED" },
+        },
+        data: { tableId: null },
+      });
+    }
 
     await writeAuditLog({
       actorType: tournamentManageActorType(session),
@@ -167,7 +238,12 @@ export async function PATCH(
       payload: data,
     });
 
-    return NextResponse.json(await withTournamentFormatLabel(tournament));
+    return NextResponse.json(
+      await withTournamentFormatLabel({
+        ...tournament,
+        participantRules: await getResolvedParticipantRules(tournament.format),
+      }),
+    );
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

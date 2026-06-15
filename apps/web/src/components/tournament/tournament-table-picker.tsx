@@ -128,13 +128,13 @@ export function TournamentTablePicker({
     <div className="tournament-table-picker space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-[var(--admin-text-primary)]">Столы под турнир</p>
-          <p className="mt-1 text-xs text-[var(--admin-text-secondary)]">
+          <p className="text-sm font-medium text-[var(--admin-text)]">Столы под турнир</p>
+          <p className="admin-text-secondary mt-1 text-xs">
             Выберите столы и при необходимости укажите ссылку на трансляцию (YouTube, Rutube).
             Без выбора стола создать турнир нельзя.
           </p>
         </div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm">
+        <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--admin-text)]">
           <input
             type="checkbox"
             checked={allSelected}
@@ -164,12 +164,12 @@ export function TournamentTablePicker({
                   style={{ backgroundColor: floorTableColor(group.format) }}
                   aria-hidden
                 />
-                <h3 className="text-sm font-semibold">{group.label}</h3>
-                <span className="text-xs text-[var(--admin-text-secondary)]">
+                <h3 className="text-sm font-semibold text-[var(--admin-text)]">{group.label}</h3>
+                <span className="admin-text-secondary text-xs">
                   {group.tables.length} ст.
                 </span>
               </div>
-              <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--admin-text)]">
                 <input
                   type="checkbox"
                   checked={groupAllSelected}
@@ -191,7 +191,7 @@ export function TournamentTablePicker({
                     key={table.id}
                     className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-panel-bg)] px-3 py-2"
                   >
-                    <label className="flex cursor-pointer items-center gap-2 text-sm">
+                    <label className="flex cursor-pointer items-center gap-2 text-sm text-[var(--admin-text)]">
                       <input
                         type="checkbox"
                         checked={selected}
@@ -218,7 +218,7 @@ export function TournamentTablePicker({
       })}
 
       {selectedIds.length === 0 && (
-        <p className="text-sm text-amber-600 dark:text-amber-400">
+        <p className="admin-notify-kind--deeplink rounded-lg px-3 py-2 text-sm">
           Выберите хотя бы один стол, чтобы создать турнир.
         </p>
       )}

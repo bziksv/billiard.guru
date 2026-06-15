@@ -38,11 +38,20 @@ const FIXED_SWISS_32_FORMATS = new Set([
   "FIXED_PAIR_SWISS_32_BRONZE",
 ]);
 
+const FIXED_SWISS_8_FORMATS = new Set([
+  "FIXED_SWISS_8R4_1_3_mesto",
+  "FIXED_PAIR_SWISS_8R4_1_3_mesto",
+]);
+
 const FIXED_SWISS_16_FORMATS = new Set([
   "FIXED_SWISS",
   "FIXED_SWISS_16_BRONZE",
+  "FIXED_SWISS_16R4_2_3_mesta",
+  "FIXED_SWISS_16R4_1_3_mesto",
   "FIXED_PAIR_SWISS",
   "FIXED_PAIR_SWISS_16_BRONZE",
+  "FIXED_PAIR_SWISS_16R4_1_3_mesto",
+  "FIXED_PAIR_SWISS_16R4_2_3_mesto",
 ]);
 
 const OLYMPIC_FORMATS = new Set(["OLYMPIC", "PAIR_OLYMPIC"]);
@@ -65,6 +74,17 @@ export function getDefaultBracketParticipantRules(
       label: "ровно 64",
       hint:
         "Сетка «тест с эксельки» — ровно 64 участника, 119 встреч в БД, разметка #1–#119 из Excel. " +
+        "Добавьте участников до 64 или смените формат.",
+    };
+  }
+  if (code === "FIXED_SWISS_64R8_1_3_mesto") {
+    return {
+      min: 64,
+      max: 64,
+      exact: 64,
+      label: "ровно 64",
+      hint:
+        "Сетка «до 2 поражений» на 64 участника — 112 встреч (111 + матч за 3–4 #120), oлимпийka с 1/8: проигравшие в 1/8 (#81–#88) сразу на места 17–24. " +
         "Добавьте участников до 64 или смените формат.",
     };
   }
@@ -136,15 +156,39 @@ export function getDefaultBracketParticipantRules(
           "Добавьте участников до 32 или смените формат.",
     };
   }
+  if (FIXED_SWISS_8_FORMATS.has(code)) {
+    return {
+      min: 8,
+      max: 8,
+      exact: 8,
+      label: "ровно 8",
+      hint:
+        "Сетка «до 2 поражений» на 8 участников — 14 встреч (13 + матч за 3–4 #14), олимпийка с 1/4. " +
+        "Добавьте участников до 8 или смените формат.",
+    };
+  }
   if (FIXED_SWISS_16_FORMATS.has(code)) {
+    const withBronze =
+      code === "FIXED_SWISS_16_BRONZE" ||
+      code === "FIXED_SWISS_16R4_1_3_mesto" ||
+      code === "FIXED_PAIR_SWISS_16_BRONZE" ||
+      code === "FIXED_PAIR_SWISS_16R4_1_3_mesto";
+    const baseHint =
+      "Сетка «до 2 поражений» рассчитана на полный состав из 16 участников. " +
+      "С меньшим числом переходы и раскладка ломаются — добавьте участников или смените формат.";
     return {
       min: 16,
       max: 16,
       exact: 16,
       label: "ровно 16",
-      hint:
-        "Сетка «до 2 поражений» рассчитана на полный состав из 16 участников. " +
-        "С меньшим числом переходы и раскладка ломаются — добавьте участников или смените формат.",
+      hint: withBronze
+        ? "Сетка «до 2 поражений» на 16 участников — 28 встреч (27 + матч за 3–4 #28), олимпийка с 1/4. " +
+          "Добавьте участников до 16 или смените формат."
+        : code === "FIXED_SWISS_16R4_2_3_mesta" ||
+            code === "FIXED_PAIR_SWISS_16R4_2_3_mesto"
+          ? "Сетка «до 2 поражений» на 16 участников — 27 встреч, oлимпийka с 1/4, проигравшие полуфиналисты делят 3-е место. " +
+            "Добавьте участников до 16 или смените формат."
+          : baseHint,
     };
   }
   if (OLYMPIC_BRONZE_FORMATS.has(code)) {
@@ -238,6 +282,22 @@ export function getBracketParticipantRules(format: string): BracketParticipantRu
   return getDefaultBracketParticipantRules(format);
 }
 
+export function validateFormatChangeParticipantCount(
+  format: string,
+  count: number,
+  rules?: BracketParticipantRules,
+): { ok: true } | { ok: false; error: string } {
+  const r = rules ?? getDefaultBracketParticipantRules(format);
+  const capacity = r.exact ?? r.max;
+  if (count > capacity) {
+    return {
+      ok: false,
+      error: `Слишком много участников для этой сетки: не более ${capacity} (сейчас ${count}). Снимите лишних или выберите другой формат.`,
+    };
+  }
+  return { ok: true };
+}
+
 export function validateBracketParticipantCount(
   format: string,
   count: number,
@@ -276,6 +336,10 @@ export function assertBracketParticipantCount(
 ): void {
   const result = validateBracketParticipantCount(format, count, rules);
   if (!result.ok) throw new Error(result.error);
+}
+
+export function isFixedSwiss8OnlyFormat(format: string): boolean {
+  return FIXED_SWISS_8_FORMATS.has(format);
 }
 
 export function isFixedSwiss16OnlyFormat(format: string): boolean {

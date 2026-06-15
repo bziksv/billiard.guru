@@ -19,6 +19,7 @@ import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap } from "@/lib/handicap";
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
+import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
 import {
   applyTournamentRatingsToTeam,
   TOURNAMENT_RATING_SOURCE_OPTIONS,
@@ -87,11 +88,13 @@ import {
   matchScoreLabel,
 } from "@/lib/tournament-match-schedule";
 import {
+  parseTournamentTableStreams,
   resolveMatchStreamUrl,
   resolveTableLabel,
   tournamentTableOptions,
   type TournamentTableOption,
 } from "@/lib/tournament-stream";
+import { parseTournamentTableIds } from "@/lib/tournament-table-pick";
 
 type Team = AdminTournament["teams"][number] & TeamWithPlayers;
 type Match = AdminTournament["matches"][number];
@@ -513,6 +516,12 @@ export function TournamentManageView({
   const [editRatingSource, setEditRatingSource] = useState<TournamentRatingSource>(
     t.ratingSource ?? "CLUB",
   );
+  const [editTableIds, setEditTableIds] = useState<string[]>(() =>
+    parseTournamentTableIds(t.tableIds),
+  );
+  const [editTableStreams, setEditTableStreams] = useState<Record<string, string>>(() =>
+    parseTournamentTableStreams(t.tableStreams),
+  );
   const [editError, setEditError] = useState<string | null>(null);
   const [editSaving, setEditSaving] = useState(false);
   const [bracketActionNotice, setBracketActionNotice] = useState<string | null>(null);
@@ -522,6 +531,29 @@ export function TournamentManageView({
     url: string;
   } | null>(null);
   const [screenshotError, setScreenshotError] = useState<string | null>(null);
+
+  function syncEditFormFromTournament() {
+    setEditName(t.name);
+    setEditDescription(t.description ?? "");
+    setEditClubId(t.clubId);
+    setEditFormat(t.format);
+    setEditStatus(t.status);
+    setEditStartsAt(t.startsAt ? t.startsAt.slice(0, 16) : "");
+    setEditHandicapHalfStep(t.handicapHalfStep !== false);
+    setEditLimitByRating(t.ratingMax != null);
+    setEditRatingMax(t.ratingMax != null ? String(t.ratingMax) : "8");
+    setEditRatingSource(t.ratingSource ?? "CLUB");
+    setEditTableIds(parseTournamentTableIds(t.tableIds));
+    setEditTableStreams(parseTournamentTableStreams(t.tableStreams));
+    setEditError(null);
+  }
+
+  function toggleEditing() {
+    setEditing((open) => {
+      if (!open) syncEditFormFromTournament();
+      return !open;
+    });
+  }
 
   const pendingRegistrations = t.registrations.filter((r) => r.status === "PENDING");
   const confirmedRegistrations = t.registrations.filter(
@@ -551,6 +583,8 @@ export function TournamentManageView({
         status: editStatus,
         startsAt: editStartsAt || null,
         handicapHalfStep: editHandicapHalfStep,
+        tableIds: editTableIds,
+        tableStreams: editTableStreams,
         ...ratingPayload,
       }),
     });
@@ -774,7 +808,7 @@ export function TournamentManageView({
           <div className="ml-auto flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setEditing((v) => !v)}
+              onClick={toggleEditing}
               className="text-xs text-emerald-400 hover:underline"
             >
               {editing ? "Закрыть настройки" : "Настройки турнира"}
@@ -799,7 +833,7 @@ export function TournamentManageView({
             <div className="flex shrink-0 items-center justify-end gap-2 sm:justify-start">
               <button
                 type="button"
-                onClick={() => setEditing((v) => !v)}
+                onClick={toggleEditing}
                 className="text-xs text-emerald-400 hover:underline"
               >
                 {editing ? "Закрыть настройки" : "Настройки турнира"}
@@ -819,18 +853,18 @@ export function TournamentManageView({
       )}
 
       {editing && (
-        <div className="space-y-3 rounded-lg border border-zinc-700 bg-zinc-900 p-4">
+        <div className="admin-panel space-y-3 p-4">
           <input
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            className="admin-input w-full rounded-lg px-3 py-2 text-sm"
             placeholder="Название"
           />
           <textarea
             value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
             rows={4}
-            className="w-full resize-y rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            className="admin-input w-full resize-y rounded-lg px-3 py-2 text-sm"
             placeholder="Описание"
           />
           <SearchableSelect
@@ -859,18 +893,18 @@ export function TournamentManageView({
             type="datetime-local"
             value={editStartsAt}
             onChange={(e) => setEditStartsAt(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            className="admin-input w-full rounded-lg px-3 py-2 text-sm"
           />
           <label className="flex cursor-pointer items-start gap-3 text-sm">
             <input
               type="checkbox"
               checked={editHandicapHalfStep}
               onChange={(e) => setEditHandicapHalfStep(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+              className="mt-1 h-4 w-4 rounded border-[var(--admin-input-border)] text-emerald-600"
             />
             <span>
-              <span className="font-medium text-zinc-200">Учитывать рейтинг 0,5</span>
-              <span className="mt-1 block text-xs text-zinc-500">
+              <span className="font-medium text-[var(--admin-text)]">Учитывать рейтинг 0,5</span>
+              <span className="admin-muted mt-1 block text-xs">
                 Включено: шаг 0,5 и +1 в нечётных. Выключено: 1,5 → 1 для форы (3 vs 1,5 → 2
                 шара).
               </span>
@@ -881,9 +915,9 @@ export function TournamentManageView({
               type="checkbox"
               checked={editLimitByRating}
               onChange={(e) => setEditLimitByRating(e.target.checked)}
-              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+              className="mt-1 h-4 w-4 rounded border-[var(--admin-input-border)] text-emerald-600"
             />
-            <span className="font-medium text-zinc-200">Лимит рейтинга участников</span>
+            <span className="font-medium text-[var(--admin-text)]">Лимит рейтинга участников</span>
           </label>
           {editLimitByRating && (
             <>
@@ -896,7 +930,7 @@ export function TournamentManageView({
                 searchPlaceholder="Рейтинг…"
               />
               <label className="block text-sm">
-                <span className="mb-1 block text-zinc-400">
+                <span className="admin-text-secondary mb-1 block text-xs">
                   Максимальный рейтинг (0–{MAX_PLAYER_RATING}, шаг {RATING_STEP})
                 </span>
                 <input
@@ -906,12 +940,28 @@ export function TournamentManageView({
                   max={MAX_PLAYER_RATING}
                   value={editRatingMax}
                   onChange={(e) => setEditRatingMax(e.target.value)}
-                  className="w-full max-w-xs rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+                  className="admin-input w-full max-w-xs rounded-lg px-3 py-2 text-sm"
                 />
               </label>
             </>
           )}
-          {editError && <p className="text-sm text-red-400">{editError}</p>}
+          <div className="admin-inset border border-[var(--admin-border)] p-3">
+            <p className="text-sm font-medium text-[var(--admin-text)]">Столы и трансляции</p>
+            <p className="admin-text-secondary mt-1 text-xs">
+              Можно менять во время турнира: обновите ссылку на трансляцию или снимите стол,
+              если его закрыли — он перестанет назначаться новым встречам.
+            </p>
+            <div className="mt-3">
+              <TournamentTablePicker
+                clubId={editClubId || t.clubId}
+                selectedIds={editTableIds}
+                streamUrls={editTableStreams}
+                onChange={setEditTableIds}
+                onStreamUrlsChange={setEditTableStreams}
+              />
+            </div>
+          </div>
+          {editError && <p className="admin-error-panel text-sm">{editError}</p>}
           <TournamentBracketSettings
             t={t}
             format={t.format}
@@ -934,9 +984,9 @@ export function TournamentManageView({
           >
             {editSaving ? "Сохранение…" : "Сохранить"}
           </button>
-          <div className="border-t border-zinc-700 pt-4">
-            <p className="text-sm font-medium text-zinc-200">Удаление турнира</p>
-            <p className="mt-1 text-xs text-zinc-500">
+          <div className="border-t border-[var(--admin-border)] pt-4">
+            <p className="text-sm font-medium text-[var(--admin-text)]">Удаление турнира</p>
+            <p className="admin-muted mt-1 text-xs">
               Регистрации, команды и все встречи будут удалены без восстановления.
             </p>
             <button
