@@ -1,24 +1,23 @@
-# Боевая БД и локальная разработка
+# Одна БД (dev + prod)
 
-## Правило
+Проект работает с **одной MySQL** (Beget): локальный dev и billiard.guru — один `DATABASE_URL`. Две базы не используем.
 
-**Локальный dev не должен писать в prod MySQL**, если на billiard.guru ещё не задеплоен код с теми же изменениями схемы (enum, поля Prisma).
+## Почему мог падать сайт
 
-Иначе: новое значение `TournamentFormat` в БД → старый Prisma client на сервере → 500 на `/`, `/tournaments`.
+Новое значение enum (формат сетки) попало в БД с локалки, а на сервере ещё **старый билд** без этого enum в Prisma → 500 на страницах с турнирами.
 
-## DATABASE_URL
+## Что должно защищать prod
 
-- Локально: `mysql://setka:setka@localhost:3306/setka` (см. `apps/web/.env.example`)
-- Prod: только на Beget в `~/billiard.guru/apps/web/.env`
-- При старте dev с `beget.tech` / `billiard.guru` в URL — предупреждение в консоли (`database-url-guard.ts`)
-- Осознанно prod из dev: `ALLOW_PRODUCTION_DATABASE=1` (не отключать guard без причины)
+Публичные страницы читают турниры через `findPublicTournamentsList` / `findPublicTournamentById` (`tournament-public-read.ts`): при несовпадении enum — **raw SQL fallback**, главная и списки не падают.
 
-## Порядок при новом формате сетки
+При добавлении формата/enum:
 
-1. Закоммитить schema + generated Prisma + код
-2. `./scripts/beget-setup.sh` на сервере (успешный `npm run build`)
-3. Только после этого — создавать/менять турниры с новым форматом (локально или в админке)
+1. Закоммитить schema, generated Prisma, код
+2. **Сразу деплой** `./scripts/beget-setup.sh` (пока сборка не прошла — не сохранять турниры с новым форматом, если fallback ещё не на сервере)
+3. После успешного деплоя — полная поддержка нового формата на prod
 
-## Устойчивость публичного сайта
+## Агент
 
-Публичные страницы читают турниры через `findPublicTournamentsList` / `findPublicTournamentById` (`tournament-public-read.ts`): при несовпадении enum — raw SQL fallback, сайт не падает целиком (старый билд может не показывать сетку нового формата, но главная жива).
+- Не предлагать «поднять локальную MySQL» / «две базы»
+- После правок schema/enum/format — проверить `npm run build`, напомнить деплой
+- Публичные маршруты с турнирами — только через `tournament-public-read`, не прямой `prisma.tournament.findMany` на сайте

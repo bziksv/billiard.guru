@@ -16,6 +16,7 @@ import {
   incomingFixedSwissPhantomTeamSlot,
   isVoidFixedSwissCrossMatch,
 } from "@/lib/fixed-swiss-cross-bye";
+import { shouldAutoAdvanceFixedSwissLink, isFixedSwissTsLargeUpperTour3ToThirdPlaceWinEdge } from "@/lib/fixed-swiss-layout";
 import { assertBracketParticipantCount } from "@/lib/bracket-participant-rules";
 import { getResolvedParticipantRules } from "@/lib/bracket-formats/settings-server";
 import { logger } from "@/lib/logger";
@@ -183,7 +184,7 @@ function collectAdvanceTargets(
       fixedSwissMaxRound,
     );
     const winLink = findFixedSwissLink(links, match.round, match.slot, "win");
-    if (winLink) {
+    if (winLink && shouldAutoAdvanceFixedSwissLink(winLink, fixedSwissMatchCount, fixedSwissMaxRound)) {
       targets.push({
         round: winLink.toRound,
         slot: winLink.toSlot,
@@ -193,7 +194,7 @@ function collectAdvanceTargets(
     }
     if (loserId) {
       const loseLink = findFixedSwissLink(links, match.round, match.slot, "loss");
-      if (loseLink) {
+      if (loseLink && shouldAutoAdvanceFixedSwissLink(loseLink, fixedSwissMatchCount, fixedSwissMaxRound)) {
         targets.push({
           round: loseLink.toRound,
           slot: loseLink.toSlot,
@@ -382,6 +383,7 @@ async function forceAssignTeamToSlot(
   slot: number,
   teamSlot: 1 | 2,
   teamId: string,
+  resetFinished = false,
 ) {
   const target = await db.tournamentMatch.findUnique({
     where: {
@@ -393,7 +395,10 @@ async function forceAssignTeamToSlot(
   const field = teamSlot === 1 ? "team1Id" : "team2Id";
   await db.tournamentMatch.update({
     where: { id: target.id },
-    data: { [field]: teamId },
+    data: {
+      [field]: teamId,
+      ...(resetFinished ? { winnerTeamId: null, status: "SCHEDULED" as MatchStatus } : {}),
+    },
   });
 }
 
@@ -421,7 +426,7 @@ export async function replayFixedSwissAdvances(db: Db, tournamentId: string) {
     if (!m.winnerTeamId) continue;
 
     const winLink = findFixedSwissLink(links, m.round, m.slot, "win");
-    if (winLink) {
+    if (winLink && shouldAutoAdvanceFixedSwissLink(winLink, matchCount, maxRound)) {
       await forceAssignTeamToSlot(
         db,
         tournamentId,
@@ -436,7 +441,7 @@ export async function replayFixedSwissAdvances(db: Db, tournamentId: string) {
       m.team1Id === m.winnerTeamId ? m.team2Id : m.team1Id;
     if (loserId) {
       const loseLink = findFixedSwissLink(links, m.round, m.slot, "loss");
-      if (loseLink) {
+      if (loseLink && shouldAutoAdvanceFixedSwissLink(loseLink, matchCount, maxRound)) {
         await forceAssignTeamToSlot(
           db,
           tournamentId,
@@ -484,21 +489,42 @@ async function advanceFixedSwissResult(
   await awardSwissWin(db, winnerTeamId);
 
   const winLink = findFixedSwissLink(links, match.round, match.slot, "win");
-  if (winLink) {
-    await assignTeamToSlot(
-      db,
-      match.tournamentId,
-      winLink.toRound,
-      winLink.toSlot,
-      winLink.toTeam,
-      winnerTeamId,
-      slotMap,
-    );
+  if (winLink && shouldAutoAdvanceFixedSwissLink(winLink, matchCount, maxRound)) {
+    if (
+      isFixedSwissTsLargeUpperTour3ToThirdPlaceWinEdge(
+        winLink.fromRound,
+        winLink.fromSlot,
+        winLink.toRound,
+        winLink.toSlot,
+        matchCount,
+        maxRound,
+      )
+    ) {
+      await forceAssignTeamToSlot(
+        db,
+        match.tournamentId,
+        winLink.toRound,
+        winLink.toSlot,
+        winLink.toTeam,
+        winnerTeamId,
+        true,
+      );
+    } else {
+      await assignTeamToSlot(
+        db,
+        match.tournamentId,
+        winLink.toRound,
+        winLink.toSlot,
+        winLink.toTeam,
+        winnerTeamId,
+        slotMap,
+      );
+    }
   }
 
   if (loserId) {
     const loseLink = findFixedSwissLink(links, match.round, match.slot, "loss");
-    if (loseLink) {
+    if (loseLink && shouldAutoAdvanceFixedSwissLink(loseLink, matchCount, maxRound)) {
       await assignTeamToSlot(
         db,
         match.tournamentId,
@@ -1012,7 +1038,14 @@ async function ensureSoloTeams(db: Db, tournamentId: string) {
     where: { tournamentId, status: "CONFIRMED" },
     select: { playerId: true, source: true },
   });
-  if (registrations.length === 0) return;
+
+  if (registrations.length === 0) {
+    await db.tournamentTeam.updateMany({
+      where: { tournamentId, status: "CONFIRMED" },
+      data: { status: "CANCELLED" },
+    });
+    return;
+  }
 
   const playerIds = registrations.map((r) => r.playerId);
   const existingTeams = await db.tournamentTeam.findMany({
@@ -1055,6 +1088,15 @@ async function ensureSoloTeams(db: Db, tournamentId: string) {
   if (toCreate.length > 0) {
     await db.tournamentTeam.createMany({ data: toCreate });
   }
+
+  await db.tournamentTeam.updateMany({
+    where: {
+      tournamentId,
+      status: "CONFIRMED",
+      player1Id: { notIn: playerIds },
+    },
+    data: { status: "CANCELLED" },
+  });
 }
 
 export async function generateSoloOlympicBracket(db: Db, tournamentId: string) {
@@ -1129,7 +1171,10 @@ async function seedTeamsForFixedSwiss(
     format === "FIXED_SWISS_32R8_2_3_mesta" ||
     format === "FIXED_SWISS_32R8_1_3_mesto" ||
     format === "FIXED_SWISS_32R8_BRONZE" ||
+    format === "FIXED_SWISS_64R8_2_3_mesta" ||
     format === "FIXED_SWISS_64R8_1_3_mesto" ||
+    format === "FIXED_SWISS_128R8_2_3_mesta" ||
+    format === "FIXED_SWISS_128R8_1_3_mesto" ||
     format === "FIXED_SWISS_64" ||
     format === "FIXED_SWISS_64_BRONZE" ||
     format === "EXCEL_REF_64"

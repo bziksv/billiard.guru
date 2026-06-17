@@ -26,6 +26,8 @@ import {
   fixedSwissMatchCardHeight,
   shouldDrawFixedSwissLossEdge,
   shouldDrawFixedSwissWinEdge,
+  shouldAutoAdvanceFixedSwissLink,
+  isFixedSwissWinLinkFooterOnly,
   isFixedSwissQuarterSemiWinEdge,
   isFixedSwissRound12Edge,
   isFixedSwissRound23Edge,
@@ -40,6 +42,8 @@ import {
   fixedSwissTs64MatchCol,
   fixedSwissTs64ColumnLabel,
   fixedSwissTs64PlacementByMatchNo,
+  fixedSwissMatchColForCount,
+  fixedSwissColumnLabel,
 } from "../src/lib/fixed-swiss-layout";
 import {
   buildFixedSwissTemplate,
@@ -1361,7 +1365,7 @@ assert.equal(fixedSwissMatchNo(7, 1, MC64), 119, "only final is #119");
   const win45 = links115.find(
     (l) => l.fromRound === 2 && l.fromSlot === 13 && l.kind === "win",
   );
-  assert.equal(win45?.toSlot, 21, "#45 winner → #85 (R3 slot 21)");
+  assert.equal(win45?.toSlot, 13, "#45 winner → #68 (R3 slot 13)");
   const win47 = links115.find(
     (l) => l.fromRound === 2 && l.fromSlot === 15 && l.kind === "win",
   );
@@ -1428,14 +1432,73 @@ assert.equal(
   "#89 → #97 SVG",
 );
 assert.equal(
+  shouldDrawFixedSwissWinEdge(-1, -2, 2, 3, "win", 13, 13, MC64),
+  true,
+  "#45 → #68 SVG (short adjacent)",
+);
+assert.equal(
   shouldDrawFixedSwissWinEdge(-1, 2, 2, 3, "win", 13, 21, MC64),
   false,
-  "#45 → #85: only footer",
+  "#45 → #85: Excel footer only (no link)",
 );
 assert.equal(
   shouldDrawFixedSwissWinEdge(-1, 2, 2, 3, "win", 14, 22, MC64),
   false,
-  "#46 → #86: only footer",
+  "#46 → #86: Excel footer only (no link)",
+);
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 2, fromSlot: 14, toRound: 3, toSlot: 22, kind: "win" },
+    MC64,
+    7,
+  ),
+  false,
+  "#46 → #86 bridge: not in links",
+);
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 2, fromSlot: 13, toRound: 3, toSlot: 13, kind: "win" },
+    112,
+    7,
+  ),
+  true,
+  "#45 → #68: auto-advance on save",
+);
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 2, fromSlot: 14, toRound: 3, toSlot: 14, kind: "win" },
+    112,
+    7,
+  ),
+  true,
+  "#46 → #67: auto-advance on save",
+);
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 2, fromSlot: 28, toRound: 3, toSlot: 22, kind: "win" },
+    MC64,
+    7,
+  ),
+  true,
+  "#60 → #86 team2: auto-advance on save",
+);
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 4, fromSlot: 5, toRound: 5, toSlot: 1, kind: "win" },
+    112,
+    7,
+  ),
+  true,
+  "#92 lower tour 3 → #105 team2 (R8 elim direct quarter)",
+);
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 3, fromSlot: 29, toRound: 5, toSlot: 1, kind: "win" },
+    112,
+    7,
+  ),
+  false,
+  "#100 → #105: footer only",
 );
 assert.equal(
   shouldDrawFixedSwissWinEdge(-1, -2, 2, 3, "win", 15, 15, MC64),
@@ -2340,5 +2403,294 @@ assert.equal(
 );
 assert.equal(fixedSwissMatchNo(7, 1, 112, 7), 119, "64R8: финал #119");
 assert.equal(fixedSwissMatchNo(7, 2, 112, 7), 120, "64R8: бронза #120");
+
+assert.equal(
+  buildFixedSwissTemplate(64, "FIXED_SWISS_64R8_2_3_mesta").matches.length,
+  111,
+  "FIXED_SWISS_64R8_2_3_mesta: 111 встреч без доп. игры",
+);
+const r64R8TwoThirdLinks = buildFixedSwissTemplate(
+  64,
+  "FIXED_SWISS_64R8_2_3_mesta",
+).links;
+assert.equal(
+  r64R8TwoThirdLinks.some((l) => l.fromRound === 7 && l.fromSlot === 2),
+  false,
+  "64R8_2_3: нет матча #120",
+);
+assertProtocolPlace(117, "loser", 111, { place: 3 }, 7);
+assertProtocolPlace(118, "loser", 111, { place: 3 }, 7);
+assert.equal(fixedSwissMatchNo(7, 1, 111, 7), 119, "64R8_2_3: финал #119");
+
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 5, fromSlot: 1, toRound: 3, toSlot: 17, kind: "win" },
+    112,
+    7,
+  ),
+  true,
+  "#105 → #113 (1/4): auto-advance",
+);
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 3, fromSlot: 17, toRound: 6, toSlot: 1, kind: "win" },
+    112,
+    7,
+  ),
+  true,
+  "#113 → #117 (полуфинал): auto-advance",
+);
+
+// --- 128→64 R8 elim (215/216) ---
+assert.equal(
+  buildFixedSwissTemplate(128, "FIXED_SWISS_128R8_1_3_mesto").matches.length,
+  216,
+  "FIXED_SWISS_128R8_1_3_mesto: 215 + матч за 3–4",
+);
+const r128R8Links = buildFixedSwissTemplate(128, "FIXED_SWISS_128R8_1_3_mesto").links;
+assert.equal(
+  r128R8Links.some(
+    (l) => l.kind === "loss" && l.fromRound === 3 && l.fromSlot === 41,
+  ),
+  false,
+  "128R8: нет loss с 1/8 в нижнюю ветку",
+);
+assert.equal(
+  r128R8Links.some(
+    (l) => l.fromRound === 4 && l.toRound === 5 && l.fromSlot === 1,
+  ),
+  true,
+  "128R8: нижняя тур 3 → 1/4 напрямую",
+);
+assert.equal(
+  buildFixedSwissTemplate(128, "FIXED_SWISS_128R8_1_3_mesto").matches.filter(
+    (m) => m.round === 3,
+  ).length,
+  52,
+  "128R8: R3 без нижней тур 4 (52 слотов)",
+);
+assert.equal(
+  buildFixedSwissTemplate(128, "FIXED_SWISS_128R8_2_3_mesta").matches.length,
+  215,
+  "FIXED_SWISS_128R8_2_3_mesta: 215 встреч без доп. игры",
+);
+const r128R8TwoThirdLinks = buildFixedSwissTemplate(
+  128,
+  "FIXED_SWISS_128R8_2_3_mesta",
+).links;
+assert.equal(
+  r128R8TwoThirdLinks.some((l) => l.fromRound === 7 && l.fromSlot === 2),
+  false,
+  "128R8_2_3: нет матча #216",
+);
+assert.equal(fixedSwissMatchNo(7, 1, 215, 7), 215, "128R8_2_3: финал #215");
+assert.equal(fixedSwissMatchNo(7, 2, 216, 7), 216, "128R8: бронза #216");
+
+assert.equal(
+  shouldAutoAdvanceFixedSwissLink(
+    { fromRound: 5, fromSlot: 1, toRound: 3, toSlot: 33, kind: "win" },
+    216,
+    7,
+  ),
+  true,
+  "#209 → #225 (1/4): auto-advance",
+);
+
+const MC128 = 215;
+const MC128B = 216;
+const MR128 = 7;
+
+function mkGrid128R8(twoThird: boolean): BracketMatchView[] {
+  const template = buildFixedSwissTemplate(
+    128,
+    twoThird ? "FIXED_SWISS_128R8_2_3_mesta" : "FIXED_SWISS_128R8_1_3_mesto",
+  );
+  return template.matches.map((m) => mkMatch(m.round, m.slot));
+}
+
+function assertAllWinEdgesDrawn(
+  matches: BracketMatchView[],
+  matchCount: number,
+  maxRound: number,
+  label: string,
+) {
+  const layout = buildFixedSwissBracketLayout(matches, {
+    showCardMatchNumber: false,
+    showCardHandicap: false,
+    showCardPlacement: false,
+  });
+  const byId = new Map(matches.map((m) => [m.id, m]));
+  for (const edge of layout.edges) {
+    if (edge.kind !== "win" && edge.kind !== "bye") continue;
+    const from = byId.get(edge.fromId)!;
+    const to = byId.get(edge.toId)!;
+    const link = {
+      fromRound: from.round,
+      fromSlot: from.slot,
+      toRound: to.round,
+      toSlot: to.slot,
+      kind: "win" as const,
+    };
+    if (isFixedSwissWinLinkFooterOnly(link, matchCount, maxRound)) continue;
+    const fromCol = fixedSwissMatchColForCount(
+      from.round,
+      from.slot,
+      matchCount,
+      maxRound,
+    );
+    const toCol = fixedSwissMatchColForCount(
+      to.round,
+      to.slot,
+      matchCount,
+      maxRound,
+    );
+    const draw = shouldDrawFixedSwissWinEdge(
+      fromCol,
+      toCol,
+      from.round,
+      to.round,
+      edge.kind,
+      from.slot,
+      to.slot,
+      matchCount,
+      maxRound,
+    );
+    assert.equal(
+      draw,
+      true,
+      `${label}: SVG #${fixedSwissMatchNo(from.round, from.slot, matchCount, maxRound)}→#${fixedSwissMatchNo(to.round, to.slot, matchCount, maxRound)}`,
+    );
+  }
+}
+
+for (const [twoThird, mc] of [
+  [true, MC128],
+  [false, MC128B],
+] as const) {
+  assertAllWinEdgesDrawn(
+    mkGrid128R8(twoThird),
+    mc,
+    MR128,
+    twoThird ? "128R8_2_3" : "128R8_1_3",
+  );
+}
+
+{
+  const layout128 = buildFixedSwissBracketLayout(mkGrid128R8(false), {
+    showCardMatchNumber: false,
+  });
+  const negCols = [
+    ...new Set(
+      [...layout128.positions.values()]
+        .map((p) => p.col)
+        .filter((c) => c < 0),
+    ),
+  ].sort((a, b) => a - b);
+  assert.deepEqual(
+    negCols,
+    [-5, -4, -3, -2, -1],
+    "128R8: 5 нижних колонок с встречами (-6 пустая в R8 elim)",
+  );
+  assert.equal(
+    fixedSwissColumnLabel(-1, MC128B, MR128),
+    "Нижняя, тур 1",
+    "128: подпись нижней тур 1",
+  );
+  assert.equal(
+    fixedSwissColumnLabel(-6, MC128B, MR128),
+    "Нижняя, тур 6",
+    "128: подпись нижней тур 6",
+  );
+  const byCol = new Map<number, number>();
+  for (const m of mkGrid128R8(false)) {
+    const col = fixedSwissMatchColForCount(m.round, m.slot, MC128B, MR128);
+    byCol.set(col, (byCol.get(col) ?? 0) + 1);
+  }
+  assert.equal(byCol.get(-1), 32, "128R8: нижняя тур 1 — 32");
+  assert.equal(byCol.get(-2), 16, "128R8: нижняя тур 2 — 16");
+  assert.equal(byCol.get(-3), 16, "128R8: нижняя тур 3 — 16");
+  assert.equal(byCol.get(-4), 8, "128R8: нижняя тур 4 — 8");
+  assert.equal(byCol.get(-5), 8, "128R8: нижняя тур 5 — 8");
+  assert.equal(byCol.get(0), 64, "128R8: первый тур — 64");
+  assert.equal(byCol.get(1), 32, "128R8: верхняя тур 1 — 32");
+  assert.equal(byCol.get(3), 16, "128R8: 1/4 — 16");
+  assert.equal(byCol.get(5), 2, "128R8: полуфинал — 2");
+  assert.equal(byCol.get(6), 2, "128R8_1_3: финал + бронза — 2");
+}
+
+assert.equal(
+  shouldDrawFixedSwissWinEdge(4, 5, 3, 6, "win", 33, 1, MC128, MR128),
+  true,
+  "128R8: #225→#213 (3-е → полуфинал)",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(4, 5, 3, 6, "win", 37, 2, MC128, MR128),
+  true,
+  "128R8: #229→#214",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 3, "win", 1, 33, MC128, MR128),
+  true,
+  "128R8: #209→#225 (1/4 → 3-е)",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 41, 5, MC128, MR128),
+  true,
+  "128R8: #169→#213 (1/8 → 1/4)",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 3, 2, 5, "win", 57, 13, MC128, MR128),
+  true,
+  "128R8: #121→#221 (R2 → 1/4)",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 33, 65, MC128, MR128),
+  true,
+  "128R8: #97→#161 fork",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-4, 3, 4, 5, "win", 1, 9, MC128, MR128),
+  true,
+  "128R8: #192→#217 (нижняя тур 4 → 1/4)",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(5, 6, 6, 7, "win", 1, 1, MC128, MR128),
+  true,
+  "128R8: полуфинал → финал",
+);
+
+for (const [matchCount, maxRound] of [
+  [14, 4],
+  [28, 5],
+  [56, 7],
+  [59, 7],
+  [111, 7],
+  [112, 7],
+  [115, 7],
+  [119, 7],
+  [215, 7],
+  [216, 7],
+] as const) {
+  const links = getFixedSwissLinksForMatchCount(matchCount, maxRound);
+  for (const link of links) {
+    const auto = shouldAutoAdvanceFixedSwissLink(link, matchCount, maxRound);
+    const footerOnly = isFixedSwissWinLinkFooterOnly(link, matchCount, maxRound);
+    if (link.kind === "loss") {
+      assert.equal(auto, true, `loss link R${link.fromRound}S${link.fromSlot} (${matchCount})`);
+    } else if (footerOnly) {
+      assert.equal(
+        auto,
+        false,
+        `footer win R${link.fromRound}S${link.fromSlot} (${matchCount})`,
+      );
+    } else {
+      assert.equal(
+        auto,
+        true,
+        `real win R${link.fromRound}S${link.fromSlot}→R${link.toRound}S${link.toSlot} (${matchCount})`,
+      );
+    }
+  }
+}
 
 console.log("fixed swiss layout tests passed");

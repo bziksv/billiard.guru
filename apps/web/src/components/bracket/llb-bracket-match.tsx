@@ -33,6 +33,7 @@ import {
   fixedSwissMatchCardHeight,
   fixedSwissMatchColForCount,
   fixedSwissPlacementLabel,
+  shouldAutoAdvanceFixedSwissLink,
 } from "@/lib/fixed-swiss-layout";
 import {
   findFixedSwissLink,
@@ -363,7 +364,10 @@ export function LlbBracketMatch({
     const links = getFixedSwissLinksForMatchCount(matchNumbers.size, maxRound);
     if (winnerToNo === undefined) {
       const winLink = findFixedSwissLink(links, match.round, match.slot, "win");
-      if (winLink) {
+      if (
+        winLink &&
+        shouldAutoAdvanceFixedSwissLink(winLink, matchNumbers.size, maxRound)
+      ) {
         const dest = Array.from(matchById.values()).find(
           (m) => m.round === winLink.toRound && m.slot === winLink.toSlot,
         );
@@ -381,7 +385,10 @@ export function LlbBracketMatch({
     }
     if (loserToNo === undefined) {
       const loseLink = findFixedSwissLink(links, match.round, match.slot, "loss");
-      if (loseLink) {
+      if (
+        loseLink &&
+        shouldAutoAdvanceFixedSwissLink(loseLink, matchNumbers.size, maxRound)
+      ) {
         const dest = Array.from(matchById.values()).find(
           (m) => m.round === loseLink.toRound && m.slot === loseLink.toSlot,
         );

@@ -6,8 +6,11 @@ import {
   buildFixedSwissTs32R8ElimAtEighthBronzeTemplate,
   buildFixedSwissTs64R8ElimAtEighthTemplate,
   buildFixedSwissTs64R8ElimAtEighthBronzeTemplate,
+  buildFixedSwissTs128R8ElimAtEighthTemplate,
+  buildFixedSwissTs128R8ElimAtEighthBronzeTemplate,
   fixedSwissTs32MatchNo,
   fixedSwissTs64MatchNo,
+  fixedSwissTs128MatchNo,
   fixedSwissTsBronzeMatchNoForHalf2,
   fixedSwissTsMatchNoForHalf2,
   isFixedSwissTs32BronzeMatchCount,
@@ -19,6 +22,12 @@ import {
   isFixedSwissTs64R8ElimAtEighthBronzeMatchCount,
   isFixedSwissTs64R8ElimAtEighthFamily,
   isFixedSwissTs64R8ElimAtEighthFromMatches,
+  isFixedSwissTs128R8ElimAtEighthMatchCount,
+  isFixedSwissTs128R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs128R8ElimAtEighthFamily,
+  isFixedSwissTs128R8ElimAtEighthFromMatches,
+  isFixedSwissTs128MatchCount,
+  isFixedSwissTs128BronzeMatchCount,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
   isFixedSwissTs84BronzeMatchCount,
@@ -37,12 +46,20 @@ export {
   buildFixedSwissTs32R8ElimAtEighthBronzeTemplate,
   buildFixedSwissTs64R8ElimAtEighthTemplate,
   buildFixedSwissTs64R8ElimAtEighthBronzeTemplate,
+  buildFixedSwissTs128R8ElimAtEighthTemplate,
+  buildFixedSwissTs128R8ElimAtEighthBronzeTemplate,
   isFixedSwissTs64MatchCount,
   isFixedSwissTs64BronzeMatchCount,
+  isFixedSwissTs128MatchCount,
+  isFixedSwissTs128BronzeMatchCount,
   isFixedSwissTs64R8ElimAtEighthMatchCount,
   isFixedSwissTs64R8ElimAtEighthBronzeMatchCount,
   isFixedSwissTs64R8ElimAtEighthFamily,
   isFixedSwissTs64R8ElimAtEighthFromMatches,
+  isFixedSwissTs128R8ElimAtEighthMatchCount,
+  isFixedSwissTs128R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs128R8ElimAtEighthFamily,
+  isFixedSwissTs128R8ElimAtEighthFromMatches,
   isOutdatedFixedSwiss32Bracket,
 } from "@/lib/fixed-swiss-ts-grid";
 export type { FixedSwissLink, FixedSwissTemplate } from "@/lib/fixed-swiss-grid-types";
@@ -77,11 +94,18 @@ export function fixedSwissNominalGridSize(
   if (
     format === "FIXED_SWISS_64" ||
     format === "FIXED_SWISS_64_BRONZE" ||
+    format === "FIXED_SWISS_64R8_2_3_mesta" ||
     format === "FIXED_SWISS_64R8_1_3_mesto" ||
     format === "FIXED_PAIR_SWISS_64" ||
     format === "FIXED_PAIR_SWISS_64_BRONZE"
   ) {
     return 64;
+  }
+  if (
+    format === "FIXED_SWISS_128R8_2_3_mesta" ||
+    format === "FIXED_SWISS_128R8_1_3_mesto"
+  ) {
+    return 128;
   }
   if (
     format === "FIXED_SWISS_8R4_1_3_mesto" ||
@@ -142,6 +166,16 @@ export function buildFixedSwissTs32Template(): FixedSwissTemplate {
 /** TS 32-16 + матч за 3–4 (#60). */
 export function buildFixedSwissTs32BronzeTemplate(): FixedSwissTemplate {
   return buildFixedSwissTsTemplateForGridSize(32, true);
+}
+
+/** TS 128-64 (231 встреч, нижняя тур 1–4, олимпийка с 1/8). */
+export function buildFixedSwissTs128Template(): FixedSwissTemplate {
+  return buildFixedSwissTsTemplateForGridSize(128, false);
+}
+
+/** TS 128-64 + матч за 3–4 (#232). */
+export function buildFixedSwissTs128BronzeTemplate(): FixedSwissTemplate {
+  return buildFixedSwissTsTemplateForGridSize(128, true);
 }
 
 /** TS 64-32 (111 встреч, нижняя тур 1–4, олимпийка с 1/8). */
@@ -514,8 +548,8 @@ export function buildFixedSwissTemplate(
   if (gridSize < 4) {
     throw new Error("Фиксированная швейцарская сетка: минимум 4 участника");
   }
-  if (gridSize > 64) {
-    throw new Error("Фиксированная швейцарская сетка: максимум 64 участника");
+  if (gridSize > 128) {
+    throw new Error("Фиксированная швейцарская сетка: максимум 128 участников");
   }
 
   if (gridSize === 8) {
@@ -569,6 +603,9 @@ export function buildFixedSwissTemplate(
   }
 
   if (gridSize === 64) {
+    if (format === "FIXED_SWISS_64R8_2_3_mesta") {
+      return buildFixedSwissTs64R8ElimAtEighthTemplate();
+    }
     if (format === "FIXED_SWISS_64R8_1_3_mesto") {
       return buildFixedSwissTs64R8ElimAtEighthBronzeTemplate();
     }
@@ -585,6 +622,16 @@ export function buildFixedSwissTemplate(
       return buildFixedSwissTsTemplateForGridSize(64, false);
     }
     return buildFixedSwissTsTemplateForGridSize(64, false);
+  }
+
+  if (gridSize === 128) {
+    if (format === "FIXED_SWISS_128R8_2_3_mesta") {
+      return buildFixedSwissTs128R8ElimAtEighthTemplate();
+    }
+    if (format === "FIXED_SWISS_128R8_1_3_mesto") {
+      return buildFixedSwissTs128R8ElimAtEighthBronzeTemplate();
+    }
+    return buildFixedSwissTsTemplateForGridSize(128, false);
   }
 
   return buildFixedSwissClassicTemplate(gridSize);
@@ -653,7 +700,11 @@ export function isFixedSwiss168MatchCount(matchCount: number): boolean {
     matchCount === 115 ||
     matchCount === 116 ||
     matchCount === 119 ||
-    matchCount === 120
+    matchCount === 120 ||
+    matchCount === 215 ||
+    matchCount === 216 ||
+    matchCount === 231 ||
+    matchCount === 232
   );
 }
 
@@ -682,7 +733,15 @@ export function inferFixedSwissGridSize(matchCount: number): number {
   ) {
     return 64;
   }
-  for (let size = 4; size <= 64; size *= 2) {
+  if (
+    matchCount === 215 ||
+    matchCount === 216 ||
+    matchCount === 231 ||
+    matchCount === 232
+  ) {
+    return 128;
+  }
+  for (let size = 4; size <= 128; size *= 2) {
     const rounds = Math.log2(size) + 1;
     if ((size / 2) * rounds === matchCount) return size;
   }
@@ -763,6 +822,18 @@ export function fixedSwissMatchNo(
     !isFixedSwissTsMatchCount(matchCount, maxRound)
   ) {
     return fixedSwiss168MatchNo(round, slot);
+  }
+  if (isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
+    return fixedSwissTs128MatchNo(round, slot, true);
+  }
+  if (isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount, maxRound)) {
+    return fixedSwissTs128MatchNo(round, slot, false);
+  }
+  if (isFixedSwissTs128BronzeMatchCount(matchCount)) {
+    return fixedSwissTs128MatchNo(round, slot, true);
+  }
+  if (isFixedSwissTs128MatchCount(matchCount)) {
+    return fixedSwissTs128MatchNo(round, slot, false);
   }
   if (isFixedSwissTs64R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
     return fixedSwissTs64MatchNo(round, slot, true);
@@ -850,6 +921,12 @@ export function fixedSwissProtocolPlace(
       return protocolExact(3);
     }
     if (
+      isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound) &&
+      matchNo === 216
+    ) {
+      return protocolExact(3);
+    }
+    if (
       isFixedSwissTs64R8ElimAtEighthBronzeMatchCount(matchCount, maxRound) &&
       matchNo === 120
     ) {
@@ -862,6 +939,13 @@ export function fixedSwissProtocolPlace(
       (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound) ||
         isFixedSwissTs32R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) &&
       matchNo === 59
+    ) {
+      return protocolExact(1);
+    }
+    if (
+      (isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+        isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) &&
+      matchNo === 215
     ) {
       return protocolExact(1);
     }
@@ -880,6 +964,17 @@ export function fixedSwissProtocolPlace(
   }
 
   if (
+    isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+    isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)
+  ) {
+    return fixedSwissProtocolPlace128R8Elim(
+      matchNo,
+      role,
+      isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound),
+    );
+  }
+
+  if (
     isFixedSwissTs64R8ElimAtEighthMatchCount(matchCount, maxRound) ||
     isFixedSwissTs64R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)
   ) {
@@ -887,6 +982,14 @@ export function fixedSwissProtocolPlace(
       matchNo,
       role,
       isFixedSwissTs64R8ElimAtEighthBronzeMatchCount(matchCount, maxRound),
+    );
+  }
+
+  if (isFixedSwissTs128BronzeMatchCount(matchCount) || isFixedSwissTs128MatchCount(matchCount)) {
+    return fixedSwissProtocolPlace128(
+      matchNo,
+      role,
+      isFixedSwissTs128BronzeMatchCount(matchCount),
     );
   }
 
@@ -982,6 +1085,91 @@ function fixedSwissProtocolPlace64R8Elim(
   if (matchNo >= 113 && matchNo <= 116) return protocolRange(5, 8);
   if (matchNo >= 65 && matchNo <= 80) return protocolRange(33, 48);
   if (matchNo >= 33 && matchNo <= 48) return protocolRange(49, 64);
+  return null;
+}
+
+function fixedSwissProtocolPlace128R8Elim(
+  matchNo: number,
+  role: "winner" | "loser",
+  withBronze: boolean,
+): FixedSwissProtocolPlaceResult | null {
+  const half1 = 32;
+  if (role === "winner") {
+    if (withBronze && matchNo === 216) return protocolExact(3);
+    if (matchNo === 215) return protocolExact(1);
+    return null;
+  }
+
+  if (withBronze && matchNo === 215) return protocolExact(2);
+  if (withBronze && matchNo === 216) return protocolExact(4);
+  if (!withBronze && matchNo === 215) return protocolExact(2);
+  if (!withBronze && (matchNo === 213 || matchNo === 214)) return protocolExact(3);
+  if (withBronze && (matchNo === 213 || matchNo === 214)) return null;
+
+  const eighthStart = 2 * half1 + half1 / 4 + 1;
+  const eighthEnd = 2 * half1 + half1 / 2;
+  const upperTour3Start = 3 * half1 + half1 / 2 + 1;
+  const upperTour3End = 3 * half1 + half1;
+  const quarterStart = 3 * half1 + half1 / 4 + 1;
+  const quarterEnd = 3 * half1 + half1 / 2;
+  const lowerTour3Start = half1 + 1;
+  const lowerTour3End = 2 * half1;
+  const lowerTour2Start = 2 * half1 + 1;
+  const lowerTour2End = 3 * half1;
+
+  if (matchNo >= eighthStart && matchNo <= eighthEnd) {
+    return protocolRange(half1 + 1, half1 + half1 / 2);
+  }
+  if (matchNo >= upperTour3Start && matchNo <= upperTour3End) {
+    return protocolRange(half1 / 2 + 1, half1);
+  }
+  if (matchNo >= quarterStart && matchNo <= quarterEnd) {
+    return protocolRange(9, 16);
+  }
+  if (matchNo >= lowerTour3Start && matchNo <= lowerTour3End) {
+    return protocolRange(half1 + half1 / 2 + 1, 2 * half1);
+  }
+  if (matchNo >= lowerTour2Start && matchNo <= lowerTour2End) {
+    return protocolRange(2 * half1 + 1, 3 * half1);
+  }
+  if (matchNo >= 1 && matchNo <= half1) {
+    return protocolRange(3 * half1 + 1, 4 * half1);
+  }
+  return null;
+}
+
+function fixedSwissProtocolPlace128(
+  matchNo: number,
+  role: "winner" | "loser",
+  withBronze: boolean,
+): FixedSwissProtocolPlaceResult | null {
+  if (role === "winner") {
+    if (withBronze && matchNo === 232) return protocolExact(3);
+    if (matchNo === 231) return protocolExact(1);
+    return null;
+  }
+
+  if (withBronze && matchNo === 231) return protocolExact(2);
+  if (withBronze && matchNo === 232) return protocolExact(4);
+  if (!withBronze && matchNo === 231) return protocolExact(2);
+  if (!withBronze && (matchNo === 229 || matchNo === 230)) return protocolExact(3);
+
+  const half1 = 32;
+  if (matchNo >= 3 * half1 + half1 / 4 + 1 && matchNo <= 3 * half1 + half1 / 2) {
+    return protocolRange(5, 8);
+  }
+  if (matchNo >= 3 * half1 + 1 && matchNo <= 3 * half1 + half1) {
+    return protocolRange(9, 16);
+  }
+  if (matchNo >= 2 * half1 + half1 / 2 + 1 && matchNo <= 3 * half1) {
+    return protocolRange(half1 + 1, half1 + half1 / 2);
+  }
+  if (matchNo >= 2 * half1 + 1 && matchNo <= 3 * half1) {
+    return protocolRange(2 * half1 + 1, 3 * half1);
+  }
+  if (matchNo >= half1 + 1 && matchNo <= 2 * half1) {
+    return protocolRange(3 * half1 + 1, 4 * half1);
+  }
   return null;
 }
 
@@ -1158,6 +1346,22 @@ export function getFixedSwissLinksForGrid(
   }
   if (gridSize === 32 && isOutdatedFixedSwiss32Bracket(matchCount ?? 0)) {
     return buildFixedSwissTs32OutdatedTemplate(matchCount === 56 || matchCount === 64).links;
+  }
+  if (
+    gridSize === 128 &&
+    isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount ?? 0, maxRound)
+  ) {
+    return buildFixedSwissTs128R8ElimAtEighthBronzeTemplate().links;
+  }
+  if (
+    gridSize === 128 &&
+    isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount ?? 0, maxRound)
+  ) {
+    return buildFixedSwissTs128R8ElimAtEighthTemplate().links;
+  }
+  if (gridSize === 128) {
+    const withBronze = matchCount === 232 || matchCount === 216;
+    return buildFixedSwissTsTemplateForGridSize(128, withBronze).links;
   }
   if (
     gridSize === 64 &&

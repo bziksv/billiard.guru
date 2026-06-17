@@ -227,7 +227,10 @@ export const tournamentSchema = z.object({
     "FIXED_SWISS_32R8_2_3_mesta",
     "FIXED_SWISS_32R8_1_3_mesto",
     "FIXED_SWISS_32R8_BRONZE",
+    "FIXED_SWISS_64R8_2_3_mesta",
     "FIXED_SWISS_64R8_1_3_mesto",
+    "FIXED_SWISS_128R8_2_3_mesta",
+    "FIXED_SWISS_128R8_1_3_mesto",
     "FIXED_SWISS_64",
     "FIXED_SWISS_64_BRONZE",
     "PAIR_OLYMPIC",
@@ -276,7 +279,10 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_SWISS_32R8_2_3_mesta",
       "FIXED_SWISS_32R8_1_3_mesto",
       "FIXED_SWISS_32R8_BRONZE",
+      "FIXED_SWISS_64R8_2_3_mesta",
       "FIXED_SWISS_64R8_1_3_mesto",
+      "FIXED_SWISS_128R8_2_3_mesta",
+      "FIXED_SWISS_128R8_1_3_mesto",
       "FIXED_SWISS_64",
       "FIXED_SWISS_64_BRONZE",
       "PAIR_OLYMPIC",
@@ -505,9 +511,21 @@ export const EXCEL_REF_64_FORMAT_LABEL = "тест с эксельки";
 export const FIXED_SWISS_64_BRONZE_FORMAT_LABEL =
   "Сетка на 64 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места";
 
+/** 64→32 (111): R8 elim — проигравшие полуфиналисты делят 3-е место. */
+export const FIXED_SWISS_64R8_FORMAT_LABEL =
+  "Сетка на 64 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
+
 /** 64→32 (112): R8 elim + матч проигравших полуфиналистов за 3–4 (#120). */
 export const FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL =
   "Сетка на 64 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
+
+/** 128→64 (215): R8 elim — проигравшие полуфиналисты делят 3-е место. */
+export const FIXED_SWISS_128R8_FORMAT_LABEL =
+  "Сетка на 128 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
+
+/** 128→64 (216): R8 elim + матч проигравших полуфиналистов за 3–4. */
+export const FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL =
+  "Сетка на 128 до 2 поражений, oлимпийka с 1/8 с определением 3 и 4 места (доп.игра)";
 
 /** 64→32 (115 встреч) — #105–#112→#113–#116, #117 1/4, #118 полуфинал, #119 финал. */
 export const FIXED_SWISS_64_FORMAT_LABEL =
@@ -570,7 +588,10 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_SWISS_32R8_2_3_mesta: FIXED_SWISS_32R8_FORMAT_LABEL,
   FIXED_SWISS_32R8_1_3_mesto: FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32R8_BRONZE: FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_64R8_2_3_mesta: FIXED_SWISS_64R8_FORMAT_LABEL,
   FIXED_SWISS_64R8_1_3_mesto: FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
+  FIXED_SWISS_128R8_2_3_mesta: FIXED_SWISS_128R8_FORMAT_LABEL,
+  FIXED_SWISS_128R8_1_3_mesto: FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_64: FIXED_SWISS_64_FORMAT_LABEL,
   FIXED_SWISS_64_BRONZE: FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
   PAIR_OLYMPIC: "Парный (фикс. сетка)",

@@ -267,6 +267,17 @@ export async function PATCH(request: NextRequest) {
       include: { player: true, tournament: true },
     });
 
+    if (status === "CANCELLED" || status === "REJECTED") {
+      await prisma.tournamentTeam.updateMany({
+        where: {
+          tournamentId: existing.tournamentId,
+          player1Id: existing.playerId,
+          status: "CONFIRMED",
+        },
+        data: { status: "CANCELLED" },
+      });
+    }
+
     await writeAuditLog({
       actorType: isOwner && status === "CANCELLED" ? "player" : isOrganizer ? "club" : "admin",
       actorId: player.id,

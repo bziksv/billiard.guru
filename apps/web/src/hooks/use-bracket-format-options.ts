@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { FORMAT_OPTIONS } from "@/lib/bracket-formats/catalog";
+import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 
 export type BracketFormatSelectOption = {
   value: string;
@@ -40,8 +40,8 @@ export function useBracketFormatOptions(
         if (cancelled || !r.ok || !Array.isArray(json.options)) return;
         let next = json.options as BracketFormatSelectOption[];
         if (includeValue && !next.some((o) => o.value === includeValue)) {
-          const extra = FORMAT_OPTIONS.find((o) => o.value === includeValue);
-          if (extra) next = [...next, { ...extra, disabled: true }];
+          const label = TOURNAMENT_FORMAT_LABELS[includeValue] ?? includeValue;
+          next = [...next, { value: includeValue, label, disabled: true }];
         }
         if (next.length > 0) setOptions(next);
       })

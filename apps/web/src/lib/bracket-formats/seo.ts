@@ -8,7 +8,10 @@ import {
   FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32R8_FORMAT_LABEL,
+  FIXED_SWISS_64R8_FORMAT_LABEL,
   FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
+  FIXED_SWISS_128R8_FORMAT_LABEL,
+  FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
 } from "@/lib/validators";
@@ -119,6 +122,21 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     participantBadge: "32 человека",
     keywords: ["сетка 32 бронза", "турнирная таблица 32", "матч за 3 место"],
   },
+  FIXED_SWISS_64R8_2_3_mesta: {
+    code: "FIXED_SWISS_64R8_2_3_mesta",
+    slug: "setka-64-chelovek-1-8",
+    pageTitle: "Турнирная сетка на 64 человека — олимпийка с 1/8",
+    metaTitle: "Турнирная сетка на 64 человека — до 2 поражений, 1/8 | billiard.guru",
+    metaDescription:
+      "Турнирная сетка на 64 участника: 111 встреч, олимпийка с 1/8 — проигравшие в 1/8 сразу на места 17–24.",
+    lead: "Фиксированная сетка на 64: 111 встреч, 11 колонок, олимпийка с 1/8 — вылет с 1/8 на места 17–24, без нижней тур 4; полуфиналисты делят 3-е.",
+    participantBadge: "64 человека",
+    keywords: [
+      "турнирная сетка 64",
+      "сетка на 64 человека",
+      "таблица турнира 64",
+    ],
+  },
   FIXED_SWISS_64R8_1_3_mesto: {
     code: "FIXED_SWISS_64R8_1_3_mesto",
     slug: "setka-64-1-8-matc-za-3-4",
@@ -129,6 +147,32 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     lead: "Oлимпийka с 1/8 на 64 участника (111 основных встреч + матч #120) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
     participantBadge: "64 человека",
     keywords: ["сетка 64 бронза", "турнирная таблица 64", "матч за 3 место 1/8"],
+  },
+  FIXED_SWISS_128R8_2_3_mesta: {
+    code: "FIXED_SWISS_128R8_2_3_mesta",
+    slug: "setka-128-chelovek-1-8",
+    pageTitle: "Турнирная сетка на 128 человек — олимпийка с 1/8",
+    metaTitle: "Турнирная сетка на 128 человек — до 2 поражений, 1/8 | billiard.guru",
+    metaDescription:
+      "Турнирная сетка на 128 участников: 215 встреч, oлимпийka с 1/8 — проигравшие в 1/8 сразу на места 33–48.",
+    lead: "Фиксированная сетка на 128: 215 встреч, oлимпийka с 1/8 — вылет с 1/8 на места 33–48, без нижней тур 4; полуфиналисты делят 3-е.",
+    participantBadge: "128 человек",
+    keywords: [
+      "турнирная сетка 128",
+      "сетка на 128 человек",
+      "таблица турнира 128",
+    ],
+  },
+  FIXED_SWISS_128R8_1_3_mesto: {
+    code: "FIXED_SWISS_128R8_1_3_mesto",
+    slug: "setka-128-1-8-matc-za-3-4",
+    pageTitle: "Сетка на 128 с 1/8 и матчем за 3–4 место",
+    metaTitle: "Сетка на 128 (1/8) + матч за 3–4 | billiard.guru",
+    metaDescription:
+      "Турнирная таблица на 128: oлимпийka с 1/8 (215 встреч) и отдельный матч #216 за 3–4 место. Демо на billiard.guru.",
+    lead: "Oлимпийka с 1/8 на 128 участников (215 основных встреч + матч #216) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
+    participantBadge: "128 человек",
+    keywords: ["сетка 128 бронза", "турнирная таблица 128", "матч за 3 место 1/8"],
   },
   FIXED_SWISS_8R4_1_3_mesto: {
     code: "FIXED_SWISS_8R4_1_3_mesto",
@@ -192,7 +236,10 @@ export function bracketFormatDisplayLabel(code: BracketFormatCode): string {
   if (code === "FIXED_SWISS_32R8_2_3_mesta") return FIXED_SWISS_32R8_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R8_1_3_mesto") return FIXED_SWISS_32R8_1_3_mesto_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R8_BRONZE") return FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_64R8_2_3_mesta") return FIXED_SWISS_64R8_FORMAT_LABEL;
   if (code === "FIXED_SWISS_64R8_1_3_mesto") return FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_128R8_2_3_mesta") return FIXED_SWISS_128R8_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_128R8_1_3_mesto") return FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL;
   return code;
 }
 

@@ -496,8 +496,6 @@ export const STATUS_OPTIONS = [
   { value: "FINISHED", label: "Завершён" },
 ];
 
-export { FORMAT_OPTIONS } from "@/lib/bracket-formats/catalog";
-
 const playerWithCity = { include: { city: true } };
 
 /** Без city — сотни вложенных join на сетке из 27–96 встреч сильно раздувают ответ API. */

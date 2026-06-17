@@ -20,6 +20,7 @@ import {
 import {
   fixedSwissTs32OlympicToQuarterTarget,
   fixedSwissTs64OlympicToQuarterTarget,
+  fixedSwissTsOlympicToQuarterTarget,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32R8ElimAtEighthMatchCount,
@@ -29,8 +30,15 @@ import {
   isFixedSwissTs64R8ElimAtEighthBronzeMatchCount,
   isFixedSwissTs64R8ElimAtEighthFamily,
   isFixedSwissTs64R8ElimAtEighthFromMatches,
+  isFixedSwissTs128R8ElimAtEighthMatchCount,
+  isFixedSwissTs128R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs128R8ElimAtEighthFamily,
+  isFixedSwissTs128R8ElimAtEighthFromMatches,
+  isFixedSwissTs128BronzeMatchCount,
+  isFixedSwissTs128MatchCount,
   isFixedSwissTs64BronzeMatchCount,
   isFixedSwissTs64MatchCount,
+  fixedSwissTsUpperTour2Slot,
   isFixedSwissTs84BronzeMatchCount,
   isFixedSwissTs84MatchCount,
   isOutdatedFixedSwiss32Bracket,
@@ -247,6 +255,10 @@ function buildMatchNumbers(
     isFixedSwissTs64BronzeMatchCount(matchCount) ||
     isFixedSwissTs64R8ElimAtEighthFamily(matchCount, maxRound) ||
     isFixedSwissTs64R8ElimAtEighthFromMatches(matches) ||
+    isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound) ||
+    isFixedSwissTs128R8ElimAtEighthFromMatches(matches) ||
+    isFixedSwissTs128MatchCount(matchCount) ||
+    isFixedSwissTs128BronzeMatchCount(matchCount) ||
     isFixedSwissTs32MatchCount(matchCount) ||
     isFixedSwissTs32BronzeMatchCount(matchCount) ||
     isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRound)
@@ -360,6 +372,11 @@ export function fixedSwissMatchColForCount(
     isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRound)
   ) {
     return fixedSwissTs32MatchCol(round, slot);
+  }
+  if (
+    isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound ?? 0)
+  ) {
+    return fixedSwissTs128MatchCol(round, slot);
   }
   if (
     isFixedSwissTs64R8ElimAtEighthFamily(matchCount, maxRound ?? 0)
@@ -755,11 +772,17 @@ function buildTsPositions(
   matchCount: number,
   maxRound: number,
 ): Map<string, SwissMatchPosition> {
+  if (isFixedSwissTs128R8ElimAtEighthFromMatches(matches)) {
+    if (matchCount === 216) {
+      return buildTsPositionsLargeR8ElimAtEighthBronze(matches, cardH, 64);
+    }
+    return buildTsPositionsLargeR8ElimAtEighth(matches, cardH, 64);
+  }
   if (isFixedSwissTs64R8ElimAtEighthFromMatches(matches)) {
     if (matchCount === 112) {
-      return buildTsPositions64R8ElimAtEighthBronze(matches, cardH);
+      return buildTsPositionsLargeR8ElimAtEighthBronze(matches, cardH, 32);
     }
-    return buildTsPositions64R8ElimAtEighth(matches, cardH);
+    return buildTsPositionsLargeR8ElimAtEighth(matches, cardH, 32);
   }
   if (isFixedSwissTs32BronzeMatchCount(matchCount)) {
     return buildTsPositions32Bronze(matches, cardH);
@@ -773,11 +796,17 @@ function buildTsPositions(
   if (isFixedSwissTs32R8ElimAtEighthMatchCount(matchCount, maxRound)) {
     return buildTsPositions32R8ElimAtEighth(matches, cardH);
   }
+  if (isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
+    return buildTsPositionsLargeR8ElimAtEighthBronze(matches, cardH, 64);
+  }
+  if (isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount, maxRound)) {
+    return buildTsPositionsLargeR8ElimAtEighth(matches, cardH, 64);
+  }
   if (isFixedSwissTs64R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
-    return buildTsPositions64R8ElimAtEighthBronze(matches, cardH);
+    return buildTsPositionsLargeR8ElimAtEighthBronze(matches, cardH, 32);
   }
   if (isFixedSwissTs64R8ElimAtEighthMatchCount(matchCount, maxRound)) {
-    return buildTsPositions64R8ElimAtEighth(matches, cardH);
+    return buildTsPositionsLargeR8ElimAtEighth(matches, cardH, 32);
   }
   if (isFixedSwissTs64BronzeMatchCount(matchCount)) {
     return buildTsPositions64Bronze(matches, cardH);
@@ -897,12 +926,13 @@ function buildTsPositions27SixRound(
   return positions;
 }
 
-/** TS 64→32 R8 elim (111): без нижней тур 4 — вылет с 1/8 на места 17–24. */
-function buildTsPositions64R8ElimAtEighth(
+/** TS large-grid R8 elim: без нижней тур 4 — вылет с 1/8 на места (half1+1)–(half1+half1/2). */
+function buildTsPositionsLargeR8ElimAtEighth(
   matches: BracketMatchView[],
   cardH: number,
+  half2: 32 | 64,
 ): Map<string, SwissMatchPosition> {
-  const half1 = 16;
+  const half1 = half2 / 2;
   const positions = new Map<string, SwissMatchPosition>();
   const byRoundSlot = new Map<string, BracketMatchView>();
   for (const m of matches) {
@@ -912,7 +942,7 @@ function buildTsPositions64R8ElimAtEighth(
   const slotY = new Map<string, number>();
   const unit = FIXED_SWISS_BRACKET_UNIT;
 
-  for (let slot = 1; slot <= 32; slot++) {
+  for (let slot = 1; slot <= half2; slot++) {
     const y = fixedSwissRound1SlotY(slot, unit);
     slotY.set(`1:${slot}`, y);
     const m = byRoundSlot.get(`1:${slot}`);
@@ -937,21 +967,48 @@ function buildTsPositions64R8ElimAtEighth(
     const y = yAt(2, slot, slotY);
     slotY.set(`3:${slot}`, y);
     const m = byRoundSlot.get(`3:${slot}`);
-    if (m) positions.set(m.id, { col: -2, y });
+    if (m) {
+      const col = half2 > 32 && slot > half1 / 2 ? -3 : -2;
+      positions.set(m.id, { col, y });
+    }
   }
-  resolveFixedColCollisionsInOrder(
-    positions,
-    slotY,
-    Array.from({ length: half1 }, (_, i) => byRoundSlot.get(`3:${i + 1}`)!.id),
-    cardH,
-    COL_COLLISION_GAP,
-  );
+  if (half2 > 32) {
+    resolveFixedColCollisionsInOrder(
+      positions,
+      slotY,
+      Array.from({ length: half1 / 2 }, (_, i) =>
+        byRoundSlot.get(`3:${i + 1}`)!.id,
+      ),
+      cardH,
+      COL_COLLISION_GAP,
+    );
+    resolveFixedColCollisionsInOrder(
+      positions,
+      slotY,
+      Array.from({ length: half1 / 2 }, (_, i) =>
+        byRoundSlot.get(`3:${i + half1 / 2 + 1}`)!.id,
+      ),
+      cardH,
+      COL_COLLISION_GAP,
+    );
+  } else {
+    resolveFixedColCollisionsInOrder(
+      positions,
+      slotY,
+      Array.from({ length: half1 }, (_, i) => byRoundSlot.get(`3:${i + 1}`)!.id),
+      cardH,
+      COL_COLLISION_GAP,
+    );
+  }
 
   const upperTour2Ids: string[] = [];
-  for (let k = 1; k <= half1 / 2; k++) {
+  const upperTourPairCount =
+    half2 <= 32 ? half1 / 2 : (3 * half1) / 8;
+  for (let k = 1; k <= upperTourPairCount; k++) {
     const slotA = half1 + 2 * k - 1;
     const slotB = half1 + 2 * k;
-    const upperTour2Slot = k <= half1 / 4 ? half1 * 2 + k : half1 + k;
+    const upperTour2Slot = fixedSwissTsUpperTour2Slot(half2, k);
+    if (upperTour2Slot == null) continue;
     const upperY = centerBetweenParents(
       yAt(2, slotA, slotY),
       yAt(2, slotB, slotY),
@@ -966,10 +1023,10 @@ function buildTsPositions64R8ElimAtEighth(
   }
 
   const eighthIds: string[] = [];
-  for (let k = 5; k <= 8; k++) {
+  for (let k = half1 / 4 + 1; k <= half1 / 2; k++) {
     const slotA = half1 + 2 * k - 1;
     const slotB = half1 + 2 * k;
-    const eighthSlot = half1 + (9 - k);
+    const eighthSlot = half1 + (half1 / 2 + 1 - k);
     const eighthY = centerBetweenParents(
       yAt(2, slotA, slotY),
       yAt(2, slotB, slotY),
@@ -988,10 +1045,10 @@ function buildTsPositions64R8ElimAtEighth(
     slotY,
     [
       ...Array.from({ length: half1 / 4 }, (_, i) =>
-        byRoundSlot.get(`3:${half1 * 2 + i + 1}`)?.id,
+        byRoundSlot.get(`3:${half2 + i + 1}`)?.id,
       ),
       ...Array.from({ length: half1 / 4 }, (_, i) =>
-        byRoundSlot.get(`3:${half1 + 5 + i}`)?.id,
+        byRoundSlot.get(`3:${half1 + half1 / 4 + 1 + i}`)?.id,
       ),
     ].filter((id): id is string => id != null),
     cardH,
@@ -1009,44 +1066,77 @@ function buildTsPositions64R8ElimAtEighth(
         yAt(3, crossA + 1, slotY),
         cardH,
       );
-    } else if (slot <= half1 / 4 + half1 / 8) {
-      const bridgeA = 8 + 2 * (slot - half1 / 4) - 1;
+    } else if (slot <= half1 / 2) {
+      const bridgeA = half1 / 2 + 2 * (slot - half1 / 4) - 1;
       y = centerBetweenParents(
         yAt(3, bridgeA, slotY),
         yAt(3, bridgeA + 1, slotY),
         cardH,
       );
-    } else if (slot === half1 / 4 + half1 / 8 + 1) {
-      y = centerBetweenParents(yAt(3, 13, slotY), yAt(3, 14, slotY), cardH);
-    } else if (slot === half1 / 4 + half1 / 8 + 2) {
-      y = centerBetweenParents(yAt(3, 15, slotY), yAt(3, 16, slotY), cardH);
     } else {
       throw new Error(`Unexpected lower tour 3 slot ${slot}`);
     }
     slotY.set(`4:${slot}`, y);
     const lowerR3 = byRoundSlot.get(`4:${slot}`);
     if (lowerR3) {
-      positions.set(lowerR3.id, { col: -3, y });
+      const col = half2 > 32 && slot > half1 / 4 ? -5 : half2 > 32 ? -4 : -3;
+      positions.set(lowerR3.id, { col, y });
       lowerTour3Ids.push(lowerR3.id);
     }
   }
-  resolveFixedColCollisionsInOrder(
-    positions,
-    slotY,
-    Array.from({ length: half1 / 2 }, (_, i) =>
-      byRoundSlot.get(`4:${i + 1}`)!.id,
-    ),
-    cardH,
-    COL_COLLISION_GAP,
-  );
+  if (half2 > 32) {
+    resolveFixedColCollisionsInOrder(
+      positions,
+      slotY,
+      Array.from({ length: half1 / 4 }, (_, i) =>
+        byRoundSlot.get(`4:${i + 1}`)!.id,
+      ),
+      cardH,
+      COL_COLLISION_GAP,
+    );
+    resolveFixedColCollisionsInOrder(
+      positions,
+      slotY,
+      Array.from({ length: half1 / 4 }, (_, i) =>
+        byRoundSlot.get(`4:${i + half1 / 4 + 1}`)!.id,
+      ),
+      cardH,
+      COL_COLLISION_GAP,
+    );
+  } else {
+    resolveFixedColCollisionsInOrder(
+      positions,
+      slotY,
+      Array.from({ length: half1 / 2 }, (_, i) =>
+        byRoundSlot.get(`4:${i + 1}`)!.id,
+      ),
+      cardH,
+      COL_COLLISION_GAP,
+    );
+  }
 
   const upperTour3Count = half1 / 2;
-  for (let slot = 1; slot <= upperTour3Count; slot++) {
-    const upperTour2Slot = slot <= half1 / 4 ? half1 * 2 + slot : half1 + slot;
+  for (let k = 1; k <= upperTourPairCount; k++) {
+    const upperTour2Slot = fixedSwissTsUpperTour2Slot(half2, k)!;
     const y = yAt(3, upperTour2Slot, slotY);
-    slotY.set(`5:${slot}`, y);
-    const quarter = byRoundSlot.get(`5:${slot}`);
+    slotY.set(`5:${k}`, y);
+    const quarter = byRoundSlot.get(`5:${k}`);
     if (quarter) positions.set(quarter.id, { col: 3, y });
+  }
+  if (half2 > 32) {
+    for (let k = 13; k <= half1 / 2; k++) {
+      const r5Slot = half1 / 2 - half1 / 8 + 1 + (k - 13);
+      const slotA = half1 + 2 * k - 1;
+      const slotB = half1 + 2 * k;
+      const y = centerBetweenParents(
+        yAt(2, slotA, slotY),
+        yAt(2, slotB, slotY),
+        cardH,
+      );
+      slotY.set(`5:${r5Slot}`, y);
+      const quarter = byRoundSlot.get(`5:${r5Slot}`);
+      if (quarter) positions.set(quarter.id, { col: 3, y });
+    }
   }
   resolveFixedColCollisionsInOrder(
     positions,
@@ -1058,37 +1148,33 @@ function buildTsPositions64R8ElimAtEighth(
     COL_COLLISION_GAP,
   );
 
-  const match113 = byRoundSlot.get("3:17");
-  if (match113) {
-    const y113 = centerBetweenParents(yAt(5, 1, slotY), yAt(5, 2, slotY), cardH);
-    slotY.set("3:17", y113);
-    positions.set(match113.id, { col: 4, y: y113 });
-  }
-  const match114 = byRoundSlot.get("3:18");
-  if (match114) {
-    const y114 = centerBetweenParents(yAt(5, 3, slotY), yAt(5, 4, slotY), cardH);
-    slotY.set("3:18", y114);
-    positions.set(match114.id, { col: 4, y: y114 });
-  }
-  const match115 = byRoundSlot.get("3:19");
-  if (match115) {
-    const y115 = centerBetweenParents(yAt(5, 5, slotY), yAt(5, 6, slotY), cardH);
-    slotY.set("3:19", y115);
-    positions.set(match115.id, { col: 4, y: y115 });
-  }
-  const match116 = byRoundSlot.get("3:20");
-  if (match116) {
-    const y116 = centerBetweenParents(yAt(5, 7, slotY), yAt(5, 8, slotY), cardH);
-    slotY.set("3:20", y116);
-    positions.set(match116.id, { col: 4, y: y116 });
+  for (let slot = 1; slot <= half1 / 4; slot++) {
+    const r3QuarterSlot = half1 + slot;
+    const r5A = 2 * slot - 1;
+    const r5B = 2 * slot;
+    const quarterMatch = byRoundSlot.get(`3:${r3QuarterSlot}`);
+    if (quarterMatch) {
+      const yQ = centerBetweenParents(yAt(5, r5A, slotY), yAt(5, r5B, slotY), cardH);
+      slotY.set(`3:${r3QuarterSlot}`, yQ);
+      positions.set(quarterMatch.id, { col: 4, y: yQ });
+    }
   }
 
-  const semi1Y = centerBetweenParents(yAt(3, 17, slotY), yAt(3, 18, slotY), cardH);
+  const thirdGroupSize = half1 / 8;
+  const semi1Y = centerBetweenParents(
+    yAt(3, half1 + 1, slotY),
+    yAt(3, half1 + thirdGroupSize, slotY),
+    cardH,
+  );
   slotY.set(`6:1`, semi1Y);
   const semi1 = byRoundSlot.get("6:1");
   if (semi1) positions.set(semi1.id, { col: 5, y: semi1Y });
 
-  const semi2Y = centerBetweenParents(yAt(3, 19, slotY), yAt(3, 20, slotY), cardH);
+  const semi2Y = centerBetweenParents(
+    yAt(3, half1 + thirdGroupSize + 1, slotY),
+    yAt(3, half1 + half1 / 4, slotY),
+    cardH,
+  );
   slotY.set(`6:2`, semi2Y);
   const semi2 = byRoundSlot.get("6:2");
   if (semi2) positions.set(semi2.id, { col: 5, y: semi2Y });
@@ -1100,12 +1186,13 @@ function buildTsPositions64R8ElimAtEighth(
   return positions;
 }
 
-/** TS 64→32 R8 elim (112): матч за 3–4 (#120) под финалом. */
-function buildTsPositions64R8ElimAtEighthBronze(
+/** TS large-grid R8 elim + бронза под финалом. */
+function buildTsPositionsLargeR8ElimAtEighthBronze(
   matches: BracketMatchView[],
   cardH: number,
+  half2: 32 | 64,
 ): Map<string, SwissMatchPosition> {
-  const positions = buildTsPositions64R8ElimAtEighth(matches, cardH);
+  const positions = buildTsPositionsLargeR8ElimAtEighth(matches, cardH, half2);
   const byRoundSlot = new Map<string, BracketMatchView>();
   for (const m of matches) {
     byRoundSlot.set(`${m.round}:${m.slot}`, m);
@@ -2141,6 +2228,10 @@ export function buildFixedSwissBracketLayout(
     isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRoundEarly) ||
     isFixedSwissTs64R8ElimAtEighthFamily(matchCount, maxRoundEarly) ||
     isFixedSwissTs64R8ElimAtEighthFromMatches(matches) ||
+    isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRoundEarly) ||
+    isFixedSwissTs128R8ElimAtEighthFromMatches(matches) ||
+    isFixedSwissTs128MatchCount(matchCount) ||
+    isFixedSwissTs128BronzeMatchCount(matchCount) ||
     isFixedSwissTs64MatchCount(matchCount) ||
     isFixedSwissTs64BronzeMatchCount(matchCount) ||
     useTsLegacy29 ||
@@ -2634,6 +2725,18 @@ function isFixedSwissTs32CurrentGrid(
   );
 }
 
+function isFixedSwissTs128CurrentGrid(
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  return (
+    matchCount !== undefined &&
+    (isFixedSwissTs128MatchCount(matchCount) ||
+      isFixedSwissTs128BronzeMatchCount(matchCount) ||
+      isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound))
+  );
+}
+
 function isFixedSwissTs64CurrentGrid(
   matchCount?: number,
   maxRound?: number,
@@ -2652,12 +2755,14 @@ function isFixedSwissTsLargeCurrentGrid(
 ): boolean {
   return (
     isFixedSwissTs32CurrentGrid(matchCount, maxRound) ||
-    isFixedSwissTs64CurrentGrid(matchCount)
+    isFixedSwissTs64CurrentGrid(matchCount) ||
+    isFixedSwissTs128CurrentGrid(matchCount, maxRound)
   );
 }
 
 function half1ForLargeGrid(matchCount?: number, maxRound?: number): number {
   if (matchCount === 13 || matchCount === 14) return 2;
+  if (isFixedSwissTs128CurrentGrid(matchCount, maxRound)) return 32;
   if (isFixedSwissTs64CurrentGrid(matchCount)) return 16;
   if (isFixedSwissTs32CurrentGrid(matchCount, maxRound)) return 8;
   return 4;
@@ -2710,6 +2815,14 @@ export function isFixedSwissSemiFinalForkEdge(
   maxRound?: number,
 ): boolean {
   if (isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) {
+    if (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) {
+      return (
+        (fromRound === 5 && toRound === 3) ||
+        (fromRound === 3 && toRound === 6) ||
+        (fromRound === 4 && toRound === 5) ||
+        (fromRound === 6 && toRound === 7)
+      );
+    }
     if (isFixedSwissTs64CurrentGrid(matchCount)) {
       return (
         (fromRound === 5 && toRound === 3) ||
@@ -2850,29 +2963,37 @@ export function isFixedSwissCrossAtSourceYEdge(
   );
 }
 
-/** #105–#112→#113–#116 (парами): верхняя тур 3 → 1/8 (R5→R3) на 64→32. */
+/** #105–#112→#113–#116 (парами): 1/4 → переигровка за 3-е (R5→R3) на 64→32 и 128→64. */
+export function isFixedSwissTsLargeUpperTour3ToThirdPlaceWinEdge(
+  fromRound: number,
+  fromSlot: number,
+  toRound: number,
+  toSlot: number,
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  if (fromRound !== 5 || toRound !== 3) return false;
+  if (!isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) return false;
+  const half1 = half1ForLargeGrid(matchCount, maxRound);
+  return toSlot === half1 + Math.ceil(fromSlot / 2);
+}
+
+/** @deprecated — см. isFixedSwissTsLargeUpperTour3ToThirdPlaceWinEdge */
 export function isFixedSwissTs64UpperTour3ToEighthWinEdge(
   fromRound: number,
   fromSlot: number,
   toRound: number,
   toSlot: number,
   matchCount?: number,
+  maxRound?: number,
 ): boolean {
-  if (!isFixedSwissTs64CurrentGrid(matchCount)) return false;
-  const toEighth: Record<number, number> = {
-    1: 17,
-    2: 17,
-    3: 18,
-    4: 18,
-    5: 19,
-    6: 19,
-    7: 20,
-    8: 20,
-  };
-  return (
-    fromRound === 5 &&
-    toRound === 3 &&
-    toEighth[fromSlot] === toSlot
+  return isFixedSwissTsLargeUpperTour3ToThirdPlaceWinEdge(
+    fromRound,
+    fromSlot,
+    toRound,
+    toSlot,
+    matchCount,
+    maxRound,
   );
 }
 
@@ -2887,6 +3008,11 @@ export function isFixedSwissQuarterSemiWinEdge(
 ): boolean {
   const half1 = half1ForLargeGrid(matchCount, maxRound);
   const olympicToRound = isFixedSwissTsLargeCurrentGrid(matchCount, maxRound) ? 5 : 4;
+  if (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) {
+    if (fromRound !== 3 || toRound !== 5) return false;
+    const target = fixedSwissTsOlympicToQuarterTarget(32, fromSlot);
+    return target?.toRound === 5 && target.toSlot === toSlot;
+  }
   if (isFixedSwissTs64CurrentGrid(matchCount)) {
     if (fromRound !== 3 || toRound !== 5) return false;
     const target = fixedSwissTs64OlympicToQuarterTarget(fromSlot);
@@ -2929,6 +3055,7 @@ export function isFixedSwissLowerTour3To4WinEdge(
 ): boolean {
   if (!isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) return false;
   if (isFixedSwissTs64R8ElimAtEighthFamily(matchCount, maxRound)) return false;
+  if (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) return false;
   if (fromRound !== 4 || toRound !== 3) return false;
   const half1 = half1ForLargeGrid(matchCount, maxRound);
   const lowerTour4Start = half1 + half1 / 2 + 1;
@@ -2986,8 +3113,34 @@ export function isFixedSwissLowerToSemiWinEdge(
   return false;
 }
 
-/** #25/#26→#27; на 32 — 1/4→полуфинал и полуфинал→финал. */
-/** 64→32: #113+#114→#117, #115+#116→#118 (R3→R6). */
+/** 64→32 / 128→64 R8: R3 за 3-е (#113–#116 / #225–#232) → полуфинал. */
+export function isFixedSwissTsLargeThirdToSemiWinEdge(
+  fromRound: number,
+  fromSlot: number,
+  toRound: number,
+  toSlot: number,
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  if (fromRound !== 3 || toRound !== 6) return false;
+  if (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) {
+    const half1 = 32;
+    const thirdStart = half1 + 1;
+    const thirdEnd = half1 + half1 / 4;
+    if (fromSlot < thirdStart || fromSlot > thirdEnd) return false;
+    const groupSlot = fromSlot - half1;
+    return toSlot === Math.ceil(groupSlot / (half1 / 8));
+  }
+  return isFixedSwissTs64EighthToQuarterWinEdge(
+    fromRound,
+    fromSlot,
+    toRound,
+    toSlot,
+    matchCount,
+  );
+}
+
+/** @deprecated — см. isFixedSwissTsLargeThirdToSemiWinEdge */
 export function isFixedSwissTs64EighthToQuarterWinEdge(
   fromRound: number,
   fromSlot: number,
@@ -3004,6 +3157,29 @@ export function isFixedSwissTs64EighthToQuarterWinEdge(
   return false;
 }
 
+/** 128→64 R8: R2 #121–#128 → 1/4 #221–#224 (минуя 1/8). */
+export function isFixedSwissTs128R2DirectQuarterWinEdge(
+  fromRound: number,
+  fromSlot: number,
+  toRound: number,
+  toSlot: number,
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  if (!isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) return false;
+  if (fromRound !== 2 || toRound !== 5) return false;
+  const half1 = 32;
+  for (let k = 13; k <= half1 / 2; k++) {
+    const expectedToSlot = half1 / 2 - half1 / 8 + 1 + (k - 13);
+    const slotA = half1 + 2 * k - 1;
+    const slotB = half1 + 2 * k;
+    if (toSlot === expectedToSlot && (fromSlot === slotA || fromSlot === slotB)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function isFixedSwissSemiFinalWinEdge(
   fromRound: number,
   fromSlot: number,
@@ -3013,6 +3189,30 @@ export function isFixedSwissSemiFinalWinEdge(
   maxRound?: number,
 ): boolean {
   if (isFixedSwissTsLargeCurrentGrid(matchCount, maxRound)) {
+    if (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) {
+      if (fromRound === 4 && toRound === 5) {
+        const half1 = 32;
+        const r3Slot = half1 + half1 / 2 + fromSlot;
+        const target = fixedSwissTsOlympicToQuarterTarget(half1, r3Slot);
+        return target?.toRound === 5 && target.toSlot === toSlot;
+      }
+      if (
+        isFixedSwissTsLargeThirdToSemiWinEdge(
+          fromRound,
+          fromSlot,
+          toRound,
+          toSlot,
+          matchCount,
+          maxRound,
+        )
+      ) {
+        return true;
+      }
+      if (fromRound === 6 && toRound === 7) {
+        return toSlot === 1 && (fromSlot === 1 || fromSlot === 2);
+      }
+      return false;
+    }
     if (isFixedSwissTs64CurrentGrid(matchCount, maxRound)) {
       if (isFixedSwissTs64R8ElimAtEighthFamily(matchCount, maxRound)) {
         if (fromRound === 4 && toRound === 5) {
@@ -3022,12 +3222,13 @@ export function isFixedSwissSemiFinalWinEdge(
           return target?.toRound === 5 && target.toSlot === toSlot;
         }
         if (
-          isFixedSwissTs64EighthToQuarterWinEdge(
+          isFixedSwissTsLargeThirdToSemiWinEdge(
             fromRound,
             fromSlot,
             toRound,
             toSlot,
             matchCount,
+            maxRound,
           )
         ) {
           return true;
@@ -3038,7 +3239,7 @@ export function isFixedSwissSemiFinalWinEdge(
         return false;
       }
       if (
-        isFixedSwissTs64EighthToQuarterWinEdge(
+        isFixedSwissTsLargeThirdToSemiWinEdge(
           fromRound,
           fromSlot,
           toRound,
@@ -3105,11 +3306,23 @@ export function isFixedSwissR23Upper18ForkEdge(
   if (fromRound !== 2 || toRound !== 3) return false;
   const half1 = half1ForLargeGrid(matchCount, maxRound);
   if (fromSlot <= half1) return false;
+  if (isFixedSwissTs128CurrentGrid(matchCount, maxRound)) {
+    const pairCount = (3 * half1) / 8;
+    for (let k = 1; k <= pairCount; k++) {
+      const olympicSlot = fixedSwissTsUpperTour2Slot(64, k);
+      if (olympicSlot == null) continue;
+      if (toSlot !== olympicSlot) continue;
+      const slotA = half1 + 2 * k - 1;
+      const slotB = half1 + 2 * k;
+      if (fromSlot === slotA || fromSlot === slotB) return true;
+    }
+    return false;
+  }
   for (let k = 1; k <= half1 / 2; k++) {
     const olympicSlot = isFixedSwissTs64CurrentGrid(matchCount)
       ? k <= half1 / 4
         ? half1 * 2 + k
-        : 16 + k
+        : half1 + k
       : half1 + k;
     if (toSlot !== olympicSlot) continue;
     const slotA = half1 + 2 * k - 1;
@@ -3163,8 +3376,49 @@ export function isFixedSwissShortAdjacentWinEdge(
   );
 }
 
-/**
- * SVG: вилки R1→R2 (0→±1) + явные короткие победы R2→R3 (см. isFixedSwissShortAdjacentWinEdge).
+function isFixedSwissCrossToLowerSvgCols(
+  fromCol: number,
+  toCol: number,
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  if (isFixedSwissTs128CurrentGrid(matchCount, maxRound)) {
+    return (
+      (fromCol === -2 && toCol === -4) ||
+      (fromCol === -3 && toCol === -5)
+    );
+  }
+  return fromCol === -2 && toCol === -3;
+}
+
+function isFixedSwissLowerTour3To4SvgCols(
+  fromCol: number,
+  toCol: number,
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  if (isFixedSwissTs128CurrentGrid(matchCount, maxRound)) {
+    return (
+      (fromCol === -4 && toCol === -5) ||
+      (fromCol === -5 && toCol === -6)
+    );
+  }
+  return fromCol === -3 && toCol === -4;
+}
+
+function isFixedSwissLowerTour3DirectQuarterSvgCols(
+  fromCol: number,
+  toCol: number,
+  matchCount?: number,
+  maxRound?: number,
+): boolean {
+  if (isFixedSwissTs128CurrentGrid(matchCount, maxRound)) {
+    return (fromCol === -4 || fromCol === -5) && toCol === 3;
+  }
+  return fromCol === -3 && toCol === 3;
+}
+
+/** SVG: вилки R1→R2 (0→±1) + явные короткие победы R2→R3 (см. isFixedSwissShortAdjacentWinEdge).
  */
 export function shouldDrawFixedSwissWinEdge(
   fromCol: number,
@@ -3219,7 +3473,10 @@ export function shouldDrawFixedSwissWinEdge(
       matchCount,
       maxRound,
     ) &&
-    isFixedSwissAdjacentWinEdge(fromCol, toCol)
+    (isFixedSwissAdjacentWinEdge(fromCol, toCol) ||
+      (isFixedSwissTs128CurrentGrid(matchCount, maxRound) &&
+        fromCol === -1 &&
+        (toCol === -2 || toCol === -3)))
   ) {
     return true;
   }
@@ -3241,8 +3498,12 @@ export function shouldDrawFixedSwissWinEdge(
         toSlot,
         matchCount,
       )) &&
-    toCol === -3 &&
-    fromCol === -2
+    isFixedSwissCrossToLowerSvgCols(
+      fromCol,
+      toCol,
+      matchCount,
+      maxRound,
+    )
   ) {
     return true;
   }
@@ -3257,8 +3518,12 @@ export function shouldDrawFixedSwissWinEdge(
       matchCount,
       maxRound,
     ) &&
-    fromCol === -3 &&
-    toCol === -4
+    isFixedSwissLowerTour3To4SvgCols(
+      fromCol,
+      toCol,
+      matchCount,
+      maxRound,
+    )
   ) {
     return true;
   }
@@ -3281,7 +3546,26 @@ export function shouldDrawFixedSwissWinEdge(
         fromSlot <= 12) ||
       (isFixedSwissTs64CurrentGrid(matchCount) &&
         ((fromSlot >= 21 && fromSlot <= 24) ||
-          (fromSlot >= 33 && fromSlot <= 36))))
+          (fromSlot >= 33 && fromSlot <= 36))) ||
+      (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound) &&
+        ((fromSlot >= 41 && fromSlot <= 48) ||
+          (fromSlot >= 65 && fromSlot <= 68))))
+  ) {
+    return true;
+  }
+  if (
+    fromSlot != null &&
+    toSlot != null &&
+    isFixedSwissTs128R2DirectQuarterWinEdge(
+      fromRound,
+      fromSlot,
+      toRound,
+      toSlot,
+      matchCount,
+      maxRound,
+    ) &&
+    fromCol === 1 &&
+    toCol === 3
   ) {
     return true;
   }
@@ -3318,12 +3602,13 @@ export function shouldDrawFixedSwissWinEdge(
   if (
     fromSlot != null &&
     toSlot != null &&
-    isFixedSwissTs64EighthToQuarterWinEdge(
+    isFixedSwissTsLargeThirdToSemiWinEdge(
       fromRound,
       fromSlot,
       toRound,
       toSlot,
       matchCount,
+      maxRound,
     ) &&
     fromCol === 4 &&
     toCol === 5
@@ -3341,7 +3626,15 @@ export function shouldDrawFixedSwissWinEdge(
       matchCount,
       maxRound,
     ) &&
-    ((fromCol === 3 && toCol === 4) || (fromCol === 4 && toCol === 5) || (fromCol === 5 && toCol === 6))
+    ((fromCol === 3 && toCol === 4) ||
+      (fromCol === 4 && toCol === 5) ||
+      (fromCol === 5 && toCol === 6) ||
+      isFixedSwissLowerTour3DirectQuarterSvgCols(
+        fromCol,
+        toCol,
+        matchCount,
+        maxRound,
+      ))
   ) {
     return true;
   }
@@ -3387,6 +3680,118 @@ export function shouldDrawFixedSwissLossEdge(
     return fromCol === 0 && toCol === -1;
   }
   return false;
+}
+
+/** R8 elim: нижняя тур 4 → 1/8 — только подпись в Excel, не автоподстановка. */
+export function isFixedSwissLowerTour4FooterWinEdge(
+  link: {
+    fromRound: number;
+    fromSlot: number;
+    toRound: number;
+    toSlot: number;
+    kind: "win" | "loss";
+  },
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  if (link.kind !== "win") return false;
+  if (
+    !isFixedSwissTs64R8ElimAtEighthFamily(matchCount, maxRound) &&
+    !isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound) &&
+    !isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRound)
+  ) {
+    return false;
+  }
+  if (link.fromRound !== 3 || link.toRound !== 5) return false;
+  const fromCol = fixedSwissMatchColForCount(
+    link.fromRound,
+    link.fromSlot,
+    matchCount,
+    maxRound,
+  );
+  if (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) {
+    return fromCol === -5 || fromCol === -6;
+  }
+  return fromCol === -4;
+}
+
+/** Win-link только для подписи — не автоподстановка и не «победитель на #…» в UI. */
+export function isFixedSwissWinLinkFooterOnly(
+  link: {
+    fromRound: number;
+    fromSlot: number;
+    toRound: number;
+    toSlot: number;
+    kind: "win" | "loss";
+  },
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  if (link.kind !== "win") return false;
+  return (
+    isFixedSwissTs64LowerTour1ToUpperTour2BridgeEdge(
+      link.fromRound,
+      link.fromSlot,
+      link.toRound,
+      link.toSlot,
+      matchCount,
+    ) || isFixedSwissLowerTour4FooterWinEdge(link, matchCount, maxRound)
+  );
+}
+
+/** @deprecated используйте isFixedSwissWinLinkFooterOnly / обратную логику в shouldAutoAdvance */
+export function isFixedSwissLowerTour3DirectQuarterWinEdge(
+  link: {
+    fromRound: number;
+    fromSlot: number;
+    toRound: number;
+    toSlot: number;
+    kind: "win" | "loss";
+  },
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  if (link.kind === "win" && isFixedSwissWinLinkFooterOnly(link, matchCount, maxRound)) {
+    return false;
+  }
+  if (link.kind !== "win") return false;
+  if (
+    !isFixedSwissTs64R8ElimAtEighthFamily(matchCount, maxRound) &&
+    !isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound) &&
+    !isFixedSwissTs32R8ElimAtEighthFamily(matchCount, maxRound)
+  ) {
+    return false;
+  }
+  if (link.fromRound !== 4 || link.toRound !== 5) return false;
+  const fromCol = fixedSwissMatchColForCount(
+    link.fromRound,
+    link.fromSlot,
+    matchCount,
+    maxRound,
+  );
+  if (isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound)) {
+    return fromCol === -4 || fromCol === -5;
+  }
+  return fromCol === -3;
+}
+
+/**
+ * Автоподстановка в слот при сохранении результата.
+ * Почти все links из шаблона — реальные; исключения: мост #45→#85 и подписи нижней тур 4.
+ */
+export function shouldAutoAdvanceFixedSwissLink(
+  link: {
+    fromRound: number;
+    fromSlot: number;
+    toRound: number;
+    toSlot: number;
+    kind: "win" | "loss";
+  },
+  matchCount: number,
+  maxRound?: number,
+): boolean {
+  if (link.kind === "loss") return true;
+  return !isFixedSwissWinLinkFooterOnly(link, matchCount, maxRound);
 }
 
 /** Подписи «место …» для актуальной TS-сетки 27 (#13–#27). */
@@ -3458,6 +3863,45 @@ export function fixedSwissTs64MatchCol(round: number, slot: number): number {
   return 6;
 }
 
+export function fixedSwissTs128MatchCol(round: number, slot: number): number {
+  const half1 = 32;
+  const half2 = 64;
+  if (round === 1) return 0;
+  if (round === 2 && slot <= half1) return -1;
+  if (round === 2) return 1;
+  if (round === 3 && slot <= half1 / 2) return -2;
+  if (round === 3 && slot <= half1) return -3;
+  if (round === 3 && slot <= half1 + half1 / 4) return 4;
+  if (round === 3 && slot <= half1 + half1 / 2) return 2;
+  if (round === 3 && slot <= half2 - half1 / 4) return -5;
+  if (round === 3 && slot <= half2) return -6;
+  if (round === 3 && slot <= half2 + half1 / 4) return 2;
+  if (round === 4 && slot <= half1 / 4) return -4;
+  if (round === 4) return -5;
+  if (round === 5) return 3;
+  if (round === 6) return 5;
+  return 6;
+}
+
+export function fixedSwissTs128ColumnLabel(col: number): string {
+  const labels: Record<number, string> = {
+    [-6]: "Нижняя, тур 6",
+    [-5]: "Нижняя, тур 5",
+    [-4]: "Нижняя, тур 4",
+    [-3]: "Нижняя, тур 3",
+    [-2]: "Нижняя, тур 2",
+    [-1]: "Нижняя, тур 1",
+    0: "Первый тур",
+    1: "Верхняя, тур 1",
+    2: "Верхняя, тур 2",
+    3: "Верхняя, тур 3 · 1/8",
+    4: "1/4 финала",
+    5: "Полуфинал",
+    6: "Финал",
+  };
+  return labels[col] ?? gridFixedColumnLabel(col);
+}
+
 export function fixedSwissTs64ColumnLabel(col: number): string {
   const labels: Record<number, string> = {
     [-4]: "Нижняя, тур 4",
@@ -3490,6 +3934,43 @@ export function fixedSwissTs64PlacementByMatchNo(
   if (no >= 97 && no <= 104) return "место 17–24";
   if (no >= 105 && no <= 112) return "место 9–16";
   if (no >= 113 && no <= 116) return "место 5–8";
+  return null;
+}
+
+export function fixedSwissTs128R8ElimPlacementByMatchNo(
+  no: number,
+  withBronze: boolean,
+): string | null {
+  const half1 = 32;
+  const finalNo = 3 * half1 * 2 + half1 + half1 / 4 + 3;
+  const bronzeNo = finalNo + 1;
+  const eighthStart = 2 * half1 + half1 / 4 + 1;
+  const eighthEnd = 2 * half1 + half1 / 2;
+  const upperTour3Start = 3 * half1 + half1 / 2 + 1;
+  const upperTour3End = 3 * half1 + half1;
+  const quarterStart = 3 * half1 + half1 / 4 + 1;
+  const quarterEnd = 3 * half1 + half1 / 2;
+  const semi1 = finalNo - 2;
+  const semi2 = finalNo - 1;
+
+  if (withBronze && no === bronzeNo) return "матч за 3–4 место";
+  if (no === finalNo) return "место 1–2";
+  if (no >= eighthStart && no <= eighthEnd) {
+    return `место ${half1 + 1}–${half1 + half1 / 2}`;
+  }
+  if (no >= 1 && no <= half1) return `место ${3 * half1 + 1}–${4 * half1}`;
+  if (no >= half1 + 1 && no <= 2 * half1) {
+    return `место ${2 * half1 + 1}–${3 * half1}`;
+  }
+  if (no >= 2 * half1 + 1 && no <= 3 * half1) {
+    return `место ${half1 + half1 / 2 + 1}–${2 * half1}`;
+  }
+  if (no >= upperTour3Start && no <= upperTour3End) {
+    return `место ${half1 / 2 + 1}–${half1}`;
+  }
+  if (no >= quarterStart && no <= quarterEnd) return "место 5–8";
+  if (withBronze && (no === semi1 || no === semi2)) return "полуфинал";
+  if (!withBronze && (no === semi1 || no === semi2)) return "3-е место";
   return null;
 }
 
@@ -3590,6 +4071,20 @@ export function fixedSwissPlacementLabel(
       matchNumber ??
       fixedSwissMatchNo(round, slot, matchCount, maxRound);
     return fixedSwissTs32PlacementByMatchNo(no, true);
+  }
+
+  if (isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount ?? 0, maxRound)) {
+    const no =
+      matchNumber ??
+      fixedSwissMatchNo(round, slot, matchCount ?? 0, maxRound);
+    return fixedSwissTs128R8ElimPlacementByMatchNo(no, false);
+  }
+
+  if (isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount ?? 0, maxRound)) {
+    const no =
+      matchNumber ??
+      fixedSwissMatchNo(round, slot, matchCount ?? 0, maxRound);
+    return fixedSwissTs128R8ElimPlacementByMatchNo(no, true);
   }
 
   if (isFixedSwissTs64R8ElimAtEighthMatchCount(matchCount ?? 0, maxRound)) {
@@ -3770,6 +4265,13 @@ export function fixedSwissColumnLabel(
   }
   if (isFixedSwissTs32MatchCount(matchCount) || isFixedSwissTs32BronzeMatchCount(matchCount) || isOutdatedFixedSwiss32Bracket(matchCount)) {
     return fixedSwissTs32ColumnLabel(col);
+  }
+  if (
+    isFixedSwissTs128R8ElimAtEighthFamily(matchCount, maxRound) ||
+    isFixedSwissTs128MatchCount(matchCount) ||
+    isFixedSwissTs128BronzeMatchCount(matchCount)
+  ) {
+    return fixedSwissTs128ColumnLabel(col);
   }
   if (isFixedSwissTs64MatchCount(matchCount) || isFixedSwissTs64BronzeMatchCount(matchCount)) {
     return fixedSwissTs64ColumnLabel(col);
