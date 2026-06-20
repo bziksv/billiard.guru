@@ -162,6 +162,20 @@ export function IconDatabaseBackup({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function IconAnalytics({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <path d="M4 20V10" />
+      <path d="M10 20V4" />
+      <path d="M16 20v-8" />
+      <path d="M22 20H2" />
+      <circle cx="4" cy="10" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="10" cy="4" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="12" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export function IconHandicap({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>

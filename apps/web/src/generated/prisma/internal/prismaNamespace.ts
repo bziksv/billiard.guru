@@ -392,6 +392,7 @@ export const ModelName = {
   ClubNews: 'ClubNews',
   SiteNews: 'SiteNews',
   Player: 'Player',
+  SitePageView: 'SitePageView',
   PlayerNotificationPreference: 'PlayerNotificationPreference',
   CoachRating: 'CoachRating',
   ClubPlayerRating: 'ClubPlayerRating',
@@ -427,7 +428,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "siteNews" | "player" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "dbBackupConfig" | "telegramDeliveryLog"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "siteNews" | "player" | "sitePageView" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "dbBackupConfig" | "telegramDeliveryLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -956,6 +957,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PlayerCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PlayerCountAggregateOutputType> | number
+        }
+      }
+    }
+    SitePageView: {
+      payload: Prisma.$SitePageViewPayload<ExtArgs>
+      fields: Prisma.SitePageViewFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SitePageViewFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SitePageViewFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload>
+        }
+        findFirst: {
+          args: Prisma.SitePageViewFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SitePageViewFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload>
+        }
+        findMany: {
+          args: Prisma.SitePageViewFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload>[]
+        }
+        create: {
+          args: Prisma.SitePageViewCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload>
+        }
+        createMany: {
+          args: Prisma.SitePageViewCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.SitePageViewDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload>
+        }
+        update: {
+          args: Prisma.SitePageViewUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload>
+        }
+        deleteMany: {
+          args: Prisma.SitePageViewDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SitePageViewUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.SitePageViewUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SitePageViewPayload>
+        }
+        aggregate: {
+          args: Prisma.SitePageViewAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSitePageView>
+        }
+        groupBy: {
+          args: Prisma.SitePageViewGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SitePageViewGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SitePageViewCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SitePageViewCountAggregateOutputType> | number
         }
       }
     }
@@ -2463,6 +2530,21 @@ export const PlayerScalarFieldEnum = {
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
 
 
+export const SitePageViewScalarFieldEnum = {
+  id: 'id',
+  visitorId: 'visitorId',
+  playerId: 'playerId',
+  surface: 'surface',
+  path: 'path',
+  referrer: 'referrer',
+  countryCode: 'countryCode',
+  countryName: 'countryName',
+  createdAt: 'createdAt'
+} as const
+
+export type SitePageViewScalarFieldEnum = (typeof SitePageViewScalarFieldEnum)[keyof typeof SitePageViewScalarFieldEnum]
+
+
 export const PlayerNotificationPreferenceScalarFieldEnum = {
   playerId: 'playerId',
   notificationId: 'notificationId',
@@ -2925,6 +3007,19 @@ export const PlayerOrderByRelevanceFieldEnum = {
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
 
 
+export const SitePageViewOrderByRelevanceFieldEnum = {
+  id: 'id',
+  visitorId: 'visitorId',
+  playerId: 'playerId',
+  path: 'path',
+  referrer: 'referrer',
+  countryCode: 'countryCode',
+  countryName: 'countryName'
+} as const
+
+export type SitePageViewOrderByRelevanceFieldEnum = (typeof SitePageViewOrderByRelevanceFieldEnum)[keyof typeof SitePageViewOrderByRelevanceFieldEnum]
+
+
 export const PlayerNotificationPreferenceOrderByRelevanceFieldEnum = {
   playerId: 'playerId',
   notificationId: 'notificationId'
@@ -3220,6 +3315,13 @@ export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
+ * Reference to a field of type 'AnalyticsSurface'
+ */
+export type EnumAnalyticsSurfaceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnalyticsSurface'>
+    
+
+
+/**
  * Reference to a field of type 'LoginChallengeMethod'
  */
 export type EnumLoginChallengeMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'LoginChallengeMethod'>
@@ -3420,6 +3522,7 @@ export type GlobalOmitConfig = {
   clubNews?: Prisma.ClubNewsOmit
   siteNews?: Prisma.SiteNewsOmit
   player?: Prisma.PlayerOmit
+  sitePageView?: Prisma.SitePageViewOmit
   playerNotificationPreference?: Prisma.PlayerNotificationPreferenceOmit
   coachRating?: Prisma.CoachRatingOmit
   clubPlayerRating?: Prisma.ClubPlayerRatingOmit

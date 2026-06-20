@@ -59,6 +59,7 @@ export const ModelName = {
   ClubNews: 'ClubNews',
   SiteNews: 'SiteNews',
   Player: 'Player',
+  SitePageView: 'SitePageView',
   PlayerNotificationPreference: 'PlayerNotificationPreference',
   CoachRating: 'CoachRating',
   ClubPlayerRating: 'ClubPlayerRating',
@@ -240,6 +241,21 @@ export const PlayerScalarFieldEnum = {
 } as const
 
 export type PlayerScalarFieldEnum = (typeof PlayerScalarFieldEnum)[keyof typeof PlayerScalarFieldEnum]
+
+
+export const SitePageViewScalarFieldEnum = {
+  id: 'id',
+  visitorId: 'visitorId',
+  playerId: 'playerId',
+  surface: 'surface',
+  path: 'path',
+  referrer: 'referrer',
+  countryCode: 'countryCode',
+  countryName: 'countryName',
+  createdAt: 'createdAt'
+} as const
+
+export type SitePageViewScalarFieldEnum = (typeof SitePageViewScalarFieldEnum)[keyof typeof SitePageViewScalarFieldEnum]
 
 
 export const PlayerNotificationPreferenceScalarFieldEnum = {
@@ -702,6 +718,19 @@ export const PlayerOrderByRelevanceFieldEnum = {
 } as const
 
 export type PlayerOrderByRelevanceFieldEnum = (typeof PlayerOrderByRelevanceFieldEnum)[keyof typeof PlayerOrderByRelevanceFieldEnum]
+
+
+export const SitePageViewOrderByRelevanceFieldEnum = {
+  id: 'id',
+  visitorId: 'visitorId',
+  playerId: 'playerId',
+  path: 'path',
+  referrer: 'referrer',
+  countryCode: 'countryCode',
+  countryName: 'countryName'
+} as const
+
+export type SitePageViewOrderByRelevanceFieldEnum = (typeof SitePageViewOrderByRelevanceFieldEnum)[keyof typeof SitePageViewOrderByRelevanceFieldEnum]
 
 
 export const PlayerNotificationPreferenceOrderByRelevanceFieldEnum = {

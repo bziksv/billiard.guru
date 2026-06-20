@@ -3,6 +3,7 @@ import { PreviewBannerSlot } from "@/components/site/preview-banner-slot";
 import { SiteDevBanner } from "@/components/site/site-dev-banner";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { PageviewBeacon } from "@/components/analytics/pageview-beacon";
 
 export default function SiteLayout({
   children,
@@ -19,6 +20,7 @@ export default function SiteLayout({
       <div className="site-content-shell flex-1 bg-transparent">{children}</div>
       <SiteFooter />
       <CookieConsentPopup />
+      <PageviewBeacon surface="MARKETING" />
     </div>
   );
 }

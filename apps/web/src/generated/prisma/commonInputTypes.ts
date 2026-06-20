@@ -375,6 +375,23 @@ export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
 }
 
+export type EnumAnalyticsSurfaceFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnalyticsSurface | Prisma.EnumAnalyticsSurfaceFieldRefInput<$PrismaModel>
+  in?: $Enums.AnalyticsSurface[]
+  notIn?: $Enums.AnalyticsSurface[]
+  not?: Prisma.NestedEnumAnalyticsSurfaceFilter<$PrismaModel> | $Enums.AnalyticsSurface
+}
+
+export type EnumAnalyticsSurfaceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnalyticsSurface | Prisma.EnumAnalyticsSurfaceFieldRefInput<$PrismaModel>
+  in?: $Enums.AnalyticsSurface[]
+  notIn?: $Enums.AnalyticsSurface[]
+  not?: Prisma.NestedEnumAnalyticsSurfaceWithAggregatesFilter<$PrismaModel> | $Enums.AnalyticsSurface
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAnalyticsSurfaceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAnalyticsSurfaceFilter<$PrismaModel>
+}
+
 export type EnumLoginChallengeMethodFilter<$PrismaModel = never> = {
   equals?: $Enums.LoginChallengeMethod | Prisma.EnumLoginChallengeMethodFieldRefInput<$PrismaModel>
   in?: $Enums.LoginChallengeMethod[]
@@ -970,6 +987,23 @@ export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumUserRoleFilter<$PrismaModel>
+}
+
+export type NestedEnumAnalyticsSurfaceFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnalyticsSurface | Prisma.EnumAnalyticsSurfaceFieldRefInput<$PrismaModel>
+  in?: $Enums.AnalyticsSurface[]
+  notIn?: $Enums.AnalyticsSurface[]
+  not?: Prisma.NestedEnumAnalyticsSurfaceFilter<$PrismaModel> | $Enums.AnalyticsSurface
+}
+
+export type NestedEnumAnalyticsSurfaceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.AnalyticsSurface | Prisma.EnumAnalyticsSurfaceFieldRefInput<$PrismaModel>
+  in?: $Enums.AnalyticsSurface[]
+  notIn?: $Enums.AnalyticsSurface[]
+  not?: Prisma.NestedEnumAnalyticsSurfaceWithAggregatesFilter<$PrismaModel> | $Enums.AnalyticsSurface
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumAnalyticsSurfaceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumAnalyticsSurfaceFilter<$PrismaModel>
 }
 
 export type NestedEnumLoginChallengeMethodFilter<$PrismaModel = never> = {

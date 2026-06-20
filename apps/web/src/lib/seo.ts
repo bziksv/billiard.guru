@@ -5,6 +5,11 @@ import {
   getBracketFormatSeoBySlug,
   type BracketFormatSeoEntry,
 } from "@/lib/bracket-formats/seo";
+import type { BilliardGame, BilliardTableType } from "@/lib/billiard-rules";
+import {
+  resolveRulesGameSeo,
+  resolveRulesTableSeo,
+} from "@/lib/billiard-rules/rules-seo";
 import { LEGAL_DOCS, type LegalDocSlug } from "@/lib/legal";
 
 export const SEO_SITE_URL =
@@ -149,14 +154,16 @@ export const STATIC_PAGE_SEO = {
     path: "/brackets",
   },
   rules: {
-    title: "Правила бильярда — справочник",
+    title: "Правила бильярда — по типам столов",
     description:
-      "Справочник по дисциплинам бильярда, нарушениям, форе и этикете за столом для игроков и судей.",
+      "Справочник по пирамиде, пулу, снукеру, китайскому пулу и карамболю: типы столов, дисциплины и краткий регламент для игроков.",
     keywords: [
       "правила бильярда",
+      "русская пирамида правила",
+      "пул 8-ball правила",
+      "снукер правила",
+      "карамболь правила",
       "форa бильярд",
-      "этикет бильярд",
-      "нарушения бильярд",
     ],
     path: "/rules",
   },
@@ -199,6 +206,27 @@ export function legalDocMetadata(doc: LegalDocSlug): Metadata {
     description: entry.description,
     keywords: LEGAL_KEYWORDS[doc],
     path: `/legal/${doc}`,
+  });
+}
+
+export function rulesTableMetadata(table: BilliardTableType): Metadata {
+  const seo = resolveRulesTableSeo(table);
+  return buildPageMetadata({
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    path: `/rules/${table.slug}`,
+  });
+}
+
+export function rulesGameMetadata(table: BilliardTableType, game: BilliardGame): Metadata {
+  const seo = resolveRulesGameSeo(table, game);
+  return buildPageMetadata({
+    title: seo.title,
+    description: seo.description,
+    keywords: seo.keywords,
+    path: `/rules/${table.slug}/${game.slug}`,
+    openGraphType: "article",
   });
 }
 

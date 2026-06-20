@@ -186,3 +186,12 @@ export const TableBookingKind = {
 } as const
 
 export type TableBookingKind = (typeof TableBookingKind)[keyof typeof TableBookingKind]
+
+
+export const AnalyticsSurface = {
+  MARKETING: 'MARKETING',
+  ADMIN: 'ADMIN',
+  MANAGE: 'MANAGE'
+} as const
+
+export type AnalyticsSurface = (typeof AnalyticsSurface)[keyof typeof AnalyticsSurface]

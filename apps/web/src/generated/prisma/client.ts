@@ -82,6 +82,11 @@ export type SiteNews = Prisma.SiteNewsModel
  */
 export type Player = Prisma.PlayerModel
 /**
+ * Model SitePageView
+ * Просмотры страниц (собственная аналитика посещений).
+ */
+export type SitePageView = Prisma.SitePageViewModel
+/**
  * Model PlayerNotificationPreference
  * Подписка игрока на типы Telegram-уведомлений (нет строки = включено).
  */

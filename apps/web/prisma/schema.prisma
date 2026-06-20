@@ -352,8 +352,37 @@ model Player {
   coachReviewsReceived CoachRating[] @relation("CoachReviewsReceived")
   coachReviewsGiven    CoachRating[] @relation("CoachReviewsGiven")
   notificationPreferences PlayerNotificationPreference[]
+  pageViews              SitePageView[]
 
   @@map("players")
+}
+
+enum AnalyticsSurface {
+  MARKETING
+  ADMIN
+  MANAGE
+}
+
+/// Просмотры страниц (собственная аналитика посещений).
+model SitePageView {
+  id        String           @id @default(cuid())
+  visitorId String           @map("visitor_id") @db.VarChar(36)
+  playerId  String?          @map("player_id")
+  player    Player?          @relation(fields: [playerId], references: [id], onDelete: SetNull)
+  surface   AnalyticsSurface
+  path      String           @db.VarChar(512)
+  referrer  String?          @db.VarChar(512)
+  countryCode String?        @map("country_code") @db.VarChar(2)
+  countryName String?        @map("country_name") @db.VarChar(64)
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  @@index([surface, createdAt])
+  @@index([visitorId, createdAt])
+  @@index([playerId, createdAt])
+  @@index([path, createdAt])
+  @@index([countryCode, createdAt])
+  @@index([createdAt])
+  @@map("site_page_views")
 }
 
 /// Подписка игрока на типы Telegram-уведомлений (нет строки = включено).

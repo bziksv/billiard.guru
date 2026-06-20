@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { ManageShell } from "@/components/manage/manage-shell";
+import { PageviewBeacon } from "@/components/analytics/pageview-beacon";
 import { getCurrentPlayer } from "@/lib/auth";
 import { getAccessibleOwnedClubs } from "@/lib/club-owner-access";
 
@@ -19,11 +20,14 @@ export default async function ManageLayout({
   }
 
   return (
+    <>
     <ManageShell
       userName={`${player.lastName} ${player.firstName}`}
       clubs={clubs}
     >
       {children}
     </ManageShell>
+    <PageviewBeacon surface="MANAGE" />
+    </>
   );
 }

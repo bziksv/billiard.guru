@@ -6,7 +6,10 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
-  const [clubs, players, tournaments, pending, pendingIdeas, pendingClubNews] =
+  const weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+
+  const [clubs, players, tournaments, pending, pendingIdeas, pendingClubNews, recentVisitors] =
     await Promise.all([
     prisma.club.count(),
     prisma.player.count(),
@@ -14,6 +17,11 @@ export default async function AdminDashboard() {
     prisma.tournamentRegistration.count({ where: { status: "PENDING" } }),
     prisma.idea.count({ where: { status: "PENDING" } }),
     prisma.clubNews.count({ where: { status: "PENDING" } }),
+    prisma.sitePageView.findMany({
+      where: { createdAt: { gte: weekAgo } },
+      distinct: ["visitorId"],
+      select: { visitorId: true },
+    }),
   ]);
 
   const cards = [
@@ -29,6 +37,7 @@ export default async function AdminDashboard() {
     { label: "Ожидают подтверждения", value: pending, href: "/admin/tournaments" },
     { label: "Идеи на модерации", value: pendingIdeas, href: "/admin/ideas" },
     { label: "Новости клубов", value: pendingClubNews, href: "/admin/club-news" },
+    { label: "Посетители (7 дн.)", value: recentVisitors.length, href: "/admin/analytics" },
   ];
 
   return (

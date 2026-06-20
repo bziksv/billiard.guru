@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentPlayer, getSession } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { PageviewBeacon } from "@/components/analytics/pageview-beacon";
 
 export default async function AdminLayout({
   children,
@@ -24,6 +25,7 @@ export default async function AdminLayout({
         }
       />
       <main className="admin-main min-h-0 min-w-0 w-full flex-1 overflow-x-hidden overflow-y-auto">{children}</main>
+      <PageviewBeacon surface="ADMIN" />
     </div>
   );
 }

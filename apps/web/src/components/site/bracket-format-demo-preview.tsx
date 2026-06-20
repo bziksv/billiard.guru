@@ -23,12 +23,14 @@ export function BracketFormatDemoPreview({
 
   return (
     <div className="bracket-format-demo">
-      <div className="bracket-format-demo-badge" aria-hidden>
-        Демо-схема
+      <div className="bracket-format-demo-toolbar">
+        <span className="bracket-format-demo-badge" aria-hidden>
+          Демо-схема
+        </span>
       </div>
 
       {useStructure ? (
-        <div className="space-y-4 p-4 pt-10">
+        <div className="space-y-4 px-4 pb-4">
           <pre className="guide-diagram text-xs sm:text-sm">{structureDiagram}</pre>
           {compactDemoMatches && compactDemoMatches.length > 0 && (
             <div>
