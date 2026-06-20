@@ -50,7 +50,7 @@ async function main() {
     throw new Error("Город Воронеж не найден — сначала выполните seed geo");
   }
 
-  for (let i = 1; i <= 130; i++) {
+  for (let i = 1; i <= 300; i++) {
     const phone = testPlayerPhone(i);
     const rating = randomTestPlayerRating();
     await prisma.player.upsert({
@@ -74,7 +74,7 @@ async function main() {
       },
     });
   }
-  console.log("Test players: Тест1 … Тест130 (+79000000001 … +79000000130)");
+  console.log("Test players: Тест1 … Тест300 (+79000000001 … +79000000300)");
 }
 
 main()

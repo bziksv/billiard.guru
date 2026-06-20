@@ -231,6 +231,7 @@ export const tournamentSchema = z.object({
     "FIXED_SWISS_64R8_1_3_mesto",
     "FIXED_SWISS_128R8_2_3_mesta",
     "FIXED_SWISS_128R8_1_3_mesto",
+    "FIXED_SWISS_256R8_1_3_mesto",
     "FIXED_SWISS_64",
     "FIXED_SWISS_64_BRONZE",
     "PAIR_OLYMPIC",
@@ -283,6 +284,7 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_SWISS_64R8_1_3_mesto",
       "FIXED_SWISS_128R8_2_3_mesta",
       "FIXED_SWISS_128R8_1_3_mesto",
+    "FIXED_SWISS_256R8_1_3_mesto",
       "FIXED_SWISS_64",
       "FIXED_SWISS_64_BRONZE",
       "PAIR_OLYMPIC",
@@ -527,6 +529,9 @@ export const FIXED_SWISS_128R8_FORMAT_LABEL =
 export const FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL =
   "Сетка на 128 до 2 поражений, oлимпийka с 1/8 с определением 3 и 4 места (доп.игра)";
 
+export const FIXED_SWISS_256R8_1_3_mesto_FORMAT_LABEL =
+  "Сетка на 256 до 2 поражений, oлимпийka с 1/16 с определением 3 и 4 места (доп.игра)";
+
 /** 64→32 (115 встреч) — #105–#112→#113–#116, #117 1/4, #118 полуфинал, #119 финал. */
 export const FIXED_SWISS_64_FORMAT_LABEL =
   "Сетка на 64 до 2 поражений, олимпийка с 1/8 с двумя 3 местами";
@@ -592,6 +597,7 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_SWISS_64R8_1_3_mesto: FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_128R8_2_3_mesta: FIXED_SWISS_128R8_FORMAT_LABEL,
   FIXED_SWISS_128R8_1_3_mesto: FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL,
+  FIXED_SWISS_256R8_1_3_mesto: FIXED_SWISS_256R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_64: FIXED_SWISS_64_FORMAT_LABEL,
   FIXED_SWISS_64_BRONZE: FIXED_SWISS_64_BRONZE_FORMAT_LABEL,
   PAIR_OLYMPIC: "Парный (фикс. сетка)",

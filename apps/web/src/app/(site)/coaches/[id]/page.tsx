@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { ClubPhotoGallery } from "@/components/site/club-photo-gallery";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
@@ -12,6 +13,21 @@ import { formatRating } from "@/lib/rating";
 import { getCurrentPlayer, getSession } from "@/lib/auth";
 import { playerName } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
+import { coachDetailMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const coach = await prisma.player.findFirst({
+    where: { id, isCoach: true, isVerified: true },
+    include: { city: true },
+  });
+  if (!coach) return { title: "Тренер не найден" };
+  return coachDetailMetadata(playerName(coach), coach.city?.name ?? null, id);
+}
 
 export default async function CoachDetailPage({
   params,

@@ -11,6 +11,7 @@ import {
   FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_128R8_FORMAT_LABEL,
   FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL,
+  FIXED_SWISS_256R8_1_3_mesto_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
 } from "@/lib/validators";
@@ -30,7 +31,8 @@ export type BracketFormatCode =
   | "FIXED_SWISS_64R8_2_3_mesta"
   | "FIXED_SWISS_64R8_1_3_mesto"
   | "FIXED_SWISS_128R8_2_3_mesta"
-  | "FIXED_SWISS_128R8_1_3_mesto";
+  | "FIXED_SWISS_128R8_1_3_mesto"
+  | "FIXED_SWISS_256R8_1_3_mesto";
 
 export interface BracketFormatDefinition {
   code: BracketFormatCode;
@@ -90,9 +92,12 @@ const TS128_R8_ELIM_BRONZE_IMPL = [
   "swiss-bracket-view.tsx",
 ] as const;
 
-/**
- * Реестр типов сеток. Новый формат → запись здесь → появится в /admin/brackets и в FORMAT_OPTIONS.
- */
+const TS256_R8_ELIM_BRONZE_IMPL = [
+  "fixed-swiss-ts-256r8-grid.ts — buildFixedSwissTs256R8ElimAtEighthBronzeTemplate()",
+  "fixed-swiss-layout.ts — buildTsPositionsLargeR8ElimAtEighth(half2=128)",
+  "swiss-bracket-view.tsx",
+] as const;
+
 export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
   {
     code: "OLYMPIC",
@@ -283,9 +288,21 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     pairing: "single",
     layout: "swiss_fixed",
     shortDescription:
-      "216 встреч — копия R8 elim (215) + #216: матч проигравших полуфиналистов под финалом; вылет с 1/8 на места 33–48.",
+      "216 встреч — копия R8 elim (215) + #248: матч проигравших полуфиналистов под финалом; вылет с 1/8 на места 33–48.",
     guideSectionId: "swiss-fixed-128-r8-1-3",
     implementation: [...TS128_R8_ELIM_BRONZE_IMPL],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_SWISS_256R8_1_3_mesto",
+    adminLabel: FIXED_SWISS_256R8_1_3_mesto_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    shortDescription:
+      "456 встреч — oлимпийka с 1/16, #456 бронза под финалом; 5 нижних туров.",
+    guideSectionId: "swiss-fixed-256-r8-1-3",
+    docPaths: ["docs/FIXED_SWISS_128R8_1_3_mesto.md"],
+    implementation: [...TS256_R8_ELIM_BRONZE_IMPL],
     testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
   },
 ];

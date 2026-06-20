@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { LEGAL_DOCS } from "@/lib/legal";
+import { legalDocMetadata } from "@/lib/seo";
 
 type DocParam = keyof typeof LEGAL_DOCS;
 
@@ -18,10 +19,7 @@ export async function generateMetadata({
   const { doc } = await params;
   const entry = LEGAL_DOCS[doc as DocParam];
   if (!entry) return { title: "Документ" };
-  return {
-    title: entry.title,
-    description: entry.description,
-  };
+  return legalDocMetadata(doc as DocParam);
 }
 
 export default async function LegalDocumentPage({

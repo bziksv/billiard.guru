@@ -6,6 +6,9 @@ import { getCurrentPlayer } from "@/lib/auth";
 import { loadNewsFeed } from "@/lib/home-data";
 import type { GeoSearchParams } from "@/lib/site";
 import { hrefWithGeo } from "@/lib/site";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
+
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.news);
 
 function resolveGeo(
   params: GeoSearchParams,

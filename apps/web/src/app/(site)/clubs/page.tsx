@@ -15,6 +15,9 @@ import {
 import { prisma } from "@/lib/prisma";
 import type { GeoSearchParams } from "@/lib/site";
 import { t } from "@/lib/site";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
+
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.clubs);
 
 function ClubList({
   clubs,

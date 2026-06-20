@@ -12,6 +12,7 @@ import {
   FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_128R8_FORMAT_LABEL,
   FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL,
+  FIXED_SWISS_256R8_1_3_mesto_FORMAT_LABEL,
   OLYMPIC_1L_BRONZE_FORMAT_LABEL,
   OLYMPIC_SINGLE_FORMAT_LABEL,
 } from "@/lib/validators";
@@ -32,7 +33,7 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "OLYMPIC",
     slug: "olimpiyskaya-sistema",
     pageTitle: "Турнирная сетка oлимпийская система",
-    metaTitle: "Oлимпийская турнирная сетка на выбывание | billiard.guru",
+    metaTitle: "Oлимпийская турнирная сетка на выбывание",
     metaDescription:
       "Классическая oлимпийская сетка на выбывание: жеребьёвка по рейтингу, автопроходы, демо на 8–16 игроков. Создайте турнир на billiard.guru.",
     lead: "Классическая сетка на выбывание: проигравший покидает турнир, все пары известны сразу после жеребьёвки.",
@@ -48,7 +49,7 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "OLYMPIC_1L_BRONZE",
     slug: "olimpiyskaya-s-bronzoy",
     pageTitle: "Oлимпийская сетка с матчем за 3–4 место",
-    metaTitle: "Oлимпийская сетка + матч за 3–4 место | billiard.guru",
+    metaTitle: "Oлимпийская сетка + матч за 3–4 место",
     metaDescription:
       "Oлимпийская система с дополнительной игрой проигравших полуфиналистов за бронзу. Демо-схема и организация турнира на billiard.guru.",
     lead: "Сетка на выбывание плюс отдельный матч между проигравшими в полуфиналах — для честного определения 3-го и 4-го места.",
@@ -63,70 +64,70 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "FIXED_SWISS_32R4_2_3_mesta",
     slug: "setka-32-chelovek-1-4",
     pageTitle: "Турнирная сетка на 32 человека — олимпийка с 1/4",
-    metaTitle: "Турнирная сетка на 32 человека — до 2 поражений, 1/4 | billiard.guru",
+    metaTitle: "Турнирная сетка на 32 человека — до 2 поражений, 1/4",
     metaDescription:
       "Турнирная сетка на 32 участника: 59 встреч, подпись «олимпийка с 1/4». Демо на billiard.guru.",
     lead: "Фиксированная сетка на 32 участника (59 встреч), олимпийка с 1/4 — проигравшие полуфиналисты делят 3-е место.",
     participantBadge: "32 человека",
     keywords: [
-      "турнирная сетка 32",
-      "сетка на 32 человека",
-      "таблица турнира 32",
+      "турнирная сетка 32 1/4",
+      "сетка 32 четвертьфинал",
+      "59 встреч 32",
     ],
   },
   FIXED_SWISS_32R4_1_3_mesto: {
     code: "FIXED_SWISS_32R4_1_3_mesto",
     slug: "setka-32-chelovek-1-4-s-bronzoy",
     pageTitle: "Сетка на 32 человека с 1/4 и матчем за 3–4 место",
-    metaTitle: "Сетка на 32 человека (1/4) + матч за 3–4 | billiard.guru",
+    metaTitle: "Сетка на 32 человека (1/4) + матч за 3–4",
     metaDescription:
       "Турнирная таблица на 32 с олимпийкой с 1/4 и матчем за бронзу (#60). Демо 60 встреч на billiard.guru.",
     lead: "Сетка 32→16 (59+1 встреч) с подписью «1/4» плюс матч #60 за 3–4 между проигравшими полуфиналистами.",
     participantBadge: "32 человека",
-    keywords: ["сетка 32 бронза", "турнирная таблица 32", "матч за 3 место"],
+    keywords: ["сетка 32 бронза 1/4", "турнирная таблица 32 четверть", "матч 60 бильярд"],
   },
   FIXED_SWISS_32R8_2_3_mesta: {
     code: "FIXED_SWISS_32R8_2_3_mesta",
     slug: "setka-32-chelovek-1-8",
     pageTitle: "Турнирная сетка на 32 человека — олимпийка с 1/8",
-    metaTitle: "Турнирная сетка на 32 человека — до 2 поражений, 1/8 | billiard.guru",
+    metaTitle: "Турнирная сетка на 32 человека — до 2 поражений, 1/8",
     metaDescription:
       "Турнирная сетка на 32 участника: 55 встреч, oлимпийka с 1/8 — проигравшие в 1/8 сразу на места 9–12.",
     lead: "Фиксированная сетка на 32: 55 встреч, 9 колонок, oлимпийka с 1/8 — вылет с 1/8 на места 9–12, без нижней тур 4.",
     participantBadge: "32 человека",
     keywords: [
-      "турнирная сетка 32",
-      "сетка на 32 человека",
-      "таблица турнира 32",
+      "турнирная сетка 32 1/8",
+      "сетка 32 восьмой финал",
+      "55 встреч 32",
     ],
   },
   FIXED_SWISS_32R8_1_3_mesto: {
     code: "FIXED_SWISS_32R8_1_3_mesto",
     slug: "setka-32-1-8-matc-za-3-4",
     pageTitle: "Сетка на 32 с 1/8 и матчем за 3–4 место",
-    metaTitle: "Сетка на 32 (1/8) + матч за 3–4 | billiard.guru",
+    metaTitle: "Сетка 32 (1/8), 56 встреч + матч за 3–4",
     metaDescription:
       "Турнирная таблица на 32: олимпийка с 1/8 (56 встреч) и отдельный матч #60 за 3–4 место. Демо на billiard.guru.",
     lead: "Oлимпийka с 1/8 (55 основных встреч + матч #60) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
     participantBadge: "32 человека",
-    keywords: ["сетка 32 бронза", "турнирная таблица 32", "матч за 3 место 1/8"],
+    keywords: ["сетка 32 1/8 бронза", "56 встреч 32", "матч 60 бильярд"],
   },
   FIXED_SWISS_32R8_BRONZE: {
     code: "FIXED_SWISS_32R8_BRONZE",
     slug: "setka-32-chelovek-1-8-s-bronzoy",
     pageTitle: "Сетка на 32 с 1/8 и матчем за 3–4 место",
-    metaTitle: "Сетка на 32 (1/8) + матч за 3–4 | billiard.guru",
+    metaTitle: "Сетка 32 (1/8) с бронзой, 60 встреч",
     metaDescription:
       "Турнирная таблица на 32 с олимпийкой с 1/8 и матчем за бронзу (#60). Демо 60 встреч на billiard.guru.",
     lead: "Oлимпийka с 1/8 (59 встреч) плюс матч #60 между проигравшими полуфиналистами за 3-е и 4-е место.",
     participantBadge: "32 человека",
-    keywords: ["сетка 32 бронза", "турнирная таблица 32", "матч за 3 место"],
+    keywords: ["сетка 32 бронза 1/8", "турнирная таблица 32", "матч за 3 место 32"],
   },
   FIXED_SWISS_64R8_2_3_mesta: {
     code: "FIXED_SWISS_64R8_2_3_mesta",
     slug: "setka-64-chelovek-1-8",
     pageTitle: "Турнирная сетка на 64 человека — олимпийка с 1/8",
-    metaTitle: "Турнирная сетка на 64 человека — до 2 поражений, 1/8 | billiard.guru",
+    metaTitle: "Турнирная сетка на 64 человека — до 2 поражений, 1/8",
     metaDescription:
       "Турнирная сетка на 64 участника: 111 встреч, олимпийка с 1/8 — проигравшие в 1/8 сразу на места 17–24.",
     lead: "Фиксированная сетка на 64: 111 встреч, 11 колонок, олимпийка с 1/8 — вылет с 1/8 на места 17–24, без нижней тур 4; полуфиналисты делят 3-е.",
@@ -141,7 +142,7 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "FIXED_SWISS_64R8_1_3_mesto",
     slug: "setka-64-1-8-matc-za-3-4",
     pageTitle: "Сетка на 64 с 1/8 и матчем за 3–4 место",
-    metaTitle: "Сетка на 64 (1/8) + матч за 3–4 | billiard.guru",
+    metaTitle: "Сетка на 64 (1/8) + матч за 3–4",
     metaDescription:
       "Турнирная таблица на 64: oлимпийka с 1/8 (111 встреч) и отдельный матч #120 за 3–4 место. Демо на billiard.guru.",
     lead: "Oлимпийka с 1/8 на 64 участника (111 основных встреч + матч #120) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
@@ -152,7 +153,7 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "FIXED_SWISS_128R8_2_3_mesta",
     slug: "setka-128-chelovek-1-8",
     pageTitle: "Турнирная сетка на 128 человек — олимпийка с 1/8",
-    metaTitle: "Турнирная сетка на 128 человек — до 2 поражений, 1/8 | billiard.guru",
+    metaTitle: "Турнирная сетка на 128 человек — до 2 поражений, 1/8",
     metaDescription:
       "Турнирная сетка на 128 участников: 215 встреч, oлимпийka с 1/8 — проигравшие в 1/8 сразу на места 33–48.",
     lead: "Фиксированная сетка на 128: 215 встреч, oлимпийka с 1/8 — вылет с 1/8 на места 33–48, без нижней тур 4; полуфиналисты делят 3-е.",
@@ -167,7 +168,7 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "FIXED_SWISS_128R8_1_3_mesto",
     slug: "setka-128-1-8-matc-za-3-4",
     pageTitle: "Сетка на 128 с 1/8 и матчем за 3–4 место",
-    metaTitle: "Сетка на 128 (1/8) + матч за 3–4 | billiard.guru",
+    metaTitle: "Сетка на 128 (1/8) + матч за 3–4",
     metaDescription:
       "Турнирная таблица на 128: oлимпийka с 1/8 (215 встреч) и отдельный матч #216 за 3–4 место. Демо на billiard.guru.",
     lead: "Oлимпийka с 1/8 на 128 участников (215 основных встреч + матч #216) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
@@ -178,7 +179,7 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "FIXED_SWISS_8R4_1_3_mesto",
     slug: "setka-8-chelovek-1-4-s-bronzoy",
     pageTitle: "Сетка на 8 человека с 1/4 и матчем за 3–4 место",
-    metaTitle: "Сетка на 8 человека (1/4) + матч за 3–4 | billiard.guru",
+    metaTitle: "Сетка на 8 человека (1/4) + матч за 3–4",
     metaDescription:
       "Турнирная таблица на 8 с oлимпийкой с 1/4 и матчем за бронзу (#14). Демо 14 встреч на billiard.guru.",
     lead: "Сетка 8→4 (13+1 встреч) с oлимпийкой с 1/4 плюс матч #14 за 3–4 между проигравшими полуфиналистами.",
@@ -189,7 +190,7 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "FIXED_SWISS_16R4_2_3_mesta",
     slug: "setka-16-chelovek-1-4",
     pageTitle: "Турнирная сетка на 16 человека — oлимпийka с 1/4",
-    metaTitle: "Турнирная сетка на 16 человека — до 2 поражений, 1/4 | billiard.guru",
+    metaTitle: "Турнирная сетка на 16 человека — до 2 поражений, 1/4",
     metaDescription:
       "Турнирная таблица на 16 с oлимпийкой с 1/4: 27 встреч, проигравшие полуфиналисты делят 3-е место. Демо на billiard.guru.",
     lead: "Сетка 16→8 (27 встреч) с oлимпийкой с 1/4 — проигравшие полуфиналисты получают 3-е место без дополнительной игры.",
@@ -200,12 +201,23 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
     code: "FIXED_SWISS_16R4_1_3_mesto",
     slug: "setka-16-chelovek-1-4-s-bronzoy",
     pageTitle: "Сетка на 16 человека с 1/4 и матчем за 3–4 место",
-    metaTitle: "Сетка на 16 человека (1/4) + матч за 3–4 | billiard.guru",
+    metaTitle: "Сетка на 16 человека (1/4) + матч за 3–4",
     metaDescription:
       "Турнирная таблица на 16 с oлимпийкой с 1/4 и матчем за бронзу (#28). Демо 28 встреч на billiard.guru.",
     lead: "Сетка 16→8 (27+1 встреч) с oлимпийкой с 1/4 плюс матч #28 за 3–4 между проигравшими полуфиналистами.",
     participantBadge: "16 человек",
     keywords: ["сетка 16 бронза", "турнирная таблица 16", "матч за 3 место"],
+  },
+  FIXED_SWISS_256R8_1_3_mesto: {
+    code: "FIXED_SWISS_256R8_1_3_mesto",
+    slug: "setka-256-1-16-matc-za-3-4",
+    pageTitle: "Сетка на 256 с 1/16 и матчем за 3–4 место",
+    metaTitle: "Сетка на 256 (1/16) + матч за 3–4",
+    metaDescription:
+      "Турнирная таблица на 256: oлимпийka с 1/16 (496 встреч) и матч #496 за 3–4 место. Демо на billiard.guru.",
+    lead: "Oлимпийka с 1/16 на 256 участников (495 основных встреч + #496) — проигравшие полуфиналисты играют за 3-е и 4-е место.",
+    participantBadge: "256 человек",
+    keywords: ["сетка 256 бронза", "турнирная таблица 256", "матч за 3 место 1/16"],
   },
 };
 
@@ -240,6 +252,7 @@ export function bracketFormatDisplayLabel(code: BracketFormatCode): string {
   if (code === "FIXED_SWISS_64R8_1_3_mesto") return FIXED_SWISS_64R8_1_3_mesto_FORMAT_LABEL;
   if (code === "FIXED_SWISS_128R8_2_3_mesta") return FIXED_SWISS_128R8_FORMAT_LABEL;
   if (code === "FIXED_SWISS_128R8_1_3_mesto") return FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_256R8_1_3_mesto") return FIXED_SWISS_256R8_1_3_mesto_FORMAT_LABEL;
   return code;
 }
 

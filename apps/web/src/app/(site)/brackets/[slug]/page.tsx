@@ -6,6 +6,7 @@ import {
   getPublicBracketFormatBySlug,
   getPublicEnabledBracketFormats,
 } from "@/lib/bracket-formats/public-formats";
+import { bracketFormatMetadata } from "@/lib/seo";
 
 export const revalidate = 3600;
 
@@ -24,21 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Формат не найден" };
   }
 
-  const { seo } = format;
-  const canonical = `https://billiard.guru/brackets/${seo.slug}`;
-
-  return {
-    title: seo.metaTitle,
-    description: seo.metaDescription,
-    keywords: seo.keywords,
-    alternates: { canonical },
-    openGraph: {
-      title: seo.metaTitle,
-      description: seo.metaDescription,
-      url: canonical,
-      type: "article",
-    },
-  };
+  return bracketFormatMetadata(format.seo);
 }
 
 export default async function BracketFormatPage({ params }: PageProps) {

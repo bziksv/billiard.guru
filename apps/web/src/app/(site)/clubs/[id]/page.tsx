@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { ClubBookingWidget } from "@/components/site/club-booking-widget";
 import { ClubFloorPlanLive } from "@/components/club/club-floor-plan-live";
@@ -20,6 +21,7 @@ import {
 } from "@/lib/public-queries";
 import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
+import { clubDetailMetadata } from "@/lib/seo";
 
 function formatNewsDate(date: Date) {
   return date.toLocaleDateString("ru-RU", {
@@ -27,6 +29,20 @@ function formatNewsDate(date: Date) {
     month: "long",
     year: "numeric",
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const club = await prisma.club.findUnique({
+    where: { id },
+    include: { city: true },
+  });
+  if (!club) return { title: "Клуб не найден" };
+  return clubDetailMetadata(club.name, club.city.name, id);
 }
 
 export default async function ClubPage({

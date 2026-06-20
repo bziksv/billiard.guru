@@ -2,13 +2,14 @@
  * Сформировать сетку и прогнать все доступные встречи (team1 побеждает).
  * Проверка: все auto-advance links после каждого тура.
  *
- * npx tsx scripts/simulate-fixed-swiss-tournament.ts [tournamentId] [--regenerate]
+ * npx tsx scripts/simulate-fixed-swiss-tournament.ts [tournamentId] [--regenerate] [--verbose]
  */
 import { prisma } from "../src/lib/prisma";
 import {
+  advanceWinner,
   generateTournamentPairing,
+  processByes,
   regenerateBracket,
-  saveMatchResult,
 } from "../src/lib/bracket-service";
 import {
   fixedSwissMatchNo,
@@ -18,10 +19,11 @@ import { shouldAutoAdvanceFixedSwissLink } from "../src/lib/fixed-swiss-layout";
 
 const args = process.argv.slice(2);
 const regenerate = args.includes("--regenerate");
+const verbose = args.includes("--verbose");
 const tournamentId =
   args.find((a) => !a.startsWith("--")) ?? "cmqf3zlvf00003i3kcusdpfnz";
 
-type MatchRow = {
+type SlotRow = {
   id: string;
   round: number;
   slot: number;
@@ -31,7 +33,24 @@ type MatchRow = {
   status: string;
 };
 
-function isReady(m: MatchRow): boolean {
+function buildByeCache(
+  rows: SlotRow[],
+  tournamentId: string,
+  format: string,
+) {
+  const slotMap = new Map(rows.map((m) => [`${m.round}:${m.slot}`, m]));
+  const byId = new Map(rows.map((m) => [m.id, m]));
+  return {
+    tournamentId,
+    format,
+    matchCount: rows.length,
+    maxRound: Math.max(0, ...rows.map((m) => m.round)),
+    slotMap,
+    byId,
+  };
+}
+
+function isReady(m: SlotRow): boolean {
   if (m.winnerTeamId || m.status === "FINISHED" || m.status === "WALKOVER") {
     return false;
   }
@@ -40,13 +59,13 @@ function isReady(m: MatchRow): boolean {
   return false;
 }
 
-function pickWinner(m: MatchRow): string {
+function pickWinner(m: SlotRow): string {
   if (m.team1Id && m.team2Id) return m.team1Id;
   return (m.team1Id ?? m.team2Id)!;
 }
 
 async function auditAdvances(
-  all: MatchRow[],
+  all: SlotRow[],
   matchCount: number,
   maxRound: number,
 ): Promise<string[]> {
@@ -80,7 +99,7 @@ async function auditAdvances(
   return broken;
 }
 
-async function loadMatches(): Promise<MatchRow[]> {
+async function loadMatches(): Promise<SlotRow[]> {
   return prisma.tournamentMatch.findMany({
     where: { tournamentId },
     select: {
@@ -99,7 +118,9 @@ async function loadMatches(): Promise<MatchRow[]> {
 async function main() {
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
-    include: {
+    select: {
+      name: true,
+      format: true,
       _count: {
         select: {
           teams: { where: { status: "CONFIRMED" } },
@@ -141,16 +162,18 @@ async function main() {
   let played = 0;
   let lastRound = 0;
   const errors: string[] = [];
+  const t0 = Date.now();
 
   for (let pass = 0; pass < 500; pass++) {
     const all = await loadMatches();
+    const byeCache = buildByeCache(all, tournamentId, tournament.format);
     const ready = all.filter(isReady);
     if (ready.length === 0) break;
 
     const minRound = Math.min(...ready.map((m) => m.round));
     const batch = ready.filter((m) => m.round === minRound);
 
-    if (minRound !== lastRound) {
+    if (verbose && minRound !== lastRound) {
       const broken = await auditAdvances(all, matchCount, maxRound);
       if (broken.length > 0) {
         console.error(`\n❌ Broken advances before R${minRound} (${broken.length}):`);
@@ -163,17 +186,14 @@ async function main() {
       lastRound = minRound;
     }
 
-    console.log(`R${minRound}: playing ${batch.length} matches…`);
+    if (verbose) {
+      console.log(`R${minRound}: playing ${batch.length} matches…`);
+    }
 
     for (const m of batch) {
       try {
         const winnerTeamId = pickWinner(m);
-        await saveMatchResult(prisma, {
-          matchId: m.id,
-          winnerTeamId,
-          team1Score: m.team1Id === winnerTeamId ? 2 : 0,
-          team2Score: m.team2Id === winnerTeamId ? 2 : 0,
-        });
+        await advanceWinner(prisma, m.id, winnerTeamId, "FINISHED", byeCache);
         played++;
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
@@ -182,6 +202,8 @@ async function main() {
         errors.push(`${no}: ${msg}`);
       }
     }
+
+    await processByes(prisma, tournamentId, tournament.format);
   }
 
   const final = await loadMatches();
@@ -192,8 +214,10 @@ async function main() {
   const scheduled = final.filter((m) => !m.winnerTeamId).length;
   const playable = final.filter(isReady).length;
 
+  const elapsedSec = ((Date.now() - t0) / 1000).toFixed(1);
+
   console.log("\n=== Summary ===");
-  console.log(`Played: ${played}`);
+  console.log(`Played: ${played} (${elapsedSec}s)`);
   console.log(`Finished: ${finished}/${final.length}`);
   console.log(`Still scheduled (no winner): ${scheduled}`);
   console.log(`Ready to play now: ${playable}`);
@@ -210,8 +234,12 @@ async function main() {
     console.error("\n❌ Save errors:", errors.length);
     process.exitCode = 1;
   }
+  if (scheduled > 0 && process.exitCode !== 1) {
+    console.error(`\n❌ Deadlock: ${scheduled} matches without winner`);
+    process.exitCode = 1;
+  }
   if (process.exitCode !== 1) {
-    console.log("\n✅ Simulation completed without advance errors");
+    console.log(`\n✅ ${finished}/${final.length} — simulation OK`);
   }
 
   await prisma.$disconnect();

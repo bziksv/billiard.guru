@@ -1,5 +1,6 @@
 "use client";
 
+import { useServerInsertedHTML } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -9,7 +10,11 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { THEME_DEFAULT, THEME_STORAGE_KEY } from "@/lib/theme-script";
+import {
+  buildThemeInitScript,
+  THEME_DEFAULT,
+  THEME_STORAGE_KEY,
+} from "@/lib/theme-script";
 
 type Theme = "light" | "dark" | "system";
 type ResolvedTheme = "light" | "dark";
@@ -76,6 +81,13 @@ function applyTheme(theme: Theme, disableTransition: boolean) {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(THEME_DEFAULT);
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(defaultResolvedTheme);
+
+  useServerInsertedHTML(() => (
+    <script
+      id="setka-theme-init"
+      dangerouslySetInnerHTML={{ __html: buildThemeInitScript() }}
+    />
+  ));
 
   useEffect(() => {
     const stored = readStoredTheme();

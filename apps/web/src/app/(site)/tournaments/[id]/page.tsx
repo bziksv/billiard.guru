@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { TournamentBracket } from "@/components/bracket/tournament-bracket";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { PageHeader, PageMain } from "@/components/site/page-header";
@@ -31,6 +32,7 @@ import {
   REGISTRATION_STATUS_LABELS,
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
+import { tournamentDetailMetadata } from "@/lib/seo";
 
 async function getMyParticipation(
   tournamentId: string,
@@ -55,6 +57,31 @@ async function getMyParticipation(
     },
     include: { player: true },
   });
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const tournament = await findPublicTournamentById(id, {
+    club: { include: { city: true } },
+  });
+  if (
+    !tournament ||
+    !PUBLIC_TOURNAMENT_STATUSES.includes(
+      tournament.status as (typeof PUBLIC_TOURNAMENT_STATUSES)[number],
+    )
+  ) {
+    return { title: "Турнир не найден" };
+  }
+  return tournamentDetailMetadata(
+    tournament.name,
+    tournament.club.name,
+    tournament.club.city.name,
+    id,
+  );
 }
 
 export default async function TournamentPage({

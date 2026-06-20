@@ -13,7 +13,8 @@ alwaysApply: false
 1. Enum в `prisma/schema.prisma`
 2. Запись в `BRACKET_FORMAT_CATALOG` (adminLabel, layout, implementation, guideSectionId)
 3. Логика в `bracket-service.ts` / layout-модули
-4. Секция в `tournament-brackets-guide.ts` при необходимости
+4. SEO в `bracket-formats/seo.ts` — уникальные `metaTitle`, `metaDescription`, `keywords`; прогнать `npm run verify:seo`
+5. Секция в `tournament-brackets-guide.ts` при необходимости
 
 `FORMAT_OPTIONS` для форм берётся из каталога. Настройки типов — `/admin/brackets` (`BracketFormatConfig`: `enabled`, `maintenanceMode`). API `/api/bracket-formats/options`: все `enabled`, на техобслуживании — `disabled` в селекте (видны, не выбираются).
 

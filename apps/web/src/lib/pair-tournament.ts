@@ -30,7 +30,8 @@ export function isFixedSwiss64BronzeFormat(format: string): boolean {
 export function isFixedSwiss128Format(format: string): boolean {
   return (
     format === "FIXED_SWISS_128R8_2_3_mesta" ||
-    format === "FIXED_SWISS_128R8_1_3_mesto"
+    format === "FIXED_SWISS_128R8_1_3_mesto" ||
+    format === "FIXED_SWISS_256R8_1_3_mesto"
   );
 }
 
@@ -142,6 +143,7 @@ export function isSoloFormat(format: string): boolean {
     format === "FIXED_SWISS_64R8_1_3_mesto" ||
     format === "FIXED_SWISS_128R8_2_3_mesta" ||
     format === "FIXED_SWISS_128R8_1_3_mesto" ||
+    format === "FIXED_SWISS_256R8_1_3_mesto" ||
     format === "FIXED_SWISS_64" ||
     format === "FIXED_SWISS_64_BRONZE" ||
     format === "EXCEL_REF_64" ||

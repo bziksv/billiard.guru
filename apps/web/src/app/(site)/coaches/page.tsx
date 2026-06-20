@@ -7,6 +7,9 @@ import { coachGeoWhere, coachListInclude, coachListOrderBy } from "@/lib/public-
 import { prisma } from "@/lib/prisma";
 import type { GeoSearchParams } from "@/lib/site";
 import { t } from "@/lib/site";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
+
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.coaches);
 
 export default async function CoachesPage({
   searchParams,

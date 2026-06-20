@@ -1,4 +1,4 @@
-/** Тестовые игроки Тест1 … Тест130 */
+/** Тестовые игроки Тест1 … Тест300 */
 
 export function testPlayerPhone(i: number): string {
   return `+7900000${String(i).padStart(5, "0")}`;

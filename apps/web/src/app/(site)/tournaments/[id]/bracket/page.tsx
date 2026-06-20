@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { TournamentBracket } from "@/components/bracket/tournament-bracket";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
@@ -20,10 +21,25 @@ import {
 import { StatusBadge } from "@/components/admin/status-badge";
 import { resolveMatchStreamUrl, resolveTableLabel } from "@/lib/tournament-stream";
 import { APP_NAME } from "@/lib/brand";
+import { tournamentBracketMetadata } from "@/lib/seo";
 
-export const metadata = {
-  robots: { index: true, follow: true },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const tournament = await findPublicTournamentById(id, { club: true });
+  if (
+    !tournament ||
+    !PUBLIC_TOURNAMENT_STATUSES.includes(
+      tournament.status as (typeof PUBLIC_TOURNAMENT_STATUSES)[number],
+    )
+  ) {
+    return { title: "Сетка не найдена" };
+  }
+  return tournamentBracketMetadata(tournament.name, id);
+}
 
 export default async function TournamentBracketPage({
   params,

@@ -1,5 +1,5 @@
 /**
- * Переназначает рейтинги Тест1 … Тест130: 0–6, шаг 0,5, случайно.
+ * Переназначает рейтинги Тест1 … Тест300: 0–6, шаг 0,5, случайно.
  * npx tsx scripts/reassign-test-players-ratings.ts
  */
 import "dotenv/config";
@@ -10,7 +10,7 @@ const prisma = createPrismaClient();
 
 async function main() {
   let updated = 0;
-  for (let i = 1; i <= 130; i++) {
+  for (let i = 1; i <= 300; i++) {
     const rating = randomTestPlayerRating(6);
     const result = await prisma.player.updateMany({
       where: {
@@ -21,7 +21,7 @@ async function main() {
     });
     if (result.count > 0) updated += result.count;
   }
-  console.log(`Рейтинги обновлены: ${updated} игроков (Тест1 … Тест130, 0–6, шаг 0,5)`);
+  console.log(`Рейтинги обновлены: ${updated} игроков (Тест1 … Тест300, 0–6, шаг 0,5)`);
 }
 
 main()

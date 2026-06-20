@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { formatRating } from "@/lib/rating";
@@ -10,6 +11,21 @@ import {
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { playerDetailMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const player = await prisma.player.findUnique({
+    where: { id, isVerified: true },
+    include: { city: true },
+  });
+  if (!player) return { title: "Игрок не найден" };
+  return playerDetailMetadata(playerName(player), player.city?.name ?? null, id);
+}
 
 export default async function PlayerPage({
   params,

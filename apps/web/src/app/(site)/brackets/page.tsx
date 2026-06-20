@@ -1,11 +1,8 @@
 import { BracketsIndexPage } from "@/components/site/brackets-index-page";
 import { getPublicEnabledBracketFormats } from "@/lib/bracket-formats/public-formats";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
 
-export const metadata = {
-  title: "Турнирные сетки — форматы и демо-схемы",
-  description:
-    "Турнирные сетки на billiard.guru: олимпийская, швейцарская, сетки на 16, 32 и 64 человек. Интерактивные демо и создание турнира онлайн.",
-};
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.brackets);
 
 export const revalidate = 3600;
 

@@ -42,6 +42,7 @@ import {
   isFixedSwissTs64MatchCount,
   isOutdatedFixedSwiss32Bracket,
 } from "@/lib/fixed-swiss-grid";
+import { isFixedSwissTs256R16Family } from "@/lib/fixed-swiss-ts-256r8-grid";
 import {
   buildSwissBracketLayout,
   GRID_COL_W,
@@ -172,6 +173,7 @@ export function SwissBracketView({
           forkTrunkFromY,
           matchById,
           trunkMatchCount,
+          bracketMaxRound,
         )
       : new Map<string, number>();
   const r34TrunkY =
@@ -183,6 +185,7 @@ export function SwissBracketView({
           forkTrunkFromY,
           matchById,
           trunkMatchCount,
+          bracketMaxRound,
         )
       : new Map<string, number>();
   const is32Grid =
@@ -212,11 +215,15 @@ export function SwissBracketView({
         bracketMaxRound,
       ));
   const isLargeCurrent = is32Current || is64Current;
+  const is256R16Current =
+    fixedGrid &&
+    useFixed168 &&
+    isFixedSwissTs256R16Family(matches.length, bracketMaxRound);
   const is32Outdated =
     is32Grid &&
     isOutdatedFixedSwiss32Bracket(matches.length, bracketMaxRound);
   const r23TrunkY =
-    is32Outdated || isLargeCurrent
+    is32Outdated || isLargeCurrent || is256R16Current
       ? fixedSwissForkTrunkYByTarget(
           2,
           3,
@@ -224,6 +231,7 @@ export function SwissBracketView({
           forkTrunkFromY,
           matchById,
           trunkMatchCount,
+          bracketMaxRound,
         )
       : new Map<string, number>();
   const r35TrunkY =
@@ -235,6 +243,7 @@ export function SwissBracketView({
           forkTrunkFromY,
           matchById,
           trunkMatchCount,
+          bracketMaxRound,
         )
       : new Map<string, number>();
   const r45TrunkY =
@@ -246,6 +255,7 @@ export function SwissBracketView({
           forkTrunkFromY,
           matchById,
           trunkMatchCount,
+          bracketMaxRound,
         )
       : new Map<string, number>();
   const r56TrunkY =
@@ -257,10 +267,11 @@ export function SwissBracketView({
           forkTrunkFromY,
           matchById,
           trunkMatchCount,
+          bracketMaxRound,
         )
       : new Map<string, number>();
   const r67TrunkY =
-    isLargeCurrent
+    isLargeCurrent || is256R16Current
       ? fixedSwissForkTrunkYByTarget(
           6,
           7,
@@ -268,8 +279,31 @@ export function SwissBracketView({
           forkTrunkFromY,
           matchById,
           trunkMatchCount,
+          bracketMaxRound,
         )
       : new Map<string, number>();
+  const r78TrunkY = is256R16Current
+    ? fixedSwissForkTrunkYByTarget(
+        7,
+        8,
+        layout.edges,
+        forkTrunkFromY,
+        matchById,
+        trunkMatchCount,
+        bracketMaxRound,
+      )
+    : new Map<string, number>();
+  const r89TrunkY = is256R16Current
+    ? fixedSwissForkTrunkYByTarget(
+        8,
+        9,
+        layout.edges,
+        forkTrunkFromY,
+        matchById,
+        trunkMatchCount,
+        bracketMaxRound,
+      )
+    : new Map<string, number>();
   const r53TrunkY = is64Current
     ? fixedSwissForkTrunkYByTarget(
         5,
@@ -278,6 +312,7 @@ export function SwissBracketView({
         forkTrunkFromY,
         matchById,
         trunkMatchCount,
+        bracketMaxRound,
       )
     : new Map<string, number>();
   const r36TrunkY = is64Current
@@ -288,6 +323,7 @@ export function SwissBracketView({
         forkTrunkFromY,
         matchById,
         trunkMatchCount,
+        bracketMaxRound,
       )
     : new Map<string, number>();
 
@@ -308,6 +344,8 @@ export function SwissBracketView({
       "5:3": r53TrunkY,
       "5:6": r56TrunkY,
       "6:7": r67TrunkY,
+      "7:8": r78TrunkY,
+      "8:9": r89TrunkY,
     };
     return maps[key]?.get(toId) ?? fallback;
   }
@@ -449,6 +487,8 @@ export function SwissBracketView({
                     isPhantomLoss,
                     fromMatch.round,
                     toMatch.round,
+                    matches.length,
+                    bracketMaxRound,
                   )
                 ) {
                   return null;
@@ -499,6 +539,7 @@ export function SwissBracketView({
                     fromMatch.slot,
                     toMatch.slot,
                     matches.length,
+                    bracketMaxRound,
                   );
                 const path = isR12Fork
                   ? gridFixedConnectorPath(

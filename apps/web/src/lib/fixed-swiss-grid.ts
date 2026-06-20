@@ -11,6 +11,7 @@ import {
   fixedSwissTs32MatchNo,
   fixedSwissTs64MatchNo,
   fixedSwissTs128MatchNo,
+  fixedSwissTs128R8ElimMatchNo,
   fixedSwissTsBronzeMatchNoForHalf2,
   fixedSwissTsMatchNoForHalf2,
   isFixedSwissTs32BronzeMatchCount,
@@ -36,6 +37,15 @@ import {
   isOutdatedFixedSwiss32Bracket,
   tsTotalMatchCount,
 } from "@/lib/fixed-swiss-ts-grid";
+import {
+  buildFixedSwissTs256R8ElimAtEighthBronzeTemplate,
+  buildFixedSwissTs256R8ElimAtEighthTemplate,
+  fixedSwissTs256R8ElimMatchNo,
+  isFixedSwissTs256R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs256R8ElimAtEighthFamily,
+  isFixedSwissTs256R8ElimAtEighthFromMatches,
+  isFixedSwissTs256R8ElimAtEighthMatchCount,
+} from "@/lib/fixed-swiss-ts-256r8-grid";
 export {
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32BronzeMatchCount,
@@ -62,6 +72,15 @@ export {
   isFixedSwissTs128R8ElimAtEighthFromMatches,
   isOutdatedFixedSwiss32Bracket,
 } from "@/lib/fixed-swiss-ts-grid";
+export {
+  buildFixedSwissTs256R8ElimAtEighthTemplate,
+  buildFixedSwissTs256R8ElimAtEighthBronzeTemplate,
+  fixedSwissTs256R8ElimMatchNo,
+  isFixedSwissTs256R8ElimAtEighthBronzeMatchCount,
+  isFixedSwissTs256R8ElimAtEighthFamily,
+  isFixedSwissTs256R8ElimAtEighthFromMatches,
+  isFixedSwissTs256R8ElimAtEighthMatchCount,
+} from "@/lib/fixed-swiss-ts-256r8-grid";
 export type { FixedSwissLink, FixedSwissTemplate } from "@/lib/fixed-swiss-grid-types";
 export { findFixedSwissLink } from "@/lib/fixed-swiss-grid-types";
 import type { FixedSwissLink, FixedSwissTemplate } from "@/lib/fixed-swiss-grid-types";
@@ -106,6 +125,9 @@ export function fixedSwissNominalGridSize(
     format === "FIXED_SWISS_128R8_1_3_mesto"
   ) {
     return 128;
+  }
+  if (format === "FIXED_SWISS_256R8_1_3_mesto") {
+    return 256;
   }
   if (
     format === "FIXED_SWISS_8R4_1_3_mesto" ||
@@ -548,8 +570,8 @@ export function buildFixedSwissTemplate(
   if (gridSize < 4) {
     throw new Error("Фиксированная швейцарская сетка: минимум 4 участника");
   }
-  if (gridSize > 128) {
-    throw new Error("Фиксированная швейцарская сетка: максимум 128 участников");
+  if (gridSize > 256) {
+    throw new Error("Фиксированная швейцарская сетка: максимум 256 участников");
   }
 
   if (gridSize === 8) {
@@ -634,6 +656,13 @@ export function buildFixedSwissTemplate(
     return buildFixedSwissTsTemplateForGridSize(128, false);
   }
 
+  if (gridSize === 256) {
+    if (format === "FIXED_SWISS_256R8_1_3_mesto") {
+      return buildFixedSwissTs256R8ElimAtEighthBronzeTemplate();
+    }
+    return buildFixedSwissTs256R8ElimAtEighthBronzeTemplate();
+  }
+
   return buildFixedSwissClassicTemplate(gridSize);
 }
 
@@ -703,8 +732,22 @@ export function isFixedSwiss168MatchCount(matchCount: number): boolean {
     matchCount === 120 ||
     matchCount === 215 ||
     matchCount === 216 ||
+    matchCount === 219 ||
+    matchCount === 220 ||
+    matchCount === 247 ||
+    matchCount === 248 ||
     matchCount === 231 ||
-    matchCount === 232
+    matchCount === 232 ||
+    matchCount === 455 ||
+    matchCount === 456 ||
+    matchCount === 256 ||
+    matchCount === 352 ||
+    matchCount === 448 ||
+    matchCount === 464 ||
+    matchCount === 480 ||
+    matchCount === 488 ||
+    matchCount === 496 ||
+    matchCount === 479
   );
 }
 
@@ -736,10 +779,19 @@ export function inferFixedSwissGridSize(matchCount: number): number {
   if (
     matchCount === 215 ||
     matchCount === 216 ||
+    matchCount === 215 ||
+    matchCount === 216 ||
+    matchCount === 219 ||
+    matchCount === 220 ||
+    matchCount === 247 ||
+    matchCount === 248 ||
     matchCount === 231 ||
     matchCount === 232
   ) {
     return 128;
+  }
+  if (matchCount === 455 || matchCount === 456 || matchCount === 256 || matchCount === 352 || matchCount === 448 || matchCount === 464 || matchCount === 480 || matchCount === 488 || matchCount === 496 || matchCount === 479) {
+    return 256;
   }
   for (let size = 4; size <= 128; size *= 2) {
     const rounds = Math.log2(size) + 1;
@@ -823,11 +875,17 @@ export function fixedSwissMatchNo(
   ) {
     return fixedSwiss168MatchNo(round, slot);
   }
+  if (isFixedSwissTs256R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
+    return fixedSwissTs256R8ElimMatchNo(round, slot, true);
+  }
+  if (isFixedSwissTs256R8ElimAtEighthMatchCount(matchCount, maxRound)) {
+    return fixedSwissTs256R8ElimMatchNo(round, slot, false);
+  }
   if (isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) {
-    return fixedSwissTs128MatchNo(round, slot, true);
+    return fixedSwissTs128R8ElimMatchNo(round, slot, true);
   }
   if (isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount, maxRound)) {
-    return fixedSwissTs128MatchNo(round, slot, false);
+    return fixedSwissTs128R8ElimMatchNo(round, slot, false);
   }
   if (isFixedSwissTs128BronzeMatchCount(matchCount)) {
     return fixedSwissTs128MatchNo(round, slot, true);
@@ -922,7 +980,7 @@ export function fixedSwissProtocolPlace(
     }
     if (
       isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound) &&
-      matchNo === 216
+      matchNo === 248
     ) {
       return protocolExact(3);
     }
@@ -945,7 +1003,7 @@ export function fixedSwissProtocolPlace(
     if (
       (isFixedSwissTs128R8ElimAtEighthMatchCount(matchCount, maxRound) ||
         isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) &&
-      matchNo === 215
+      matchNo === 247
     ) {
       return protocolExact(1);
     }
@@ -1095,41 +1153,42 @@ function fixedSwissProtocolPlace128R8Elim(
 ): FixedSwissProtocolPlaceResult | null {
   const half1 = 32;
   if (role === "winner") {
-    if (withBronze && matchNo === 216) return protocolExact(3);
-    if (matchNo === 215) return protocolExact(1);
+    if (withBronze && matchNo === 248) return protocolExact(3);
+    if (matchNo === 247) return protocolExact(1);
     return null;
   }
 
-  if (withBronze && matchNo === 215) return protocolExact(2);
-  if (withBronze && matchNo === 216) return protocolExact(4);
-  if (!withBronze && matchNo === 215) return protocolExact(2);
-  if (!withBronze && (matchNo === 213 || matchNo === 214)) return protocolExact(3);
-  if (withBronze && (matchNo === 213 || matchNo === 214)) return null;
+  if (withBronze && matchNo === 247) return protocolExact(2);
+  if (withBronze && matchNo === 248) return protocolExact(4);
+  if (!withBronze && matchNo === 247) return protocolExact(2);
+  if (!withBronze && (matchNo === 245 || matchNo === 246)) return protocolExact(3);
+  if (withBronze && (matchNo === 245 || matchNo === 246)) return null;
 
-  const eighthStart = 2 * half1 + half1 / 4 + 1;
-  const eighthEnd = 2 * half1 + half1 / 2;
-  const upperTour3Start = 3 * half1 + half1 / 2 + 1;
-  const upperTour3End = 3 * half1 + half1;
-  const quarterStart = 3 * half1 + half1 / 4 + 1;
-  const quarterEnd = 3 * half1 + half1 / 2;
-  const lowerTour3Start = half1 + 1;
-  const lowerTour3End = 2 * half1;
-  const lowerTour2Start = 2 * half1 + 1;
-  const lowerTour2End = 3 * half1;
-
-  if (matchNo >= eighthStart && matchNo <= eighthEnd) {
-    return protocolRange(half1 + 1, half1 + half1 / 2);
-  }
-  if (matchNo >= upperTour3Start && matchNo <= upperTour3End) {
-    return protocolRange(half1 / 2 + 1, half1);
-  }
-  if (matchNo >= quarterStart && matchNo <= quarterEnd) {
+  if (matchNo >= 233 && matchNo <= 240) {
     return protocolRange(9, 16);
   }
-  if (matchNo >= lowerTour3Start && matchNo <= lowerTour3End) {
-    return protocolRange(half1 + half1 / 2 + 1, 2 * half1);
+  if (matchNo >= 209 && matchNo <= 216) {
+    return protocolRange(half1 / 2 + 1, half1);
   }
-  if (matchNo >= lowerTour2Start && matchNo <= lowerTour2End) {
+  if (matchNo >= 241 && matchNo <= 244) {
+    return protocolRange(5, 8);
+  }
+  if (matchNo >= 177 && matchNo <= 192) {
+    return protocolRange(49, 64);
+  }
+  if (matchNo >= 193 && matchNo <= 208) {
+    return protocolRange(33, 48);
+  }
+  if (matchNo >= 217 && matchNo <= 224) {
+    return protocolRange(25, 32);
+  }
+  if (matchNo >= 225 && matchNo <= 232) {
+    return protocolRange(17, 24);
+  }
+  if (matchNo >= 65 && matchNo <= 96) {
+    return protocolRange(97, 128);
+  }
+  if (matchNo >= 129 && matchNo <= 160) {
     return protocolRange(2 * half1 + 1, 3 * half1);
   }
   if (matchNo >= 1 && matchNo <= half1) {
@@ -1348,6 +1407,18 @@ export function getFixedSwissLinksForGrid(
     return buildFixedSwissTs32OutdatedTemplate(matchCount === 56 || matchCount === 64).links;
   }
   if (
+    gridSize === 256 &&
+    isFixedSwissTs256R8ElimAtEighthBronzeMatchCount(matchCount ?? 0, maxRound)
+  ) {
+    return buildFixedSwissTs256R8ElimAtEighthBronzeTemplate().links;
+  }
+  if (
+    gridSize === 256 &&
+    isFixedSwissTs256R8ElimAtEighthMatchCount(matchCount ?? 0, maxRound)
+  ) {
+    return buildFixedSwissTs256R8ElimAtEighthTemplate().links;
+  }
+  if (
     gridSize === 128 &&
     isFixedSwissTs128R8ElimAtEighthBronzeMatchCount(matchCount ?? 0, maxRound)
   ) {
@@ -1360,7 +1431,8 @@ export function getFixedSwissLinksForGrid(
     return buildFixedSwissTs128R8ElimAtEighthTemplate().links;
   }
   if (gridSize === 128) {
-    const withBronze = matchCount === 232 || matchCount === 216;
+    const withBronze =
+      matchCount === 232 || matchCount === 220 || matchCount === 216;
     return buildFixedSwissTsTemplateForGridSize(128, withBronze).links;
   }
   if (

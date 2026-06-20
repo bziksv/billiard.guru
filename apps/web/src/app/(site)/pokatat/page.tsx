@@ -4,6 +4,9 @@ import { PageHeader, PageMain } from "@/components/site/page-header";
 import { PokatatPageClient } from "@/components/site/pokatat-page-client";
 import { getCurrentPlayer } from "@/lib/auth";
 import { t } from "@/lib/site";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
+
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.pokatat);
 
 export default async function PokatatPage() {
   const player = await getCurrentPlayer();

@@ -1,4 +1,5 @@
 import { EmptyState } from "@/components/site/site-card";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
 import { TournamentCard } from "@/components/site/tournament-card";
 import { HomeAnnouncements } from "@/components/home/home-announcements";
 import { HomeClubShowcase } from "@/components/home/home-club-showcase";
@@ -28,6 +29,8 @@ import { findPublicTournamentsList } from "@/lib/tournament-public-read";
 import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 import { GeoSearchParams, hrefWithGeo, t } from "@/lib/site";
+
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.home);
 
 function resolveGeo(
   params: GeoSearchParams,

@@ -30,6 +30,7 @@ import {
   FIXED_SWISS_CARD_W,
   FIXED_SWISS_COMPACT_ROW_H,
   fixedSwissDestSplit,
+  fixedSwissFooterDestLabel,
   fixedSwissMatchCardHeight,
   fixedSwissMatchColForCount,
   fixedSwissPlacementLabel,
@@ -371,16 +372,14 @@ export function LlbBracketMatch({
         const dest = Array.from(matchById.values()).find(
           (m) => m.round === winLink.toRound && m.slot === winLink.toSlot,
         );
-        if (dest) {
-          winnerToNo =
-            matchNumbers.get(dest.id) ??
-            fixedSwissMatchNo(
-              dest.round,
-              dest.slot,
-              matchNumbers.size,
-              maxRound,
-            );
-        }
+        winnerToNo =
+          (dest ? matchNumbers.get(dest.id) : undefined) ??
+          fixedSwissMatchNo(
+            winLink.toRound,
+            winLink.toSlot,
+            matchNumbers.size,
+            maxRound,
+          );
       }
     }
     if (loserToNo === undefined) {
@@ -392,16 +391,14 @@ export function LlbBracketMatch({
         const dest = Array.from(matchById.values()).find(
           (m) => m.round === loseLink.toRound && m.slot === loseLink.toSlot,
         );
-        if (dest) {
-          loserToNo =
-            matchNumbers.get(dest.id) ??
-            fixedSwissMatchNo(
-              dest.round,
-              dest.slot,
-              matchNumbers.size,
-              maxRound,
-            );
-        }
+        loserToNo =
+          (dest ? matchNumbers.get(dest.id) : undefined) ??
+          fixedSwissMatchNo(
+            loseLink.toRound,
+            loseLink.toSlot,
+            matchNumbers.size,
+            maxRound,
+          );
       }
     }
   }
@@ -496,22 +493,31 @@ export function LlbBracketMatch({
   const winnerLine =
     showCardPlacement && winnerToNo !== undefined
       ? winnerKind === "bye"
-        ? `автопроход на #${winnerToNo}`
-        : `победитель на #${winnerToNo}`
+        ? fixedSwissFooterDestLabel("bye", winnerToNo, bracketCol)
+        : fixedSwissFooterDestLabel("win", winnerToNo, bracketCol)
       : null;
   const terminalLoserPlacement =
     finished &&
+    loserToNo === undefined &&
+    placement != null &&
+    placement.startsWith("место ") &&
+    bracketCol <= 0;
+  const upperTourElimPlacement =
+    isFixedSwissGrid &&
+    bracketCol > 0 &&
     loserToNo === undefined &&
     placement != null &&
     placement.startsWith("место ");
   const loserLine =
     showCardPlacement && loserToNo !== undefined
       ? roundOneBye && phantomRow
-        ? `× на #${loserToNo}`
-        : `проигравший на #${loserToNo}`
-      : terminalLoserPlacement
-        ? placement
-        : null;
+        ? `× #${loserToNo}`
+        : fixedSwissFooterDestLabel("loss", loserToNo, bracketCol)
+      : upperTourElimPlacement
+        ? null
+        : terminalLoserPlacement
+          ? placement
+          : null;
 
   type FooterRow =
     | { kind: "text"; text: string }
@@ -521,12 +527,15 @@ export function LlbBracketMatch({
 
   if (showCardPlacement) {
     if (winnerLine && loserLine) {
-      if (placement && !terminalLoserPlacement) {
+      if (placement && !terminalLoserPlacement && !upperTourElimPlacement) {
         footerRows.push({ kind: "text", text: placement });
       }
       const dest = fixedSwissDestSplit(bracketCol, loserLine, winnerLine);
       footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-    } else if (placement && winnerLine) {
+    } else if (placement && winnerLine && !upperTourElimPlacement) {
+      const dest = fixedSwissDestSplit(bracketCol, placement, winnerLine);
+      footerRows.push({ kind: "split", left: dest.left, right: dest.right });
+    } else if (placement && winnerLine && upperTourElimPlacement) {
       const dest = fixedSwissDestSplit(bracketCol, placement, winnerLine);
       footerRows.push({ kind: "split", left: dest.left, right: dest.right });
     } else if (placement && loserLine) {

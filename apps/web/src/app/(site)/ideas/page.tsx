@@ -1,6 +1,9 @@
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { IdeasPageClient } from "@/components/site/ideas-page-client";
 import { getCurrentPlayer } from "@/lib/auth";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
+
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.ideas);
 
 export default async function IdeasPage() {
   const player = await getCurrentPlayer();

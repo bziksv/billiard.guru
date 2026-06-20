@@ -21,6 +21,9 @@ import {
   sortTournamentsForTab,
   tournamentTabConfig,
 } from "@/lib/tournament-tabs";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
+
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.tournaments);
 
 type TournamentSearchParams = GeoSearchParams & {
   tab?: string;

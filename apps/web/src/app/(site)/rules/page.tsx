@@ -2,11 +2,9 @@ import Link from "next/link";
 import { GuideSections, GuideToc } from "@/components/site/guide-sections";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { BILLIARD_RULES_SECTIONS } from "@/lib/guide-content";
+import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
 
-export const metadata = {
-  title: "Правила бильярда",
-  description: "Справочник по дисциплинам, нарушениям, форе и этикете за столом.",
-};
+export const metadata = buildPageMetadata(STATIC_PAGE_SEO.rules);
 
 export default function BilliardRulesPage() {
   return (

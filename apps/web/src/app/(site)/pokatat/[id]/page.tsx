@@ -1,10 +1,26 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { PlayListingDetailClient } from "@/components/site/play-listing-detail-client";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { getCurrentPlayer } from "@/lib/auth";
 import { serializePlayListing } from "@/lib/play-listing-server";
 import { prisma } from "@/lib/prisma";
 import { playListingListInclude } from "@/lib/public-queries";
+import { pokatatDetailMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await prisma.playListing.findUnique({
+    where: { id },
+    include: { city: true },
+  });
+  if (!listing) return { title: "Объявление не найдено" };
+  return pokatatDetailMetadata(listing.title, listing.city.name, id);
+}
 
 export default async function PlayListingDetailPage({
   params,

@@ -1,0 +1,42 @@
+---
+description: SEO meta-теги для публичных страниц billiard.guru
+globs: apps/web/src/app/(site)/**,apps/web/src/lib/seo.ts,apps/web/src/lib/bracket-formats/seo.ts,apps/web/src/lib/legal.ts
+alwaysApply: true
+---
+
+# SEO: title, description, keywords
+
+Каждая **публичная** страница `(site)` обязана иметь уникальные `title`, `description` и `keywords`.
+
+## Где и как
+
+1. **Утилита:** `apps/web/src/lib/seo.ts` — `buildPageMetadata`, реестр `STATIC_PAGE_SEO`, фабрики для динамических страниц.
+2. **Корневой layout:** `title.template` добавляет `| billiard.guru` — в SEO-строках **не** дублировать суффикс.
+3. **Статическая страница:** `export const metadata = buildPageMetadata(STATIC_PAGE_SEO.<key>);`
+4. **Динамическая:** `export async function generateMetadata(...)` → фабрика из `seo.ts` (`tournamentDetailMetadata`, `clubDetailMetadata`, …).
+5. **Клиентская страница** (`"use client"`): metadata в соседнем `layout.tsx` (пример: `/login/layout.tsx`).
+6. **Приватные** (`/login`, `/cabinet/*`): `noindex: true` через `STATIC_PAGE_SEO` или layout.
+7. **Форматы сеток:** `apps/web/src/lib/bracket-formats/seo.ts` — при новом формате добавить запись с **уникальными** title, description, keywords; landing использует `bracketFormatMetadata()`.
+8. **Legal:** keywords в `LEGAL_DOCS` / `legalDocMetadata()`.
+
+## Запреты
+
+- **Не повторять** title, description и keywords между страницами (в т.ч. между форматами сеток).
+- **Не оставлять** маркетинговую страницу без metadata (наследование только root default — ошибка).
+- **Не индексировать** кабинет и вход.
+
+## Проверка
+
+После добавления/изменения SEO:
+
+```bash
+cd apps/web && npx tsx scripts/verify-seo-uniqueness.ts
+```
+
+Скрипт падает при дубликатах title, description или keywords (внутри страницы и между страницами).
+
+## Новая страница — чеклист
+
+1. Добавить запись в `STATIC_PAGE_SEO` или фабрику в `seo.ts`.
+2. Экспортировать `metadata` / `generateMetadata` в `page.tsx` или `layout.tsx`.
+3. Прогнать `verify-seo-uniqueness.ts`.

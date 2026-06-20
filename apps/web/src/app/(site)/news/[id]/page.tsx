@@ -1,8 +1,22 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { APP_NAME } from "@/lib/brand";
 import { getPublishedSiteNews } from "@/lib/site-news-server";
+import { siteNewsMetadata } from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const item = await getPublishedSiteNews(id);
+  if (!item) return { title: "Новость не найдена" };
+  const excerpt = item.body.slice(0, 160);
+  return siteNewsMetadata(item.title, excerpt, id);
+}
 
 export default async function SiteNewsPage({
   params,
