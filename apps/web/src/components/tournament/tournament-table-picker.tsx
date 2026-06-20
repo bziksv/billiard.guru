@@ -145,6 +145,12 @@ export function TournamentTablePicker({
         </label>
       </div>
 
+      {selectedIds.length === 0 && (
+        <p className="admin-notify-kind--deeplink rounded-lg px-3 py-2 text-sm">
+          Выберите хотя бы один стол, чтобы создать турнир.
+        </p>
+      )}
+
       {groups.map((group) => {
         const groupIds = group.tables.map((table) => table.id);
         const groupAllSelected =
@@ -216,12 +222,6 @@ export function TournamentTablePicker({
           </section>
         );
       })}
-
-      {selectedIds.length === 0 && (
-        <p className="admin-notify-kind--deeplink rounded-lg px-3 py-2 text-sm">
-          Выберите хотя бы один стол, чтобы создать турнир.
-        </p>
-      )}
     </div>
   );
 }

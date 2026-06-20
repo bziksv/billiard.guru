@@ -10,11 +10,11 @@ import { resolveMatchStreamUrl, resolveTableLabel } from "@/lib/tournament-strea
 
 type BracketTournamentInput = {
   format: string;
-  tableIds: unknown;
-  tableStreams: unknown;
+  tableIds?: unknown;
+  tableStreams?: unknown;
   club: {
-    floorPlan: unknown;
-    tableCounts: unknown;
+    floorPlan?: unknown;
+    tableCounts?: unknown;
   };
   teams: AdminTournamentTeam[];
   matches: AdminTournamentMatch[];
@@ -63,7 +63,7 @@ export function buildPublicTournamentBracketView(tournament: BracketTournamentIn
     const adminInput = {
       ...tournament,
       registrations: [],
-    } as AdminTournament;
+    } as unknown as AdminTournament;
     const placeByTeamId = new Map(
       computeTournamentStandings(adminInput)
         .filter((row) => row.teamId && row.place != null)
