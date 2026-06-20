@@ -392,6 +392,151 @@ export async function sendTournamentNearbyAnnounceToPlayer(
   return ok ? { ok: true } : { ok: false, error: "Не удалось отправить (настройки или Telegram)" };
 }
 
+/** Повторная рассылка «турнир рядом» игрокам города клуба (с кнопкой заявки). */
+export async function sendTournamentNearbyAnnounceToClubCity(
+  tournamentId: string,
+  options?: { force?: boolean },
+): Promise<{ batchId: string; sent: number; failed: number; skipped: number; cityName: string }> {
+  const batchId = randomUUID();
+  const tournament = await loadTournamentForApproval(tournamentId);
+  if (!tournament) {
+    throw new Error("Турнир не найден");
+  }
+  if (tournamentNotificationsSuppressed(tournament) && !options?.force) {
+    throw new Error("Уведомления по этому турниру отключены");
+  }
+
+  const payload = await buildTournamentNearbyAnnouncePayload(tournamentId);
+  if (!payload) {
+    throw new Error("Не удалось собрать текст уведомления");
+  }
+
+  const cityId = tournament.club.cityId;
+  const cityName = tournament.club.city.nameRu;
+
+  const players = await prisma.player.findMany({
+    where: {
+      cityId,
+      isVerified: true,
+      telegramId: { not: null },
+    },
+    include: { city: true },
+  });
+
+  const { eligible: ratingEligiblePlayers, skippedByRating } =
+    await filterPlayersByTournamentRatingMax(
+      players,
+      tournament.clubId,
+      tournament.ratingMax,
+      tournament.ratingSource ?? "CLUB",
+    );
+  const ratingEligibleIds = new Set(ratingEligiblePlayers.map((p) => p.id));
+
+  const intended = ratingEligiblePlayers
+    .filter((p) => p.telegramId)
+    .map((p) => ({ playerId: p.id, telegramId: p.telegramId! }));
+
+  const recipients = await resolveMassTelegramRecipients(
+    "tournament-nearby-announce",
+    intended,
+  );
+  const recipientSet = new Set(recipients.map((r) => r.telegramId));
+  const global = await getNotificationGlobalSettings();
+
+  const announceKeyboard = isPairFormat(payload.tournament.format)
+    ? { replyMarkup: tournamentNearbyViewKeyboard(payload.link) }
+    : {
+        replyMarkup: tournamentNearbyAnnounceKeyboard(
+          payload.tournament.id,
+          payload.link,
+        ),
+      };
+
+  let sent = 0;
+  let failed = 0;
+  let skipped = 0;
+
+  for (const player of players) {
+    if (!player.telegramId) {
+      skipped += 1;
+      continue;
+    }
+    if (!ratingEligibleIds.has(player.id)) {
+      skipped += 1;
+      await writeTelegramDeliveryLog({
+        notificationId: "tournament-nearby-announce",
+        context: "tournament-nearby-city-resend",
+        status: "skipped",
+        skipReason: "rating_above_max",
+        chatId: player.telegramId,
+        playerId: player.id,
+        entityType: "tournament",
+        entityId: tournamentId,
+        batchId,
+      });
+      continue;
+    }
+    if (!recipientSet.has(player.telegramId)) {
+      skipped += 1;
+      await writeTelegramDeliveryLog({
+        notificationId: "tournament-nearby-announce",
+        context: "tournament-nearby-city-resend",
+        status: "skipped",
+        skipReason: global.testModeEnabled ? "test_mode" : "not_in_recipients",
+        chatId: player.telegramId,
+        playerId: player.id,
+        entityType: "tournament",
+        entityId: tournamentId,
+        batchId,
+      });
+      continue;
+    }
+
+    const ok = await dispatchNotification(
+      "tournament-nearby-announce",
+      player.telegramId,
+      payload.fallbackText,
+      announceKeyboard,
+      {
+        playerId: player.id,
+        templateVars: payload.templateVars,
+        batchId,
+        entityType: "tournament",
+        entityId: tournamentId,
+      },
+    );
+    if (ok) sent += 1;
+    else failed += 1;
+  }
+
+  await writeAuditLog({
+    actorType: "system",
+    action: "tournament.notify.city_resend",
+    entityType: "tournament",
+    entityId: tournamentId,
+    summary: `Повторная рассылка «турнир рядом» (${cityName}): отправлено ${sent}, ошибок ${failed}, пропущено ${skipped}${skippedByRating > 0 ? ` (рейтинг: ${skippedByRating})` : ""}`,
+    payload: {
+      batchId,
+      cityId,
+      cityName,
+      recipients: players.length,
+      ratingEligible: ratingEligiblePlayers.length,
+      skippedByRating,
+      sent,
+      failed,
+      skipped,
+      testMode: global.testModeEnabled,
+    },
+  });
+
+  logger.info(
+    { tournamentId, batchId, cityName, sent, failed, skipped },
+    "City tournament nearby resend finished",
+  );
+
+  return { batchId, sent, failed, skipped, cityName };
+}
+
 async function canApproveTournamentClub(
   club: { id: string; phone: string; telegramId: string | null },
   telegramId: string,

@@ -45,6 +45,8 @@ import {
   isFixedSwissTs256R8ElimAtEighthFamily,
   isFixedSwissTs256R8ElimAtEighthFromMatches,
   isFixedSwissTs256R8ElimAtEighthMatchCount,
+  TS256_NO_BRONZE,
+  TS256_NO_FINAL,
 } from "@/lib/fixed-swiss-ts-256r8-grid";
 export {
   isFixedSwissTs32MatchCount,
@@ -966,7 +968,11 @@ export function fixedSwissProtocolPlace(
     if (isFixedSwissTs64BronzeMatchCount(matchCount) && matchNo === 120) {
       return protocolExact(3);
     }
-    if (isFixedSwissTs64MatchCount(matchCount) && matchNo === 119) {
+    if (
+      (isFixedSwissTs64MatchCount(matchCount) ||
+        isFixedSwissTs64BronzeMatchCount(matchCount)) &&
+      matchNo === 119
+    ) {
       return protocolExact(1);
     }
     if (isFixedSwissTs32BronzeMatchCount(matchCount) && matchNo === 60) {
@@ -990,7 +996,11 @@ export function fixedSwissProtocolPlace(
     ) {
       return protocolExact(3);
     }
-    if (isFixedSwissTs32MatchCount(matchCount) && matchNo === 59) {
+    if (
+      (isFixedSwissTs32MatchCount(matchCount) ||
+        isFixedSwissTs32BronzeMatchCount(matchCount)) &&
+      matchNo === 59
+    ) {
       return protocolExact(1);
     }
     if (
@@ -1014,11 +1024,35 @@ export function fixedSwissProtocolPlace(
     ) {
       return protocolExact(1);
     }
+    if (
+      isFixedSwissTs256R8ElimAtEighthBronzeMatchCount(matchCount, maxRound) &&
+      matchNo === TS256_NO_BRONZE
+    ) {
+      return protocolExact(3);
+    }
+    if (
+      (isFixedSwissTs256R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+        isFixedSwissTs256R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)) &&
+      matchNo === TS256_NO_FINAL
+    ) {
+      return protocolExact(1);
+    }
     if (isFixedSwissTsBronzeMatchCount(matchCount) && (matchNo === 28 || matchNo === 14)) {
       return protocolExact(3);
     }
     if (matchNo === 27 || matchNo === 13) return protocolExact(1);
     return null;
+  }
+
+  if (
+    isFixedSwissTs256R8ElimAtEighthMatchCount(matchCount, maxRound) ||
+    isFixedSwissTs256R8ElimAtEighthBronzeMatchCount(matchCount, maxRound)
+  ) {
+    return fixedSwissProtocolPlace256R8Elim(
+      matchNo,
+      role,
+      isFixedSwissTs256R8ElimAtEighthBronzeMatchCount(matchCount, maxRound),
+    );
   }
 
   if (
@@ -1143,6 +1177,38 @@ function fixedSwissProtocolPlace64R8Elim(
   if (matchNo >= 113 && matchNo <= 116) return protocolRange(5, 8);
   if (matchNo >= 65 && matchNo <= 80) return protocolRange(33, 48);
   if (matchNo >= 33 && matchNo <= 48) return protocolRange(49, 64);
+  return null;
+}
+
+function fixedSwissProtocolPlace256R8Elim(
+  matchNo: number,
+  role: "winner" | "loser",
+  withBronze: boolean,
+): FixedSwissProtocolPlaceResult | null {
+  const half1 = 64;
+  if (role === "winner") {
+    if (withBronze && matchNo === TS256_NO_BRONZE) return protocolExact(3);
+    if (matchNo === TS256_NO_FINAL) return protocolExact(1);
+    return null;
+  }
+
+  if (withBronze && matchNo === TS256_NO_FINAL) return protocolExact(2);
+  if (withBronze && matchNo === TS256_NO_BRONZE) return protocolExact(4);
+  if (!withBronze && matchNo === TS256_NO_FINAL) return protocolExact(2);
+  if (!withBronze && (matchNo === 493 || matchNo === 494)) return protocolExact(3);
+  if (withBronze && (matchNo === 493 || matchNo === 494)) return null;
+
+  if (matchNo >= 481 && matchNo <= 488) return protocolRange(9, 16);
+  if (matchNo >= 465 && matchNo <= 472) return protocolRange(25, 32);
+  if (matchNo >= 473 && matchNo <= 480) return protocolRange(17, 24);
+  if (matchNo >= 489 && matchNo <= 492) return protocolRange(5, 8);
+  if (matchNo >= 417 && matchNo <= 448) return protocolRange(49, 64);
+  if (matchNo >= 449 && matchNo <= 464) return protocolRange(33, 48);
+  if (matchNo >= 353 && matchNo <= 384) return protocolRange(97, 128);
+  if (matchNo >= 385 && matchNo <= 416) return protocolRange(65, 96);
+  if (matchNo >= 257 && matchNo <= 320) return protocolRange(129, 192);
+  if (matchNo >= 193 && matchNo <= 256) return protocolRange(193, 256);
+  if (matchNo >= 1 && matchNo <= half1) return protocolRange(3 * half1 + 1, 4 * half1);
   return null;
 }
 

@@ -8,6 +8,9 @@ import {
   playListingListInclude,
 } from "@/lib/public-queries";
 import { prisma } from "@/lib/prisma";
+import type { PublicTournamentListItem } from "@/lib/tournament-public-read";
+import { findPublicTournamentsList } from "@/lib/tournament-public-read";
+import { pickHomeTournaments } from "@/lib/tournament-tabs";
 import type { GeoSearchParams } from "@/lib/site";
 import {
   formatPlayListingSchedule,
@@ -202,4 +205,29 @@ export async function loadHomeStats() {
   ]);
 
   return { tournaments, clubs, players, playListings };
+}
+
+/** Турниры для блока на главной: город + соседние, приоритет OPEN с ближайшей датой. */
+export async function loadHomeTournaments(options: {
+  geo: GeoSearchParams;
+  playerCityId?: string;
+  nearbyCityIds?: string[];
+  take?: number;
+}): Promise<PublicTournamentListItem[]> {
+  const take = options.take ?? 4;
+  let pool: PublicTournamentListItem[];
+
+  if (options.playerCityId != null && options.nearbyCityIds != null) {
+    const [local, nearby] = await Promise.all([
+      findPublicTournamentsList({ geo: { cityId: options.playerCityId } }),
+      options.nearbyCityIds.length > 0
+        ? findPublicTournamentsList({ cityIds: options.nearbyCityIds })
+        : Promise.resolve([]),
+    ]);
+    pool = [...local, ...nearby];
+  } else {
+    pool = await findPublicTournamentsList({ geo: options.geo });
+  }
+
+  return pickHomeTournaments(pool, take);
 }

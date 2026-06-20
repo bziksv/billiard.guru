@@ -66,6 +66,9 @@ export interface AdminTournamentMatch {
   round: number;
   slot: number;
   status: string;
+  team1Id?: string | null;
+  team2Id?: string | null;
+  winnerTeamId?: string | null;
   team1Score?: number | null;
   team2Score?: number | null;
   startedAt?: string | null;
@@ -292,9 +295,15 @@ function isFinishedMatch(m: AdminTournamentMatch): boolean {
   return m.status === "FINISHED" || m.status === "WALKOVER";
 }
 
-function matchLoser(m: AdminTournamentMatch): AdminTournamentTeam | null {
-  if (!m.winnerTeam || !m.team1 || !m.team2) return null;
-  return m.winnerTeam.id === m.team1.id ? m.team2 : m.team1;
+function matchLoserIds(m: AdminTournamentMatch): string[] {
+  const winnerId = m.winnerTeamId ?? m.winnerTeam?.id;
+  if (!winnerId) return [];
+  const losers: string[] = [];
+  const team1Id = m.team1Id ?? m.team1?.id;
+  const team2Id = m.team2Id ?? m.team2?.id;
+  if (team1Id && team1Id !== winnerId) losers.push(team1Id);
+  if (team2Id && team2Id !== winnerId) losers.push(team2Id);
+  return losers;
 }
 
 function prelimTeamsByRating(t: AdminTournament, note: string): TournamentStandingRow[] {
@@ -317,7 +326,8 @@ function computeFixedSwissStandings(t: AdminTournament): TournamentStandingRow[]
   const placed = new Map<string, { place: number; placeTo?: number }>();
 
   for (const m of t.matches) {
-    if (!isFinishedMatch(m) || !m.winnerTeam || !m.team1 || !m.team2) continue;
+    const winnerTeamId = m.winnerTeamId ?? m.winnerTeam?.id;
+    if (!isFinishedMatch(m) || !winnerTeamId) continue;
 
     let matchNo: number;
     try {
@@ -330,11 +340,12 @@ function computeFixedSwissStandings(t: AdminTournament): TournamentStandingRow[]
     const loserPlace = fixedSwissProtocolPlace(matchNo, "loser", matchCount, maxRound);
 
     if (winnerPlace !== null) {
-      placed.set(m.winnerTeam.id, winnerPlace);
+      placed.set(winnerTeamId, winnerPlace);
     }
-    const loser = matchLoser(m);
-    if (loserPlace !== null && loser) {
-      placed.set(loser.id, loserPlace);
+    if (loserPlace !== null) {
+      for (const loserId of matchLoserIds(m)) {
+        placed.set(loserId, loserPlace);
+      }
     }
   }
 

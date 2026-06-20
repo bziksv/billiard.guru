@@ -80,15 +80,52 @@ export function sortTournamentsForTab<T extends TournamentListItem>(
   tab: TournamentTab,
 ): T[] {
   const sorted = [...tournaments];
-  sorted.sort((a, b) => {
-    const aTime = a.startsAt?.getTime() ?? 0;
-    const bTime = b.startsAt?.getTime() ?? 0;
-    if (aTime !== bTime) {
-      return tab === "finished" ? bTime - aTime : aTime - bTime;
-    }
-    const aCreated = a.createdAt?.getTime() ?? 0;
-    const bCreated = b.createdAt?.getTime() ?? 0;
-    return tab === "finished" ? bCreated - aCreated : aCreated - bCreated;
-  });
+  sorted.sort((a, b) => compareStartsAtForTab(a, b, tab));
   return sorted;
+}
+
+const HOME_STATUS_PRIORITY: Record<string, number> = {
+  OPEN: 0,
+  ACTIVE: 1,
+  FINISHED: 2,
+};
+
+function compareStartsAtForTab(
+  a: TournamentListItem,
+  b: TournamentListItem,
+  tab: TournamentTab,
+): number {
+  const aTime = a.startsAt?.getTime() ?? null;
+  const bTime = b.startsAt?.getTime() ?? null;
+  if (aTime != null && bTime != null && aTime !== bTime) {
+    return tab === "finished" ? bTime - aTime : aTime - bTime;
+  }
+  if (aTime != null && bTime == null) return -1;
+  if (aTime == null && bTime != null) return 1;
+  const aCreated = a.createdAt?.getTime() ?? 0;
+  const bCreated = b.createdAt?.getTime() ?? 0;
+  return tab === "finished" ? bCreated - aCreated : bCreated - aCreated;
+}
+
+/** Турниры для главной: OPEN → ACTIVE → FINISHED, с датой раньше без даты. */
+export function pickHomeTournaments<T extends TournamentListItem & { id: string }>(
+  tournaments: T[],
+  take = 4,
+): T[] {
+  const seen = new Set<string>();
+  const unique = tournaments.filter((t) => {
+    if (seen.has(t.id)) return false;
+    seen.add(t.id);
+    return true;
+  });
+
+  const sorted = [...unique].sort((a, b) => {
+    const pa = HOME_STATUS_PRIORITY[a.status] ?? 9;
+    const pb = HOME_STATUS_PRIORITY[b.status] ?? 9;
+    if (pa !== pb) return pa - pb;
+    const tab: TournamentTab = a.status === "FINISHED" ? "finished" : "upcoming";
+    return compareStartsAtForTab(a, b, tab);
+  });
+
+  return sorted.slice(0, take);
 }

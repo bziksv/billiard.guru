@@ -1,5 +1,8 @@
 export const PUBLIC_TOURNAMENT_STATUSES = ["OPEN", "ACTIVE", "FINISHED"] as const;
 
+/** Участники и заявки, видимые на публичной странице турнира. */
+export const PUBLIC_PARTICIPANT_STATUSES = ["CONFIRMED", "PENDING"] as const;
+
 export function formatStartsAt(date: Date | null) {
   if (!date) return "Дата уточняется";
   return new Intl.DateTimeFormat("ru-RU", {

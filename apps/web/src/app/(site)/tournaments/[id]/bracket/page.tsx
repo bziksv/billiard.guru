@@ -1,25 +1,22 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { TournamentBracket } from "@/components/bracket/tournament-bracket";
+import { PublicTournamentBracketPanel } from "@/components/site/public-tournament-bracket-panel";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
-import type { BracketMatchView, SwissStandingView } from "@/lib/bracket-view";
 import {
   formatStartsAt,
   PUBLIC_TOURNAMENT_STATUSES,
 } from "@/lib/public-display";
 import { findPublicTournamentById } from "@/lib/tournament-public-read";
 import { getBracketFormatLabel } from "@/lib/bracket-formats/settings-server";
-import { computeTournamentStandings } from "@/lib/tournament-admin";
 import type { AdminTournament } from "@/lib/tournament-admin";
-import { isFixedSwissFormat } from "@/lib/pair-tournament";
+import { buildPublicTournamentBracketView } from "@/lib/tournament-public-bracket";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
 import { StatusBadge } from "@/components/admin/status-badge";
-import { resolveMatchStreamUrl, resolveTableLabel } from "@/lib/tournament-stream";
 import { APP_NAME } from "@/lib/brand";
 import { tournamentBracketMetadata } from "@/lib/seo";
 
@@ -75,58 +72,8 @@ export default async function TournamentBracketPage({
   }
 
   const formatLabel = await getBracketFormatLabel(tournament.format);
-  const streamContext = {
-    tableIds: tournament.tableIds,
-    tableStreams: tournament.tableStreams,
-  };
-  const floorPlan = tournament.club.floorPlan;
-
-  const matches: BracketMatchView[] = tournament.matches.map((m) => ({
-    id: m.id,
-    round: m.round,
-    slot: m.slot,
-    status: m.status,
-    winnerTeamId: m.winnerTeamId,
-    team1Score: m.team1Score,
-    team2Score: m.team2Score,
-    startedAt: m.startedAt?.toISOString() ?? null,
-    finishedAt: m.finishedAt?.toISOString() ?? null,
-    tableId: m.tableId,
-    streamUrl: resolveMatchStreamUrl({ tableId: m.tableId }, streamContext, floorPlan),
-    tableLabel: resolveTableLabel(m.tableId, floorPlan, tournament.club.tableCounts),
-    team1: m.team1,
-    team2: m.team2,
-  }));
-
-  const standings: SwissStandingView[] = (() => {
-    const base: SwissStandingView[] = tournament.teams.map((t) => ({
-      ...t,
-      swissPoints: t.swissPoints,
-    }));
-    if (!isFixedSwissFormat(tournament.format) || tournament.matches.length === 0) {
-      return base;
-    }
-    const adminInput = {
-      ...tournament,
-      registrations: [],
-    } as AdminTournament;
-    const placeByTeamId = new Map(
-      computeTournamentStandings(adminInput)
-        .filter((row) => row.teamId && row.place != null)
-        .map((row) => [row.teamId!, { place: row.place, placeTo: row.placeTo ?? null }]),
-    );
-    return base
-      .map((team) => {
-        const p = placeByTeamId.get(team.id);
-        return p ? { ...team, place: p.place, placeTo: p.placeTo } : team;
-      })
-      .sort((a, b) => {
-        if (a.place != null && b.place != null) return a.place - b.place;
-        if (a.place != null) return -1;
-        if (b.place != null) return 1;
-        return b.swissPoints - a.swissPoints;
-      });
-  })();
+  const adminTournament = tournament as unknown as AdminTournament;
+  const { matches, standings } = buildPublicTournamentBracketView(adminTournament);
 
   const bracketUrl = `/tournaments/${tournament.id}/bracket`;
 
@@ -162,7 +109,9 @@ export default async function TournamentBracketPage({
           </Link>
         </p>
 
-        <TournamentBracket
+        <PublicTournamentBracketPanel
+          tournamentId={tournament.id}
+          tournamentName={tournament.name}
           format={tournament.format}
           matches={matches}
           standings={standings}

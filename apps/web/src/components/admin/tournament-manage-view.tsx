@@ -95,6 +95,12 @@ import {
   type TournamentTableOption,
 } from "@/lib/tournament-stream";
 import { parseTournamentTableIds } from "@/lib/tournament-table-pick";
+import { BracketCardDisplayToggles } from "@/components/bracket/bracket-card-display-toggles";
+import {
+  bracketDisplayStorageKey,
+  readBracketDisplayPrefs,
+  type BracketCardDisplayPrefs,
+} from "@/lib/bracket-display-prefs";
 
 type Team = AdminTournament["teams"][number] & TeamWithPlayers;
 type Match = AdminTournament["matches"][number];
@@ -105,88 +111,6 @@ type ManageTab =
   | "upcoming-matches"
   | "completed-matches"
   | "protocol";
-
-type BracketCardDisplayPrefs = {
-  showMatchNumber: boolean;
-  showHandicap: boolean;
-  showPlacement: boolean;
-};
-
-function bracketDisplayStorageKey(tournamentId: string) {
-  return `setka:bracket-display:${tournamentId}`;
-}
-
-function readBracketDisplayPrefs(tournamentId: string): BracketCardDisplayPrefs {
-  if (typeof window === "undefined") {
-    return { showMatchNumber: true, showHandicap: true, showPlacement: true };
-  }
-  try {
-    const raw = localStorage.getItem(bracketDisplayStorageKey(tournamentId));
-    if (!raw) return { showMatchNumber: true, showHandicap: true, showPlacement: true };
-    const parsed = JSON.parse(raw) as Partial<BracketCardDisplayPrefs>;
-    return {
-      showMatchNumber: parsed.showMatchNumber !== false,
-      showHandicap: parsed.showHandicap !== false,
-      showPlacement: parsed.showPlacement !== false,
-    };
-  } catch {
-    return { showMatchNumber: true, showHandicap: true, showPlacement: true };
-  }
-}
-
-function BracketCardDisplayToggles({
-  showMatchNumber,
-  showHandicap,
-  showPlacement,
-  onShowMatchNumberChange,
-  onShowHandicapChange,
-  onShowPlacementChange,
-}: {
-  showMatchNumber: boolean;
-  showHandicap: boolean;
-  showPlacement: boolean;
-  onShowMatchNumberChange: (value: boolean) => void;
-  onShowHandicapChange: (value: boolean) => void;
-  onShowPlacementChange: (value: boolean) => void;
-}) {
-  return (
-    <div className="flex shrink-0 items-center gap-2 border-l border-[var(--admin-border)] pl-2 text-xs text-[var(--admin-text-muted)]">
-      <label
-        className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap"
-        title="Шапка карточки: номер встречи (№…)"
-      >
-        <input
-          type="checkbox"
-          className="admin-checkbox"
-          checked={showMatchNumber}
-          onChange={(e) => onShowMatchNumberChange(e.target.checked)}
-        />
-        Встреча
-      </label>
-      <label className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap">
-        <input
-          type="checkbox"
-          className="admin-checkbox"
-          checked={showHandicap}
-          onChange={(e) => onShowHandicapChange(e.target.checked)}
-        />
-        Фора
-      </label>
-      <label
-        className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap"
-        title="Подвал карточки: места и переходы (победитель/проигравший на #…)"
-      >
-        <input
-          type="checkbox"
-          className="admin-checkbox"
-          checked={showPlacement}
-          onChange={(e) => onShowPlacementChange(e.target.checked)}
-        />
-        Места
-      </label>
-    </div>
-  );
-}
 
 function ManageTabButtons({
   tab,

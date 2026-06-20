@@ -1,22 +1,22 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { TournamentBracket } from "@/components/bracket/tournament-bracket";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { TournamentRegisterButton } from "@/components/site/tournament-register-button";
 import { RegistrationCancelButton } from "@/components/site/registration-cancel-button";
+import { TournamentPublicView } from "@/components/site/tournament-public-view";
+import type { PublicParticipantRow } from "@/lib/tournament-public-standings";
 import { getCurrentPlayer } from "@/lib/auth";
-import type { BracketMatchView, SwissStandingView } from "@/lib/bracket-view";
 import {
   formatStartsAt,
   isPairFormat,
   playerName,
   PUBLIC_TOURNAMENT_STATUSES,
+  PUBLIC_PARTICIPANT_STATUSES,
   teamLabel,
 } from "@/lib/public-display";
-import { prisma } from "@/lib/prisma";
 import { findPublicTournamentById } from "@/lib/tournament-public-read";
 import { formatRatingRange } from "@/lib/play-listing-display";
 import {
@@ -25,14 +25,21 @@ import {
   tournamentRatingLimitMessage,
 } from "@/lib/tournament-rating-limit-server";
 import { formatRating } from "@/lib/rating";
-import { resolveMatchStreamUrl, resolveTableLabel } from "@/lib/tournament-stream";
 import { getBracketFormatLabel } from "@/lib/bracket-formats/settings-server";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
+import type { AdminTournament } from "@/lib/tournament-admin";
+import {
+  buildPublicTournamentStandings,
+  defaultPublicTournamentTab,
+} from "@/lib/tournament-public-standings";
 import {
   REGISTRATION_STATUS_LABELS,
   TOURNAMENT_STATUS_LABELS,
 } from "@/lib/validators";
+import { buildPublicTournamentBracketView } from "@/lib/tournament-public-bracket";
+import { buildPublicMatchRows } from "@/lib/tournament-public-matches";
 import { tournamentDetailMetadata } from "@/lib/seo";
+import { prisma } from "@/lib/prisma";
 
 async function getMyParticipation(
   tournamentId: string,
@@ -57,6 +64,47 @@ async function getMyParticipation(
     },
     include: { player: true },
   });
+}
+
+function buildParticipantRows(
+  tournament: AdminTournament,
+  pair: boolean,
+): PublicParticipantRow[] {
+  const publicStatuses = new Set<string>(PUBLIC_PARTICIPANT_STATUSES);
+  const publicTeams = tournament.teams.filter((t) => publicStatuses.has(t.status));
+  const confirmedTeams = publicTeams.filter((t) => t.status === "CONFIRMED");
+
+  const pendingNote = (status: string) =>
+    status === "PENDING" ? "заявка ожидает подтверждения" : undefined;
+
+  if (pair || (tournament.matches.length > 0 && confirmedTeams.length > 0)) {
+    const teams = tournament.matches.length > 0 ? confirmedTeams : publicTeams;
+    return teams.map((team) => ({
+      id: team.id,
+      name: teamLabel(team),
+      href: team.player2
+        ? `/players/${team.player1.id}`
+        : `/players/${team.player1.id}`,
+      city: team.player1.city?.nameRu ?? undefined,
+      ratingLabel: formatRating(
+        pair
+          ? (team.player1.rating + (team.player2?.rating ?? team.player1.rating)) / (team.player2 ? 2 : 1)
+          : team.player1.rating,
+      ),
+      note: pendingNote(team.status),
+    }));
+  }
+
+  return tournament.registrations
+    .filter((r) => publicStatuses.has(r.status))
+    .map((r) => ({
+      id: r.player.id,
+      name: playerName(r.player),
+      href: `/players/${r.player.id}`,
+      city: r.player.city?.nameRu ?? undefined,
+      ratingLabel: formatRating(r.player.rating),
+      note: pendingNote(r.status),
+    }));
 }
 
 export async function generateMetadata({
@@ -92,15 +140,22 @@ export default async function TournamentPage({
   const { id } = await params;
 
   const tournament = await findPublicTournamentById(id, {
-    club: { include: { city: { include: { country: true } } } },
+    club: {
+      include: {
+        city: { include: { country: true } },
+      },
+    },
     registrations: {
-      where: { status: "CONFIRMED" },
-      include: { player: true },
+      where: { status: { in: [...PUBLIC_PARTICIPANT_STATUSES] } },
+      include: { player: { include: { city: true } } },
       orderBy: { createdAt: "asc" },
     },
     teams: {
-      where: { status: "CONFIRMED" },
-      include: { player1: true, player2: true },
+      where: { status: { in: [...PUBLIC_PARTICIPANT_STATUSES] } },
+      include: {
+        player1: { include: { city: true } },
+        player2: { include: { city: true } },
+      },
       orderBy: [{ swissPoints: "desc" }, { seed: "asc" }],
     },
     matches: {
@@ -124,31 +179,16 @@ export default async function TournamentPage({
 
   const pair = isPairFormat(tournament.format);
   const formatLabel = await getBracketFormatLabel(tournament.format);
-  const streamContext = {
-    tableIds: tournament.tableIds,
-    tableStreams: tournament.tableStreams,
-  };
-  const floorPlan = tournament.club.floorPlan;
-  const bracketMatches: BracketMatchView[] = tournament.matches.map((m) => ({
-    id: m.id,
-    round: m.round,
-    slot: m.slot,
-    status: m.status,
-    winnerTeamId: m.winnerTeamId,
-    team1Score: m.team1Score,
-    team2Score: m.team2Score,
-    startedAt: m.startedAt?.toISOString() ?? null,
-    finishedAt: m.finishedAt?.toISOString() ?? null,
-    tableId: m.tableId,
-    streamUrl: resolveMatchStreamUrl({ tableId: m.tableId }, streamContext, floorPlan),
-    tableLabel: resolveTableLabel(m.tableId, floorPlan, tournament.club.tableCounts),
-    team1: m.team1,
-    team2: m.team2,
-  }));
-  const standings: SwissStandingView[] = tournament.teams.map((t) => ({
-    ...t,
-    swissPoints: t.swissPoints,
-  }));
+  const formatDisplay = tournamentFormatDisplayLabel({
+    format: tournament.format,
+    formatLabel,
+  });
+
+  const adminTournament = tournament as unknown as AdminTournament;
+  const standings = buildPublicTournamentStandings(adminTournament);
+  const participants = buildParticipantRows(adminTournament, pair);
+  const matchCount = tournament.matches.length;
+  const registrationOpen = tournament.status === "OPEN";
 
   const player = await getCurrentPlayer();
   const myParticipation = player
@@ -173,6 +213,25 @@ export default async function TournamentPage({
       ? formatRatingRange(null, tournament.ratingMax)
       : null;
 
+  const defaultTab = defaultPublicTournamentTab(standings, registrationOpen);
+
+  const bracketView =
+    matchCount > 0 ? buildPublicTournamentBracketView(adminTournament) : null;
+  const publicMatches = bracketView
+    ? buildPublicMatchRows(bracketView.matches, tournament.format)
+    : [];
+
+  const bracketPanel = bracketView
+    ? {
+        tournamentId: tournament.id,
+        tournamentName: tournament.name,
+        format: tournament.format,
+        matches: bracketView.matches,
+        standings: bracketView.standings,
+        handicapHalfStep: tournament.handicapHalfStep,
+      }
+    : null;
+
   return (
     <>
       <PageHeader title={tournament.name}>
@@ -187,10 +246,13 @@ export default async function TournamentPage({
               status={tournament.status}
               label={TOURNAMENT_STATUS_LABELS[tournament.status] ?? tournament.status}
             />
+            {matchCount > 0 && (
+              <span className="text-xs text-[var(--text-muted)]">
+                {participants.length} участников · {matchCount} встреч
+              </span>
+            )}
           </div>
-          <p className="mt-3 text-[var(--text-secondary)]">
-            {tournamentFormatDisplayLabel({ format: tournament.format, formatLabel })}
-          </p>
+          <p className="mt-3 text-[var(--text-secondary)]">{formatDisplay}</p>
           <p className="mt-1 text-sm text-zinc-500">
             <Link href={`/clubs/${tournament.club.id}`} className="hover:text-emerald-400">
               {tournament.club.name}
@@ -217,146 +279,105 @@ export default async function TournamentPage({
           )}
         </SiteCard>
 
-        <section>
-          <h2 className="site-section-title mb-3">{pair ? "Команды" : "Участники"}</h2>
-          {pair ? (
-            tournament.teams.length === 0 ? (
-              <p className="text-sm text-zinc-500">Пока никто не зарегистрирован.</p>
-            ) : (
-              <ul className="space-y-2">
-                {tournament.teams.map((team) => (
-                  <li key={team.id} className="site-card px-4 py-3 text-sm">
-                    <span className="font-medium">{teamLabel(team)}</span>
-                    <span className="text-zinc-500">
-                      {" "}
-                      — {playerName(team.player1)}
-                      {team.player2 ? `, ${playerName(team.player2)}` : ""}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )
-          ) : tournament.registrations.length === 0 ? (
-            <p className="text-sm text-zinc-500">Пока никто не зарегистрирован.</p>
-          ) : (
-            <ul className="space-y-2">
-              {tournament.registrations.map((r) => (
-                <li key={r.id} className="site-card px-4 py-3 text-sm">
-                  <Link href={`/players/${r.player.id}`} className="hover:text-emerald-400">
-                    {playerName(r.player)}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-          {tournament.status === "OPEN" && (
-            <div className="mt-4 text-sm">
-              {!player ? (
-                <p className="text-[var(--text-secondary)]">
-                  <Link
-                    href={`/login?next=/tournaments/${tournament.id}`}
-                    className="font-medium text-emerald-700 underline hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
-                  >
-                    Войдите
-                  </Link>
-                  , чтобы записаться на турнир.
-                </p>
-              ) : myParticipation ? (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200">
-                  {pair && "player1" in myParticipation ? (
-                    <>
-                      Вы участвуете в паре{" "}
-                      <span className="font-medium">{teamLabel(myParticipation)}</span>
-                      {" · "}
-                      <StatusBadge
-                        status={myParticipation.status}
-                        label={
-                          REGISTRATION_STATUS_LABELS[myParticipation.status] ??
-                          myParticipation.status
-                        }
-                      />
-                    </>
-                  ) : myParticipation && "player" in myParticipation ? (
-                    <>
-                      {myParticipation.status === "PENDING" ? (
-                        <>Заявка подана — ожидает подтверждения организатора</>
-                      ) : myParticipation.status === "CONFIRMED" ? (
-                        <>Вы участвуете в турнире</>
-                      ) : (
-                        <>
-                          Статус заявки:{" "}
-                          {REGISTRATION_STATUS_LABELS[myParticipation.status] ??
-                            myParticipation.status}
-                        </>
-                      )}
-                      {" · "}
-                      <StatusBadge
-                        status={myParticipation.status}
-                        label={
-                          REGISTRATION_STATUS_LABELS[myParticipation.status] ??
-                          myParticipation.status
-                        }
-                      />
-                    </>
-                  ) : null}
-                  {myParticipation && "player" in myParticipation && (
-                    <RegistrationCancelButton
-                      registrationId={myParticipation.id}
-                      tournamentStatus={tournament.status}
-                      registrationStatus={myParticipation.status}
-                      bracketFormed={tournament.matches.length > 0}
-                      className="mt-3"
+        {registrationOpen && (
+          <SiteCard className="text-sm">
+            {!player ? (
+              <p className="text-[var(--text-secondary)]">
+                <Link
+                  href={`/login?next=/tournaments/${tournament.id}`}
+                  className="font-medium text-emerald-700 underline hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+                >
+                  Войдите
+                </Link>
+                , чтобы записаться на турнир.
+              </p>
+            ) : myParticipation ? (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200">
+                {pair && "player1" in myParticipation ? (
+                  <>
+                    Вы участвуете в паре{" "}
+                    <span className="font-medium">{teamLabel(myParticipation)}</span>
+                    {" · "}
+                    <StatusBadge
+                      status={myParticipation.status}
+                      label={
+                        REGISTRATION_STATUS_LABELS[myParticipation.status] ??
+                        myParticipation.status
+                      }
                     />
-                  )}
-                  <p className="mt-2 text-[var(--text-secondary)]">
-                    <Link
-                      href="/cabinet"
-                      className="font-medium text-emerald-700 hover:underline dark:text-emerald-400"
-                    >
-                      Личный кабинет
-                    </Link>
-                  </p>
-                </div>
-              ) : pair ? (
-                <div className="home-content-card rounded-xl px-4 py-3 home-card-body">
-                  <p>
-                    Запись на парный турнир — через клуб-организатор. Попросите
-                    администратора клуба зарегистрировать вашу пару.
-                  </p>
-                  {registrationBlockedByRating && (
-                    <p className="mt-2 text-amber-800 dark:text-amber-200/90">{registrationBlockedByRating}</p>
-                  )}
-                </div>
-              ) : registrationBlockedByRating ? (
-                <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200/90">
-                  {registrationBlockedByRating}
+                  </>
+                ) : myParticipation && "player" in myParticipation ? (
+                  <>
+                    {myParticipation.status === "PENDING" ? (
+                      <>Заявка подана — ожидает подтверждения организатора</>
+                    ) : myParticipation.status === "CONFIRMED" ? (
+                      <>Вы участвуете в турнире</>
+                    ) : (
+                      <>
+                        Статус заявки:{" "}
+                        {REGISTRATION_STATUS_LABELS[myParticipation.status] ??
+                          myParticipation.status}
+                      </>
+                    )}
+                    {" · "}
+                    <StatusBadge
+                      status={myParticipation.status}
+                      label={
+                        REGISTRATION_STATUS_LABELS[myParticipation.status] ??
+                        myParticipation.status
+                      }
+                    />
+                  </>
+                ) : null}
+                {myParticipation && "player" in myParticipation && (
+                  <RegistrationCancelButton
+                    registrationId={myParticipation.id}
+                    tournamentStatus={tournament.status}
+                    registrationStatus={myParticipation.status}
+                    bracketFormed={matchCount > 0}
+                    className="mt-3"
+                  />
+                )}
+                <p className="mt-2 text-[var(--text-secondary)]">
+                  <Link
+                    href="/cabinet"
+                    className="font-medium text-emerald-700 hover:underline dark:text-emerald-400"
+                  >
+                    Личный кабинет
+                  </Link>
                 </p>
-              ) : (
-                <TournamentRegisterButton tournamentId={tournament.id} />
-              )}
-            </div>
-          )}
-        </section>
-
-        {tournament.matches.length > 0 && (
-          <section>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <h2 className="site-section-title">Сетка</h2>
-              <Link
-                href={`/tournaments/${tournament.id}/bracket`}
-                className="site-btn-secondary text-sm"
-              >
-                Открыть сетку →
-              </Link>
-            </div>
-            <TournamentBracket
-              format={tournament.format}
-              matches={bracketMatches}
-              standings={standings}
-              handicapHalfStep={tournament.handicapHalfStep}
-            />
-          </section>
+              </div>
+            ) : pair ? (
+              <div className="home-content-card rounded-xl px-4 py-3 home-card-body">
+                <p>
+                  Запись на парный турнир — через клуб-организатор. Попросите
+                  администратора клуба зарегистрировать вашу пару.
+                </p>
+                {registrationBlockedByRating && (
+                  <p className="mt-2 text-amber-800 dark:text-amber-200/90">
+                    {registrationBlockedByRating}
+                  </p>
+                )}
+              </div>
+            ) : registrationBlockedByRating ? (
+              <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200/90">
+                {registrationBlockedByRating}
+              </p>
+            ) : (
+              <TournamentRegisterButton tournamentId={tournament.id} />
+            )}
+          </SiteCard>
         )}
+
+        <TournamentPublicView
+          standings={standings}
+          participants={participants}
+          matches={publicMatches}
+          matchCount={matchCount}
+          defaultTab={defaultTab}
+          pair={pair}
+          bracket={bracketPanel}
+        />
       </PageMain>
     </>
   );

@@ -19,13 +19,14 @@ import {
   loadHomeNews,
   loadHomePlayAnnouncements,
   loadHomeStats,
+  loadHomeTournaments,
 } from "@/lib/home-data";
+import { getNearbyCityIds, NOTIFY_RADIUS_KM } from "@/lib/geo";
 import {
   clubGeoWhere,
   clubListInclude,
   playerGeoWhere,
 } from "@/lib/public-queries";
-import { findPublicTournamentsList } from "@/lib/tournament-public-read";
 import { getAllBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 import { GeoSearchParams, hrefWithGeo, t } from "@/lib/site";
@@ -57,8 +58,34 @@ export default async function HomePage({
     player?.city.countryId,
   );
 
+  const hasManualGeo = Boolean(rawParams.cityId || rawParams.countryId);
+  const usePlayerRegion = Boolean(player && !hasManualGeo);
+
+  async function loadTournamentsForHome() {
+    if (usePlayerRegion && player) {
+      const allCities = await prisma.city.findMany({
+        select: { id: true, latitude: true, longitude: true },
+      });
+      const nearbyCityIds = getNearbyCityIds(
+        {
+          id: player.city.id,
+          latitude: player.city.latitude,
+          longitude: player.city.longitude,
+        },
+        allCities,
+        NOTIFY_RADIUS_KM,
+      ).filter((id) => id !== player.cityId);
+      return loadHomeTournaments({
+        geo,
+        playerCityId: player.cityId,
+        nearbyCityIds,
+      });
+    }
+    return loadHomeTournaments({ geo });
+  }
+
   const [localTournaments, clubs, topPlayers, playAnnouncements] = await Promise.all([
-    findPublicTournamentsList({ geo, take: 4 }),
+    loadTournamentsForHome(),
     prisma.club.findMany({
       where: { ...clubGeoWhere(geo), isVerified: true },
       include: clubListInclude,

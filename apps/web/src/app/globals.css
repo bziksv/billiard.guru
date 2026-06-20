@@ -5174,6 +5174,31 @@ html.light .bracket-presentation .bracket-canvas--presentation {
   box-shadow: var(--card-shadow);
 }
 
+.site-bracket-presentation {
+  background-color: var(--surface-card-solid);
+  color: var(--text-primary);
+}
+
+.site-bracket-presentation__header {
+  border-bottom: 1px solid var(--border-subtle);
+  background-color: var(--surface-card-solid);
+}
+
+.site-bracket-presentation__title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.site-bracket-presentation__content {
+  background-color: var(--surface-card);
+}
+
+/** Полноэкранная сетка на публичном сайте — без бета-баннера и шапки. */
+body.bracket-presentation-open .site-top-shell {
+  display: none;
+}
+
 .bracket-empty-state {
   border-radius: 0.75rem;
   border: 1px solid var(--bracket-canvas-border);

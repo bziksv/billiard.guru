@@ -22,6 +22,11 @@ export function TournamentBracket({
   standings = [],
   handicapHalfStep = true,
   demoPreview = false,
+  showStandings = true,
+  showCardMatchNumber = true,
+  showCardHandicap = true,
+  showCardPlacement = true,
+  presentation = false,
 }: {
   format: string;
   matches: BracketMatchView[];
@@ -29,6 +34,13 @@ export function TournamentBracket({
   handicapHalfStep?: boolean;
   /** Лендинг / демо: без вертикального центрирования огромных сеток */
   demoPreview?: boolean;
+  /** Таблица мест над сеткой (на странице турнира — в протоколе). */
+  showStandings?: boolean;
+  showCardMatchNumber?: boolean;
+  showCardHandicap?: boolean;
+  showCardPlacement?: boolean;
+  /** Полноэкранный режим: сетка на всю высоту. */
+  presentation?: boolean;
 }) {
   if (matches.length === 0) {
     return (
@@ -40,7 +52,9 @@ export function TournamentBracket({
 
   if (isExcelRef64Format(format)) {
     const liveByMatchNo = mapBracketMatchesByExcelNo(matches);
-    return <ExcelBracketView liveByMatchNo={liveByMatchNo} />;
+    return (
+      <ExcelBracketView liveByMatchNo={liveByMatchNo} presentation={presentation} />
+    );
   }
 
   if (isFixedSwissFormat(format)) {
@@ -51,6 +65,11 @@ export function TournamentBracket({
         fixedGrid
         handicapHalfStep={handicapHalfStep}
         demoPreview={demoPreview}
+        showStandings={showStandings}
+        showCardMatchNumber={showCardMatchNumber}
+        showCardHandicap={showCardHandicap}
+        showCardPlacement={showCardPlacement}
+        presentation={presentation}
       />
     );
   }
@@ -61,6 +80,11 @@ export function TournamentBracket({
         matches={matches}
         standings={standings}
         handicapHalfStep={handicapHalfStep}
+        showStandings={showStandings}
+        showCardMatchNumber={showCardMatchNumber}
+        showCardHandicap={showCardHandicap}
+        showCardPlacement={showCardPlacement}
+        presentation={presentation}
       />
     );
   }
@@ -71,6 +95,10 @@ export function TournamentBracket({
         matches={matches}
         withBronzeMatch={isOlympicBronzeFormat(format)}
         handicapHalfStep={handicapHalfStep}
+        showCardMatchNumber={showCardMatchNumber}
+        showCardHandicap={showCardHandicap}
+        showCardPlacement={showCardPlacement}
+        presentation={presentation}
       />
     );
   }
@@ -89,6 +117,7 @@ export function TournamentBracket({
                 key={match.id}
                 match={match}
                 handicapHalfStep={handicapHalfStep}
+                showCardHandicap={showCardHandicap}
               />
             ))}
           </div>

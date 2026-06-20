@@ -15,7 +15,7 @@ export function resolveGeoForPlayer(
 }
 
 export const tournamentListOrderBy = [
-  { startsAt: "asc" as const },
+  { startsAt: { sort: "asc" as const, nulls: "last" as const } },
   { createdAt: "desc" as const },
 ];
 
