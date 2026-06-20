@@ -89,6 +89,26 @@ export function loginConfirmKeyboard(token: string) {
   };
 }
 
+export function tournamentRegisterCallbackPrefix() {
+  return "treg_";
+}
+
+export function tournamentNearbyAnnounceKeyboard(tournamentId: string, tournamentUrl: string) {
+  return {
+    inline_keyboard: [
+      [{ text: "📝 Подать заявку", callback_data: `${tournamentRegisterCallbackPrefix()}${tournamentId}` }],
+      [{ text: "Подробнее о турнире", url: tournamentUrl }],
+    ],
+  };
+}
+
+/** После подачи заявки — только ссылка на турнир. */
+export function tournamentNearbyViewKeyboard(tournamentUrl: string) {
+  return {
+    inline_keyboard: [[{ text: "Открыть турнир", url: tournamentUrl }]],
+  };
+}
+
 export function tournamentApprovalKeyboard(token: string) {
   return {
     inline_keyboard: [
@@ -135,9 +155,19 @@ export function ideaVoteKeyboard(ideaId: string) {
 }
 
 function appUrlBase() {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
-  return base.replace(/\/$/, "");
+  const raw = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "https://billiard.guru";
+  const base = raw.replace(/\/$/, "");
+  // Telegram inline URL-кнопки не принимают localhost
+  if (/localhost|127\.0\.0\.1/i.test(base)) {
+    return "https://billiard.guru";
+  }
+  return base;
 }
+
+export function appUrl(path = "") {
+  return `${appUrlBase()}${path}`;
+}
+
 
 interface SendMessageOptions {
   replyMarkup?: object;
@@ -280,10 +310,18 @@ export async function answerCallbackQuery(
 
 /** Убирает inline-кнопки после нажатия (чтобы не нажимали повторно). */
 export async function clearInlineKeyboard(chatId: string, messageId: number): Promise<void> {
+  await editInlineKeyboard(chatId, messageId, { inline_keyboard: [] });
+}
+
+export async function editInlineKeyboard(
+  chatId: string,
+  messageId: number,
+  replyMarkup: object,
+): Promise<void> {
   await telegramApi("editMessageReplyMarkup", {
     chat_id: chatId,
     message_id: messageId,
-    reply_markup: { inline_keyboard: [] },
+    reply_markup: replyMarkup,
   });
 }
 

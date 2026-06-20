@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeAuditLog } from "@/lib/audit";
 import { getCurrentPlayer } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { isPairFormat } from "@/lib/public-display";
-import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
-import { assertPlayerEligibleForTournamentRating } from "@/lib/tournament-rating-limit-server";
-import { notifyTournamentSelfRegistered } from "@/lib/tournament-registration-notify";
+import { submitSelfTournamentRegistration } from "@/lib/tournament-self-register-server";
 import { z } from "zod";
 
 const selfRegisterSchema = z.object({
@@ -18,93 +13,25 @@ export async function POST(request: NextRequest) {
     if (!player) {
       return NextResponse.json({ error: "Войдите, чтобы подать заявку" }, { status: 401 });
     }
-    if (!player.isVerified) {
-      return NextResponse.json(
-        { error: "Подтвердите профиль через Telegram, затем подайте заявку" },
-        { status: 403 },
-      );
-    }
 
     const body = await request.json();
     const { tournamentId } = selfRegisterSchema.parse(body);
 
-    const tournament = await prisma.tournament.findUnique({
-      where: { id: tournamentId },
-    });
-    if (!tournament) {
-      return NextResponse.json({ error: "Турнир не найден" }, { status: 404 });
-    }
-    if (tournament.status !== "OPEN") {
-      return NextResponse.json(
-        { error: "Регистрация на этот турнир сейчас закрыта" },
-        { status: 400 },
-      );
-    }
-    if (isPairFormat(tournament.format)) {
-      return NextResponse.json(
-        { error: "На парный турнир заявку подаёт клуб-организатор" },
-        { status: 400 },
-      );
+    const result = await submitSelfTournamentRegistration(player.id, tournamentId);
+    if (!result.ok) {
+      const status =
+        result.error.includes("подтвердите") || result.error.includes("Подтвердите")
+          ? 403
+          : result.error.includes("уже")
+            ? 409
+            : 400;
+      return NextResponse.json({ error: result.error }, { status });
     }
 
-    const ratingCheck = await assertPlayerEligibleForTournamentRating(
-      player.id,
-      tournament,
+    return NextResponse.json(
+      { id: result.registrationId, tournamentId },
+      { status: result.created ? 201 : 200 },
     );
-    if (!ratingCheck.ok) {
-      return NextResponse.json({ error: ratingCheck.error }, { status: 400 });
-    }
-
-    const existing = await prisma.tournamentRegistration.findUnique({
-      where: {
-        tournamentId_playerId: { tournamentId, playerId: player.id },
-      },
-    });
-    if (existing) {
-      if (existing.status === "REJECTED" || existing.status === "CANCELLED") {
-        await assertCanAddTournamentParticipants(tournamentId, 1);
-        const registration = await prisma.tournamentRegistration.update({
-          where: { id: existing.id },
-          data: { status: "PENDING", source: "SELF", clubId: null },
-          include: { tournament: true },
-        });
-        await writeAuditLog({
-          actorType: "player",
-          actorId: player.id,
-          action: "tournament.register.self",
-          entityType: "tournament_registration",
-          entityId: registration.id,
-        });
-        await notifyTournamentSelfRegistered(registration.id);
-        return NextResponse.json(registration, { status: 200 });
-      }
-      return NextResponse.json(
-        { error: "Вы уже подали заявку на этот турнир" },
-        { status: 409 },
-      );
-    }
-
-    const registration = await prisma.tournamentRegistration.create({
-      data: {
-        tournamentId,
-        playerId: player.id,
-        source: "SELF",
-        status: "PENDING",
-      },
-      include: { tournament: true },
-    });
-
-    await writeAuditLog({
-      actorType: "player",
-      actorId: player.id,
-      action: "tournament.register.self",
-      entityType: "tournament_registration",
-      entityId: registration.id,
-    });
-
-    await notifyTournamentSelfRegistered(registration.id);
-
-    return NextResponse.json(registration, { status: 201 });
   } catch (error) {
     if (error instanceof Error && error.message !== "Турнир не найден") {
       return NextResponse.json({ error: error.message }, { status: 400 });

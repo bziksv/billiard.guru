@@ -188,7 +188,7 @@ export default async function TournamentPage({
               label={TOURNAMENT_STATUS_LABELS[tournament.status] ?? tournament.status}
             />
           </div>
-          <p className="mt-3 text-zinc-400">
+          <p className="mt-3 text-[var(--text-secondary)]">
             {tournamentFormatDisplayLabel({ format: tournament.format, formatLabel })}
           </p>
           <p className="mt-1 text-sm text-zinc-500">
@@ -211,7 +211,7 @@ export default async function TournamentPage({
               : "только целая часть разницы рейтингов (без +1 в нечётных)"}
           </p>
           {tournament.description && (
-            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
+            <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-secondary)]">
               {tournament.description}
             </p>
           )}
@@ -252,17 +252,17 @@ export default async function TournamentPage({
           {tournament.status === "OPEN" && (
             <div className="mt-4 text-sm">
               {!player ? (
-                <p className="text-emerald-300/90">
+                <p className="text-[var(--text-secondary)]">
                   <Link
                     href={`/login?next=/tournaments/${tournament.id}`}
-                    className="underline hover:text-emerald-200"
+                    className="font-medium text-emerald-700 underline hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
                   >
                     Войдите
                   </Link>
                   , чтобы записаться на турнир.
                 </p>
               ) : myParticipation ? (
-                <div className="rounded-xl border border-emerald-900/50 bg-emerald-950/30 px-4 py-3 text-emerald-200">
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-200">
                   {pair && "player1" in myParticipation ? (
                     <>
                       Вы участвуете в паре{" "}
@@ -308,8 +308,11 @@ export default async function TournamentPage({
                       className="mt-3"
                     />
                   )}
-                  <p className="mt-2 text-zinc-400">
-                    <Link href="/cabinet" className="text-emerald-400 hover:underline">
+                  <p className="mt-2 text-[var(--text-secondary)]">
+                    <Link
+                      href="/cabinet"
+                      className="font-medium text-emerald-700 hover:underline dark:text-emerald-400"
+                    >
                       Личный кабинет
                     </Link>
                   </p>
@@ -321,11 +324,11 @@ export default async function TournamentPage({
                     администратора клуба зарегистрировать вашу пару.
                   </p>
                   {registrationBlockedByRating && (
-                    <p className="mt-2 text-amber-200/90">{registrationBlockedByRating}</p>
+                    <p className="mt-2 text-amber-800 dark:text-amber-200/90">{registrationBlockedByRating}</p>
                   )}
                 </div>
               ) : registrationBlockedByRating ? (
-                <p className="rounded-xl border border-amber-900/40 bg-amber-950/30 px-4 py-3 text-amber-200/90">
+                <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200/90">
                   {registrationBlockedByRating}
                 </p>
               ) : (

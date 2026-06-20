@@ -10,21 +10,20 @@ import {
   resolveMassTelegramRecipients,
 } from "@/lib/notifications/settings-server";
 import { prisma } from "@/lib/prisma";
+import { isPairFormat } from "@/lib/public-display";
 import {
   answerCallbackQuery,
+  appUrl,
   clearInlineKeyboard,
   sendTelegramMessage,
   tournamentApprovalKeyboard,
+  tournamentNearbyAnnounceKeyboard,
+  tournamentNearbyViewKeyboard,
 } from "@/lib/telegram";
 import { formatRating } from "@/lib/rating";
 import { filterPlayersByTournamentRatingMax } from "@/lib/tournament-rating-limit-server";
 import { tournamentNotificationsSuppressed } from "@/lib/tournament-notifications-guard";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
-
-function appUrl(path = "") {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
-  return `${base.replace(/\/$/, "")}${path}`;
-}
 
 function formatStartsAt(date: Date | null): string {
   if (!date) return "дата уточняется";
@@ -237,11 +236,15 @@ async function notifyNearbyPlayers(tournamentId: string) {
       continue;
     }
 
+    const announceKeyboard = isPairFormat(tournament.format)
+      ? { replyMarkup: tournamentNearbyViewKeyboard(link) }
+      : { replyMarkup: tournamentNearbyAnnounceKeyboard(tournament.id, link) };
+
     const ok = await dispatchNotification(
       "tournament-nearby-announce",
       player.telegramId,
       fallbackText,
-      undefined,
+      announceKeyboard,
       {
         playerId: player.id,
         templateVars,
@@ -291,6 +294,102 @@ async function notifyNearbyPlayers(tournamentId: string) {
   });
 
   return { batchId, sent, failed, skipped };
+}
+
+type NearbyAnnouncePayload = {
+  tournament: NonNullable<Awaited<ReturnType<typeof loadTournamentForApproval>>>;
+  fallbackText: string;
+  templateVars: Record<string, string>;
+  link: string;
+};
+
+async function buildTournamentNearbyAnnouncePayload(
+  tournamentId: string,
+): Promise<NearbyAnnouncePayload | null> {
+  const tournament = await loadTournamentForApproval(tournamentId);
+  if (!tournament) return null;
+  if (tournamentNotificationsSuppressed(tournament)) {
+    throw new Error("Уведомления по этому турниру отключены");
+  }
+
+  const origin = tournament.club.city;
+  const link = appUrl(`/tournaments/${tournament.id}`);
+  const descriptionBlock = tournament.description
+    ? `\n${tournament.description.slice(0, 300)}${tournament.description.length > 300 ? "…" : ""}`
+    : "";
+  const ratingAnnounce =
+    tournament.ratingMax != null
+      ? `\nРейтинг: до ${formatRating(tournament.ratingMax)}.`
+      : "";
+  const fallbackText =
+    `📣 <b>Новый турнир рядом с вами</b>\n\n` +
+    `<b>${tournament.name}</b>\n` +
+    `Клуб: ${tournament.club.name}, ${origin.nameRu}\n` +
+    `${TOURNAMENT_FORMAT_LABELS[tournament.format] ?? tournament.format}\n` +
+    `${formatStartsAt(tournament.startsAt)}` +
+    ratingAnnounce +
+    descriptionBlock +
+    `\n\nПодробнее: ${link}`;
+  const ratingMaxLabel =
+    tournament.ratingMax != null ? formatRating(tournament.ratingMax) : "";
+
+  return {
+    tournament,
+    fallbackText,
+    link,
+    templateVars: {
+      tournamentName: tournament.name,
+      clubName: tournament.club.name,
+      cityName: origin.nameRu,
+      format: TOURNAMENT_FORMAT_LABELS[tournament.format] ?? tournament.format,
+      startsAt: formatStartsAt(tournament.startsAt),
+      description: tournament.description?.slice(0, 300) ?? "",
+      link,
+      radiusKm: String(NOTIFY_RADIUS_KM),
+      ratingMax: ratingMaxLabel,
+    },
+  };
+}
+
+/** Повторная отправка «турнир рядом» одному игроку (с кнопкой заявки). */
+export async function sendTournamentNearbyAnnounceToPlayer(
+  tournamentId: string,
+  playerId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const payload = await buildTournamentNearbyAnnouncePayload(tournamentId);
+  if (!payload) return { ok: false, error: "Турнир не найден" };
+
+  const player = await prisma.player.findUnique({
+    where: { id: playerId },
+    select: { id: true, telegramId: true, isVerified: true },
+  });
+  if (!player?.telegramId) {
+    return { ok: false, error: "У игрока нет Telegram" };
+  }
+
+  const announceKeyboard = isPairFormat(payload.tournament.format)
+    ? { replyMarkup: tournamentNearbyViewKeyboard(payload.link) }
+    : {
+        replyMarkup: tournamentNearbyAnnounceKeyboard(
+          payload.tournament.id,
+          payload.link,
+        ),
+      };
+
+  const ok = await dispatchNotification(
+    "tournament-nearby-announce",
+    player.telegramId,
+    payload.fallbackText,
+    announceKeyboard,
+    {
+      playerId: player.id,
+      templateVars: payload.templateVars,
+      entityType: "tournament",
+      entityId: tournamentId,
+    },
+  );
+
+  return ok ? { ok: true } : { ok: false, error: "Не удалось отправить (настройки или Telegram)" };
 }
 
 async function canApproveTournamentClub(

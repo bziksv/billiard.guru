@@ -36,6 +36,7 @@ import {
   handleTournamentApprovalCallback,
   handleTournamentApprovalMessage,
 } from "@/lib/tournament-approval";
+import { handleTournamentSelfRegisterCallback } from "@/lib/tournament-self-register-server";
 
 export interface TelegramUpdate {
   message?: {
@@ -188,6 +189,27 @@ export async function processTelegramUpdate(
   if (update.callback_query?.from) {
     const telegramId = String(update.callback_query.from.id);
     const data = update.callback_query.data ?? "";
+    if (data.startsWith("treg_")) {
+      const sourceMessage = update.callback_query.message
+        ? {
+            chatId: String(update.callback_query.message.chat.id),
+            messageId: update.callback_query.message.message_id,
+          }
+        : undefined;
+      try {
+        const handled = await handleTournamentSelfRegisterCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+          sourceMessage,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "Tournament self-register callback failed");
+        await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
+      }
+      return;
+    }
     if (data.startsWith("tournament_")) {
       const sourceMessage = update.callback_query.message
         ? {
