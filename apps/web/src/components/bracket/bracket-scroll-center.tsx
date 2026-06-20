@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 const DRAG_THRESHOLD_PX = 4;
@@ -35,7 +35,17 @@ function clampPinchScale(value: number) {
   return Math.min(MAX_PINCH_SCALE, Math.max(MIN_PINCH_SCALE, value));
 }
 
-/** Сохраняет точку под центром pinch при смене масштаба. */
+type ZoomScrollAdjust = {
+  prevScale: number;
+  nextScale: number;
+  focalClientX: number;
+  focalClientY: number;
+};
+
+/**
+ * Точка в координатах контента C = scroll + focalViewport.
+ * После zoom ratio: scroll' = C * ratio - focalViewport.
+ */
 function zoomScrollToFocal(
   el: HTMLDivElement,
   prevScale: number,
@@ -48,8 +58,14 @@ function zoomScrollToFocal(
   const focalX = focalClientX - rect.left;
   const focalY = focalClientY - rect.top;
   const ratio = nextScale / prevScale;
-  el.scrollLeft = focalX + ratio * (el.scrollLeft - focalX);
-  el.scrollTop = focalY + ratio * (el.scrollTop - focalY);
+
+  el.scrollLeft = (el.scrollLeft + focalX) * ratio - focalX;
+  el.scrollTop = (el.scrollTop + focalY) * ratio - focalY;
+
+  const maxScrollLeft = Math.max(0, el.scrollWidth - el.clientWidth);
+  el.scrollLeft = Math.min(Math.max(0, el.scrollLeft), maxScrollLeft);
+  const maxScrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
+  el.scrollTop = Math.min(Math.max(0, el.scrollTop), maxScrollTop);
 }
 
 export function BracketScrollCenter({
@@ -63,16 +79,13 @@ export function BracketScrollCenter({
   children: ReactNode;
   className?: string;
   centerX: number;
-  /** Для высоких fixed-сеток — начальная прокрутка по вертикали. */
   contentHeight?: number;
   contentScrollY?: "center" | "start";
-  /** Два пальца — масштаб сетки (полноэкранный режим). */
   enablePinchZoom?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const userAdjustedRef = useRef(false);
-  /** Автоцентрирование только при первом показе; смена высоты (галочки) не сбрасывает скролл. */
   const hasAutoCenteredRef = useRef(false);
   const panRef = useRef({
     active: false,
@@ -86,10 +99,26 @@ export function BracketScrollCenter({
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
   const pinchRef = useRef({ active: false, startDistance: 0, startScale: 1 });
   const scaleRef = useRef(1);
+  const zoomAdjustRef = useRef<ZoomScrollAdjust | null>(null);
   const [scale, setScale] = useState(1);
-  const [naturalSize, setNaturalSize] = useState({ w: 0, h: 0 });
+  const [baseSize, setBaseSize] = useState({ w: 0, h: 0 });
 
   scaleRef.current = scale;
+
+  useLayoutEffect(() => {
+    const adjust = zoomAdjustRef.current;
+    const el = ref.current;
+    if (!adjust || !el) return;
+
+    zoomScrollToFocal(
+      el,
+      adjust.prevScale,
+      adjust.nextScale,
+      adjust.focalClientX,
+      adjust.focalClientY,
+    );
+    zoomAdjustRef.current = null;
+  }, [scale]);
 
   useEffect(() => {
     userAdjustedRef.current = false;
@@ -105,11 +134,16 @@ export function BracketScrollCenter({
     function measure() {
       const node = contentRef.current;
       if (!node) return;
-      setNaturalSize({ w: node.offsetWidth, h: node.offsetHeight });
+      const currentScale = scaleRef.current || 1;
+      setBaseSize({
+        w: node.offsetWidth / currentScale,
+        h: node.offsetHeight / currentScale,
+      });
     }
 
     measure();
     const ro = new ResizeObserver(() => {
+      if (pinchRef.current.active) return;
       requestAnimationFrame(measure);
     });
     ro.observe(content);
@@ -122,12 +156,9 @@ export function BracketScrollCenter({
 
     function clampScroll(node: HTMLDivElement) {
       const maxScrollLeft = Math.max(0, node.scrollWidth - node.clientWidth);
-      node.scrollLeft = Math.min(node.scrollLeft, maxScrollLeft);
-      node.scrollLeft = Math.max(0, node.scrollLeft);
-
+      node.scrollLeft = Math.min(Math.max(0, node.scrollLeft), maxScrollLeft);
       const maxScrollTop = Math.max(0, node.scrollHeight - node.clientHeight);
-      node.scrollTop = Math.min(node.scrollTop, maxScrollTop);
-      node.scrollTop = Math.max(0, node.scrollTop);
+      node.scrollTop = Math.min(Math.max(0, node.scrollTop), maxScrollTop);
     }
 
     function applyAutoScroll() {
@@ -141,7 +172,7 @@ export function BracketScrollCenter({
 
       const currentScale = enablePinchZoom ? scaleRef.current : 1;
       const contentWidth = enablePinchZoom
-        ? naturalSize.w * currentScale
+        ? baseSize.w * currentScale
         : (() => {
             const inner = node.firstElementChild as HTMLElement | null;
             return inner?.scrollWidth ?? inner?.offsetWidth ?? 0;
@@ -159,7 +190,7 @@ export function BracketScrollCenter({
       }
 
       const scrollContentHeight = enablePinchZoom
-        ? naturalSize.h * currentScale
+        ? baseSize.h * currentScale
         : contentHeight;
       if (scrollContentHeight != null && scrollContentHeight > node.clientHeight) {
         node.scrollTop =
@@ -181,15 +212,20 @@ export function BracketScrollCenter({
     if (outerContent) ro.observe(outerContent);
 
     return () => ro.disconnect();
-  }, [centerX, contentHeight, contentScrollY, enablePinchZoom, naturalSize.h, naturalSize.w]);
+  }, [centerX, contentHeight, contentScrollY, enablePinchZoom, baseSize.h, baseSize.w]);
 
-  function applyScale(el: HTMLDivElement, nextScale: number, focal?: { x: number; y: number }) {
+  function queueScale(nextScale: number) {
     const prevScale = scaleRef.current;
     const clamped = clampPinchScale(nextScale);
     if (clamped === prevScale) return;
 
-    const center = focal ?? pointerCenter(pointersRef.current);
-    zoomScrollToFocal(el, prevScale, clamped, center.x, center.y);
+    const center = pointerCenter(pointersRef.current);
+    zoomAdjustRef.current = {
+      prevScale,
+      nextScale: clamped,
+      focalClientX: center.x,
+      focalClientY: center.y,
+    };
     scaleRef.current = clamped;
     setScale(clamped);
   }
@@ -248,8 +284,9 @@ export function BracketScrollCenter({
     if (enablePinchZoom && pointersRef.current.size >= 2 && pinchRef.current.active) {
       const distance = pointerDistance(pointersRef.current);
       if (pinchRef.current.startDistance > 0 && distance > 0) {
-        const next = pinchRef.current.startScale * (distance / pinchRef.current.startDistance);
-        applyScale(el, next);
+        const next =
+          pinchRef.current.startScale * (distance / pinchRef.current.startDistance);
+        queueScale(next);
       }
       return;
     }
@@ -295,12 +332,6 @@ export function BracketScrollCenter({
     panRef.current.active = false;
   }
 
-  const contentNode = (
-    <div ref={contentRef} className="w-max text-left">
-      {children}
-    </div>
-  );
-
   return (
     <div
       ref={ref}
@@ -316,23 +347,11 @@ export function BracketScrollCenter({
     >
       {enablePinchZoom ? (
         <div
-          className="relative"
-          style={{
-            width: naturalSize.w > 0 ? naturalSize.w * scale : undefined,
-            height: naturalSize.h > 0 ? naturalSize.h * scale : undefined,
-          }}
+          ref={contentRef}
+          className="w-max origin-top-left text-left"
+          style={{ zoom: scale }}
         >
-          <div
-            className="absolute left-0 top-0"
-            style={{
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
-              width: naturalSize.w > 0 ? naturalSize.w : undefined,
-              height: naturalSize.h > 0 ? naturalSize.h : undefined,
-            }}
-          >
-            {contentNode}
-          </div>
+          {children}
         </div>
       ) : (
         <div className="mx-auto w-max text-left">{children}</div>
