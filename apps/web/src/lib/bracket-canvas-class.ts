@@ -8,7 +8,7 @@ export function bracketCanvasClassName(options: {
 }): string {
   const { presentation, fixedGrid, demoPreview } = options;
   if (presentation) {
-    return "bracket-canvas bracket-canvas--presentation h-full min-h-0 overflow-x-auto overflow-y-auto pb-3 pt-0";
+    return "bracket-canvas bracket-canvas--presentation h-full min-h-0 overflow-hidden pb-3 pt-0";
   }
   if (fixedGrid) {
     if (demoPreview) {
