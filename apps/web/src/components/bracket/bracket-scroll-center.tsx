@@ -22,6 +22,36 @@ function pointerDistance(points: Map<number, { x: number; y: number }>): number 
   return Math.hypot(values[1].x - values[0].x, values[1].y - values[0].y);
 }
 
+function pointerCenter(points: Map<number, { x: number; y: number }>) {
+  const values = [...points.values()];
+  if (values.length < 2) return { x: 0, y: 0 };
+  return {
+    x: (values[0].x + values[1].x) / 2,
+    y: (values[0].y + values[1].y) / 2,
+  };
+}
+
+function clampPinchScale(value: number) {
+  return Math.min(MAX_PINCH_SCALE, Math.max(MIN_PINCH_SCALE, value));
+}
+
+/** Сохраняет точку под центром pinch при смене масштаба. */
+function zoomScrollToFocal(
+  el: HTMLDivElement,
+  prevScale: number,
+  nextScale: number,
+  focalClientX: number,
+  focalClientY: number,
+) {
+  if (prevScale === nextScale) return;
+  const rect = el.getBoundingClientRect();
+  const focalX = focalClientX - rect.left;
+  const focalY = focalClientY - rect.top;
+  const ratio = nextScale / prevScale;
+  el.scrollLeft = focalX + ratio * (el.scrollLeft - focalX);
+  el.scrollTop = focalY + ratio * (el.scrollTop - focalY);
+}
+
 export function BracketScrollCenter({
   children,
   className,
@@ -55,12 +85,16 @@ export function BracketScrollCenter({
   });
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
   const pinchRef = useRef({ active: false, startDistance: 0, startScale: 1 });
+  const scaleRef = useRef(1);
   const [scale, setScale] = useState(1);
   const [naturalSize, setNaturalSize] = useState({ w: 0, h: 0 });
+
+  scaleRef.current = scale;
 
   useEffect(() => {
     userAdjustedRef.current = false;
     hasAutoCenteredRef.current = false;
+    scaleRef.current = 1;
     setScale(1);
   }, [centerX]);
 
@@ -88,14 +122,12 @@ export function BracketScrollCenter({
 
     function clampScroll(node: HTMLDivElement) {
       const maxScrollLeft = Math.max(0, node.scrollWidth - node.clientWidth);
-      if (node.scrollLeft > maxScrollLeft) {
-        node.scrollLeft = maxScrollLeft;
-      }
-      const scrollHeight = enablePinchZoom ? node.scrollHeight : contentHeight ?? node.scrollHeight;
-      const maxScrollTop = Math.max(0, scrollHeight - node.clientHeight);
-      if (node.scrollTop > maxScrollTop) {
-        node.scrollTop = maxScrollTop;
-      }
+      node.scrollLeft = Math.min(node.scrollLeft, maxScrollLeft);
+      node.scrollLeft = Math.max(0, node.scrollLeft);
+
+      const maxScrollTop = Math.max(0, node.scrollHeight - node.clientHeight);
+      node.scrollTop = Math.min(node.scrollTop, maxScrollTop);
+      node.scrollTop = Math.max(0, node.scrollTop);
     }
 
     function applyAutoScroll() {
@@ -107,14 +139,15 @@ export function BracketScrollCenter({
         return;
       }
 
-      const content = enablePinchZoom
-        ? contentRef.current
-        : (node.firstElementChild as HTMLElement | null);
+      const currentScale = enablePinchZoom ? scaleRef.current : 1;
       const contentWidth = enablePinchZoom
-        ? naturalSize.w * scale
-        : (content?.scrollWidth ?? content?.offsetWidth ?? 0);
+        ? naturalSize.w * currentScale
+        : (() => {
+            const inner = node.firstElementChild as HTMLElement | null;
+            return inner?.scrollWidth ?? inner?.offsetWidth ?? 0;
+          })();
       const maxScrollLeft = Math.max(0, node.scrollWidth - node.clientWidth);
-      const scaledCenterX = centerX * (enablePinchZoom ? scale : 1);
+      const scaledCenterX = centerX * currentScale;
 
       if (contentWidth > node.clientWidth + 1) {
         node.scrollLeft = Math.min(
@@ -126,7 +159,7 @@ export function BracketScrollCenter({
       }
 
       const scrollContentHeight = enablePinchZoom
-        ? naturalSize.h * scale
+        ? naturalSize.h * currentScale
         : contentHeight;
       if (scrollContentHeight != null && scrollContentHeight > node.clientHeight) {
         node.scrollTop =
@@ -140,6 +173,7 @@ export function BracketScrollCenter({
     applyAutoScroll();
 
     const ro = new ResizeObserver(() => {
+      if (pinchRef.current.active) return;
       requestAnimationFrame(applyAutoScroll);
     });
     ro.observe(el);
@@ -147,7 +181,18 @@ export function BracketScrollCenter({
     if (outerContent) ro.observe(outerContent);
 
     return () => ro.disconnect();
-  }, [centerX, contentHeight, contentScrollY, enablePinchZoom, naturalSize.h, naturalSize.w, scale]);
+  }, [centerX, contentHeight, contentScrollY, enablePinchZoom, naturalSize.h, naturalSize.w]);
+
+  function applyScale(el: HTMLDivElement, nextScale: number, focal?: { x: number; y: number }) {
+    const prevScale = scaleRef.current;
+    const clamped = clampPinchScale(nextScale);
+    if (clamped === prevScale) return;
+
+    const center = focal ?? pointerCenter(pointersRef.current);
+    zoomScrollToFocal(el, prevScale, clamped, center.x, center.y);
+    scaleRef.current = clamped;
+    setScale(clamped);
+  }
 
   function cancelPan() {
     const el = ref.current;
@@ -172,7 +217,7 @@ export function BracketScrollCenter({
       pinchRef.current = {
         active: true,
         startDistance: pointerDistance(pointersRef.current),
-        startScale: scale,
+        startScale: scaleRef.current,
       };
       userAdjustedRef.current = true;
       return;
@@ -204,7 +249,7 @@ export function BracketScrollCenter({
       const distance = pointerDistance(pointersRef.current);
       if (pinchRef.current.startDistance > 0 && distance > 0) {
         const next = pinchRef.current.startScale * (distance / pinchRef.current.startDistance);
-        setScale(Math.min(MAX_PINCH_SCALE, Math.max(MIN_PINCH_SCALE, next)));
+        applyScale(el, next);
       }
       return;
     }
@@ -271,13 +316,14 @@ export function BracketScrollCenter({
     >
       {enablePinchZoom ? (
         <div
-          className="mx-auto"
+          className="relative"
           style={{
             width: naturalSize.w > 0 ? naturalSize.w * scale : undefined,
             height: naturalSize.h > 0 ? naturalSize.h * scale : undefined,
           }}
         >
           <div
+            className="absolute left-0 top-0"
             style={{
               transform: `scale(${scale})`,
               transformOrigin: "top left",
