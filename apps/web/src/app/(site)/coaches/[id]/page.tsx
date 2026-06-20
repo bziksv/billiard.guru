@@ -26,7 +26,7 @@ export async function generateMetadata({
     include: { city: true },
   });
   if (!coach) return { title: "Тренер не найден" };
-  return coachDetailMetadata(playerName(coach), coach.city?.name ?? null, id);
+  return coachDetailMetadata(playerName(coach), coach.city?.nameRu ?? null, id);
 }
 
 export default async function CoachDetailPage({

@@ -42,7 +42,7 @@ export async function generateMetadata({
     include: { city: true },
   });
   if (!club) return { title: "Клуб не найден" };
-  return clubDetailMetadata(club.name, club.city.name, id);
+  return clubDetailMetadata(club.name, club.city.nameRu, id);
 }
 
 export default async function ClubPage({

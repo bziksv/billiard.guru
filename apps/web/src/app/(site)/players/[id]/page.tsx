@@ -24,7 +24,7 @@ export async function generateMetadata({
     include: { city: true },
   });
   if (!player) return { title: "Игрок не найден" };
-  return playerDetailMetadata(playerName(player), player.city?.name ?? null, id);
+  return playerDetailMetadata(playerName(player), player.city?.nameRu ?? null, id);
 }
 
 export default async function PlayerPage({

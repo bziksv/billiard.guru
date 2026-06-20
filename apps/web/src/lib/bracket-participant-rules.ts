@@ -103,7 +103,6 @@ export function getDefaultBracketParticipantRules(
     return {
       min: 2,
       max: 256,
-      exact: null,
       label: "2–256",
       hint:
         "Сетка «до 2 поражений» на 256 участников — 496 встреч (R1–R6: тур 1–6), олимпийка с 1/16. " +

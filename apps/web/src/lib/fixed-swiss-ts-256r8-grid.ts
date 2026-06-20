@@ -4,7 +4,8 @@
  * Верх: 1–128, 129–192, 321–352, 417–432, 465–480, 481–488, 489–492, 493–494, 495, 496
  * Низ:  193–256, 257–320, 353–384, 385–416, 433–448, 449–464
  */
-import type { BracketMatchInput, FixedSwissLink, FixedSwissTemplate } from "@/lib/fixed-swiss-grid-types";
+import type { BracketMatchInput } from "@/lib/pair-tournament";
+import type { FixedSwissLink, FixedSwissTemplate } from "@/lib/fixed-swiss-grid-types";
 
 const HALF1 = 64;
 const HALF2 = 128;
@@ -596,9 +597,10 @@ export function isFixedSwissTs256R16BronzeMatchCount(
 }
 
 export function isFixedSwissTs256R16Family(
-  matchCount: number,
+  matchCount?: number,
   maxRound?: number,
 ): boolean {
+  if (matchCount == null) return false;
   return isFixedSwissTs256R16MatchCount(matchCount, maxRound);
 }
 

@@ -19,7 +19,7 @@ export async function generateMetadata({
     include: { city: true },
   });
   if (!listing) return { title: "Объявление не найдено" };
-  return pokatatDetailMetadata(listing.title, listing.city.name, id);
+  return pokatatDetailMetadata(listing.title, listing.city.nameRu, id);
 }
 
 export default async function PlayListingDetailPage({

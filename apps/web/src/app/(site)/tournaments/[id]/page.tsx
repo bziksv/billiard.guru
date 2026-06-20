@@ -79,7 +79,7 @@ export async function generateMetadata({
   return tournamentDetailMetadata(
     tournament.name,
     tournament.club.name,
-    tournament.club.city.name,
+    tournament.club.city.nameRu,
     id,
   );
 }

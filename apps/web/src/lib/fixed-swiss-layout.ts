@@ -3569,7 +3569,7 @@ export function fixedSwissForkTrunkYByTarget(
       edge.toId,
       edge.fromTeamSlot,
       edge.toTeamSlot,
-      edge.kind === "loss" ? "loss" : "win",
+      "win",
     );
     if (y == null) continue;
     const list = byTarget.get(edge.toId) ?? [];
@@ -3733,7 +3733,7 @@ export function isFixedSwissSemiFinalForkEdge(
   matchCount?: number,
   maxRound?: number,
 ): boolean {
-  if (isFixedSwissTs256R16Family(matchCount, maxRound)) {
+  if (matchCount != null && isFixedSwissTs256R16Family(matchCount, maxRound)) {
     return (
       (fromRound === 6 && toRound === 7) ||
       (fromRound === 7 && toRound === 8) ||
@@ -4618,6 +4618,7 @@ export function shouldDrawFixedSwissWinEdge(
     return true;
   }
   if (
+    matchCount != null &&
     isFixedSwissTs256R16Family(matchCount, maxRound) &&
     isFixedSwissRound44Edge(fromRound, toRound) &&
     fromCol === -3 &&
