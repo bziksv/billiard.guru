@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 const DRAG_THRESHOLD_PX = 4;
+const MIN_PINCH_SCALE = 0.35;
+const MAX_PINCH_SCALE = 3;
 
 function isInteractiveTarget(target: EventTarget | null) {
   if (!(target instanceof Element)) return false;
@@ -14,12 +16,19 @@ function isInteractiveTarget(target: EventTarget | null) {
   );
 }
 
+function pointerDistance(points: Map<number, { x: number; y: number }>): number {
+  const values = [...points.values()];
+  if (values.length < 2) return 0;
+  return Math.hypot(values[1].x - values[0].x, values[1].y - values[0].y);
+}
+
 export function BracketScrollCenter({
   children,
   className,
   centerX,
   contentHeight,
   contentScrollY = "center",
+  enablePinchZoom = false,
 }: {
   children: ReactNode;
   className?: string;
@@ -27,8 +36,11 @@ export function BracketScrollCenter({
   /** Для высоких fixed-сеток — начальная прокрутка по вертикали. */
   contentHeight?: number;
   contentScrollY?: "center" | "start";
+  /** Два пальца — масштаб сетки (полноэкранный режим). */
+  enablePinchZoom?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const userAdjustedRef = useRef(false);
   /** Автоцентрирование только при первом показе; смена высоты (галочки) не сбрасывает скролл. */
   const hasAutoCenteredRef = useRef(false);
@@ -41,11 +53,34 @@ export function BracketScrollCenter({
     scrollLeft: 0,
     scrollTop: 0,
   });
+  const pointersRef = useRef(new Map<number, { x: number; y: number }>());
+  const pinchRef = useRef({ active: false, startDistance: 0, startScale: 1 });
+  const [scale, setScale] = useState(1);
+  const [naturalSize, setNaturalSize] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
     userAdjustedRef.current = false;
     hasAutoCenteredRef.current = false;
+    setScale(1);
   }, [centerX]);
+
+  useEffect(() => {
+    const content = contentRef.current;
+    if (!content) return;
+
+    function measure() {
+      const node = contentRef.current;
+      if (!node) return;
+      setNaturalSize({ w: node.offsetWidth, h: node.offsetHeight });
+    }
+
+    measure();
+    const ro = new ResizeObserver(() => {
+      requestAnimationFrame(measure);
+    });
+    ro.observe(content);
+    return () => ro.disconnect();
+  }, [children, enablePinchZoom]);
 
   useEffect(() => {
     const el = ref.current;
@@ -56,11 +91,10 @@ export function BracketScrollCenter({
       if (node.scrollLeft > maxScrollLeft) {
         node.scrollLeft = maxScrollLeft;
       }
-      if (contentHeight != null) {
-        const maxScrollTop = Math.max(0, contentHeight - node.clientHeight);
-        if (node.scrollTop > maxScrollTop) {
-          node.scrollTop = maxScrollTop;
-        }
+      const scrollHeight = enablePinchZoom ? node.scrollHeight : contentHeight ?? node.scrollHeight;
+      const maxScrollTop = Math.max(0, scrollHeight - node.clientHeight);
+      if (node.scrollTop > maxScrollTop) {
+        node.scrollTop = maxScrollTop;
       }
     }
 
@@ -73,23 +107,32 @@ export function BracketScrollCenter({
         return;
       }
 
-      const content = node.firstElementChild as HTMLElement | null;
-      const contentWidth = content?.scrollWidth ?? content?.offsetWidth ?? 0;
+      const content = enablePinchZoom
+        ? contentRef.current
+        : (node.firstElementChild as HTMLElement | null);
+      const contentWidth = enablePinchZoom
+        ? naturalSize.w * scale
+        : (content?.scrollWidth ?? content?.offsetWidth ?? 0);
       const maxScrollLeft = Math.max(0, node.scrollWidth - node.clientWidth);
+      const scaledCenterX = centerX * (enablePinchZoom ? scale : 1);
 
       if (contentWidth > node.clientWidth + 1) {
         node.scrollLeft = Math.min(
           maxScrollLeft,
-          Math.max(0, centerX - node.clientWidth / 2),
+          Math.max(0, scaledCenterX - node.clientWidth / 2),
         );
       } else {
         node.scrollLeft = 0;
       }
-      if (contentHeight != null && contentHeight > node.clientHeight) {
+
+      const scrollContentHeight = enablePinchZoom
+        ? naturalSize.h * scale
+        : contentHeight;
+      if (scrollContentHeight != null && scrollContentHeight > node.clientHeight) {
         node.scrollTop =
           contentScrollY === "start"
             ? 0
-            : Math.max(0, (contentHeight - node.clientHeight) / 2);
+            : Math.max(0, (scrollContentHeight - node.clientHeight) / 2);
       }
       hasAutoCenteredRef.current = true;
     }
@@ -100,11 +143,20 @@ export function BracketScrollCenter({
       requestAnimationFrame(applyAutoScroll);
     });
     ro.observe(el);
-    const content = el.firstElementChild;
-    if (content) ro.observe(content);
+    const outerContent = el.firstElementChild;
+    if (outerContent) ro.observe(outerContent);
 
     return () => ro.disconnect();
-  }, [centerX, contentHeight, contentScrollY]);
+  }, [centerX, contentHeight, contentScrollY, enablePinchZoom, naturalSize.h, naturalSize.w, scale]);
+
+  function cancelPan() {
+    const el = ref.current;
+    const pan = panRef.current;
+    if (el && pan.active && pan.pointerId >= 0 && el.hasPointerCapture(pan.pointerId)) {
+      el.releasePointerCapture(pan.pointerId);
+    }
+    panRef.current.active = false;
+  }
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     if (event.button !== 0) return;
@@ -112,6 +164,21 @@ export function BracketScrollCenter({
 
     const el = ref.current;
     if (!el) return;
+
+    pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+
+    if (enablePinchZoom && pointersRef.current.size >= 2) {
+      cancelPan();
+      pinchRef.current = {
+        active: true,
+        startDistance: pointerDistance(pointersRef.current),
+        startScale: scale,
+      };
+      userAdjustedRef.current = true;
+      return;
+    }
+
+    if (pointersRef.current.size > 1) return;
 
     panRef.current = {
       active: true,
@@ -127,8 +194,23 @@ export function BracketScrollCenter({
 
   function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
     const el = ref.current;
+    if (!el) return;
+
+    if (pointersRef.current.has(event.pointerId)) {
+      pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    }
+
+    if (enablePinchZoom && pointersRef.current.size >= 2 && pinchRef.current.active) {
+      const distance = pointerDistance(pointersRef.current);
+      if (pinchRef.current.startDistance > 0 && distance > 0) {
+        const next = pinchRef.current.startScale * (distance / pinchRef.current.startDistance);
+        setScale(Math.min(MAX_PINCH_SCALE, Math.max(MIN_PINCH_SCALE, next)));
+      }
+      return;
+    }
+
     const pan = panRef.current;
-    if (!el || !pan.active || pan.pointerId !== event.pointerId) return;
+    if (!pan.active || pan.pointerId !== event.pointerId) return;
 
     const dx = event.clientX - pan.startX;
     const dy = event.clientY - pan.startY;
@@ -142,8 +224,15 @@ export function BracketScrollCenter({
 
   function endPan(event: React.PointerEvent<HTMLDivElement>) {
     const el = ref.current;
+    if (!el) return;
+
+    pointersRef.current.delete(event.pointerId);
+    if (pointersRef.current.size < 2) {
+      pinchRef.current.active = false;
+    }
+
     const pan = panRef.current;
-    if (!el || !pan.active || pan.pointerId !== event.pointerId) return;
+    if (!pan.active || pan.pointerId !== event.pointerId) return;
 
     if (el.hasPointerCapture(event.pointerId)) {
       el.releasePointerCapture(event.pointerId);
@@ -161,11 +250,18 @@ export function BracketScrollCenter({
     panRef.current.active = false;
   }
 
+  const contentNode = (
+    <div ref={contentRef} className="w-max text-left">
+      {children}
+    </div>
+  );
+
   return (
     <div
       ref={ref}
       className={cn(
-        "w-full max-w-full min-w-0 cursor-grab touch-pan-x touch-pan-y select-none active:cursor-grabbing",
+        "w-full max-w-full min-w-0 cursor-grab select-none active:cursor-grabbing",
+        enablePinchZoom ? "touch-none" : "touch-pan-x touch-pan-y",
         className,
       )}
       onPointerDownCapture={onPointerDown}
@@ -173,7 +269,28 @@ export function BracketScrollCenter({
       onPointerUpCapture={endPan}
       onPointerCancelCapture={endPan}
     >
-      <div className="mx-auto w-max text-left">{children}</div>
+      {enablePinchZoom ? (
+        <div
+          className="mx-auto"
+          style={{
+            width: naturalSize.w > 0 ? naturalSize.w * scale : undefined,
+            height: naturalSize.h > 0 ? naturalSize.h * scale : undefined,
+          }}
+        >
+          <div
+            style={{
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+              width: naturalSize.w > 0 ? naturalSize.w : undefined,
+              height: naturalSize.h > 0 ? naturalSize.h : undefined,
+            }}
+          >
+            {contentNode}
+          </div>
+        </div>
+      ) : (
+        <div className="mx-auto w-max text-left">{children}</div>
+      )}
     </div>
   );
 }

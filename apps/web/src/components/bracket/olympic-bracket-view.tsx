@@ -159,6 +159,7 @@ export function OlympicBracketView({
       centerX={centerX}
       contentHeight={canvasHeight}
       contentScrollY={presentation ? "start" : "center"}
+      enablePinchZoom={presentation}
       className={bracketCanvasClassName({ presentation })}
     >
       <div

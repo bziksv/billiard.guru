@@ -71,7 +71,12 @@ export function BracketPresentationShell({
           {title ?? "Турнирная сетка"}
         </span>
         {tabs ? (
-          <AdminHorizontalScroll className="min-w-0 flex-1">{tabs}</AdminHorizontalScroll>
+          <AdminHorizontalScroll className="min-w-0 flex-1">
+            <div className="flex w-max items-center gap-2 pb-0.5">
+              {tabs}
+              {toolbar}
+            </div>
+          </AdminHorizontalScroll>
         ) : toolbar ? (
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 overflow-x-auto pb-0.5">
             {toolbar}

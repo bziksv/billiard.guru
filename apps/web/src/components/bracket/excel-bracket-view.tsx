@@ -156,6 +156,7 @@ export function ExcelBracketView({
         centerX={layout.centerX}
         contentHeight={layout.totalHeight}
         contentScrollY={presentation ? "start" : "center"}
+        enablePinchZoom={presentation}
         className={bracketCanvasClassName({ presentation })}
       >
         <div

@@ -399,6 +399,7 @@ export function SwissBracketView({
         centerX={layout.centerX}
         contentHeight={fixedGrid ? layout.totalHeight : undefined}
         contentScrollY={demoPreview || presentation ? "start" : "center"}
+        enablePinchZoom={presentation}
         className={bracketCanvasClassName({ presentation, fixedGrid, demoPreview })}
       >
         <div

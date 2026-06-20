@@ -1,10 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView, SwissStandingView } from "@/lib/bracket-view";
-import { PublicTournamentBracketPanel } from "@/components/site/public-tournament-bracket-panel";
+import { BracketPresentationShell } from "@/components/bracket/bracket-presentation-shell";
+import { PublicBracketDisplayToolbar } from "@/components/site/public-bracket-display-toolbar";
+import { PublicTournamentBracketCanvas } from "@/components/site/public-tournament-bracket-canvas";
+import {
+  bracketDisplayStorageKey,
+  DEFAULT_BRACKET_CARD_DISPLAY,
+  readBracketDisplayPrefs,
+  type BracketCardDisplayPrefs,
+} from "@/lib/bracket-display-prefs";
 import type {
   PublicParticipantRow,
   PublicStandingRow,
@@ -40,26 +48,97 @@ function TabButton({
   active,
   onClick,
   children,
+  compact = false,
 }: {
   active: boolean;
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
+  compact?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
+        compact
+          ? "site-presentation-tab font-medium transition-colors"
+          : "rounded-lg px-4 py-2 text-sm font-medium transition-colors",
         active
-          ? "bg-emerald-600 text-white shadow-sm"
-          : "home-card-body hover:text-[var(--text-primary)]",
+          ? compact
+            ? "bg-emerald-600 text-white shadow-sm"
+            : "bg-emerald-600 text-white shadow-sm"
+          : compact
+            ? "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            : "home-card-body hover:text-[var(--text-primary)]",
       )}
       aria-current={active ? "true" : undefined}
     >
       {children}
     </button>
   );
+}
+
+function TournamentTabBar({
+  tab,
+  onTabChange,
+  standings,
+  participantsCount,
+  matchCount,
+  pair,
+  compact = false,
+}: {
+  tab: TabId;
+  onTabChange: (tab: TabId) => void;
+  standings: PublicTournamentStandings;
+  participantsCount: number;
+  matchCount: number;
+  pair: boolean;
+  compact?: boolean;
+}) {
+  const countClass = (active: boolean) =>
+    cn(
+      "ml-1.5 tabular-nums",
+      active
+        ? compact
+          ? "text-emerald-100/90"
+          : "text-emerald-100/90"
+        : compact
+          ? "text-[var(--text-muted)]"
+          : "home-card-muted",
+    );
+
+  const bar = (
+    <>
+      {standings.hasMatches && (
+        <TabButton compact={compact} active={tab === "results"} onClick={() => onTabChange("results")}>
+          Результаты
+          {standings.rows.length > 0 && (
+            <span className={countClass(tab === "results")}>{standings.rows.length}</span>
+          )}
+        </TabButton>
+      )}
+      <TabButton compact={compact} active={tab === "participants"} onClick={() => onTabChange("participants")}>
+        {pair ? "Команды" : "Участники"}
+        <span className={countClass(tab === "participants")}>{participantsCount}</span>
+      </TabButton>
+      {matchCount > 0 && (
+        <TabButton compact={compact} active={tab === "matches"} onClick={() => onTabChange("matches")}>
+          Встречи
+          <span className={countClass(tab === "matches")}>{matchCount}</span>
+        </TabButton>
+      )}
+      <TabButton compact={compact} active={tab === "bracket"} onClick={() => onTabChange("bracket")}>
+        Сетка
+        {matchCount > 0 && <span className={countClass(tab === "bracket")}>{matchCount}</span>}
+      </TabButton>
+    </>
+  );
+
+  if (compact) {
+    return <div className="home-tab-bar site-presentation-tab-bar">{bar}</div>;
+  }
+
+  return <div className="home-tab-bar inline-flex max-w-full flex-wrap gap-1 rounded-xl p-1">{bar}</div>;
 }
 
 function PlayerLinks({ row }: { row: PublicStandingRow }) {
@@ -206,9 +285,11 @@ function ResultsTab({
 function ParticipantsTab({
   participants,
   pair,
+  alwaysShowSearch = false,
 }: {
   participants: PublicParticipantRow[];
   pair: boolean;
+  alwaysShowSearch?: boolean;
 }) {
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
@@ -236,7 +317,7 @@ function ParticipantsTab({
           {pendingCount} ожидают подтверждения).
         </p>
       )}
-      {participants.length > 12 && (
+      {(alwaysShowSearch || participants.length > 12) && (
         <input
           type="search"
           value={query}
@@ -267,7 +348,21 @@ function ParticipantsTab({
   );
 }
 
-function BracketTab({ bracket }: { bracket?: PublicBracketPanelProps | null }) {
+function BracketTabContent({
+  bracket,
+  display,
+  onDisplayChange,
+  onFullscreen,
+  presentation = false,
+}: {
+  bracket?: PublicBracketPanelProps | null;
+  display: BracketCardDisplayPrefs;
+  onDisplayChange: (
+    next: BracketCardDisplayPrefs | ((prev: BracketCardDisplayPrefs) => BracketCardDisplayPrefs),
+  ) => void;
+  onFullscreen?: () => void;
+  presentation?: boolean;
+}) {
   if (!bracket || bracket.matches.length === 0) {
     return (
       <p className="text-sm text-[var(--text-muted)]">
@@ -277,15 +372,81 @@ function BracketTab({ bracket }: { bracket?: PublicBracketPanelProps | null }) {
   }
 
   return (
-    <PublicTournamentBracketPanel
-      tournamentId={bracket.tournamentId}
-      tournamentName={bracket.tournamentName}
-      format={bracket.format}
-      matches={bracket.matches}
-      standings={bracket.standings}
-      handicapHalfStep={bracket.handicapHalfStep}
-    />
+    <>
+      {!presentation && (
+        <PublicBracketDisplayToolbar
+          display={display}
+          onDisplayChange={onDisplayChange}
+          onFullscreen={onFullscreen}
+        />
+      )}
+      <div className={cn("min-w-0", presentation && "min-h-0 flex-1")}>
+        <PublicTournamentBracketCanvas
+          format={bracket.format}
+          matches={bracket.matches}
+          standings={bracket.standings}
+          handicapHalfStep={bracket.handicapHalfStep}
+          display={display}
+          presentation={presentation}
+        />
+      </div>
+    </>
   );
+}
+
+function renderTabPanel({
+  tab,
+  standings,
+  participants,
+  matches,
+  pair,
+  bracket,
+  display,
+  onDisplayChange,
+  onFullscreen,
+  presentation = false,
+}: {
+  tab: TabId;
+  standings: PublicTournamentStandings;
+  participants: PublicParticipantRow[];
+  matches: PublicMatchRow[];
+  pair: boolean;
+  bracket?: PublicBracketPanelProps | null;
+  display: BracketCardDisplayPrefs;
+  onDisplayChange: (
+    next: BracketCardDisplayPrefs | ((prev: BracketCardDisplayPrefs) => BracketCardDisplayPrefs),
+  ) => void;
+  onFullscreen?: () => void;
+  presentation?: boolean;
+}) {
+  const alwaysShowSearch = presentation;
+
+  switch (tab) {
+    case "results":
+      return <ResultsTab standings={standings} pair={pair} />;
+    case "participants":
+      return (
+        <ParticipantsTab
+          participants={participants}
+          pair={pair}
+          alwaysShowSearch={alwaysShowSearch}
+        />
+      );
+    case "matches":
+      return <MatchesTab matches={matches} alwaysShowSearch={alwaysShowSearch} />;
+    case "bracket":
+      return (
+        <BracketTabContent
+          bracket={bracket}
+          display={display}
+          onDisplayChange={onDisplayChange}
+          onFullscreen={onFullscreen}
+          presentation={presentation}
+        />
+      );
+    default:
+      return null;
+  }
 }
 
 type MatchFilter = "all" | PublicMatchStatus;
@@ -311,7 +472,13 @@ function matchStatusClass(status: PublicMatchStatus): string {
   }
 }
 
-function MatchesTab({ matches }: { matches: PublicMatchRow[] }) {
+function MatchesTab({
+  matches,
+  alwaysShowSearch = false,
+}: {
+  matches: PublicMatchRow[];
+  alwaysShowSearch?: boolean;
+}) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<MatchFilter>("all");
 
@@ -375,7 +542,7 @@ function MatchesTab({ matches }: { matches: PublicMatchRow[] }) {
         })}
       </div>
 
-      {matches.length > 8 && (
+      {(alwaysShowSearch || matches.length > 8) && (
         <input
           type="search"
           value={query}
@@ -434,53 +601,92 @@ export function TournamentPublicView({
   bracket,
 }: Props) {
   const [tab, setTab] = useState<TabId>(defaultTab);
+  const [presentationOpen, setPresentationOpen] = useState(false);
+  const [display, setDisplay] = useState<BracketCardDisplayPrefs>(() =>
+    bracket ? readBracketDisplayPrefs(bracket.tournamentId) : DEFAULT_BRACKET_CARD_DISPLAY,
+  );
+
+  useEffect(() => {
+    if (!bracket) return;
+    localStorage.setItem(
+      bracketDisplayStorageKey(bracket.tournamentId),
+      JSON.stringify(display),
+    );
+  }, [bracket, display]);
+
+  const openPresentation = () => setPresentationOpen(true);
+
+  const tabBarProps = {
+    tab,
+    onTabChange: setTab,
+    standings,
+    participantsCount: participants.length,
+    matchCount,
+    pair,
+  };
 
   return (
-    <section className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="site-section-title">Турнир</h2>
-        <div className="home-tab-bar inline-flex max-w-full flex-wrap gap-1 rounded-xl p-1">
-          {standings.hasMatches && (
-            <TabButton active={tab === "results"} onClick={() => setTab("results")}>
-              Результаты
-              {standings.rows.length > 0 && (
-                <span className={cn("ml-1.5 tabular-nums", tab === "results" ? "text-emerald-100/90" : "home-card-muted")}>
-                  {standings.rows.length}
-                </span>
-              )}
-            </TabButton>
-          )}
-          <TabButton active={tab === "participants"} onClick={() => setTab("participants")}>
-            {pair ? "Команды" : "Участники"}
-            <span className={cn("ml-1.5 tabular-nums", tab === "participants" ? "text-emerald-100/90" : "home-card-muted")}>
-              {participants.length}
-            </span>
-          </TabButton>
-          {matchCount > 0 && (
-            <TabButton active={tab === "matches"} onClick={() => setTab("matches")}>
-              Встречи
-              <span className={cn("ml-1.5 tabular-nums", tab === "matches" ? "text-emerald-100/90" : "home-card-muted")}>
-                {matchCount}
-              </span>
-            </TabButton>
-          )}
-          <TabButton active={tab === "bracket"} onClick={() => setTab("bracket")}>
-            Сетка
-            {matchCount > 0 && (
-              <span className={cn("ml-1.5 tabular-nums", tab === "bracket" ? "text-emerald-100/90" : "home-card-muted")}>
-                {matchCount}
-              </span>
-            )}
-          </TabButton>
+    <>
+      <section className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="site-section-title">Турнир</h2>
+          <TournamentTabBar {...tabBarProps} />
         </div>
-      </div>
 
-      <div className="min-h-[12rem]">
-        {tab === "results" && <ResultsTab standings={standings} pair={pair} />}
-        {tab === "participants" && <ParticipantsTab participants={participants} pair={pair} />}
-        {tab === "matches" && <MatchesTab matches={matches} />}
-        {tab === "bracket" && <BracketTab bracket={bracket} />}
-      </div>
-    </section>
+        <div className="min-h-[12rem]">
+          {renderTabPanel({
+            tab,
+            standings,
+            participants,
+            matches,
+            pair,
+            bracket,
+            display,
+            onDisplayChange: setDisplay,
+            onFullscreen: bracket?.matches.length ? openPresentation : undefined,
+          })}
+        </div>
+      </section>
+
+      {bracket && bracket.matches.length > 0 && (
+        <BracketPresentationShell
+          open={presentationOpen}
+          title={bracket.tournamentName}
+          onClose={() => setPresentationOpen(false)}
+          variant="site"
+          tabs={
+            <>
+              <TournamentTabBar {...tabBarProps} compact />
+              {tab === "bracket" && (
+                <PublicBracketDisplayToolbar
+                  display={display}
+                  onDisplayChange={setDisplay}
+                  className="flex shrink-0 items-center gap-3 border-l border-[var(--border-subtle)] pl-2"
+                />
+              )}
+            </>
+          }
+          contentClassName={tab === "bracket" ? "flex flex-col" : "overflow-auto"}
+        >
+          <div
+            className={cn(
+              tab === "bracket" ? "flex min-h-0 flex-1 flex-col" : "p-2 sm:p-3",
+            )}
+          >
+            {renderTabPanel({
+              tab,
+              standings,
+              participants,
+              matches,
+              pair,
+              bracket,
+              display,
+              onDisplayChange: setDisplay,
+              presentation: tab === "bracket",
+            })}
+          </div>
+        </BracketPresentationShell>
+      )}
+    </>
   );
 }
