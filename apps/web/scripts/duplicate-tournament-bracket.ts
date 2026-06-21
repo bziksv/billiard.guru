@@ -1,7 +1,9 @@
 /**
  * Копия турнира с тем же составом, сеткой и зафиксированными результатами.
  *
- *   cd apps/web && npx tsx scripts/duplicate-tournament-bracket.ts --source=cmq3pqcrh002p2g9w5qj7zulf
+ *   cd apps/web && npx tsx scripts/duplicate-tournament-bracket.ts --source=ID
+ *   cd apps/web && npx tsx scripts/duplicate-tournament-bracket.ts --source=ID --suffix=" — копия"
+ *   cd apps/web && npx tsx scripts/duplicate-tournament-bracket.ts --source=ID --format=FIXED_SWISS_16R2_1_3_mesto
  */
 import { config } from "dotenv";
 import { resolve } from "path";
@@ -21,7 +23,13 @@ const SOURCE_ID =
     .find((a) => a.startsWith("--source="))
     ?.split("=")[1] ?? "cmq3pqcrh002p2g9w5qj7zulf";
 
-const NAME_SUFFIX = " — копия (вылет в 1/4)";
+const NAME_SUFFIX =
+  process.argv.find((a) => a.startsWith("--suffix="))?.split("=")[1] ??
+  " — копия";
+
+const FORMAT_OVERRIDE = process.argv
+  .find((a) => a.startsWith("--format="))
+  ?.split("=")[1];
 
 async function main() {
   const prisma = createPrismaClient();
@@ -56,15 +64,17 @@ async function main() {
   const copy = await prisma.tournament.create({
     data: {
       name: `${source.name}${NAME_SUFFIX}`,
-      description:
-        source.description ??
-        `Копия ${source.id}: тот же состав и результаты; проигравшие 1/8 уходят в нижнюю тур 4.`,
+      description: source.description,
       clubId: source.clubId,
-      format: source.format,
+      format: (FORMAT_OVERRIDE ?? source.format) as typeof source.format,
       status: "DRAFT",
       handicapHalfStep: source.handicapHalfStep,
       ratingMax: source.ratingMax,
       ratingSource: source.ratingSource,
+      tableIds: source.tableIds ?? undefined,
+      tableStreams: source.tableStreams ?? undefined,
+      startsAt: source.startsAt,
+      suppressNotifications: true,
       publishedAt: new Date(),
     },
   });
@@ -78,6 +88,7 @@ async function main() {
         clubId: r.clubId ?? source.clubId,
         source: r.source,
         status: "CONFIRMED" as const,
+        feePaid: r.feePaid,
         confirmedAt: r.confirmedAt ?? now,
       })),
       skipDuplicates: true,
@@ -104,6 +115,7 @@ async function main() {
           confirmedAt: team.confirmedAt ?? now,
           seed: team.seed,
           swissPoints: team.swissPoints,
+          feePaid: team.feePaid,
         },
       }),
     ),
@@ -126,7 +138,8 @@ async function main() {
     .sort((a, b) => a.seed - b.seed)
     .map((t) => t.id);
 
-  const template = buildFixedSwissTemplate(seededTeamIds.length, source.format);
+  const copyFormat = FORMAT_OVERRIDE ?? source.format;
+  const template = buildFixedSwissTemplate(seededTeamIds.length, copyFormat);
   const bracket = buildOlympicBracket(seededTeamIds);
   const round1BySlot = new Map(
     bracket.filter((m) => m.round === 1).map((m) => [m.slot, m]),
@@ -145,7 +158,7 @@ async function main() {
     }),
   });
 
-  await processByes(prisma, copy.id, source.format);
+  await processByes(prisma, copy.id, copyFormat);
   await prisma.tournament.update({
     where: { id: copy.id },
     data: { status: "ACTIVE" },
@@ -210,7 +223,7 @@ async function main() {
   console.log(`Клуб: ${source.club?.name} (${source.clubId})`);
   console.log(`Исходный: ${source.name} (${source.id})`);
   console.log(`Копия:    ${copy.name} (${copy.id})`);
-  console.log(`Формат:   ${copy.format}, команд: ${newTeams.length}, результатов: ${finished}`);
+  console.log(`Формат:   ${copyFormat}, команд: ${newTeams.length}, результатов: ${finished}`);
   console.log(`Админка:  http://localhost:3010/admin/tournaments/${copy.id}`);
 }
 

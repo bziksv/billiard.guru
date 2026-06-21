@@ -1,6 +1,6 @@
 import { EmptyState } from "@/components/site/site-card";
 import { TournamentCard } from "@/components/site/tournament-card";
-import { tournamentTabConfig, type TournamentTab } from "@/lib/tournament-tabs";
+import type { TournamentTab } from "@/lib/tournament-tabs";
 import type { PublicTournamentListItem } from "@/lib/tournament-public-read";
 
 type TournamentListItem = PublicTournamentListItem;
@@ -31,31 +31,30 @@ function TournamentGrid({
 
 export function TournamentsListSection({
   tournaments,
-  tab,
   subtitle,
   compactEmpty,
   formatLabels,
+  emptyTitle,
+  emptyDescription,
 }: {
   tournaments: TournamentListItem[];
   tab: TournamentTab;
   subtitle?: string;
   compactEmpty?: boolean;
   formatLabels: Record<string, string>;
+  emptyTitle: string;
+  emptyDescription: string;
 }) {
-  const config = tournamentTabConfig(tab);
-
   if (tournaments.length === 0) {
     if (compactEmpty) {
       return subtitle ? (
         <section className="space-y-3">
           <h2 className="site-page-subtitle">{subtitle}</h2>
-          <p className="home-card-muted text-sm">{config.emptyDescription}</p>
+          <p className="home-card-muted text-sm">{emptyDescription}</p>
         </section>
       ) : null;
     }
-    return (
-      <EmptyState title={config.emptyTitle} description={config.emptyDescription} />
-    );
+    return <EmptyState title={emptyTitle} description={emptyDescription} />;
   }
 
   return (

@@ -100,7 +100,8 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const CountryScalarFieldEnum = {
   id: 'id',
-  nameRu: 'nameRu'
+  nameRu: 'nameRu',
+  nameEn: 'nameEn'
 } as const
 
 export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeof CountryScalarFieldEnum]
@@ -109,6 +110,7 @@ export type CountryScalarFieldEnum = (typeof CountryScalarFieldEnum)[keyof typeo
 export const CityScalarFieldEnum = {
   id: 'id',
   nameRu: 'nameRu',
+  nameEn: 'nameEn',
   countryId: 'countryId',
   latitude: 'latitude',
   longitude: 'longitude'
@@ -127,16 +129,21 @@ export const ClubScalarFieldEnum = {
   photoUrl: 'photoUrl',
   galleryUrls: 'galleryUrls',
   description: 'description',
+  descriptionEn: 'descriptionEn',
   address: 'address',
+  addressEn: 'addressEn',
   latitude: 'latitude',
   longitude: 'longitude',
   workingHours: 'workingHours',
+  workingHoursEn: 'workingHoursEn',
   weeklyHours: 'weeklyHours',
   tableCount: 'tableCount',
   tableCounts: 'tableCounts',
   floorPlan: 'floorPlan',
   gamePrice: 'gamePrice',
+  gamePriceEn: 'gamePriceEn',
   priceTiers: 'priceTiers',
+  priceTiersEn: 'priceTiersEn',
   bookingEnabled: 'bookingEnabled',
   bookingSlotMinutes: 'bookingSlotMinutes',
   bookingAdvanceDays: 'bookingAdvanceDays',
@@ -188,6 +195,8 @@ export const ClubNewsScalarFieldEnum = {
   authorId: 'authorId',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   status: 'status',
   moderationToken: 'moderationToken',
   moderatedAt: 'moderatedAt',
@@ -205,6 +214,8 @@ export const SiteNewsScalarFieldEnum = {
   id: 'id',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   status: 'status',
   authorId: 'authorId',
   publishedAt: 'publishedAt',
@@ -228,8 +239,10 @@ export const PlayerScalarFieldEnum = {
   telegramUsername: 'telegramUsername',
   rating: 'rating',
   about: 'about',
+  aboutEn: 'aboutEn',
   isCoach: 'isCoach',
   coachBio: 'coachBio',
+  coachBioEn: 'coachBioEn',
   coachGalleryUrls: 'coachGalleryUrls',
   coachReviewAvg: 'coachReviewAvg',
   coachReviewCount: 'coachReviewCount',
@@ -274,6 +287,7 @@ export const CoachRatingScalarFieldEnum = {
   raterId: 'raterId',
   score: 'score',
   comment: 'comment',
+  commentEn: 'commentEn',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -310,7 +324,9 @@ export type LoginChallengeScalarFieldEnum = (typeof LoginChallengeScalarFieldEnu
 export const TournamentScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  nameEn: 'nameEn',
   description: 'description',
+  descriptionEn: 'descriptionEn',
   clubId: 'clubId',
   format: 'format',
   status: 'status',
@@ -422,6 +438,8 @@ export const IdeaScalarFieldEnum = {
   clubId: 'clubId',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   status: 'status',
   moderationToken: 'moderationToken',
   likesCount: 'likesCount',
@@ -454,6 +472,8 @@ export const PlayListingScalarFieldEnum = {
   clubId: 'clubId',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   kind: 'kind',
   scheduleType: 'scheduleType',
   playAt: 'playAt',
@@ -479,6 +499,7 @@ export const PlayListingResponseScalarFieldEnum = {
   listingId: 'listingId',
   playerId: 'playerId',
   message: 'message',
+  messageEn: 'messageEn',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -591,14 +612,6 @@ export const JsonNullValueInput = {
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
-export const CountryOrderByRelevanceFieldEnum = {
-  id: 'id',
-  nameRu: 'nameRu'
-} as const
-
-export type CountryOrderByRelevanceFieldEnum = (typeof CountryOrderByRelevanceFieldEnum)[keyof typeof CountryOrderByRelevanceFieldEnum]
-
-
 export const NullsOrder = {
   first: 'first',
   last: 'last'
@@ -607,9 +620,19 @@ export const NullsOrder = {
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
+export const CountryOrderByRelevanceFieldEnum = {
+  id: 'id',
+  nameRu: 'nameRu',
+  nameEn: 'nameEn'
+} as const
+
+export type CountryOrderByRelevanceFieldEnum = (typeof CountryOrderByRelevanceFieldEnum)[keyof typeof CountryOrderByRelevanceFieldEnum]
+
+
 export const CityOrderByRelevanceFieldEnum = {
   id: 'id',
   nameRu: 'nameRu',
+  nameEn: 'nameEn',
   countryId: 'countryId'
 } as const
 
@@ -642,9 +665,13 @@ export const ClubOrderByRelevanceFieldEnum = {
   email: 'email',
   photoUrl: 'photoUrl',
   description: 'description',
+  descriptionEn: 'descriptionEn',
   address: 'address',
+  addressEn: 'addressEn',
   workingHours: 'workingHours',
+  workingHoursEn: 'workingHoursEn',
   gamePrice: 'gamePrice',
+  gamePriceEn: 'gamePriceEn',
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   confirmToken: 'confirmToken'
@@ -683,6 +710,8 @@ export const ClubNewsOrderByRelevanceFieldEnum = {
   authorId: 'authorId',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   moderationToken: 'moderationToken',
   moderatedById: 'moderatedById',
   rejectReason: 'rejectReason'
@@ -695,6 +724,8 @@ export const SiteNewsOrderByRelevanceFieldEnum = {
   id: 'id',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   authorId: 'authorId'
 } as const
 
@@ -713,7 +744,9 @@ export const PlayerOrderByRelevanceFieldEnum = {
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   about: 'about',
+  aboutEn: 'aboutEn',
   coachBio: 'coachBio',
+  coachBioEn: 'coachBioEn',
   confirmToken: 'confirmToken'
 } as const
 
@@ -745,7 +778,8 @@ export const CoachRatingOrderByRelevanceFieldEnum = {
   id: 'id',
   coachId: 'coachId',
   raterId: 'raterId',
-  comment: 'comment'
+  comment: 'comment',
+  commentEn: 'commentEn'
 } as const
 
 export type CoachRatingOrderByRelevanceFieldEnum = (typeof CoachRatingOrderByRelevanceFieldEnum)[keyof typeof CoachRatingOrderByRelevanceFieldEnum]
@@ -772,7 +806,9 @@ export type LoginChallengeOrderByRelevanceFieldEnum = (typeof LoginChallengeOrde
 export const TournamentOrderByRelevanceFieldEnum = {
   id: 'id',
   name: 'name',
+  nameEn: 'nameEn',
   description: 'description',
+  descriptionEn: 'descriptionEn',
   clubId: 'clubId',
   clubApprovalToken: 'clubApprovalToken'
 } as const
@@ -846,6 +882,8 @@ export const IdeaOrderByRelevanceFieldEnum = {
   clubId: 'clubId',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   moderationToken: 'moderationToken',
   moderatedById: 'moderatedById',
   rejectReason: 'rejectReason'
@@ -870,6 +908,8 @@ export const PlayListingOrderByRelevanceFieldEnum = {
   clubId: 'clubId',
   title: 'title',
   body: 'body',
+  titleEn: 'titleEn',
+  bodyEn: 'bodyEn',
   timeFrom: 'timeFrom',
   timeTo: 'timeTo',
   gameFormat: 'gameFormat',
@@ -883,7 +923,8 @@ export const PlayListingResponseOrderByRelevanceFieldEnum = {
   id: 'id',
   listingId: 'listingId',
   playerId: 'playerId',
-  message: 'message'
+  message: 'message',
+  messageEn: 'messageEn'
 } as const
 
 export type PlayListingResponseOrderByRelevanceFieldEnum = (typeof PlayListingResponseOrderByRelevanceFieldEnum)[keyof typeof PlayListingResponseOrderByRelevanceFieldEnum]

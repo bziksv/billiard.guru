@@ -6,10 +6,13 @@ import { buildBookClubLink, TELEGRAM_BOOKING_LINK_HINT } from "@/lib/telegram-bo
 export function ClubTelegramBookingLink({
   clubId,
   compact = false,
+  bookLabel = "Забронировать в Telegram",
 }: {
   clubId: string;
   /** На карточке клуба — короткая кнопка; в кабинете — с копированием и подсказкой */
   compact?: boolean;
+  /** Подпись compact-кнопки (из next-intl на публичных страницах) */
+  bookLabel?: string;
 }) {
   const link = buildBookClubLink(clubId);
   const [copied, setCopied] = useState(false);
@@ -32,7 +35,7 @@ export function ClubTelegramBookingLink({
         rel="noopener noreferrer"
         className="club-telegram-booking-link site-btn-secondary w-full text-center"
       >
-        Забронировать в Telegram
+        {bookLabel}
       </a>
     );
   }

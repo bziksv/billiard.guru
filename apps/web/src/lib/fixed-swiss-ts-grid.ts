@@ -5,6 +5,11 @@ function slotParityTeam(slot: number): 1 | 2 {
   return slot % 2 === 1 ? 1 : 2;
 }
 
+/** Крест: проигравший верхней R2 — вторая позиция относительно победителя нижней R2. */
+function fixedSwissCrossUpperLossTeam(crossSlot: number): 1 | 2 {
+  return crossSlot % 2 === 1 ? 2 : 1;
+}
+
 /** Куда крест (слоты 1…half1) подставляет team2 в верхнюю ветку (слоты half1+1…2×half1). */
 export function buildCrossToQuarterMap(half1: number): Record<number, number> {
   if (half1 === 2) {
@@ -287,6 +292,220 @@ export function buildFixedSwissTs32R8ElimAtEighthBronzeTemplate(): FixedSwissTem
     ],
     variant: "ts3216r8elimbronze",
   };
+}
+
+/** 16R2 (30 встреч): R3×6 + финал/бронза в R6 — эталон legacy29 + #30. */
+export function isFixedSwissTs16R2ChartFromMatches(
+  matches: Array<{ round: number }>,
+): boolean {
+  if (matches.filter((m) => m.round === 3).length !== 6) return false;
+  return matches.some((m) => m.round === 6 && m.slot === 2);
+}
+
+/** 16R2 устаревшие 24 встречи: R3×4, без верхней тур 2. */
+export function isFixedSwissTs16R2Legacy24FromMatches(
+  matches: Array<{ round: number }>,
+): boolean {
+  return matches.filter((m) => m.round === 3).length === 4;
+}
+
+function isFixedSwissTs16R2Chart(
+  matchCount: number,
+  maxRound: number | undefined,
+  matches?: Array<{ round: number }>,
+): boolean {
+  if (maxRound === undefined || maxRound < 5) return false;
+  if (matchCount !== 24 && matchCount !== 27 && matchCount !== 28 && matchCount !== 30) {
+    return false;
+  }
+  if (matches && matches.length > 0) {
+    return (
+      isFixedSwissTs16R2ChartFromMatches(matches) ||
+      isFixedSwissTs16R2Legacy24FromMatches(matches)
+    );
+  }
+  /** Без matches 27/28 неотличимы от TS 16R4 — только устаревшие 24. */
+  return matchCount === 24;
+}
+
+function buildFixedSwissTs16R2ElimAtSemiBronzeCore(): FixedSwissTemplate {
+  const matches: BracketMatchInput[] = [];
+
+  for (let slot = 1; slot <= 8; slot++) {
+    matches.push({ round: 1, slot, team1Id: null, team2Id: null });
+  }
+  for (let slot = 1; slot <= 8; slot++) {
+    matches.push({ round: 2, slot, team1Id: null, team2Id: null });
+  }
+  for (let slot = 1; slot <= 6; slot++) {
+    matches.push({ round: 3, slot, team1Id: null, team2Id: null });
+  }
+  for (let slot = 1; slot <= 4; slot++) {
+    matches.push({ round: 4, slot, team1Id: null, team2Id: null });
+  }
+  for (let slot = 1; slot <= 2; slot++) {
+    matches.push({ round: 5, slot, team1Id: null, team2Id: null });
+  }
+  matches.push({ round: 6, slot: 1, team1Id: null, team2Id: null });
+  matches.push({ round: 6, slot: 2, team1Id: null, team2Id: null });
+
+  const links: FixedSwissLink[] = [];
+
+  for (let slot = 1; slot <= 8; slot++) {
+    const toTeam = slotParityTeam(slot);
+    links.push({
+      fromRound: 1,
+      fromSlot: slot,
+      kind: "win",
+      toRound: 2,
+      toSlot: 4 + Math.ceil(slot / 2),
+      toTeam,
+    });
+    links.push({
+      fromRound: 1,
+      fromSlot: slot,
+      kind: "loss",
+      toRound: 2,
+      toSlot: Math.ceil(slot / 2),
+      toTeam,
+    });
+  }
+
+  for (let slot = 1; slot <= 4; slot++) {
+    links.push({
+      fromRound: 2,
+      fromSlot: slot,
+      kind: "win",
+      toRound: 3,
+      toSlot: slot,
+      toTeam: slot % 2 === 1 ? 1 : 2,
+    });
+  }
+
+  for (let slot = 5; slot <= 8; slot++) {
+    const k = slot - 4;
+    const toTeam = slotParityTeam(slot);
+    links.push({
+      fromRound: 2,
+      fromSlot: slot,
+      kind: "win",
+      toRound: 3,
+      toSlot: 4 + Math.ceil(k / 2),
+      toTeam,
+    });
+    links.push({
+      fromRound: 2,
+      fromSlot: slot,
+      kind: "loss",
+      toRound: 3,
+      toSlot: 5 - k,
+      toTeam: fixedSwissCrossUpperLossTeam(5 - k),
+    });
+  }
+
+  links.push({ fromRound: 3, fromSlot: 1, kind: "win", toRound: 4, toSlot: 1, toTeam: 1 });
+  links.push({ fromRound: 3, fromSlot: 2, kind: "win", toRound: 4, toSlot: 1, toTeam: 2 });
+  links.push({ fromRound: 3, fromSlot: 3, kind: "win", toRound: 4, toSlot: 2, toTeam: 1 });
+  links.push({ fromRound: 3, fromSlot: 4, kind: "win", toRound: 4, toSlot: 2, toTeam: 2 });
+
+  links.push({ fromRound: 3, fromSlot: 5, kind: "win", toRound: 5, toSlot: 1, toTeam: 1 });
+  links.push({ fromRound: 3, fromSlot: 6, kind: "win", toRound: 5, toSlot: 2, toTeam: 1 });
+  links.push({ fromRound: 3, fromSlot: 5, kind: "loss", toRound: 4, toSlot: 3, toTeam: 2 });
+  links.push({ fromRound: 3, fromSlot: 6, kind: "loss", toRound: 4, toSlot: 4, toTeam: 2 });
+
+  links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 4, toSlot: 3, toTeam: 1 });
+  links.push({ fromRound: 4, fromSlot: 2, kind: "win", toRound: 4, toSlot: 4, toTeam: 1 });
+
+  links.push({ fromRound: 4, fromSlot: 3, kind: "win", toRound: 5, toSlot: 2, toTeam: 2 });
+  links.push({ fromRound: 4, fromSlot: 4, kind: "win", toRound: 5, toSlot: 1, toTeam: 2 });
+
+  links.push({ fromRound: 5, fromSlot: 1, kind: "win", toRound: 6, toSlot: 1, toTeam: 1 });
+  links.push({ fromRound: 5, fromSlot: 2, kind: "win", toRound: 6, toSlot: 1, toTeam: 2 });
+  links.push({ fromRound: 5, fromSlot: 1, kind: "loss", toRound: 6, toSlot: 2, toTeam: 1 });
+  links.push({ fromRound: 5, fromSlot: 2, kind: "loss", toRound: 6, toSlot: 2, toTeam: 2 });
+
+  return {
+    gridSize: 16,
+    rounds: 6,
+    matchesPerRound: 8,
+    matches,
+    links,
+    variant: "ts168r2elimbronze",
+  };
+}
+
+/**
+ * 16→8 (27 встреч): legacy29 без #28 — полуфинал #25–#26, финал #27.
+ * FIXED_SWISS_16R2_2_3_mesta (если понадобится).
+ */
+export function buildFixedSwissTs16R2ElimAtSemiTemplate(): FixedSwissTemplate {
+  const bronze = buildFixedSwissTs16R2ElimAtSemiBronzeCore();
+  return {
+    ...bronze,
+    matches: bronze.matches.filter((m) => !(m.round === 5 && m.slot === 2)),
+    links: bronze.links.filter(
+      (link) => !(link.toRound === 5 && link.toSlot === 2 && link.kind === "loss"),
+    ),
+    variant: "ts168r2elim",
+  };
+}
+
+/**
+ * 16→8 (30 встреч): 9 колонок legacy29 — нижний тур 4 (#25–#26), полуфинал #27–#28,
+ * финал #29, доп. #30 за 3–4. FIXED_SWISS_16R2_1_3_mesto.
+ */
+export function buildFixedSwissTs16R2ElimAtSemiBronzeTemplate(): FixedSwissTemplate {
+  return buildFixedSwissTs16R2ElimAtSemiBronzeCore();
+}
+
+/** 27 встреч / 5 туров — oлимпийka с 1/2, без доп.игры. */
+export function isFixedSwissTs16R2ElimAtSemiMatchCount(
+  matchCount: number,
+  maxRound?: number,
+  matches?: Array<{ round: number }>,
+): boolean {
+  return isFixedSwissTs16R2Chart(matchCount, maxRound, matches) && matchCount === 27;
+}
+
+/** 30 встреч / 6 туров — legacy29 + #30; 24 — устаревший R3×4. */
+export function isFixedSwissTs16R2ElimAtSemiBronzeMatchCount(
+  matchCount: number,
+  maxRound?: number,
+  matches?: Array<{ round: number }>,
+): boolean {
+  if (maxRound === undefined || maxRound < 5) return false;
+  if (matchCount === 30) {
+    if (matches && matches.length > 0) {
+      return isFixedSwissTs16R2ChartFromMatches(matches);
+    }
+    return maxRound >= 6;
+  }
+  if (matchCount === 24) {
+    if (matches && matches.length > 0) {
+      return isFixedSwissTs16R2Legacy24FromMatches(matches);
+    }
+    return true;
+  }
+  if (matchCount === 28) {
+    if (matches && matches.length > 0) {
+      return (
+        matches.filter((m) => m.round === 3).length === 6 && maxRound === 5
+      );
+    }
+    return false;
+  }
+  return false;
+}
+
+export function isFixedSwissTs16R2ElimAtSemiFamily(
+  matchCount: number,
+  maxRound?: number,
+  matches?: Array<{ round: number }>,
+): boolean {
+  return (
+    isFixedSwissTs16R2ElimAtSemiMatchCount(matchCount, maxRound, matches) ||
+    isFixedSwissTs16R2ElimAtSemiBronzeMatchCount(matchCount, maxRound, matches)
+  );
 }
 
 /** 55 встреч / 7 туров — вылет с 1/8 (не путать с устаревшей 55/6). */

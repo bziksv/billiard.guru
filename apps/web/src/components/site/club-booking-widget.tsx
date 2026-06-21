@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocale } from "next-intl";
+import type { AppLocale } from "@/i18n/routing";
 import { ClubFloorPlanCanvas } from "@/components/club/club-floor-plan-canvas";
 import {
   type FloorTableAvailability,
@@ -39,16 +41,18 @@ export function ClubBookingWidget({
   priceTiers: priceTiersRaw,
   isLoggedIn,
 }: ClubBookingWidgetProps) {
+  const locale = useLocale() as AppLocale;
+  const scheduleLocale = locale === "en" ? "en" : "ru";
   const router = useRouter();
   const plan = useMemo(() => parseFloorPlan(floorPlan), [floorPlan]);
   const priceTiers = useMemo(() => parsePriceTiers(priceTiersRaw), [priceTiersRaw]);
   const formats = useMemo(
-    () => clubBookingFormatEntries(tableCounts, floorPlan),
-    [tableCounts, floorPlan],
+    () => clubBookingFormatEntries(tableCounts, floorPlan, scheduleLocale),
+    [tableCounts, floorPlan, scheduleLocale],
   );
   const dates = useMemo(
-    () => bookingDateOptions(bookingAdvanceDays),
-    [bookingAdvanceDays],
+    () => bookingDateOptions(bookingAdvanceDays, scheduleLocale),
+    [bookingAdvanceDays, scheduleLocale],
   );
 
   const [format, setFormat] = useState<ClubTableFormatId | "">("");

@@ -28,6 +28,8 @@ export type ClubOpenStatus = {
   opensAt?: string;
 };
 
+export type ScheduleLocale = "ru" | "en";
+
 const DAY_LABELS: Record<Weekday, string> = {
   mon: "Пн",
   tue: "Вт",
@@ -36,6 +38,16 @@ const DAY_LABELS: Record<Weekday, string> = {
   fri: "Пт",
   sat: "Сб",
   sun: "Вс",
+};
+
+const DAY_LABELS_EN: Record<Weekday, string> = {
+  mon: "Mon",
+  tue: "Tue",
+  wed: "Wed",
+  thu: "Thu",
+  fri: "Fri",
+  sat: "Sat",
+  sun: "Sun",
 };
 
 const DAY_LABELS_FULL: Record<Weekday, string> = {
@@ -47,6 +59,24 @@ const DAY_LABELS_FULL: Record<Weekday, string> = {
   sat: "суббота",
   sun: "воскресенье",
 };
+
+const DAY_LABELS_FULL_EN: Record<Weekday, string> = {
+  mon: "Monday",
+  tue: "Tuesday",
+  wed: "Wednesday",
+  thu: "Thursday",
+  fri: "Friday",
+  sat: "Saturday",
+  sun: "Sunday",
+};
+
+function shortDayLabels(locale: ScheduleLocale): Record<Weekday, string> {
+  return locale === "en" ? DAY_LABELS_EN : DAY_LABELS;
+}
+
+function fullDayLabels(locale: ScheduleLocale): Record<Weekday, string> {
+  return locale === "en" ? DAY_LABELS_FULL_EN : DAY_LABELS_FULL;
+}
 
 const WEEKDAY_SET = new Set<Weekday>(["mon", "tue", "wed", "thu", "fri"]);
 const WEEKEND_SET = new Set<Weekday>(["sat", "sun"]);
@@ -173,7 +203,7 @@ export function resolveWeeklyHours(
   return [];
 }
 
-export function formatDayRange(days: Weekday[]): string {
+export function formatDayRange(days: Weekday[], locale: ScheduleLocale = "ru"): string {
   if (days.length === 0) return "";
   const indices = days.map((d) => WEEKDAYS.indexOf(d)).sort((a, b) => a - b);
   const groups: string[] = [];
@@ -185,7 +215,7 @@ export function formatDayRange(days: Weekday[]): string {
       prev = cur;
       continue;
     }
-    groups.push(formatIndexRange(start, prev));
+    groups.push(formatIndexRange(start, prev, locale));
     if (cur == null) break;
     start = cur;
     prev = cur;
@@ -193,21 +223,22 @@ export function formatDayRange(days: Weekday[]): string {
   return groups.join(", ");
 }
 
-function formatIndexRange(start: number, end: number): string {
+function formatIndexRange(start: number, end: number, locale: ScheduleLocale): string {
+  const labels = shortDayLabels(locale);
   const startDay = WEEKDAYS[start]!;
   const endDay = WEEKDAYS[end]!;
-  if (start === end) return DAY_LABELS[startDay];
-  return `${DAY_LABELS[startDay]}–${DAY_LABELS[endDay]}`;
+  if (start === end) return labels[startDay];
+  return `${labels[startDay]}–${labels[endDay]}`;
 }
 
 export function formatHoursSlot(slot: WeeklyHoursSlot): string {
   return `${slot.open} – ${slot.close}`;
 }
 
-export function scheduleRows(slots: WeeklyHoursSlot[], today: Weekday) {
+export function scheduleRows(slots: WeeklyHoursSlot[], today: Weekday, locale: ScheduleLocale = "ru") {
   return slots.map((slot) => ({
     key: `${slot.days.join("-")}-${slot.open}-${slot.close}`,
-    daysLabel: formatDayRange(slot.days),
+    daysLabel: formatDayRange(slot.days, locale),
     hoursLabel: formatHoursSlot(slot),
     isToday: slot.days.includes(today),
   }));
@@ -217,11 +248,13 @@ export function getClubOpenStatus(
   slots: WeeklyHoursSlot[],
   now = new Date(),
   timeZone = "Europe/Moscow",
+  locale: ScheduleLocale = "ru",
 ): ClubOpenStatus | null {
   if (slots.length === 0) return null;
 
   const today = weekdayInZone(now, timeZone);
   const minutesNow = minutesInZone(now, timeZone);
+  const fullLabels = fullDayLabels(locale);
 
   for (const slot of slots) {
     const interval = activeIntervalForSlot(slot, today, minutesNow, timeZone, now);
@@ -229,21 +262,28 @@ export function getClubOpenStatus(
       return {
         isOpen: true,
         today,
-        todayLabel: DAY_LABELS_FULL[today],
-        message: "Сейчас открыто",
-        detail: `Закроется в ${interval.closesAt}`,
+        todayLabel: fullLabels[today],
+        message: locale === "en" ? "Open now" : "Сейчас открыто",
+        detail:
+          locale === "en"
+            ? `Closes at ${interval.closesAt}`
+            : `Закроется в ${interval.closesAt}`,
         closesAt: interval.closesAt,
       };
     }
   }
 
-  const next = findNextOpening(slots, today, minutesNow);
+  const next = findNextOpening(slots, today, minutesNow, locale);
   return {
     isOpen: false,
     today,
-    todayLabel: DAY_LABELS_FULL[today],
-    message: "Сейчас закрыто",
-    detail: next ? `Откроется ${next.label} в ${next.time}` : undefined,
+    todayLabel: fullLabels[today],
+    message: locale === "en" ? "Closed now" : "Сейчас закрыто",
+    detail: next
+      ? locale === "en"
+        ? `Opens ${next.label} at ${next.time}`
+        : `Откроется ${next.label} в ${next.time}`
+      : undefined,
     opensAt: next?.time,
   };
 }
@@ -297,11 +337,20 @@ export function findActivePriceTierAt(
   return idx != null ? tiers[idx]! : null;
 }
 
-export function priceTierDaysLabel(days: PriceTier["days"]): string {
-  if (!days || days === "all") return "ежедневно";
-  if (days === "weekdays") return "будни";
-  if (days === "weekend") return "выходные";
-  return formatDayRange(days);
+export function priceTierDaysLabel(days: PriceTier["days"], locale: ScheduleLocale = "ru"): string {
+  if (!days || days === "all") return locale === "en" ? "daily" : "ежедневно";
+  if (days === "weekdays") return locale === "en" ? "weekdays" : "будни";
+  if (days === "weekend") return locale === "en" ? "weekends" : "выходные";
+  return formatDayRange(days, locale);
+}
+
+export function formatPriceTierTimeRange(tier: PriceTier, locale: ScheduleLocale = "ru"): string | null {
+  if (tier.timeFrom && tier.timeTo) {
+    return `${tier.timeFrom} – ${tier.timeTo}`;
+  }
+  if (tier.timeFrom) return locale === "en" ? `from ${tier.timeFrom}` : `с ${tier.timeFrom}`;
+  if (tier.timeTo) return locale === "en" ? `until ${tier.timeTo}` : `до ${tier.timeTo}`;
+  return null;
 }
 
 function tierMatchesDay(tier: PriceTier, today: Weekday): boolean {
@@ -345,7 +394,12 @@ function activeIntervalForSlot(
   return candidates[0] ?? null;
 }
 
-function findNextOpening(slots: WeeklyHoursSlot[], today: Weekday, minutesNow: number) {
+function findNextOpening(
+  slots: WeeklyHoursSlot[],
+  today: Weekday,
+  minutesNow: number,
+  locale: ScheduleLocale,
+) {
   for (let offset = 0; offset < 7; offset++) {
     const dayIndex = (WEEKDAYS.indexOf(today) + offset) % 7;
     const day = WEEKDAYS[dayIndex]!;
@@ -353,12 +407,19 @@ function findNextOpening(slots: WeeklyHoursSlot[], today: Weekday, minutesNow: n
       if (!slot.days.includes(day)) continue;
       const openM = timeToMinutes(slot.open);
       if (offset === 0 && minutesNow >= openM) continue;
+      const fullLabels = fullDayLabels(locale);
       const label =
         offset === 0
-          ? "сегодня"
+          ? locale === "en"
+            ? "today"
+            : "сегодня"
           : offset === 1
-            ? "завтра"
-            : `в ${DAY_LABELS_FULL[day]}`;
+            ? locale === "en"
+              ? "tomorrow"
+              : "завтра"
+            : locale === "en"
+              ? `on ${fullLabels[day]}`
+              : `в ${fullLabels[day]}`;
       return { label, time: slot.open };
     }
   }

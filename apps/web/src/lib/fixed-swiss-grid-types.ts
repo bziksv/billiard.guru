@@ -19,6 +19,8 @@ export type FixedSwissTemplate = {
   variant?:
     | "ts168"
     | "ts168bronze"
+    | "ts168r2elim"
+    | "ts168r2elimbronze"
     | "ts3216"
     | "ts3216bronze"
     | "ts3216r8elim"

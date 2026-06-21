@@ -137,6 +137,20 @@ case "$http_code" in
     ;;
 esac
 
+if [[ "$CHECK_URL" == *"billiard.guru"* ]]; then
+  echo ""
+  echo "→ www → apex (SEO) …"
+  www_code="$(curl -sS -o /dev/null -w "%{http_code}" "https://www.billiard.guru/" --max-time 45 2>/dev/null || echo "000")"
+  case "$www_code" in
+    301|308)
+      ok "www.billiard.guru → billiard.guru ($www_code)"
+      ;;
+    *)
+      fail "www.billiard.guru должен отдавать 301/308, получили $www_code (нужен деплой с редиректом)"
+      ;;
+  esac
+fi
+
 echo ""
 if [ "$failures" -gt 0 ]; then
   echo -e "${RED}Проверка не пройдена ($failures).${NC}"

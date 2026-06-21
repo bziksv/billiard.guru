@@ -1,19 +1,21 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { FooterCookieNotice } from "@/components/site/legal/footer-cookie-notice";
 import { SiteContainer } from "@/components/site/site-container";
 import { getCurrentPlayer } from "@/lib/auth";
 import { APP_NAME, TELEGRAM_BOT_USERNAME } from "@/lib/brand";
 import { TelegramLink } from "@/lib/contact-links";
-import { SITE_GUIDE_NAV, SITE_NAV_CTA, SITE_NAV_MAIN, t } from "@/lib/site";
+import { SITE_GUIDE_NAV, SITE_NAV_CTA, SITE_NAV_MAIN } from "@/lib/site";
 
 const HOME_ANCHORS = [
-  { href: "/#news", label: "Новости" },
-  { href: "/#tournaments", label: "Турниры на главной" },
-  { href: "/#players", label: "Рейтинг на главной" },
-  { href: "/#clubs", label: "Клубы на главной" },
+  { href: "/#news", labelKey: "footer.home.news" },
+  { href: "/#tournaments", labelKey: "footer.home.tournaments" },
+  { href: "/#players", labelKey: "footer.home.players" },
+  { href: "/#clubs", labelKey: "footer.home.clubs" },
 ] as const;
 
 export async function SiteFooter() {
+  const t = await getTranslations();
   const player = await getCurrentPlayer();
 
   return (
@@ -49,8 +51,8 @@ export async function SiteFooter() {
           </div>
 
           <div className="site-footer-columns">
-            <nav className="site-footer-col" aria-label="Разделы игры">
-              <p className="site-footer-col-title">Игра</p>
+            <nav className="site-footer-col" aria-label={t("footer.sections.playAria")}>
+              <p className="site-footer-col-title">{t("footer.sections.play")}</p>
               <ul className="site-footer-links">
                 {SITE_NAV_MAIN.map((item) => (
                   <li key={item.href}>
@@ -67,8 +69,8 @@ export async function SiteFooter() {
               </ul>
             </nav>
 
-            <nav className="site-footer-col" aria-label="Справочник">
-              <p className="site-footer-col-title">Справочник</p>
+            <nav className="site-footer-col" aria-label={t("footer.sections.guideAria")}>
+              <p className="site-footer-col-title">{t("footer.sections.guide")}</p>
               <ul className="site-footer-links">
                 {SITE_GUIDE_NAV.map((item) => (
                   <li key={item.href}>
@@ -80,13 +82,13 @@ export async function SiteFooter() {
               </ul>
             </nav>
 
-            <nav className="site-footer-col" aria-label="Главная страница">
-              <p className="site-footer-col-title">На главной</p>
+            <nav className="site-footer-col" aria-label={t("footer.sections.homeAria")}>
+              <p className="site-footer-col-title">{t("footer.sections.home")}</p>
               <ul className="site-footer-links">
                 {HOME_ANCHORS.map((item) => (
                   <li key={item.href}>
                     <Link href={item.href} className="site-footer-link">
-                      {item.label}
+                      {t(item.labelKey)}
                     </Link>
                   </li>
                 ))}
@@ -96,13 +98,13 @@ export async function SiteFooter() {
         </div>
 
         <div className="site-footer-features">
-          <span>Турниры</span>
+          <span>{t("footer.features.tournaments")}</span>
           <span className="site-footer-dot" aria-hidden />
-          <span>Рейтинг</span>
+          <span>{t("footer.features.rating")}</span>
           <span className="site-footer-dot" aria-hidden />
-          <span>Бронь столов</span>
+          <span>{t("footer.features.tables")}</span>
           <span className="site-footer-dot" aria-hidden />
-          <span>Спарринг-партнёр</span>
+          <span>{t("footer.features.sparring")}</span>
         </div>
       </SiteContainer>
 

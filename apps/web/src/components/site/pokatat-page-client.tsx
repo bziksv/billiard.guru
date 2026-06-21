@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CitySelect } from "@/components/admin/city-select";
 import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { EmptyState, SiteCard } from "@/components/site/site-card";
@@ -18,11 +19,6 @@ import type { SerializedPlayListing } from "@/lib/play-listing-server";
 
 type Tab = "browse" | "create" | "mine";
 
-const KIND_OPTIONS = Object.entries(PLAY_LISTING_KIND_LABELS).map(([value, label]) => ({
-  value,
-  label,
-}));
-
 const FORMAT_OPTIONS = CLUB_TABLE_FORMATS.map((f) => ({ value: f.id, label: f.label }));
 
 export function PokatatPageClient({
@@ -34,9 +30,20 @@ export function PokatatPageClient({
   isVerified: boolean;
   defaultCityId?: string;
 }) {
+  const t = useTranslations("pages.pokatat.client");
+  const tKind = useTranslations("playListing.kind");
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get("tab") as Tab) || "browse";
+
+  const kindOptions = useMemo(
+    () =>
+      Object.keys(PLAY_LISTING_KIND_LABELS).map((value) => ({
+        value,
+        label: tKind(value as "SPARRING"),
+      })),
+    [tKind],
+  );
 
   const [tab, setTab] = useState<Tab>(
     initialTab === "create" || initialTab === "mine" ? initialTab : "browse",
@@ -183,7 +190,7 @@ export function PokatatPageClient({
     setSubmitting(false);
 
     if (!res.ok) {
-      setSubmitError(data.error ?? "Ошибка публикации");
+      setSubmitError(data.error ?? t("submitError"));
       return;
     }
 
@@ -203,14 +210,14 @@ export function PokatatPageClient({
     <div className="space-y-6">
       <div className="home-tab-bar inline-flex flex-wrap gap-1 rounded-xl p-1">
         <button type="button" onClick={() => setTab("browse")} className={tabClass(tab === "browse")}>
-          Объявления{listings.length > 0 ? ` (${listings.length})` : ""}
+          {t("tabBrowse")}{listings.length > 0 ? ` (${listings.length})` : ""}
         </button>
         <button type="button" onClick={() => setTab("create")} className={tabClass(tab === "create")}>
-          Опубликовать
+          {t("tabCreate")}
         </button>
         {isLoggedIn && (
           <button type="button" onClick={() => setTab("mine")} className={tabClass(tab === "mine")}>
-            Мои{mine.length > 0 ? ` (${mine.length})` : ""}
+            {t("tabMine")}{mine.length > 0 ? ` (${mine.length})` : ""}
           </button>
         )}
       </div>
@@ -219,41 +226,41 @@ export function PokatatPageClient({
         <>
           <div className="flex flex-wrap gap-3">
             <SearchableSelect
-              options={[{ value: "", label: "Все типы" }, ...KIND_OPTIONS]}
+              options={[{ value: "", label: t("filterAllKinds") }, ...kindOptions]}
               value={filterKind}
               onChange={setFilterKind}
-              placeholder="Тип"
+              placeholder={t("filterKindPlaceholder")}
               className="min-w-[10rem]"
             />
             <SearchableSelect
               options={[
-                { value: "", label: "Разово и на постоянке" },
-                { value: "ONE_TIME", label: "Разово" },
-                { value: "RECURRING", label: "На постоянке" },
+                { value: "", label: t("filterAllSchedules") },
+                { value: "ONE_TIME", label: t("scheduleOneTime") },
+                { value: "RECURRING", label: t("scheduleRecurring") },
               ]}
               value={filterSchedule}
               onChange={setFilterSchedule}
-              placeholder="Расписание"
+              placeholder={t("filterSchedulePlaceholder")}
               className="min-w-[10rem]"
             />
           </div>
 
           {loading ? (
-            <p className="home-card-body text-sm">Загрузка…</p>
+            <p className="home-card-body text-sm">{t("loading")}</p>
           ) : listings.length === 0 ? (
             <>
               <EmptyState
-                title="Пока нет объявлений"
-                description="Станьте первым — опубликуйте, когда и с кем хотите поиграть"
+                title={t("emptyTitle")}
+                description={t("emptyDescription")}
               />
               <div className="text-center">
                 {isLoggedIn ? (
                   <button type="button" onClick={() => setTab("create")} className="site-btn-primary">
-                    Опубликовать
+                    {t("post")}
                   </button>
                 ) : (
                   <Link href="/login?next=/pokatat?tab=create" className="site-btn-primary inline-flex">
-                    Войти и опубликовать
+                    {t("loginToPost")}
                   </Link>
                 )}
               </div>
@@ -272,14 +279,14 @@ export function PokatatPageClient({
         <SiteCard>
           {!isLoggedIn ? (
             <div className="home-card-body space-y-3 text-sm">
-              <p>Публиковать объявления могут зарегистрированные игроки.</p>
+              <p>{t("loginRequired")}</p>
               <Link href="/login?next=/pokatat?tab=create" className="site-btn-primary inline-flex">
-                Войти
+                {t("login")}
               </Link>
             </div>
           ) : !isVerified ? (
             <p className="text-sm text-amber-700 dark:text-amber-400/90">
-              Подтвердите регистрацию в Telegram — после этого можно публиковать объявления.
+              {t("verifyRequired")}
             </p>
           ) : (
             <form
@@ -290,11 +297,11 @@ export function PokatatPageClient({
               }}
             >
               <section className="space-y-4">
-                <h3 className="site-form-section-title">О чём объявление</h3>
+                <h3 className="site-form-section-title">{t("sectionAbout")}</h3>
                 <input
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Например: Спарринг по средам в «Абрилок»"
+                  placeholder={t("titlePlaceholder")}
                   maxLength={120}
                   required
                   className="site-input w-full"
@@ -302,22 +309,23 @@ export function PokatatPageClient({
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
-                  placeholder="Дополнительно: стиль игры, уровень, пожелания…"
+                  placeholder={t("bodyPlaceholder")}
                   rows={4}
                   maxLength={2000}
                   className="site-input w-full resize-y"
                 />
+                <p className="text-xs text-[var(--text-muted)]">{t("autoTranslateHint")}</p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <SearchableSelect
-                    label="Что ищете"
-                    options={KIND_OPTIONS}
+                    label={t("kindLabel")}
+                    options={kindOptions}
                     value={kind}
                     onChange={setKind}
                     required
                   />
                   <SearchableSelect
-                    label="Формат стола"
-                    options={[{ value: "", label: "Не важно" }, ...FORMAT_OPTIONS]}
+                    label={t("tableFormatLabel")}
+                    options={[{ value: "", label: t("anyFormat") }, ...FORMAT_OPTIONS]}
                     value={gameFormat}
                     onChange={setGameFormat}
                   />
@@ -325,7 +333,7 @@ export function PokatatPageClient({
               </section>
 
               <section className="site-section-divider space-y-4 pt-6">
-                <h3 className="site-form-section-title">Когда играете</h3>
+                <h3 className="site-form-section-title">{t("sectionWhen")}</h3>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -336,7 +344,7 @@ export function PokatatPageClient({
                         : "site-chip"
                     }
                   >
-                    Разово
+                    {t("scheduleOneTime")}
                   </button>
                   <button
                     type="button"
@@ -347,14 +355,14 @@ export function PokatatPageClient({
                         : "site-chip"
                     }
                   >
-                    На постоянке
+                    {t("scheduleRecurring")}
                   </button>
                 </div>
 
                 {scheduleType === "ONE_TIME" ? (
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="block text-sm">
-                      <span className="site-form-label mb-1 block">Дата</span>
+                      <span className="site-form-label mb-1 block">{t("date")}</span>
                       <input
                         type="date"
                         value={playDate}
@@ -365,7 +373,7 @@ export function PokatatPageClient({
                       />
                     </label>
                     <label className="block text-sm">
-                      <span className="site-form-label mb-1 block">Время</span>
+                      <span className="site-form-label mb-1 block">{t("time")}</span>
                       <input
                         type="time"
                         value={playTime}
@@ -378,7 +386,7 @@ export function PokatatPageClient({
                 ) : (
                   <div className="space-y-4">
                     <div>
-                      <p className="site-form-label mb-2">Дни недели</p>
+                      <p className="site-form-label mb-2">{t("weekdays")}</p>
                       <div className="flex flex-wrap gap-2">
                         {WEEKDAY_LABELS.map((label, day) => (
                           <button
@@ -398,7 +406,7 @@ export function PokatatPageClient({
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <label className="block text-sm">
-                        <span className="site-form-label mb-1 block">С</span>
+                        <span className="site-form-label mb-1 block">{t("from")}</span>
                         <input
                           type="time"
                           value={timeFrom}
@@ -408,7 +416,7 @@ export function PokatatPageClient({
                         />
                       </label>
                       <label className="block text-sm">
-                        <span className="site-form-label mb-1 block">До</span>
+                        <span className="site-form-label mb-1 block">{t("to")}</span>
                         <input
                           type="time"
                           value={timeTo}
@@ -422,19 +430,19 @@ export function PokatatPageClient({
               </section>
 
               <section className="site-section-divider space-y-4 pt-6">
-                <h3 className="site-form-section-title">Где и с кем</h3>
+                <h3 className="site-form-section-title">{t("sectionWhere")}</h3>
                 <CitySelect value={cityId} onChange={setCityId} required />
                 <SearchableSelect
-                  label="Клуб (необязательно)"
+                  label={t("clubOptional")}
                   options={clubOptions}
                   value={clubId}
                   onChange={setClubId}
                   disabled={!cityId}
-                  placeholder={cityId ? "Выберите клуб" : "Сначала выберите город"}
+                  placeholder={cityId ? t("chooseClub") : t("chooseCityFirst")}
                 />
                 <div className="grid gap-4 sm:grid-cols-3">
                   <label className="block text-sm">
-                    <span className="site-form-label mb-1 block">Рейтинг от</span>
+                    <span className="site-form-label mb-1 block">{t("ratingFrom")}</span>
                     <input
                       type="number"
                       step="0.5"
@@ -447,7 +455,7 @@ export function PokatatPageClient({
                     />
                   </label>
                   <label className="block text-sm">
-                    <span className="site-form-label mb-1 block">Рейтинг до</span>
+                    <span className="site-form-label mb-1 block">{t("ratingTo")}</span>
                     <input
                       type="number"
                       step="0.5"
@@ -460,7 +468,7 @@ export function PokatatPageClient({
                     />
                   </label>
                   <label className="block text-sm sm:col-span-2">
-                    <span className="site-form-label mb-1 block">Сколько игроков</span>
+                    <span className="site-form-label mb-1 block">{t("playersNeeded")}</span>
                     <input
                       type="text"
                       list="pokatat-players-needed"
@@ -497,7 +505,7 @@ export function PokatatPageClient({
                 }
                 className="site-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? "Публикация…" : "Опубликовать"}
+                {submitting ? t("submitting") : t("submit")}
               </button>
             </form>
           )}
@@ -508,10 +516,10 @@ export function PokatatPageClient({
         <section className="space-y-4">
           {mine.length === 0 ? (
             <>
-              <EmptyState title="У вас пока нет объявлений" />
+              <EmptyState title={t("mineEmpty")} />
               <div className="text-center">
                 <button type="button" onClick={() => setTab("create")} className="site-btn-primary">
-                  Опубликовать первое
+                  {t("mineCreate")}
                 </button>
               </div>
             </>
@@ -521,12 +529,6 @@ export function PokatatPageClient({
             ))
           )}
         </section>
-      )}
-
-      {tab === "browse" && geoQuery && (
-        <p className="home-card-muted text-xs">
-          Фильтр региона применяется из панели выше{geoQuery ? "" : ""}.
-        </p>
       )}
     </div>
   );

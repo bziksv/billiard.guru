@@ -109,22 +109,121 @@ function demoParticipantCount(rules: BracketParticipantRules): number {
   return Math.max(rules.min, 4);
 }
 
-function mkSoloTeam(index: number): BracketTeamView {
+const DEMO_SURNAMES_EN = [
+  "Ivanov",
+  "Petrov",
+  "Sidorov",
+  "Kozlov",
+  "Novikov",
+  "Morozov",
+  "Volkov",
+  "Sokolov",
+  "Lebedev",
+  "Kuznetsov",
+  "Popov",
+  "Smirnov",
+  "Vasiliev",
+  "Pavlov",
+  "Semenov",
+  "Golubev",
+  "Vinogradov",
+  "Bogdanov",
+  "Vorobyov",
+  "Fedorov",
+  "Mikhailov",
+  "Belyaev",
+  "Tarasov",
+  "Belov",
+  "Komarov",
+  "Orlov",
+  "Kiselev",
+  "Makarov",
+  "Andreev",
+  "Kovalev",
+  "Ilyin",
+  "Gusev",
+  "Titov",
+  "Kuzmin",
+  "Kudryavtsev",
+  "Baranov",
+  "Kulikov",
+  "Alekseev",
+  "Stepanov",
+  "Yakovlev",
+  "Sorokin",
+  "Sergeev",
+  "Romanov",
+  "Zakharov",
+  "Borisov",
+  "Korolev",
+  "Gerasimov",
+  "Ponomarev",
+  "Grigoriev",
+  "Lazarev",
+  "Medvedev",
+  "Ershov",
+  "Nikitin",
+  "Sobolev",
+  "Ryabov",
+  "Polyakov",
+  "Tsvetkov",
+  "Danilov",
+  "Zhukov",
+  "Frolov",
+  "Zhuravlev",
+  "Nikolaev",
+  "Krylov",
+  "Maksimov",
+  "Sidorenko",
+] as const;
+
+function demoSurnames(locale: "ru" | "en" = "ru"): readonly string[] {
+  return locale === "en" ? DEMO_SURNAMES_EN : DEMO_SURNAMES;
+}
+
+const DEMO_FIRST_EN = [
+  "I.",
+  "P.",
+  "S.",
+  "K.",
+  "A.",
+  "M.",
+  "V.",
+  "D.",
+  "E.",
+  "N.",
+  "O.",
+  "R.",
+  "T.",
+  "L.",
+  "G.",
+  "B.",
+] as const;
+
+function demoFirstInitials(locale: "ru" | "en"): readonly string[] {
+  return locale === "en" ? DEMO_FIRST_EN : DEMO_FIRST;
+}
+
+function mkSoloTeam(index: number, locale: "ru" | "en" = "ru"): BracketTeamView {
+  const surnames = demoSurnames(locale);
+  const firstNames = demoFirstInitials(locale);
   const id = `demo-t${index}`;
   return {
     id,
     name: null,
     player1: {
       id: `${id}-p1`,
-      firstName: DEMO_FIRST[index % DEMO_FIRST.length]!,
-      lastName: DEMO_SURNAMES[index % DEMO_SURNAMES.length]!,
+      firstName: firstNames[index % firstNames.length]!,
+      lastName: surnames[index % surnames.length]!,
       rating: Math.round((8.5 - index * 0.12) * 10) / 10,
     },
     player2: null,
   };
 }
 
-function mkPairTeam(index: number): BracketTeamView {
+function mkPairTeam(index: number, locale: "ru" | "en" = "ru"): BracketTeamView {
+  const surnames = demoSurnames(locale);
+  const firstNames = demoFirstInitials(locale);
   const id = `demo-t${index}`;
   const i1 = index * 2;
   const i2 = index * 2 + 1;
@@ -133,22 +232,22 @@ function mkPairTeam(index: number): BracketTeamView {
     name: null,
     player1: {
       id: `${id}-p1`,
-      firstName: DEMO_FIRST[i1 % DEMO_FIRST.length]!,
-      lastName: DEMO_SURNAMES[i1 % DEMO_SURNAMES.length]!,
+      firstName: firstNames[i1 % firstNames.length]!,
+      lastName: surnames[i1 % surnames.length]!,
       rating: Math.round((7.5 - index * 0.08) * 10) / 10,
     },
     player2: {
       id: `${id}-p2`,
-      firstName: DEMO_FIRST[i2 % DEMO_FIRST.length]!,
-      lastName: DEMO_SURNAMES[i2 % DEMO_SURNAMES.length]!,
+      firstName: firstNames[i2 % firstNames.length]!,
+      lastName: surnames[i2 % surnames.length]!,
       rating: Math.round((7.0 - index * 0.08) * 10) / 10,
     },
   };
 }
 
-function mkDemoTeams(count: number, pairing: "single" | "pair"): BracketTeamView[] {
+function mkDemoTeams(count: number, pairing: "single" | "pair", locale: "ru" | "en" = "ru"): BracketTeamView[] {
   const mk = pairing === "pair" ? mkPairTeam : mkSoloTeam;
-  return Array.from({ length: count }, (_, i) => mk(i));
+  return Array.from({ length: count }, (_, i) => mk(i, locale));
 }
 
 function inputToView(
@@ -182,8 +281,9 @@ function buildOlympicDemo(
   format: string,
   count: number,
   pairing: "single" | "pair",
+  locale: "ru" | "en" = "ru",
 ): BracketMatchView[] {
-  const teams = mkDemoTeams(count, pairing);
+  const teams = mkDemoTeams(count, pairing, locale);
   const teamIds = teams.map((t) => t.id);
   const teamsById = new Map(teams.map((t) => [t.id, t]));
   const inputs = isOlympicBronzeFormat(format)
@@ -200,8 +300,9 @@ function buildFixedSwissDemo(
   format: string,
   count: number,
   pairing: "single" | "pair",
+  locale: "ru" | "en" = "ru",
 ): BracketMatchView[] {
-  const teams = mkDemoTeams(count, pairing);
+  const teams = mkDemoTeams(count, pairing, locale);
   const teamIds = teams.map((t) => t.id);
   const teamsById = new Map(teams.map((t) => [t.id, t]));
   const template = buildFixedSwissTemplate(count, format);
@@ -223,9 +324,9 @@ function buildFixedSwissDemo(
   });
 }
 
-function buildDynamicSwissDemo(pairing: "single" | "pair"): BracketMatchView[] {
+function buildDynamicSwissDemo(pairing: "single" | "pair", locale: "ru" | "en" = "ru"): BracketMatchView[] {
   const count = 8;
-  const teams = mkDemoTeams(count, pairing);
+  const teams = mkDemoTeams(count, pairing, locale);
   const matches: BracketMatchView[] = [];
 
   for (let slot = 1; slot <= count / 2; slot++) {
@@ -269,8 +370,8 @@ function buildDynamicSwissDemo(pairing: "single" | "pair"): BracketMatchView[] {
   return matches;
 }
 
-function buildExcelRef64Demo(pairing: "single" | "pair"): BracketMatchView[] {
-  return buildFixedSwissDemo("FIXED_SWISS_64", 64, pairing);
+function buildExcelRef64Demo(pairing: "single" | "pair", locale: "ru" | "en" = "ru"): BracketMatchView[] {
+  return buildFixedSwissDemo("FIXED_SWISS_64", 64, pairing, locale);
 }
 
 /** Сетки 32/64 (и больше) — на лендинге показываем схему колонок, не полную сетку */
@@ -284,22 +385,23 @@ export function isLargeBracketDemo(matches: BracketMatchView[]): boolean {
 export function buildBracketFormatDemo(
   format: BracketFormatCode,
   pairing: "single" | "pair",
+  locale: "ru" | "en" = "ru",
 ): BracketMatchView[] {
   const rules = getDefaultBracketParticipantRules(format);
   const count = demoParticipantCount(rules);
 
   if (isExcelRef64Format(format)) {
-    return buildExcelRef64Demo(pairing);
+    return buildExcelRef64Demo(pairing, locale);
   }
   if (isFixedSwissFormat(format)) {
-    return buildFixedSwissDemo(format, count, pairing);
+    return buildFixedSwissDemo(format, count, pairing, locale);
   }
   if (isOlympicFormat(format)) {
-    return buildOlympicDemo(format, count, pairing);
+    return buildOlympicDemo(format, count, pairing, locale);
   }
   if (isDynamicSwissFormat(format)) {
-    return buildDynamicSwissDemo(pairing);
+    return buildDynamicSwissDemo(pairing, locale);
   }
 
-  return buildOlympicDemo(format, count, pairing);
+  return buildOlympicDemo(format, count, pairing, locale);
 }

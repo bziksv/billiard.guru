@@ -1,11 +1,14 @@
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
+import { localizedGeoName } from "@/lib/geo-display";
+import type { AppLocale } from "@/i18n/routing";
 
 type ClubItem = {
   id: string;
   name: string;
   isVerified: boolean;
   gamePrice?: string | null;
-  city: { nameRu: string; country: { nameRu: string } };
+  city: { nameRu: string; nameEn?: string | null; country: { nameRu: string; nameEn?: string | null } };
   _count?: { tournaments: number };
 };
 
@@ -16,11 +19,23 @@ function priceLabel(gamePrice: string | null | undefined) {
   return firstLine.length > 48 ? `${firstLine.slice(0, 47)}…` : firstLine;
 }
 
-export function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
+function tournamentLabel(
+  count: number,
+  t: Awaited<ReturnType<typeof getTranslations>>,
+): string {
+  if (count === 1) return t("home.clubs.tournamentOne");
+  if (count >= 2 && count <= 4) return t("home.clubs.tournamentFew");
+  return t("home.clubs.tournamentMany");
+}
+
+export async function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
+  const t = await getTranslations();
+  const locale = (await getLocale()) as AppLocale;
+
   if (clubs.length === 0) {
     return (
       <p className="home-content-card rounded-2xl px-6 py-12 text-center home-card-muted">
-        Клубы скоро появятся в вашем регионе.
+        {t("home.clubs.empty")}
       </p>
     );
   }
@@ -47,7 +62,8 @@ export function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
                   {club.name}
                 </h3>
                 <p className="home-card-muted text-sm">
-                  {club.city.nameRu}, {club.city.country.nameRu}
+                  {localizedGeoName(club.city.nameRu, locale, club.city.nameEn)},{" "}
+                  {localizedGeoName(club.city.country.nameRu, locale, club.city.country.nameEn)}
                 </p>
               </div>
             </div>
@@ -55,21 +71,16 @@ export function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
               <div className="home-card-muted flex flex-wrap gap-3 text-xs">
                 {price && <span>{price}</span>}
                 {club.isVerified && (
-                  <span className="text-emerald-600/90">подтверждён</span>
+                  <span className="text-emerald-600/90">{t("home.clubs.verified")}</span>
                 )}
               </div>
               <div className="home-card-muted text-xs">
                 {tournamentCount > 0 ? (
                   <span>
-                    {tournamentCount}{" "}
-                    {tournamentCount === 1
-                      ? "турнир"
-                      : tournamentCount < 5
-                        ? "турнира"
-                        : "турниров"}
+                    {tournamentCount} {tournamentLabel(tournamentCount, t)}
                   </span>
                 ) : (
-                  <span>бронь столов</span>
+                  <span>{t("home.clubs.booking")}</span>
                 )}
               </div>
             </div>

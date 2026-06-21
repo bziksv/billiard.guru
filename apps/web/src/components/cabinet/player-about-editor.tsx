@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function PlayerAboutEditor({ playerId }: { playerId: string }) {
+  const t = useTranslations("pages.cabinet");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,11 +19,11 @@ export function PlayerAboutEditor({ playerId }: { playerId: string }) {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось загрузить");
+      setError(data.error ?? t("loadError"));
       return;
     }
     setAbout(data.about ?? "");
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void load();
@@ -39,26 +41,25 @@ export function PlayerAboutEditor({ playerId }: { playerId: string }) {
     const data = await res.json();
     setSaving(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось сохранить");
+      setError(data.error ?? t("saveError"));
       return;
     }
     setAbout(data.about ?? "");
-    setMessage("Сохранено — текст виден в публичном профиле");
+    setMessage(t("aboutSaved"));
   }
 
   if (loading) {
-    return <p className="text-sm text-zinc-500">Загрузка…</p>;
+    return <p className="text-sm text-zinc-500">{t("loading")}</p>;
   }
 
   return (
     <section className="site-card space-y-4 p-5">
       <div>
-        <h2 className="site-section-title text-lg">О себе</h2>
+        <h2 className="site-section-title text-lg">{t("aboutTitle")}</h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Здесь можно коротко рассказать о себе: в какие игры любите играть, каким кием играете, в
-          каких клубах чаще бываете. Текст появится в{" "}
+          {t("aboutLead")}{" "}
           <Link href={`/players/${playerId}`} className="text-emerald-600 hover:underline">
-            публичном профиле
+            {t("aboutProfileLink")}
           </Link>
           .
         </p>
@@ -70,7 +71,7 @@ export function PlayerAboutEditor({ playerId }: { playerId: string }) {
           onChange={(e) => setAbout(e.target.value)}
           rows={6}
           maxLength={4000}
-          placeholder="Например: играю в пул и пирамиду, кий Predator, чаще бываю в клубе …"
+          placeholder={t("aboutPlaceholder")}
           className="site-input w-full resize-y"
         />
       </label>
@@ -79,7 +80,7 @@ export function PlayerAboutEditor({ playerId }: { playerId: string }) {
       {message && <p className="text-sm text-emerald-600">{message}</p>}
 
       <button type="button" onClick={() => void save()} disabled={saving} className="site-btn-primary">
-        {saving ? "Сохранение…" : "Сохранить"}
+        {saving ? t("saving") : t("save")}
       </button>
     </section>
   );

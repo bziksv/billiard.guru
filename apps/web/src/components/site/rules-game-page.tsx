@@ -1,14 +1,15 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { getTranslations } from "next-intl/server";
 import { RulesBreadcrumbs } from "@/components/site/rules-breadcrumbs";
 import { RulesHistoryBlock } from "@/components/site/rules-table-detail-sections";
 import { GuideSections } from "@/components/site/guide-sections";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
-import type { BilliardGame, BilliardTableType } from "@/lib/billiard-rules";
+import type { BilliardGame, BilliardTableType } from "@/lib/billiard-rules/content";
 import { rulesTableAccentColor } from "@/lib/billiard-rules";
 
-export function RulesGamePage({
+export async function RulesGamePage({
   table,
   game,
   relatedGames,
@@ -17,6 +18,7 @@ export function RulesGamePage({
   game: BilliardGame;
   relatedGames: BilliardGame[];
 }) {
+  const t = await getTranslations("rules");
   const accent = rulesTableAccentColor(table.id);
 
   return (
@@ -30,7 +32,7 @@ export function RulesGamePage({
       <PageMain className="pt-0">
         <RulesBreadcrumbs
           items={[
-            { href: "/rules", label: "Правила" },
+            { href: "/rules", label: t("breadcrumbs.rules") },
             { href: `/rules/${table.slug}`, label: table.title },
             { label: game.title },
           ]}
@@ -40,7 +42,7 @@ export function RulesGamePage({
           <aside className="hidden lg:block">
             <div className="sticky top-28 space-y-4">
               <nav className="site-card p-5">
-                <p className="guide-toc-label">Содержание</p>
+                <p className="guide-toc-label">{t("game.toc")}</p>
                 <ul className="mt-3 space-y-2 text-sm">
                   {game.sections.map((section) => (
                     <li key={section.id}>
@@ -60,7 +62,7 @@ export function RulesGamePage({
               </nav>
               {relatedGames.length > 0 && (
                 <nav className="site-card p-5">
-                  <p className="guide-toc-label">Ещё на этом столе</p>
+                  <p className="guide-toc-label">{t("game.relatedOnTable")}</p>
                   <ul className="mt-3 space-y-2 text-sm">
                     {relatedGames.map((g) => (
                       <li key={g.slug}>
@@ -94,18 +96,15 @@ export function RulesGamePage({
             {game.history && <RulesHistoryBlock history={game.history} />}
 
             <SiteCard>
-              <p className="guide-note text-sm">
-                Это краткий ориентир. Точный регламент — в описании турнира на billiard.guru или
-                у организатора. При расхождении приоритет у официальных правил события.
-              </p>
+              <p className="guide-note text-sm">{t("game.disclaimer")}</p>
             </SiteCard>
 
             <div className="flex flex-wrap gap-3 lg:hidden">
               <Link href={`/rules/${table.slug}`} className="site-btn-secondary">
-                Все игры: {table.title}
+                {t("game.allGames", { table: table.title })}
               </Link>
               <Link href="/rules" className="site-btn-secondary">
-                Типы столов
+                {t("game.allTables")}
               </Link>
             </div>
           </div>

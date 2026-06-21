@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { translateText } from "@/lib/translation";
 import { playerAboutUpdateSchema } from "@/lib/validators";
 
 export async function GET() {
@@ -26,10 +27,16 @@ export async function PATCH(request: NextRequest) {
     }
 
     const data = playerAboutUpdateSchema.parse(await request.json());
+    const about = data.about?.trim() || null;
+    let aboutEn: string | null = null;
+    if (about) {
+      aboutEn = (await translateText(about, "ru", "en")) ?? null;
+    }
+
     const updated = await prisma.player.update({
       where: { id: player.id },
-      data: { about: data.about?.trim() || null },
-      select: { about: true },
+      data: { about, aboutEn },
+      select: { about: true, aboutEn: true },
     });
 
     return NextResponse.json({ about: updated.about });

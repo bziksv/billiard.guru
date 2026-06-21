@@ -5,6 +5,7 @@ import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { notifyClubPlayListingResponse } from "@/lib/play-listing-notify";
 import { prisma } from "@/lib/prisma";
+import { translateText } from "@/lib/translation";
 import { playListingRespondSchema } from "@/lib/validators";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -38,6 +39,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     }
 
     const data = playListingRespondSchema.parse(await request.json());
+    const message = data.message?.trim() || null;
+    const messageEn = message ? (await translateText(message, "ru", "en")) ?? null : null;
 
     const existing = await prisma.playListingResponse.findUnique({
       where: { listingId_playerId: { listingId, playerId: player.id } },
@@ -50,7 +53,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       ? await prisma.playListingResponse.update({
           where: { id: existing.id },
           data: {
-            message: data.message?.trim() || null,
+            message,
+            messageEn,
             status: "PENDING",
           },
         })
@@ -58,7 +62,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           data: {
             listingId,
             playerId: player.id,
-            message: data.message?.trim() || null,
+            message,
+            messageEn,
           },
         });
 

@@ -11,6 +11,8 @@ import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center"
 import { bracketMatchHasPlayer } from "@/lib/bracket-display";
 import { teamLabel } from "@/lib/pair-tournament";
 import { formatTournamentStandingPlace } from "@/lib/tournament-admin";
+import { getBracketUILabels, localizeBracketColumnLabel } from "@/lib/bracket-view-labels";
+import type { AppLocale } from "@/i18n/routing";
 import { cn } from "@/lib/cn";
 import type { TeamPlayer } from "@/lib/pair-tournament";
 import {
@@ -22,18 +24,21 @@ import {
   gridFixedColumnLabel,
   gridFixedConnectorPath,
   gridFixedCrossToQuarterConnectorPath,
+  gridFixedLegacy29FarSemiConnectorPath,
   gridFixedForkConnectorPath,
   gridFixedEdgePoints,
   isFixedSwissCrossAtSourceYEdge,
   isFixedSwissForkEdge,
   isFixedSwissR1LowerLossEdge,
   isFixedSwissR23UpperLossEdge,
+  isFixedSwissTsLegacy29FarSemiWinEdge,
   isFixedSwissUpperOlympicForkEdge,
   shouldDrawFixedSwissLossEdge,
   shouldDrawFixedSwissWinEdge,
 } from "@/lib/fixed-swiss-layout";
 import {
   isFixedSwiss168MatchCount,
+  isFixedSwissTsLegacy29MatchCount,
   isFixedSwissTs32BronzeMatchCount,
   isFixedSwissTs32MatchCount,
   isFixedSwissTs32R8ElimAtEighthFamily,
@@ -75,6 +80,7 @@ export function SwissBracketView({
   showCardPlacement = true,
   demoPreview = false,
   presentation = false,
+  uiLocale = "ru",
 }: {
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
@@ -89,9 +95,10 @@ export function SwissBracketView({
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   demoPreview?: boolean;
-  /** Полноэкранный режим: без подсказок, сетка на всю высоту. */
   presentation?: boolean;
+  uiLocale?: AppLocale;
 }) {
+  const labels = getBracketUILabels(uiLocale);
   const [localHighlightedPlayerId, setLocalHighlightedPlayerId] = useState<
     string | null
   >(null);
@@ -222,8 +229,11 @@ export function SwissBracketView({
   const is32Outdated =
     is32Grid &&
     isOutdatedFixedSwiss32Bracket(matches.length, bracketMaxRound);
+  const isLegacy29Family =
+    useFixed168 &&
+    (matches.length === 30 || isFixedSwissTsLegacy29MatchCount(matches.length));
   const r23TrunkY =
-    is32Outdated || isLargeCurrent || is256R16Current
+    is32Outdated || isLargeCurrent || is256R16Current || isLegacy29Family
       ? fixedSwissForkTrunkYByTarget(
           2,
           3,
@@ -355,7 +365,7 @@ export function SwissBracketView({
       {showStandings && !presentation && standings.length > 0 && (
         <section>
           <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-            Таблица
+            {labels.standings}
           </h3>
           <ol className="flex flex-wrap gap-x-6 gap-y-1 rounded-lg border border-zinc-800 bg-zinc-950/80 px-4 py-3">
             {[...standings]
@@ -411,11 +421,14 @@ export function SwissBracketView({
           }}
         >
           {columns.map((col) => {
-            const label = fixedGrid
-              ? useFixed168
-                ? fixedSwissColumnLabel(col, matches.length, fixedMaxRound)
-                : gridFixedColumnLabel(col)
-              : gridColumnLabel(col, layout.minRound);
+            const label = localizeBracketColumnLabel(
+              fixedGrid
+                ? useFixed168
+                  ? fixedSwissColumnLabel(col, matches.length, fixedMaxRound, matches)
+                  : gridFixedColumnLabel(col)
+                : gridColumnLabel(col, layout.minRound),
+              uiLocale,
+            );
             const isStart = fixedGrid ? col === 0 : col === layout.minCol;
             return (
               <div
@@ -542,6 +555,17 @@ export function SwissBracketView({
                     matches.length,
                     bracketMaxRound,
                   );
+                const legacy29FarSemi =
+                  useFixed168 &&
+                  isFixedSwissTsLegacy29FarSemiWinEdge(
+                    fromMatch.round,
+                    fromMatch.slot,
+                    toMatch.round,
+                    toMatch.slot,
+                    fromPos.col,
+                    toPos.col,
+                    matches.length,
+                  );
                 const path = isR12Fork
                   ? gridFixedConnectorPath(
                       points.from,
@@ -573,6 +597,16 @@ export function SwissBracketView({
                         layout.minCol,
                         colW,
                         edge.fromTeamSlot ?? 0,
+                      )
+                    : legacy29FarSemi
+                    ? gridFixedLegacy29FarSemiConnectorPath(
+                        points.from,
+                        points.to,
+                        fromPos.col,
+                        toPos.col,
+                        layout.minCol,
+                        colW,
+                        0,
                       )
                     : gridFixedConnectorPath(
                         points.from,
@@ -678,6 +712,7 @@ export function SwissBracketView({
                   showCardHandicap={showCardHandicap}
                   showCardPlacement={showCardPlacement}
                   highlightedPlayerId={highlightedPlayerId}
+                  uiLocale={uiLocale}
                 />
               </div>
             );

@@ -11,9 +11,12 @@ import {
   resolveRulesTableSeo,
 } from "@/lib/billiard-rules/rules-seo";
 import { LEGAL_DOCS, type LegalDocSlug } from "@/lib/legal";
+import { getAllLegalDocSlugs, getLegalDoc } from "@/lib/legal-content";
+import { BRACKET_FORMAT_SEO_EN } from "@/lib/bracket-formats/en/seo";
+import { STATIC_PAGE_SEO_EN } from "@/lib/seo-locale";
+import { getCanonicalSiteOrigin } from "@/lib/canonical-site-url";
 
-export const SEO_SITE_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://billiard.guru";
+export const SEO_SITE_URL = getCanonicalSiteOrigin();
 
 export type SeoInput = {
   /** Короткий title; суффикс «| billiard.guru» добавляет title.template в layout. */
@@ -356,6 +359,15 @@ export function collectAllSeoEntries(): SeoRegistryEntry[] {
       description: seo.description,
       keywords: [...seo.keywords],
     });
+    const en = STATIC_PAGE_SEO_EN[key as keyof typeof STATIC_PAGE_SEO_EN];
+    if (en) {
+      entries.push({
+        key: `static:en:${key}`,
+        title: en.title,
+        description: en.description,
+        keywords: [...en.keywords],
+      });
+    }
   }
 
   for (const slug of getAllBracketFormatSeoSlugs()) {
@@ -367,15 +379,30 @@ export function collectAllSeoEntries(): SeoRegistryEntry[] {
       description: seo.metaDescription,
       keywords: [...seo.keywords],
     });
+    const en = BRACKET_FORMAT_SEO_EN[seo.code];
+    if (en) {
+      entries.push({
+        key: `bracket:en:${slug}`,
+        title: en.metaTitle,
+        description: en.metaDescription,
+        keywords: [...en.keywords],
+      });
+    }
   }
 
-  for (const doc of Object.keys(LEGAL_DOCS) as LegalDocSlug[]) {
-    const entry = LEGAL_DOCS[doc];
+  for (const doc of getAllLegalDocSlugs()) {
     entries.push({
       key: `legal:${doc}`,
-      title: entry.title,
-      description: entry.description,
+      title: LEGAL_DOCS[doc].title,
+      description: LEGAL_DOCS[doc].description,
       keywords: [...LEGAL_KEYWORDS[doc]],
+    });
+    const en = getLegalDoc(doc, "en");
+    entries.push({
+      key: `legal:en:${doc}`,
+      title: en.title,
+      description: en.description,
+      keywords: [...en.keywords],
     });
   }
 

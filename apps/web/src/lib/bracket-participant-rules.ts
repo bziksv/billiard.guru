@@ -48,9 +48,11 @@ const FIXED_SWISS_16_FORMATS = new Set([
   "FIXED_SWISS_16_BRONZE",
   "FIXED_SWISS_16R4_2_3_mesta",
   "FIXED_SWISS_16R4_1_3_mesto",
+  "FIXED_SWISS_16R2_1_3_mesto",
   "FIXED_PAIR_SWISS",
   "FIXED_PAIR_SWISS_16_BRONZE",
   "FIXED_PAIR_SWISS_16R4_1_3_mesto",
+  "FIXED_PAIR_SWISS_16R2_1_3_mesto",
   "FIXED_PAIR_SWISS_16R4_2_3_mesto",
 ]);
 
@@ -211,7 +213,10 @@ export function getDefaultBracketParticipantRules(
     };
   }
   if (FIXED_SWISS_16_FORMATS.has(code)) {
-    const withBronze =
+    const is16R2Bronze =
+      code === "FIXED_SWISS_16R2_1_3_mesto" ||
+      code === "FIXED_PAIR_SWISS_16R2_1_3_mesto";
+    const is16R4Bronze =
       code === "FIXED_SWISS_16_BRONZE" ||
       code === "FIXED_SWISS_16R4_1_3_mesto" ||
       code === "FIXED_PAIR_SWISS_16_BRONZE" ||
@@ -224,14 +229,17 @@ export function getDefaultBracketParticipantRules(
       max: 16,
       exact: 16,
       label: "ровно 16",
-      hint: withBronze
-        ? "Сетка «до 2 поражений» на 16 участников — 28 встреч (27 + матч за 3–4 #28), олимпийка с 1/4. " +
+      hint: is16R2Bronze
+        ? "Сетка «до 2 поражений» на 16 участников — 24 встречи (23 + матч за 3–4 #28), oлимпийka с 1/2. " +
           "Добавьте участников до 16 или смените формат."
-        : code === "FIXED_SWISS_16R4_2_3_mesta" ||
-            code === "FIXED_PAIR_SWISS_16R4_2_3_mesto"
-          ? "Сетка «до 2 поражений» на 16 участников — 27 встреч, oлимпийka с 1/4, проигравшие полуфиналисты делят 3-е место. " +
+        : is16R4Bronze
+          ? "Сетка «до 2 поражений» на 16 участников — 28 встреч (27 + матч за 3–4 #28), oлимпийka с 1/4. " +
             "Добавьте участников до 16 или смените формат."
-          : baseHint,
+          : code === "FIXED_SWISS_16R4_2_3_mesta" ||
+              code === "FIXED_PAIR_SWISS_16R4_2_3_mesto"
+            ? "Сетка «до 2 поражений» на 16 участников — 27 встреч, oлимпийka с 1/4, проигравшие полуфиналисты делят 3-е место. " +
+              "Добавьте участников до 16 или смените формат."
+            : baseHint,
     };
   }
   if (OLYMPIC_BRONZE_FORMATS.has(code)) {

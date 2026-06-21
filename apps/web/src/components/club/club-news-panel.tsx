@@ -115,8 +115,8 @@ export function ClubNewsPanel({
         <div>
           <h2 className="font-semibold">Новая публикация</h2>
           <p className="mt-1 text-sm text-zinc-500">
-            Новости проходят модерацию перед публикацией на сайте. Обычно это занимает немного
-            времени.
+            Новости проходят модерацию перед публикацией на сайте. После одобления английский
+            перевод создаётся автоматически.
           </p>
         </div>
         <form onSubmit={addNews} className="space-y-3">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { formatRating } from "@/lib/rating";
 import { playerName } from "@/lib/public-display";
 
@@ -30,11 +31,13 @@ const RANK_BADGE_CLASS = [
   "home-player-rank-badge--3",
 ] as const;
 
-export function HomePlayerCards({ players }: { players: PlayerItem[] }) {
+export async function HomePlayerCards({ players }: { players: PlayerItem[] }) {
+  const t = await getTranslations();
+
   if (players.length === 0) {
     return (
       <p className="home-content-card rounded-2xl px-6 py-12 text-center home-card-muted">
-        Пока нет подтверждённых игроков в этом регионе.
+        {t("home.players.empty")}
       </p>
     );
   }

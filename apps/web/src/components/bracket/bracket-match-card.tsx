@@ -11,6 +11,8 @@ import {
 import { BracketMatchNumberRow } from "@/components/bracket/bracket-match-number-row";
 import { isMatchResolved } from "@/lib/match-result";
 import { GRID_FOOTER_LINE_H, GRID_META_H } from "@/lib/swiss-bracket-layout";
+import { getBracketUILabels, type BracketUILabels } from "@/lib/bracket-view-labels";
+import type { AppLocale } from "@/i18n/routing";
 import { cn } from "@/lib/cn";
 
 function ScoreSlot({
@@ -18,11 +20,13 @@ function ScoreSlot({
   isWinner,
   isLoser,
   onMatchClick,
+  labels,
 }: {
   value: string;
   isWinner?: boolean;
   isLoser?: boolean;
   onMatchClick?: () => void;
+  labels: BracketUILabels;
 }) {
   const className = cn(
     "bracket-match-score-slot font-mono text-xs font-semibold tabular-nums",
@@ -41,8 +45,8 @@ function ScoreSlot({
           onMatchClick();
         }}
         className={className}
-        title="Результат встречи"
-        aria-label="Результат встречи"
+        title={labels.matchResult}
+        aria-label={labels.matchResult}
       >
         {value}
       </button>
@@ -61,6 +65,7 @@ function TeamLine({
   onPlayerClick,
   onMatchClick,
   highlightedPlayerId,
+  labels,
 }: {
   team: BracketMatchView["team1"];
   isWinner: boolean;
@@ -70,6 +75,7 @@ function TeamLine({
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   onMatchClick?: () => void;
   highlightedPlayerId?: string | null;
+  labels: BracketUILabels;
 }) {
   if (!team) {
     return <div className="bracket-match-row bracket-match-row--empty">—</div>;
@@ -97,7 +103,7 @@ function TeamLine({
               highlightedPlayerId === team.player1.id &&
                 "bracket-player-link--selected",
             )}
-            title="Подсветить встречи игрока"
+            title={labels.highlightPlayer}
           >
             {bracketTeamLabel(team)}
           </button>
@@ -107,7 +113,7 @@ function TeamLine({
           </span>
         )}
         <span className="bracket-match-rating mt-0.5 block font-mono text-[10px] leading-none tabular-nums">
-          ур. {teamRating(team)}
+          {labels.ratingPrefix} {teamRating(team)}
         </span>
       </div>
       {showScoreColumn && (
@@ -116,6 +122,7 @@ function TeamLine({
           isWinner={isWinner}
           isLoser={isLoser}
           onMatchClick={onMatchClick}
+          labels={labels}
         />
       )}
     </div>
@@ -210,24 +217,23 @@ export function BracketMatchCard({
   handicapHalfStep = true,
   showCardHandicap = true,
   highlightedPlayerId = null,
+  uiLocale = "ru",
 }: {
   match: BracketMatchView;
-  /** Как в эталоне LlbBracketMatch — только #{номер} в шапке */
   matchNumber?: number;
-  /** Подвал: «матч за 3–4», «место 1–2» и т.п. */
   placementLabel?: string | null;
-  /** Подвал с «проигравший / победитель на #…» (олимпийка). */
   footerRows?: BracketCardFooterRow[];
   className?: string;
   style?: CSSProperties;
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   showMatchScore?: boolean;
-  /** Учитывать шаг рейтинга 0,5 в форе (из настроек турнира). */
   handicapHalfStep?: boolean;
   showCardHandicap?: boolean;
   highlightedPlayerId?: string | null;
+  uiLocale?: AppLocale;
 }) {
+  const labels = getBracketUILabels(uiLocale);
   const finished = isMatchResolved(match.status, match.winnerTeamId);
   const active = isActiveBracketMatch(match);
   const resultReady = isMatchReadyForResult(match);
@@ -266,7 +272,7 @@ export function BracketMatchCard({
       ? () => onMatchClick(match)
       : undefined;
 
-  const handicapOpts = { halfStep: handicapHalfStep };
+  const handicapOpts = { halfStep: handicapHalfStep, locale: uiLocale };
   const handicap =
     match.team1 && match.team2
       ? describeHandicap(
@@ -285,7 +291,7 @@ export function BracketMatchCard({
       : null;
 
   const showHandicapBlock =
-    showCardHandicap && handicap && handicap !== "Без форы" && handicapShort;
+    showCardHandicap && handicap && handicap !== labels.noHandicap && handicapShort;
 
   const interactiveAdmin = Boolean(onMatchClick || onPlayerClick);
 
@@ -319,6 +325,7 @@ export function BracketMatchCard({
         onPlayerClick={onPlayerClick}
         onMatchClick={openMatch}
         highlightedPlayerId={highlightedPlayerId}
+        labels={labels}
       />
       {match.team2 ? (
         <TeamLine
@@ -330,6 +337,7 @@ export function BracketMatchCard({
           onPlayerClick={onPlayerClick}
           onMatchClick={openMatch}
           highlightedPlayerId={highlightedPlayerId}
+          labels={labels}
         />
       ) : openMatch ? (
         <button
@@ -338,11 +346,11 @@ export function BracketMatchCard({
           onClick={openMatch}
           className="bracket-match-row bracket-match-row--empty w-full text-[12px]"
         >
-          {roundOneBye ? "×" : "Ожидание"}
+          {roundOneBye ? "×" : labels.waiting}
         </button>
       ) : (
         <div className="bracket-match-row bracket-match-row--empty text-[12px]">
-          {roundOneBye ? "×" : "Ожидание"}
+          {roundOneBye ? "×" : labels.waiting}
         </div>
       )}
       {showHandicapBlock && (
@@ -352,14 +360,14 @@ export function BracketMatchCard({
             data-bracket-interactive
             onClick={openMatch}
             className="bracket-match-meta bracket-match-meta--clickable"
-            title={`Фора: ${handicap}`}
+            title={labels.handicapTitle(handicap!)}
           >
-            <span className="bracket-match-meta-label">Фора</span>
+            <span className="bracket-match-meta-label">{labels.handicap}</span>
             <span className="bracket-match-meta-value">{handicapShort}</span>
           </button>
         ) : (
-          <div className="bracket-match-meta" title={`Фора: ${handicap}`}>
-            <span className="bracket-match-meta-label">Фора</span>
+          <div className="bracket-match-meta" title={labels.handicapTitle(handicap!)}>
+            <span className="bracket-match-meta-label">{labels.handicap}</span>
             <span className="bracket-match-meta-value">{handicapShort}</span>
           </div>
         )

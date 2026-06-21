@@ -1,12 +1,19 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import type { HomeNewsItem } from "@/lib/home-content";
 import { APP_NAME } from "@/lib/brand";
 
-function AuthorBadge({ type }: { type: HomeNewsItem["authorType"] }) {
+function AuthorBadge({
+  type,
+  labels,
+}: {
+  type: HomeNewsItem["authorType"];
+  labels: { service: string; club: string; player: string };
+}) {
   if (type === "service") {
     return (
       <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-violet-700 dark:border-violet-900/50 dark:bg-violet-950/40 dark:text-violet-300">
-        Сервис
+        {labels.service}
       </span>
     );
   }
@@ -18,19 +25,27 @@ function AuthorBadge({ type }: { type: HomeNewsItem["authorType"] }) {
           : "rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-sky-700 dark:border-sky-900/50 dark:bg-sky-950/40 dark:text-sky-300"
       }
     >
-      {type === "club" ? "Клуб" : "Игрок"}
+      {type === "club" ? labels.club : labels.player}
     </span>
   );
 }
 
-function NewsCard({ item }: { item: HomeNewsItem }) {
+function NewsCard({
+  item,
+  previewLabel,
+  labels,
+}: {
+  item: HomeNewsItem;
+  previewLabel: string;
+  labels: { service: string; club: string; player: string };
+}) {
   const inner = (
     <>
       {item.preview && (
-        <span className="home-preview-label absolute right-3 top-3">пример</span>
+        <span className="home-preview-label absolute right-3 top-3">{previewLabel}</span>
       )}
       <div className="home-card-muted flex flex-wrap items-center gap-2 text-xs">
-        <AuthorBadge type={item.authorType} />
+        <AuthorBadge type={item.authorType} labels={labels} />
         <span>{item.date}</span>
         <span>·</span>
         <span>{item.city}</span>
@@ -63,30 +78,43 @@ function NewsCard({ item }: { item: HomeNewsItem }) {
   );
 }
 
-export function HomeNewsGrid({ items }: { items: HomeNewsItem[] }) {
+export async function HomeNewsGrid({ items }: { items: HomeNewsItem[] }) {
+  const t = await getTranslations("home.news");
+
   if (items.length === 0) {
     return (
       <div className="home-content-card rounded-2xl px-6 py-12 text-center">
-        <p className="home-card-title font-medium">Новостей пока нет</p>
+        <p className="home-card-title font-medium">{t("emptyTitle")}</p>
         <p className="home-card-body mx-auto mt-2 max-w-md text-sm leading-relaxed">
-          Здесь появляются новости {APP_NAME} и анонсы клубов вашего региона.
+          {t("emptyLead", { appName: APP_NAME })}
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link href="/clubs" className="site-btn-secondary">
-            Смотреть клубы
+            {t("browseClubs")}
           </Link>
           <Link href="/login" className="site-btn-primary">
-            Войти как клуб
+            {t("clubLogin")}
           </Link>
         </div>
       </div>
     );
   }
 
+  const labels = {
+    service: t("service"),
+    club: t("club"),
+    player: t("player"),
+  };
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {items.map((item) => (
-        <NewsCard key={item.id} item={item} />
+        <NewsCard
+          key={item.id}
+          item={item}
+          previewLabel={t("preview")}
+          labels={labels}
+        />
       ))}
     </div>
   );

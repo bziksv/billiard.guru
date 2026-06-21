@@ -1245,6 +1245,7 @@ async function seedTeamsForFixedSwiss(
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_16R4_2_3_mesta" ||
     format === "FIXED_SWISS_16R4_1_3_mesto" ||
+    format === "FIXED_SWISS_16R2_1_3_mesto" ||
     format === "FIXED_SWISS_32" ||
     format === "FIXED_SWISS_32_BRONZE" ||
     format === "FIXED_SWISS_32R4_2_3_mesta" ||

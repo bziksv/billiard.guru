@@ -1,7 +1,24 @@
 import type { BracketCardDisplayPrefs } from "@/lib/bracket-display-prefs";
 
+type DisplayLabels = {
+  match: string;
+  matchTitle: string;
+  handicap: string;
+  placement: string;
+  placementTitle: string;
+};
+
+const ADMIN_LABELS: DisplayLabels = {
+  match: "Встреча",
+  matchTitle: "Шапка карточки: номер встречи (№…)",
+  handicap: "Фора",
+  placement: "Места",
+  placementTitle: "Подвал карточки: места и переходы (победитель/проигравший на #…)",
+};
+
 type Props = BracketCardDisplayPrefs & {
   variant?: "admin" | "site";
+  displayLabels?: DisplayLabels;
   onShowMatchNumberChange: (value: boolean) => void;
   onShowHandicapChange: (value: boolean) => void;
   onShowPlacementChange: (value: boolean) => void;
@@ -9,6 +26,7 @@ type Props = BracketCardDisplayPrefs & {
 
 export function BracketCardDisplayToggles({
   variant = "admin",
+  displayLabels,
   showMatchNumber,
   showHandicap,
   showPlacement,
@@ -16,6 +34,7 @@ export function BracketCardDisplayToggles({
   onShowHandicapChange,
   onShowPlacementChange,
 }: Props) {
+  const labels = variant === "site" && displayLabels ? displayLabels : ADMIN_LABELS;
   const checkboxClass = variant === "admin" ? "admin-checkbox" : "rounded border-[var(--border-subtle)]";
   const wrapClass =
     variant === "admin"
@@ -26,7 +45,7 @@ export function BracketCardDisplayToggles({
     <div className={wrapClass}>
       <label
         className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap"
-        title="Шапка карточки: номер встречи (№…)"
+        title={labels.matchTitle}
       >
         <input
           type="checkbox"
@@ -34,7 +53,7 @@ export function BracketCardDisplayToggles({
           checked={showMatchNumber}
           onChange={(e) => onShowMatchNumberChange(e.target.checked)}
         />
-        Встреча
+        {labels.match}
       </label>
       <label className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap">
         <input
@@ -43,11 +62,11 @@ export function BracketCardDisplayToggles({
           checked={showHandicap}
           onChange={(e) => onShowHandicapChange(e.target.checked)}
         />
-        Фора
+        {labels.handicap}
       </label>
       <label
         className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap"
-        title="Подвал карточки: места и переходы (победитель/проигравший на #…)"
+        title={labels.placementTitle}
       >
         <input
           type="checkbox"
@@ -55,7 +74,7 @@ export function BracketCardDisplayToggles({
           checked={showPlacement}
           onChange={(e) => onShowPlacementChange(e.target.checked)}
         />
-        Места
+        {labels.placement}
       </label>
     </div>
   );

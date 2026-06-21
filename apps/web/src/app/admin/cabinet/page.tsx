@@ -1,1 +1,5 @@
-export { default } from "../../(site)/cabinet/page";
+import { redirect } from "next/navigation";
+
+export default function AdminCabinetRedirect() {
+  redirect("/cabinet");
+}

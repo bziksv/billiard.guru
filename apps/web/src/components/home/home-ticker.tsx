@@ -1,9 +1,13 @@
 "use client";
 
-import { HOME_TICKER_ITEMS } from "@/lib/home-content";
+import { useTranslations } from "next-intl";
+
+const TICKER_KEYS = ["0", "1", "2", "3", "4", "5", "6"] as const;
 
 export function HomeTicker() {
-  const line = [...HOME_TICKER_ITEMS, ...HOME_TICKER_ITEMS];
+  const t = useTranslations("home.ticker");
+  const items = TICKER_KEYS.map((key) => t(key));
+  const line = [...items, ...items];
 
   return (
     <div className="home-ticker-bar overflow-hidden border-y py-2.5">

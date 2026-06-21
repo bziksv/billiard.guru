@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView, SwissStandingView } from "@/lib/bracket-view";
 import { BracketPresentationShell } from "@/components/bracket/bracket-presentation-shell";
@@ -19,7 +20,6 @@ import type {
   PublicTournamentStandings,
 } from "@/lib/tournament-public-standings";
 import type { PublicMatchRow, PublicMatchStatus } from "@/lib/tournament-public-matches";
-import { publicMatchStatusLabel } from "@/lib/tournament-public-matches";
 
 export type { PublicParticipantRow };
 
@@ -95,6 +95,7 @@ function TournamentTabBar({
   pair: boolean;
   compact?: boolean;
 }) {
+  const t = useTranslations("tournamentView.tabs");
   const countClass = (active: boolean) =>
     cn(
       "ml-1.5 tabular-nums",
@@ -111,24 +112,24 @@ function TournamentTabBar({
     <>
       {standings.hasMatches && (
         <TabButton compact={compact} active={tab === "results"} onClick={() => onTabChange("results")}>
-          Результаты
+          {t("results")}
           {standings.rows.length > 0 && (
             <span className={countClass(tab === "results")}>{standings.rows.length}</span>
           )}
         </TabButton>
       )}
       <TabButton compact={compact} active={tab === "participants"} onClick={() => onTabChange("participants")}>
-        {pair ? "Команды" : "Участники"}
+        {pair ? t("teams") : t("participants")}
         <span className={countClass(tab === "participants")}>{participantsCount}</span>
       </TabButton>
       {matchCount > 0 && (
         <TabButton compact={compact} active={tab === "matches"} onClick={() => onTabChange("matches")}>
-          Встречи
+          {t("matches")}
           <span className={countClass(tab === "matches")}>{matchCount}</span>
         </TabButton>
       )}
       <TabButton compact={compact} active={tab === "bracket"} onClick={() => onTabChange("bracket")}>
-        Сетка
+        {t("bracket")}
         {matchCount > 0 && <span className={countClass(tab === "bracket")}>{matchCount}</span>}
       </TabButton>
     </>
@@ -168,7 +169,13 @@ function PlayerLinks({ row }: { row: PublicStandingRow }) {
   return <span className="font-medium">{row.name}</span>;
 }
 
-function Podium({ rows }: { rows: PublicStandingRow[] }) {
+function Podium({
+  rows,
+  t,
+}: {
+  rows: PublicStandingRow[];
+  t: ReturnType<typeof useTranslations<"tournamentView.results">>;
+}) {
   const top = rows.filter((r) => r.placeSort <= 3 && r.placeSort > 0);
   if (top.length === 0) return null;
 
@@ -194,7 +201,7 @@ function Podium({ rows }: { rows: PublicStandingRow[] }) {
           >
             <div className="text-2xl">{medal}</div>
             <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-              {row.placeLabel} место
+              {row.placeLabel} {t("placeSuffix")}
             </div>
             <div className="mt-2 text-sm leading-snug">
               <PlayerLinks row={row} />
@@ -214,12 +221,13 @@ function ResultsTab({
   standings: PublicTournamentStandings;
   pair: boolean;
 }) {
+  const t = useTranslations("tournamentView.results");
   const { rows, finished, preliminary, hasMatches } = standings;
 
   if (rows.length === 0) {
     return (
       <p className="text-sm text-[var(--text-muted)]">
-        {hasMatches ? "Итоги появятся после завершения встреч." : "Пока нет подтверждённых участников."}
+        {hasMatches ? t("emptyWithMatches") : t("emptyNoParticipants")}
       </p>
     );
   }
@@ -230,28 +238,24 @@ function ResultsTab({
   return (
     <div className="space-y-4">
       {finished && (
-        <p className="text-sm text-emerald-700 dark:text-emerald-400/90">
-          Турнир завершён — итоговый протокол.
-        </p>
+        <p className="text-sm text-emerald-700 dark:text-emerald-400/90">{t("finished")}</p>
       )}
       {preliminary && (
-        <p className="text-sm text-[var(--text-muted)]">
-          Места предварительные — обновятся по ходу турнира.
-        </p>
+        <p className="text-sm text-[var(--text-muted)]">{t("preliminary")}</p>
       )}
 
-      {showPodium && <Podium rows={rows} />}
+      {showPodium && <Podium rows={rows} t={t} />}
 
       <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead className="border-b border-[var(--border-subtle)] bg-[var(--surface-card-solid)]">
             <tr>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">Место</th>
+              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("place")}</th>
               <th className="px-4 py-3 font-medium text-[var(--text-muted)]">
-                {pair ? "Команда" : "Участник"}
+                {pair ? t("team") : t("participant")}
               </th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">Город</th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">Рейтинг</th>
+              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("city")}</th>
+              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("rating")}</th>
             </tr>
           </thead>
           <tbody>
@@ -291,6 +295,7 @@ function ParticipantsTab({
   pair: boolean;
   alwaysShowSearch?: boolean;
 }) {
+  const t = useTranslations("tournamentView.participants");
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -306,15 +311,14 @@ function ParticipantsTab({
   const pendingCount = participants.filter((p) => p.note).length;
 
   if (participants.length === 0) {
-    return <p className="text-sm text-[var(--text-muted)]">Пока никто не зарегистрирован.</p>;
+    return <p className="text-sm text-[var(--text-muted)]">{t("empty")}</p>;
   }
 
   return (
     <div className="space-y-4">
       {pendingCount > 0 && (
         <p className="text-xs text-[var(--text-muted)]">
-          Предварительный список: показаны подтверждённые участники и поданные заявки (
-          {pendingCount} ожидают подтверждения).
+          {t("pendingList", { count: pendingCount })}
         </p>
       )}
       {(alwaysShowSearch || participants.length > 12) && (
@@ -322,13 +326,16 @@ function ParticipantsTab({
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Поиск по имени или городу…"
+          placeholder={t("searchPlaceholder")}
           className="site-input w-full max-w-md"
         />
       )}
       <p className="text-xs text-[var(--text-muted)]">
-        {filtered.length} из {participants.length}{" "}
-        {pair ? "команд" : "участников"}
+        {t("countOf", {
+          filtered: filtered.length,
+          total: participants.length,
+          unit: pair ? t("teams") : t("participants"),
+        })}
       </p>
       <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((p) => (
@@ -363,12 +370,9 @@ function BracketTabContent({
   onFullscreen?: () => void;
   presentation?: boolean;
 }) {
+  const t = useTranslations("tournamentView.bracket");
   if (!bracket || bracket.matches.length === 0) {
-    return (
-      <p className="text-sm text-[var(--text-muted)]">
-        Сетка ещё не сформирована. Следите за обновлениями на странице турнира.
-      </p>
-    );
+    return <p className="text-sm text-[var(--text-muted)]">{t("notFormed")}</p>;
   }
 
   return (
@@ -451,14 +455,6 @@ function renderTabPanel({
 
 type MatchFilter = "all" | PublicMatchStatus;
 
-const MATCH_FILTER_LABELS: Record<MatchFilter, string> = {
-  all: "Все",
-  current: "Идут",
-  upcoming: "Предстоящие",
-  completed: "Завершённые",
-  waiting: "Ожидание",
-};
-
 function matchStatusClass(status: PublicMatchStatus): string {
   switch (status) {
     case "current":
@@ -479,6 +475,7 @@ function MatchesTab({
   matches: PublicMatchRow[];
   alwaysShowSearch?: boolean;
 }) {
+  const t = useTranslations("tournamentView.matches");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<MatchFilter>("all");
 
@@ -508,11 +505,7 @@ function MatchesTab({
   }, [matches, query, filter]);
 
   if (matches.length === 0) {
-    return (
-      <p className="text-sm text-[var(--text-muted)]">
-        Встречи появятся после формирования сетки.
-      </p>
-    );
+    return <p className="text-sm text-[var(--text-muted)]">{t("empty")}</p>;
   }
 
   const filters: MatchFilter[] = ["all", "current", "upcoming", "completed", "waiting"];
@@ -535,7 +528,7 @@ function MatchesTab({
                   : "home-content-card text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
               )}
             >
-              {MATCH_FILTER_LABELS[key]}
+              {t(`filters.${key}`)}
               <span className="ml-1 tabular-nums opacity-80">{count}</span>
             </button>
           );
@@ -547,13 +540,13 @@ function MatchesTab({
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Поиск по участнику, этапу или №…"
+          placeholder={t("searchPlaceholder")}
           className="site-input w-full max-w-md"
         />
       )}
 
       <p className="text-xs text-[var(--text-muted)]">
-        {filtered.length} из {matches.length} встреч
+        {t("countOf", { filtered: filtered.length, total: matches.length })}
       </p>
 
       <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
@@ -561,10 +554,10 @@ function MatchesTab({
           <thead className="border-b border-[var(--border-subtle)] bg-[var(--surface-card-solid)]">
             <tr>
               <th className="px-4 py-3 font-medium text-[var(--text-muted)]">#</th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">Этап</th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">Встреча</th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">Счёт</th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">Статус</th>
+              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("stage")}</th>
+              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("match")}</th>
+              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("score")}</th>
+              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("status")}</th>
             </tr>
           </thead>
           <tbody>
@@ -580,7 +573,7 @@ function MatchesTab({
                 <td className="px-4 py-3 font-medium">{m.participants}</td>
                 <td className="px-4 py-3 font-mono tabular-nums">{m.score}</td>
                 <td className={cn("px-4 py-3 text-xs font-medium", matchStatusClass(m.status))}>
-                  {publicMatchStatusLabel(m.status)}
+                  {t(`statusLabels.${m.status}`)}
                 </td>
               </tr>
             ))}
@@ -600,6 +593,8 @@ export function TournamentPublicView({
   pair,
   bracket,
 }: Props) {
+  const t = useTranslations("tournamentView");
+  const tBracket = useTranslations("tournamentView.bracket");
   const [tab, setTab] = useState<TabId>(defaultTab);
   const [presentationOpen, setPresentationOpen] = useState(false);
   const [display, setDisplay] = useState<BracketCardDisplayPrefs>(() =>
@@ -615,6 +610,12 @@ export function TournamentPublicView({
   }, [bracket, display]);
 
   const openPresentation = () => setPresentationOpen(true);
+  const siteLabels = {
+    presentationTitle: tBracket("presentationTitle"),
+    presentationAria: (title: string) => tBracket("presentationAria", { title }),
+    presentationAriaDefault: tBracket("presentationAriaDefault"),
+    exit: tBracket("exit"),
+  };
 
   const tabBarProps = {
     tab,
@@ -629,7 +630,7 @@ export function TournamentPublicView({
     <>
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="site-section-title">Турнир</h2>
+          <h2 className="site-section-title">{t("title")}</h2>
           <TournamentTabBar {...tabBarProps} />
         </div>
 
@@ -654,6 +655,7 @@ export function TournamentPublicView({
           title={bracket.tournamentName}
           onClose={() => setPresentationOpen(false)}
           variant="site"
+          siteLabels={siteLabels}
           tabs={
             <>
               <TournamentTabBar {...tabBarProps} compact />

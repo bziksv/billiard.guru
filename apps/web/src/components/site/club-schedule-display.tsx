@@ -1,8 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import type { AppLocale } from "@/i18n/routing";
+import { resolveLocalizedField } from "@/lib/localized-db-text";
 import {
   findActivePriceTierIndex,
+  formatPriceTierTimeRange,
   getClubOpenStatus,
   hoursFootnote,
   parsePriceTiers,
@@ -10,32 +14,32 @@ import {
   resolveWeeklyHours,
   scheduleRows,
   type PriceTier,
+  type ScheduleLocale,
 } from "@/lib/club-schedule";
 
 type ClubScheduleDisplayProps = {
   weeklyHours?: unknown;
   workingHours?: string | null;
+  workingHoursEn?: string | null;
   priceTiers?: unknown;
   gamePrice?: string | null;
+  gamePriceEn?: string | null;
   timeZone?: string;
 };
-
-function formatTimeRange(tier: PriceTier): string | null {
-  if (tier.timeFrom && tier.timeTo) {
-    return `${tier.timeFrom} – ${tier.timeTo}`;
-  }
-  if (tier.timeFrom) return `с ${tier.timeFrom}`;
-  if (tier.timeTo) return `до ${tier.timeTo}`;
-  return null;
-}
 
 export function ClubScheduleDisplay({
   weeklyHours,
   workingHours,
+  workingHoursEn,
   priceTiers: priceTiersRaw,
   gamePrice,
+  gamePriceEn,
   timeZone = "Europe/Moscow",
 }: ClubScheduleDisplayProps) {
+  const t = useTranslations("clubSchedule");
+  const appLocale = useLocale() as AppLocale;
+  const scheduleLocale: ScheduleLocale = appLocale === "en" ? "en" : "ru";
+
   const now = useMemo(() => new Date(), []);
   const slots = useMemo(
     () => resolveWeeklyHours(weeklyHours, workingHours),
@@ -43,14 +47,21 @@ export function ClubScheduleDisplay({
   );
   const tiers = useMemo(() => parsePriceTiers(priceTiersRaw), [priceTiersRaw]);
   const status = useMemo(
-    () => (slots.length > 0 ? getClubOpenStatus(slots, now, timeZone) : null),
-    [slots, now, timeZone],
+    () => (slots.length > 0 ? getClubOpenStatus(slots, now, timeZone, scheduleLocale) : null),
+    [slots, now, timeZone, scheduleLocale],
   );
   const rows = useMemo(
-    () => (status ? scheduleRows(slots, status.today) : []),
-    [slots, status],
+    () => (status ? scheduleRows(slots, status.today, scheduleLocale) : []),
+    [slots, status, scheduleLocale],
   );
-  const footnote = hoursFootnote(workingHours);
+  const workingHoursForFootnote = resolveLocalizedField(
+    appLocale,
+    workingHours ?? "",
+    workingHoursEn,
+  );
+  const footnote = hoursFootnote(workingHoursForFootnote);
+  const displayGamePrice = resolveLocalizedField(appLocale, gamePrice ?? "", gamePriceEn);
+
   const minutesNow = useMemo(() => {
     const parts = new Intl.DateTimeFormat("en-GB", {
       hour: "2-digit",
@@ -69,11 +80,11 @@ export function ClubScheduleDisplay({
     [tiers, status, minutesNow],
   );
 
-  const hasPrices = tiers.length > 0 || Boolean(gamePrice?.trim());
+  const hasPrices = tiers.length > 0 || Boolean(displayGamePrice?.trim());
   const hasSchedule = rows.length > 0;
 
   if (!hasSchedule && !hasPrices) {
-    return <p className="home-card-muted text-sm">График уточняйте у клуба.</p>;
+    return <p className="home-card-muted text-sm">{t("contactClub")}</p>;
   }
 
   return (
@@ -85,7 +96,7 @@ export function ClubScheduleDisplay({
           }
         >
           <p className="club-schedule-status-day">
-            Сегодня · {status.todayLabel}
+            {t("todayPrefix", { day: status.todayLabel })}
           </p>
           <p className="club-schedule-status-message">{status.message}</p>
           {status.detail && <p className="club-schedule-status-detail">{status.detail}</p>}
@@ -101,7 +112,7 @@ export function ClubScheduleDisplay({
             >
               <span className="club-schedule-hours-days">
                 {row.daysLabel}
-                {row.isToday && <span className="club-schedule-today-badge">сегодня</span>}
+                {row.isToday && <span className="club-schedule-today-badge">{t("todayBadge")}</span>}
               </span>
               <span className="club-schedule-hours-time">{row.hoursLabel}</span>
             </li>
@@ -113,37 +124,55 @@ export function ClubScheduleDisplay({
 
       {hasPrices && (
         <div className="club-schedule-prices">
-          <p className="club-schedule-prices-title">Стоимость</p>
+          <p className="club-schedule-prices-title">{t("costTitle")}</p>
           {tiers.length > 0 ? (
             <ul className="club-price-tiers">
-              {tiers.map((tier, index) => {
-                const active = activeTierIndex === index;
-                const timeLabel = formatTimeRange(tier);
-                return (
-                  <li
-                    key={`${tier.label}-${index}`}
-                    className={active ? "club-price-tier club-price-tier--active" : "club-price-tier"}
-                  >
-                    <div className="club-price-tier-head">
-                      <span className="club-price-tier-label">{tier.label}</span>
-                      {active && <span className="club-schedule-today-badge">сейчас</span>}
-                    </div>
-                    <p className="club-price-tier-meta">
-                      {[priceTierDaysLabel(tier.days), timeLabel].filter(Boolean).join(" · ")}
-                    </p>
-                    <p className="club-price-tier-price">{tier.price}</p>
-                    {tier.note && <p className="club-price-tier-note">{tier.note}</p>}
-                  </li>
-                );
-              })}
+              {tiers.map((tier, index) => (
+                <PriceTierRow
+                  key={`${tier.label}-${index}`}
+                  tier={tier}
+                  active={activeTierIndex === index}
+                  locale={scheduleLocale}
+                  nowBadge={t("nowBadge")}
+                />
+              ))}
             </ul>
           ) : (
-            gamePrice?.trim() && (
-              <p className="home-card-body whitespace-pre-wrap text-sm leading-relaxed">{gamePrice.trim()}</p>
+            displayGamePrice?.trim() && (
+              <p className="home-card-body whitespace-pre-wrap text-sm leading-relaxed">
+                {displayGamePrice.trim()}
+              </p>
             )
           )}
         </div>
       )}
     </div>
+  );
+}
+
+function PriceTierRow({
+  tier,
+  active,
+  locale,
+  nowBadge,
+}: {
+  tier: PriceTier;
+  active: boolean;
+  locale: ScheduleLocale;
+  nowBadge: string;
+}) {
+  const timeLabel = formatPriceTierTimeRange(tier, locale);
+  return (
+    <li className={active ? "club-price-tier club-price-tier--active" : "club-price-tier"}>
+      <div className="club-price-tier-head">
+        <span className="club-price-tier-label">{tier.label}</span>
+        {active && <span className="club-schedule-today-badge">{nowBadge}</span>}
+      </div>
+      <p className="club-price-tier-meta">
+        {[priceTierDaysLabel(tier.days, locale), timeLabel].filter(Boolean).join(" · ")}
+      </p>
+      <p className="club-price-tier-price">{tier.price}</p>
+      {tier.note && <p className="club-price-tier-note">{tier.note}</p>}
+    </li>
   );
 }

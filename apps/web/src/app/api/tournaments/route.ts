@@ -13,6 +13,7 @@ import {
   validateTournamentTableStreams,
 } from "@/lib/tournament-stream";
 import { tournamentSchema } from "@/lib/validators";
+import { syncLocalizedDescription, syncLocalizedLabel } from "@/lib/translation";
 import { withTournamentFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { ZodError } from "zod";
 
@@ -103,11 +104,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: streamsError }, { status: 400 });
     }
     const tableStreams = sanitizeTournamentTableStreams(data.tableIds, data.tableStreams);
+    const descriptionFields = await syncLocalizedDescription({
+      description: data.description,
+    });
+    const nameFields = await syncLocalizedLabel({ text: data.name });
 
     const tournament = await prisma.tournament.create({
       data: {
-        name: data.name,
-        description: data.description || null,
+        name: nameFields.text,
+        nameEn: nameFields.textEn,
+        description: descriptionFields.description,
+        descriptionEn: descriptionFields.descriptionEn,
         clubId: data.clubId,
         format: data.format,
         status: suppressNotifications ? "OPEN" : "DRAFT",

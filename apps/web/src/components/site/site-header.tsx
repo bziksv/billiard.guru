@@ -1,14 +1,16 @@
-import Link from "next/link";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
+import { SiteThemeToggle } from "@/components/site/site-theme-toggle";
+import { LocaleSwitcher } from "@/components/site/locale-switcher";
 import { SiteHeaderNav } from "@/components/site/site-header-nav";
 import { UserMenu } from "@/components/site/user-menu";
 import { SiteContainer } from "@/components/site/site-container";
 import { getCurrentPlayer, getImpersonation, getSession, isSuperAdmin } from "@/lib/auth";
 import { getAccessibleOwnedClubs } from "@/lib/club-owner-access";
 import { APP_NAME } from "@/lib/brand";
-import { t } from "@/lib/site";
 
 export async function SiteHeader() {
+  const t = await getTranslations();
   const session = await getSession();
   const impersonation = await getImpersonation();
   const player = await getCurrentPlayer();
@@ -47,7 +49,8 @@ export async function SiteHeader() {
         </div>
 
         <div className="site-header-actions">
-          <ThemeToggle variant="site" className="site-header-theme-toggle inline-flex" />
+          <LocaleSwitcher className="hidden sm:flex" />
+          <SiteThemeToggle className="site-header-theme-toggle inline-flex" />
           {player ? (
             <UserMenu
               firstName={player.firstName}

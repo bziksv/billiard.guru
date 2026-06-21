@@ -70,8 +70,10 @@ export function isFixedSwiss16BronzeFormat(format: string): boolean {
   return (
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_16R4_1_3_mesto" ||
+    format === "FIXED_SWISS_16R2_1_3_mesto" ||
     format === "FIXED_PAIR_SWISS_16_BRONZE" ||
-    format === "FIXED_PAIR_SWISS_16R4_1_3_mesto"
+    format === "FIXED_PAIR_SWISS_16R4_1_3_mesto" ||
+    format === "FIXED_PAIR_SWISS_16R2_1_3_mesto"
   );
 }
 
@@ -130,6 +132,7 @@ export function isSoloFormat(format: string): boolean {
     format === "FIXED_SWISS_8R4_1_3_mesto" ||
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_16R4_1_3_mesto" ||
+    format === "FIXED_SWISS_16R2_1_3_mesto" ||
     format === "FIXED_SWISS_16R4_2_3_mesta" ||
     format === "FIXED_SWISS_32" ||
     format === "FIXED_SWISS_32_BRONZE" ||
@@ -159,6 +162,7 @@ export function isSwissPairFormat(format: string): boolean {
     format === "FIXED_PAIR_SWISS_8R4_1_3_mesto" ||
     format === "FIXED_PAIR_SWISS_16_BRONZE" ||
     format === "FIXED_PAIR_SWISS_16R4_1_3_mesto" ||
+    format === "FIXED_PAIR_SWISS_16R2_1_3_mesto" ||
     format === "FIXED_PAIR_SWISS_16R4_2_3_mesto"
   );
 }

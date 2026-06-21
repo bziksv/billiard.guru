@@ -43,45 +43,6 @@ export type SiteLabelKey =
   | "empty.coaches"
   | "empty.pokatat";
 
-/** Тексты UI — сейчас RU, позже locale → dictionary. */
-export const SITE_COPY: Record<SiteLabelKey, string> = {
-  "nav.home": "Главная",
-  "nav.tournaments": "Турниры",
-  "nav.clubs": "Клубы",
-  "nav.players": "Игроки",
-  "nav.coaches": "Тренеры",
-  "nav.rules": "Правила",
-  "nav.brackets": "Сетки",
-  "nav.ideas": "Идеи",
-  "nav.pokatat": "Покатать",
-  "nav.guide": "Справочник",
-  "nav.login": "Войти",
-  "nav.logout": "Выйти",
-  "nav.cabinet": "Кабинет",
-  "nav.admin": "Админ",
-  "footer.tagline":
-    "Турниры, новости и бильярдное сообщество — находите игру и партнёров рядом с вами.",
-  "geo.all": "Все регионы",
-  "geo.country": "Страна",
-  "geo.city": "Город",
-  "geo.region": "Регион",
-  "home.hero.title": "Турниры и бильярдное сообщество",
-  "home.hero.subtitle":
-    "Публикуйте турниры и новости, находите клубы и игроков. Ищите партнёра для игры в разделе «Покатать».",
-  "home.local": "Турниры в вашем регионе",
-  "home.upcoming": "Ближайшие турниры",
-  "home.explore": "Разделы",
-  "empty.tournaments": "В этом регионе пока нет опубликованных турниров.",
-  "empty.clubs": "В этом регионе пока нет клубов.",
-  "empty.players": "Игроков пока нет.",
-  "empty.coaches": "Тренеров в этом регионе пока нет.",
-  "empty.pokatat": "В этом регионе пока нет объявлений «Покатать».",
-};
-
-export function t(key: SiteLabelKey): string {
-  return SITE_COPY[key];
-}
-
 export type GeoSearchParams = {
   countryId?: string;
   cityId?: string;

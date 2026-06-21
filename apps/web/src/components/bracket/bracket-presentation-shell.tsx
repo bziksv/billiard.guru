@@ -5,6 +5,20 @@ import { createPortal } from "react-dom";
 import { AdminHorizontalScroll } from "@/components/admin/admin-horizontal-scroll";
 import { cn } from "@/lib/cn";
 
+export type BracketPresentationSiteLabels = {
+  presentationTitle: string;
+  presentationAria: (title: string) => string;
+  presentationAriaDefault: string;
+  exit: string;
+};
+
+const ADMIN_LABELS = {
+  presentationTitle: "Турнирная сетка",
+  presentationAria: (title: string) => `Сетка: ${title}`,
+  presentationAriaDefault: "Сетка на весь экран",
+  exit: "Выйти · Esc",
+};
+
 export function BracketPresentationShell({
   open,
   title,
@@ -13,19 +27,27 @@ export function BracketPresentationShell({
   toolbar,
   variant = "admin",
   contentClassName,
+  siteLabels,
   children,
 }: {
   open: boolean;
   title?: string;
   onClose: () => void;
-  /** Вкладки под заголовком (сетка, участники, встречи…). */
   tabs?: ReactNode;
-  /** Доп. панель (галки отображения сетки и т.п.). */
   toolbar?: ReactNode;
   variant?: "admin" | "site";
   contentClassName?: string;
+  siteLabels?: BracketPresentationSiteLabels;
   children: ReactNode;
 }) {
+  const labels =
+    variant === "site" && siteLabels ? siteLabels : ADMIN_LABELS;
+  const presentationTitle = labels.presentationTitle;
+  const presentationAria = title
+    ? labels.presentationAria(title)
+    : labels.presentationAriaDefault;
+  const exitLabel = labels.exit;
+
   useEffect(() => {
     if (!open) return;
     function onKey(event: KeyboardEvent) {
@@ -54,7 +76,7 @@ export function BracketPresentationShell({
       )}
       role="dialog"
       aria-modal="true"
-      aria-label={title ? `Сетка: ${title}` : "Сетка на весь экран"}
+      aria-label={presentationAria}
     >
       <header
         className={cn(
@@ -68,7 +90,7 @@ export function BracketPresentationShell({
             variant === "site" && "site-bracket-presentation__title",
           )}
         >
-          {title ?? "Турнирная сетка"}
+          {title ?? presentationTitle}
         </span>
         {tabs ? (
           <AdminHorizontalScroll className="min-w-0 flex-1">
@@ -88,7 +110,7 @@ export function BracketPresentationShell({
               variant === "site" && "site-bracket-presentation__title",
             )}
           >
-            {title ?? "Турнирная сетка"}
+            {title ?? presentationTitle}
           </span>
         )}
         <button
@@ -101,7 +123,7 @@ export function BracketPresentationShell({
               : "site-btn-secondary px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm",
           )}
         >
-          Выйти · Esc
+          {exitLabel}
         </button>
       </header>
       <div

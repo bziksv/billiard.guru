@@ -5,6 +5,13 @@ import {
   bracketPlayerLabel,
   bracketTeamLabel,
 } from "@/lib/bracket-display";
+import {
+  getBracketUILabels,
+  localizedFixedSwissFooterDestLabel,
+  localizeBracketFooterText,
+  type BracketUILabels,
+} from "@/lib/bracket-view-labels";
+import type { AppLocale } from "@/i18n/routing";
 import { teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
@@ -30,7 +37,6 @@ import {
   FIXED_SWISS_CARD_W,
   FIXED_SWISS_COMPACT_ROW_H,
   fixedSwissDestSplit,
-  fixedSwissFooterDestLabel,
   fixedSwissMatchCardHeight,
   fixedSwissMatchColForCount,
   fixedSwissPlacementLabel,
@@ -89,6 +95,7 @@ function TeamRow({
   onPlayerClick,
   onMatchClick,
   playerHighlighted,
+  labels,
 }: {
   label: string;
   rating?: number;
@@ -99,6 +106,7 @@ function TeamRow({
   onPlayerClick?: () => void;
   onMatchClick?: () => void;
   playerHighlighted?: boolean;
+  labels: BracketUILabels;
 }) {
   const rowClass = playerRowClass(isWinner, isLoser, empty);
 
@@ -140,7 +148,7 @@ function TeamRow({
             "bracket-player-link min-w-0 flex-1 truncate text-left text-[12px] font-medium leading-none",
             playerHighlighted && "bracket-player-link--selected",
           )}
-          title="Подсветить встречи игрока"
+          title={labels.highlightPlayer}
         >
           {label}
         </button>
@@ -151,7 +159,7 @@ function TeamRow({
       )}
       {rating !== undefined && !empty && (
         <span className="bracket-match-rating shrink-0 font-mono text-[10px] tabular-nums">
-          ур. {rating}
+          {labels.ratingPrefix} {rating}
         </span>
       )}
       {onMatchClick ? (
@@ -163,7 +171,7 @@ function TeamRow({
             onMatchClick();
           }}
           className="shrink-0 rounded hover:ring-1 hover:ring-inset hover:ring-emerald-500/50"
-          aria-label="Открыть встречу"
+          aria-label={labels.matchResult}
         >
           <ScoreBox
             value={score}
@@ -188,6 +196,7 @@ function PairTeamRow({
   onPlayerClick,
   onMatchClick,
   highlightedPlayerId,
+  labels,
 }: {
   team: TeamWithPlayers;
   score: string;
@@ -196,6 +205,7 @@ function PairTeamRow({
   onPlayerClick?: (playerId: string) => void;
   onMatchClick?: () => void;
   highlightedPlayerId?: string | null;
+  labels: BracketUILabels;
 }) {
   const rowClass = playerRowClass(isWinner, isLoser);
 
@@ -214,7 +224,7 @@ function PairTeamRow({
           onPlayerClick && "bracket-player-link",
           highlightedPlayerId === team.player1.id && "bracket-player-link--selected",
         )}
-        title={onPlayerClick ? "Подсветить встречи игрока" : undefined}
+        title={onPlayerClick ? labels.highlightPlayer : undefined}
       >
         {bracketPlayerLabel(team.player1)}
       </button>
@@ -234,7 +244,7 @@ function PairTeamRow({
             highlightedPlayerId === team.player2.id &&
             "bracket-player-link--selected",
         )}
-        title={onPlayerClick && team.player2 ? "Подсветить встречи игрока" : undefined}
+        title={onPlayerClick && team.player2 ? labels.highlightPlayer : undefined}
       >
         {team.player2 ? bracketPlayerLabel(team.player2) : "—"}
       </button>
@@ -250,7 +260,7 @@ function PairTeamRow({
             onMatchClick();
           }}
           className="shrink-0 rounded hover:ring-1 hover:ring-inset hover:ring-emerald-500/50"
-          aria-label="Открыть встречу"
+          aria-label={labels.matchResult}
         >
           <ScoreBox
             value={score}
@@ -318,6 +328,7 @@ export function LlbBracketMatch({
   showCardHandicap = true,
   showCardPlacement = true,
   highlightedPlayerId = null,
+  uiLocale = "ru",
 }: {
   match: BracketMatchView;
   matchNumber: number;
@@ -331,7 +342,10 @@ export function LlbBracketMatch({
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   highlightedPlayerId?: string | null;
+  uiLocale?: AppLocale;
 }) {
+  const labels = getBracketUILabels(uiLocale);
+  const waitingLabel = labels.waiting.toLowerCase();
   const finished = isMatchResolved(match.status, match.winnerTeamId);
   const active = isActiveBracketMatch(match);
   const winnerId = match.winnerTeamId;
@@ -408,7 +422,7 @@ export function LlbBracketMatch({
   const openResult =
     onMatchClick && canOpenResult ? () => onMatchClick(match) : undefined;
 
-  const handicapOpts = { halfStep: handicapHalfStep };
+  const handicapOpts = { halfStep: handicapHalfStep, locale: uiLocale };
   const handicap =
     match.team1 && match.team2
       ? describeHandicap(
@@ -425,7 +439,12 @@ export function LlbBracketMatch({
           handicapOpts,
         )
       : null;
-  const showHandicap = handicap && handicap !== "Без форы";
+  const showHandicap =
+    match.team1 &&
+    match.team2 &&
+    teamRating(match.team1) !== teamRating(match.team2) &&
+    handicap &&
+    handicapShort;
   const showScores = resultReady || finished;
   const team1ScoreDisplay =
     !showScores
@@ -489,34 +508,37 @@ export function LlbBracketMatch({
     matchCount,
     matchNumber,
   );
-  const placement = showCardPlacement ? placementLabel : null;
+  const placementDisplay =
+    showCardPlacement && placementLabel
+      ? localizeBracketFooterText(placementLabel, uiLocale)
+      : null;
   const winnerLine =
     showCardPlacement && winnerToNo !== undefined
       ? winnerKind === "bye"
-        ? fixedSwissFooterDestLabel("bye", winnerToNo, bracketCol)
-        : fixedSwissFooterDestLabel("win", winnerToNo, bracketCol)
+        ? localizedFixedSwissFooterDestLabel("bye", winnerToNo, uiLocale)
+        : localizedFixedSwissFooterDestLabel("win", winnerToNo, uiLocale)
       : null;
   const terminalLoserPlacement =
     finished &&
     loserToNo === undefined &&
-    placement != null &&
-    placement.startsWith("место ") &&
+    placementLabel != null &&
+    placementLabel.startsWith("место ") &&
     bracketCol <= 0;
   const upperTourElimPlacement =
     isFixedSwissGrid &&
     bracketCol > 0 &&
     loserToNo === undefined &&
-    placement != null &&
-    placement.startsWith("место ");
+    placementLabel != null &&
+    placementLabel.startsWith("место ");
   const loserLine =
     showCardPlacement && loserToNo !== undefined
       ? roundOneBye && phantomRow
         ? `× #${loserToNo}`
-        : fixedSwissFooterDestLabel("loss", loserToNo, bracketCol)
+        : localizedFixedSwissFooterDestLabel("loss", loserToNo, uiLocale)
       : upperTourElimPlacement
         ? null
         : terminalLoserPlacement
-          ? placement
+          ? placementDisplay
           : null;
 
   type FooterRow =
@@ -527,22 +549,22 @@ export function LlbBracketMatch({
 
   if (showCardPlacement) {
     if (winnerLine && loserLine) {
-      if (placement && !terminalLoserPlacement && !upperTourElimPlacement) {
-        footerRows.push({ kind: "text", text: placement });
+      if (placementDisplay && !terminalLoserPlacement && !upperTourElimPlacement) {
+        footerRows.push({ kind: "text", text: placementDisplay });
       }
       const dest = fixedSwissDestSplit(bracketCol, loserLine, winnerLine);
       footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-    } else if (placement && winnerLine && !upperTourElimPlacement) {
-      const dest = fixedSwissDestSplit(bracketCol, placement, winnerLine);
+    } else if (placementDisplay && winnerLine && !upperTourElimPlacement) {
+      const dest = fixedSwissDestSplit(bracketCol, placementDisplay, winnerLine);
       footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-    } else if (placement && winnerLine && upperTourElimPlacement) {
-      const dest = fixedSwissDestSplit(bracketCol, placement, winnerLine);
+    } else if (placementDisplay && winnerLine && upperTourElimPlacement) {
+      const dest = fixedSwissDestSplit(bracketCol, placementDisplay, winnerLine);
       footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-    } else if (placement && loserLine) {
-      const dest = fixedSwissDestSplit(bracketCol, loserLine, placement);
+    } else if (placementDisplay && loserLine) {
+      const dest = fixedSwissDestSplit(bracketCol, loserLine, placementDisplay);
       footerRows.push({ kind: "split", left: dest.left, right: dest.right });
-    } else if (placement) {
-      footerRows.push({ kind: "text", text: placement });
+    } else if (placementDisplay) {
+      footerRows.push({ kind: "text", text: placementDisplay });
     } else if (winnerLine) {
       const dest = fixedSwissDestSplit(bracketCol, null, winnerLine);
       footerRows.push({ kind: "split", left: dest.left, right: dest.right });
@@ -552,7 +574,7 @@ export function LlbBracketMatch({
     }
   }
   if (match.status === "WALKOVER") {
-    footerRows.push({ kind: "text", text: "тех. поражение" });
+    footerRows.push({ kind: "text", text: labels.walkover });
   }
 
   const footerRowH = isFixedSwissGrid ? FIXED_SWISS_COMPACT_ROW_H : GRID_FOOTER_LINE_H;
@@ -614,9 +636,10 @@ export function LlbBracketMatch({
               : undefined
           }
           highlightedPlayerId={highlightedPlayerId}
+          labels={labels}
         />
       ) : roundOneBye && phantomRow === 1 && !match.team1 ? (
-        <TeamRow label="×" score="—" empty onMatchClick={openResult} />
+        <TeamRow label="×" score="—" empty onMatchClick={openResult} labels={labels} />
       ) : (
         <TeamRow
           label={
@@ -624,7 +647,7 @@ export function LlbBracketMatch({
               ? bracketTeamLabel(match.team1)
               : incomingPhantom1
                 ? "×"
-                : "ожидание"
+                : waitingLabel
           }
           rating={match.team1 ? teamRating(match.team1) : undefined}
           score={team1ScoreDisplay}
@@ -641,6 +664,7 @@ export function LlbBracketMatch({
             highlightedPlayerId != null &&
             match.team1?.player1.id === highlightedPlayerId
           }
+          labels={labels}
         />
       )}
 
@@ -663,6 +687,7 @@ export function LlbBracketMatch({
               : undefined
           }
           highlightedPlayerId={highlightedPlayerId}
+          labels={labels}
         />
       ) : match.team2 ? (
         <TeamRow
@@ -681,19 +706,21 @@ export function LlbBracketMatch({
             highlightedPlayerId != null &&
             match.team2.player1.id === highlightedPlayerId
           }
+          labels={labels}
         />
       ) : roundOneBye && phantomRow === 2 && !match.team2 ? (
-        <TeamRow label="×" score="—" empty onMatchClick={openResult} />
+        <TeamRow label="×" score="—" empty onMatchClick={openResult} labels={labels} />
       ) : (
         <TeamRow
           label={
             incomingPhantom2
               ? "×"
-              : "ожидание"
+              : waitingLabel
           }
           score="—"
           empty={incomingPhantom2 && !roundOneBye}
           onMatchClick={openResult}
+          labels={labels}
         />
       )}
 
@@ -705,11 +732,11 @@ export function LlbBracketMatch({
             onClick={openResult}
             className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-left text-[9px] leading-[18px] text-[var(--bracket-meta-text)] transition-colors hover:bg-emerald-950/25"
             style={{ height: FIXED_SWISS_COMPACT_ROW_H, maxHeight: FIXED_SWISS_COMPACT_ROW_H }}
-            title={`Фора: ${handicap}`}
+            title={labels.handicapTitle(handicap!)}
           >
             <span className="block truncate">
               <span className="font-semibold uppercase tracking-wide opacity-85">
-                Фора{" "}
+                {labels.handicap}{" "}
               </span>
               {handicapShort}
             </span>
@@ -718,11 +745,11 @@ export function LlbBracketMatch({
           <div
             className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-[9px] leading-[18px] text-[var(--bracket-meta-text)]"
             style={{ height: FIXED_SWISS_COMPACT_ROW_H, maxHeight: FIXED_SWISS_COMPACT_ROW_H }}
-            title={`Фора: ${handicap}`}
+            title={labels.handicapTitle(handicap!)}
           >
             <span className="block truncate">
               <span className="font-semibold uppercase tracking-wide opacity-85">
-                Фора{" "}
+                {labels.handicap}{" "}
               </span>
               {handicapShort}
             </span>

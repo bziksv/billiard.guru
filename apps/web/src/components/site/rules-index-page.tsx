@@ -1,21 +1,27 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { getLocale, getTranslations } from "next-intl/server";
 import { RulesTableIcon } from "@/components/site/rules-table-icon";
 import { GuideSections } from "@/components/site/guide-sections";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
-import {
-  BILLIARD_GENERAL_SECTIONS,
-  BILLIARD_TABLE_TYPES,
-  RULES_INDEX_INTRO,
-  rulesTableAccentColor,
-  rulesTableGameCount,
-} from "@/lib/billiard-rules";
+import { getRulesContent } from "@/lib/billiard-rules/get-rules-content";
+import type { BilliardTableType } from "@/lib/billiard-rules/content";
+import { rulesTableAccentColor, rulesTableGameCount } from "@/lib/billiard-rules";
+import type { AppLocale } from "@/i18n/routing";
+
+function gameCountLabel(count: number, t: Awaited<ReturnType<typeof getTranslations>>) {
+  if (count === 1) return t("rules.index.gameOne");
+  if (count >= 2 && count <= 4) return t("rules.index.gameFew");
+  return t("rules.index.gameMany");
+}
 
 function TableTypeCard({
   table,
+  t,
 }: {
-  table: (typeof BILLIARD_TABLE_TYPES)[number];
+  table: BilliardTableType;
+  t: Awaited<ReturnType<typeof getTranslations>>;
 }) {
   const accent = rulesTableAccentColor(table.id);
   const gameCount = rulesTableGameCount(table);
@@ -36,8 +42,7 @@ function TableTypeCard({
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="rules-table-chip">{table.pocketsLabel}</span>
           <span className="rules-table-chip rules-table-chip-muted">
-            {gameCount}{" "}
-            {gameCount === 1 ? "игра" : gameCount < 5 ? "игры" : "игр"}
+            {gameCount} {gameCountLabel(gameCount, t)}
           </span>
         </div>
         <h2 className="mt-3 text-lg font-semibold leading-snug">{table.title}</h2>
@@ -55,67 +60,60 @@ function TableTypeCard({
             </li>
           ))}
         </ul>
-        <span className="rules-table-card-cta">Выбрать дисциплины →</span>
+        <span className="rules-table-card-cta">{t("rules.index.pickDisciplines")}</span>
       </SiteCard>
     </Link>
   );
 }
 
-export function RulesIndexPage() {
+export async function RulesIndexPage() {
+  const locale = (await getLocale()) as AppLocale;
+  const t = await getTranslations("rules");
+  const { tableTypes, generalSections, indexIntro } = getRulesContent(locale);
+
   return (
     <>
-      <PageHeader
-        title="Правила бильярда"
-        lead="Справочник по типам столов и дисциплинам — как в каталоге клубов. Сначала выберите стол, затем игру."
-      >
+      <PageHeader title={t("index.title")} lead={t("index.lead")}>
         <Link href="/brackets" className="site-btn-secondary shrink-0">
-          Турнирные сетки →
+          {t("index.bracketsLink")}
         </Link>
         <Link href="/tournaments" className="site-btn-secondary shrink-0">
-          Турниры
+          {t("index.tournamentsLink")}
         </Link>
       </PageHeader>
 
       <PageMain className="space-y-14 pt-0">
-        <p className="guide-body-text max-w-3xl text-base leading-relaxed">
-          {RULES_INDEX_INTRO}
-        </p>
+        <p className="guide-body-text max-w-3xl text-base leading-relaxed">{indexIntro}</p>
 
         <section>
-          <h2 className="site-section-title text-xl">Типы столов</h2>
+          <h2 className="site-section-title text-xl">{t("index.tableTypesTitle")}</h2>
           <p className="guide-body-text mt-2 max-w-2xl text-sm leading-relaxed">
-            Пять форматов, которые клубы указывают при бронировании и создании турнира на
-            billiard.guru.
+            {t("index.tableTypesLead")}
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {BILLIARD_TABLE_TYPES.map((table) => (
-              <TableTypeCard key={table.id} table={table} />
+            {tableTypes.map((table) => (
+              <TableTypeCard key={table.id} table={table} t={t} />
             ))}
           </div>
         </section>
 
         <section className="home-section-alt rounded-2xl border border-[var(--border-subtle)] p-6 md:p-8">
-          <h2 className="site-section-title text-xl">Общее для всех дисциплин</h2>
-          <p className="guide-body-text mt-2 max-w-2xl text-sm">
-            Фора, этикет и приоритет регламента турнира — не зависят от типа стола.
-          </p>
+          <h2 className="site-section-title text-xl">{t("index.generalTitle")}</h2>
+          <p className="guide-body-text mt-2 max-w-2xl text-sm">{t("index.generalLead")}</p>
           <div className="mt-6 space-y-4">
-            <GuideSections sections={BILLIARD_GENERAL_SECTIONS} />
+            <GuideSections sections={generalSections} />
           </div>
         </section>
 
         <section className="home-cta-card rounded-2xl p-6 md:p-8">
-          <h2 className="site-section-title text-xl">Готовы сыграть турнир?</h2>
-          <p className="guide-body-text mt-2 max-w-xl text-sm">
-            Найдите ближайшее событие или создайте своё — формат стола и игры указываются в
-            карточке турнира.
-          </p>
+          <h2 className="site-section-title text-xl">{t("index.ctaTitle")}</h2>
+          <p className="guide-body-text mt-2 max-w-xl text-sm">{t("index.ctaLead")}</p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link href="/tournaments" className="site-btn-primary">
-              Смотреть турниры
+              {t("index.ctaTournaments")}
             </Link>
             <Link href="/clubs" className="site-btn-secondary">
-              Клубы и столы
+              {t("index.ctaClubs")}
             </Link>
           </div>
         </section>

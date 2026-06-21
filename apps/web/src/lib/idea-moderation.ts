@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { writeAuditLog } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { syncLocalizedTitleBody } from "@/lib/translation";
 import {
   answerCallbackQuery,
   ideaModerationKeyboard,
@@ -198,6 +199,11 @@ export async function approveIdea(
     return { ok: false, message: "Идея уже модерирована." };
   }
 
+  const localized = await syncLocalizedTitleBody({
+    title: idea.title,
+    body: idea.body,
+  });
+
   await prisma.idea.update({
     where: { id: idea.id },
     data: {
@@ -206,6 +212,8 @@ export async function approveIdea(
       moderatedAt: new Date(),
       moderatedById: moderatorId,
       rejectReason: null,
+      titleEn: localized.titleEn,
+      bodyEn: localized.bodyEn,
     },
   });
 

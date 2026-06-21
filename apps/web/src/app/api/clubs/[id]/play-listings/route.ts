@@ -10,6 +10,7 @@ import {
 import { loadClubPlayListingsManage } from "@/lib/play-listing-manage";
 import { prisma } from "@/lib/prisma";
 import { playListingListInclude } from "@/lib/public-queries";
+import { syncLocalizedTitleBody } from "@/lib/translation";
 import { playListingCreateSchema } from "@/lib/validators";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -51,14 +52,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       playAt,
     });
 
+    const localized = await syncLocalizedTitleBody({
+      title: data.title,
+      body: data.body,
+    });
+
     const listing = await prisma.playListing.create({
       data: {
         authorId,
         cityId: club.cityId,
         clubId,
         publishedByClub: true,
-        title: data.title.trim(),
-        body: data.body?.trim() || null,
+        title: localized.title,
+        body: localized.body,
+        titleEn: localized.titleEn,
+        bodyEn: localized.bodyEn,
         kind: data.kind,
         scheduleType: data.scheduleType,
         playAt,

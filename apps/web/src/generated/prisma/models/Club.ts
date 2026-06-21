@@ -51,12 +51,16 @@ export type ClubMinAggregateOutputType = {
   email: string | null
   photoUrl: string | null
   description: string | null
+  descriptionEn: string | null
   address: string | null
+  addressEn: string | null
   latitude: number | null
   longitude: number | null
   workingHours: string | null
+  workingHoursEn: string | null
   tableCount: number | null
   gamePrice: string | null
+  gamePriceEn: string | null
   bookingEnabled: boolean | null
   bookingSlotMinutes: number | null
   bookingAdvanceDays: number | null
@@ -77,12 +81,16 @@ export type ClubMaxAggregateOutputType = {
   email: string | null
   photoUrl: string | null
   description: string | null
+  descriptionEn: string | null
   address: string | null
+  addressEn: string | null
   latitude: number | null
   longitude: number | null
   workingHours: string | null
+  workingHoursEn: string | null
   tableCount: number | null
   gamePrice: string | null
+  gamePriceEn: string | null
   bookingEnabled: boolean | null
   bookingSlotMinutes: number | null
   bookingAdvanceDays: number | null
@@ -104,16 +112,21 @@ export type ClubCountAggregateOutputType = {
   photoUrl: number
   galleryUrls: number
   description: number
+  descriptionEn: number
   address: number
+  addressEn: number
   latitude: number
   longitude: number
   workingHours: number
+  workingHoursEn: number
   weeklyHours: number
   tableCount: number
   tableCounts: number
   floorPlan: number
   gamePrice: number
+  gamePriceEn: number
   priceTiers: number
+  priceTiersEn: number
   bookingEnabled: number
   bookingSlotMinutes: number
   bookingAdvanceDays: number
@@ -152,12 +165,16 @@ export type ClubMinAggregateInputType = {
   email?: true
   photoUrl?: true
   description?: true
+  descriptionEn?: true
   address?: true
+  addressEn?: true
   latitude?: true
   longitude?: true
   workingHours?: true
+  workingHoursEn?: true
   tableCount?: true
   gamePrice?: true
+  gamePriceEn?: true
   bookingEnabled?: true
   bookingSlotMinutes?: true
   bookingAdvanceDays?: true
@@ -178,12 +195,16 @@ export type ClubMaxAggregateInputType = {
   email?: true
   photoUrl?: true
   description?: true
+  descriptionEn?: true
   address?: true
+  addressEn?: true
   latitude?: true
   longitude?: true
   workingHours?: true
+  workingHoursEn?: true
   tableCount?: true
   gamePrice?: true
+  gamePriceEn?: true
   bookingEnabled?: true
   bookingSlotMinutes?: true
   bookingAdvanceDays?: true
@@ -205,16 +226,21 @@ export type ClubCountAggregateInputType = {
   photoUrl?: true
   galleryUrls?: true
   description?: true
+  descriptionEn?: true
   address?: true
+  addressEn?: true
   latitude?: true
   longitude?: true
   workingHours?: true
+  workingHoursEn?: true
   weeklyHours?: true
   tableCount?: true
   tableCounts?: true
   floorPlan?: true
   gamePrice?: true
+  gamePriceEn?: true
   priceTiers?: true
+  priceTiersEn?: true
   bookingEnabled?: true
   bookingSlotMinutes?: true
   bookingAdvanceDays?: true
@@ -323,16 +349,21 @@ export type ClubGroupByOutputType = {
   photoUrl: string | null
   galleryUrls: runtime.JsonValue | null
   description: string | null
+  descriptionEn: string | null
   address: string | null
+  addressEn: string | null
   latitude: number | null
   longitude: number | null
   workingHours: string | null
+  workingHoursEn: string | null
   weeklyHours: runtime.JsonValue | null
   tableCount: number | null
   tableCounts: runtime.JsonValue | null
   floorPlan: runtime.JsonValue | null
   gamePrice: string | null
+  gamePriceEn: string | null
   priceTiers: runtime.JsonValue | null
+  priceTiersEn: runtime.JsonValue | null
   bookingEnabled: boolean
   bookingSlotMinutes: number
   bookingAdvanceDays: number
@@ -377,16 +408,21 @@ export type ClubWhereInput = {
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableFilter<"Club">
   description?: Prisma.StringNullableFilter<"Club"> | string | null
+  descriptionEn?: Prisma.StringNullableFilter<"Club"> | string | null
   address?: Prisma.StringNullableFilter<"Club"> | string | null
+  addressEn?: Prisma.StringNullableFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableFilter<"Club"> | string | null
+  workingHoursEn?: Prisma.StringNullableFilter<"Club"> | string | null
   weeklyHours?: Prisma.JsonNullableFilter<"Club">
   tableCount?: Prisma.IntNullableFilter<"Club"> | number | null
   tableCounts?: Prisma.JsonNullableFilter<"Club">
   floorPlan?: Prisma.JsonNullableFilter<"Club">
   gamePrice?: Prisma.StringNullableFilter<"Club"> | string | null
+  gamePriceEn?: Prisma.StringNullableFilter<"Club"> | string | null
   priceTiers?: Prisma.JsonNullableFilter<"Club">
+  priceTiersEn?: Prisma.JsonNullableFilter<"Club">
   bookingEnabled?: Prisma.BoolFilter<"Club"> | boolean
   bookingSlotMinutes?: Prisma.IntFilter<"Club"> | number
   bookingAdvanceDays?: Prisma.IntFilter<"Club"> | number
@@ -418,16 +454,21 @@ export type ClubOrderByWithRelationInput = {
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   galleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  addressEn?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   workingHours?: Prisma.SortOrderInput | Prisma.SortOrder
+  workingHoursEn?: Prisma.SortOrderInput | Prisma.SortOrder
   weeklyHours?: Prisma.SortOrderInput | Prisma.SortOrder
   tableCount?: Prisma.SortOrderInput | Prisma.SortOrder
   tableCounts?: Prisma.SortOrderInput | Prisma.SortOrder
   floorPlan?: Prisma.SortOrderInput | Prisma.SortOrder
   gamePrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  gamePriceEn?: Prisma.SortOrderInput | Prisma.SortOrder
   priceTiers?: Prisma.SortOrderInput | Prisma.SortOrder
+  priceTiersEn?: Prisma.SortOrderInput | Prisma.SortOrder
   bookingEnabled?: Prisma.SortOrder
   bookingSlotMinutes?: Prisma.SortOrder
   bookingAdvanceDays?: Prisma.SortOrder
@@ -464,16 +505,21 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableFilter<"Club">
   description?: Prisma.StringNullableFilter<"Club"> | string | null
+  descriptionEn?: Prisma.StringNullableFilter<"Club"> | string | null
   address?: Prisma.StringNullableFilter<"Club"> | string | null
+  addressEn?: Prisma.StringNullableFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableFilter<"Club"> | string | null
+  workingHoursEn?: Prisma.StringNullableFilter<"Club"> | string | null
   weeklyHours?: Prisma.JsonNullableFilter<"Club">
   tableCount?: Prisma.IntNullableFilter<"Club"> | number | null
   tableCounts?: Prisma.JsonNullableFilter<"Club">
   floorPlan?: Prisma.JsonNullableFilter<"Club">
   gamePrice?: Prisma.StringNullableFilter<"Club"> | string | null
+  gamePriceEn?: Prisma.StringNullableFilter<"Club"> | string | null
   priceTiers?: Prisma.JsonNullableFilter<"Club">
+  priceTiersEn?: Prisma.JsonNullableFilter<"Club">
   bookingEnabled?: Prisma.BoolFilter<"Club"> | boolean
   bookingSlotMinutes?: Prisma.IntFilter<"Club"> | number
   bookingAdvanceDays?: Prisma.IntFilter<"Club"> | number
@@ -504,16 +550,21 @@ export type ClubOrderByWithAggregationInput = {
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   galleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  addressEn?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   workingHours?: Prisma.SortOrderInput | Prisma.SortOrder
+  workingHoursEn?: Prisma.SortOrderInput | Prisma.SortOrder
   weeklyHours?: Prisma.SortOrderInput | Prisma.SortOrder
   tableCount?: Prisma.SortOrderInput | Prisma.SortOrder
   tableCounts?: Prisma.SortOrderInput | Prisma.SortOrder
   floorPlan?: Prisma.SortOrderInput | Prisma.SortOrder
   gamePrice?: Prisma.SortOrderInput | Prisma.SortOrder
+  gamePriceEn?: Prisma.SortOrderInput | Prisma.SortOrder
   priceTiers?: Prisma.SortOrderInput | Prisma.SortOrder
+  priceTiersEn?: Prisma.SortOrderInput | Prisma.SortOrder
   bookingEnabled?: Prisma.SortOrder
   bookingSlotMinutes?: Prisma.SortOrder
   bookingAdvanceDays?: Prisma.SortOrder
@@ -543,16 +594,21 @@ export type ClubScalarWhereWithAggregatesInput = {
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableWithAggregatesFilter<"Club">
   description?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
+  descriptionEn?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
+  addressEn?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableWithAggregatesFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableWithAggregatesFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
+  workingHoursEn?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   weeklyHours?: Prisma.JsonNullableWithAggregatesFilter<"Club">
   tableCount?: Prisma.IntNullableWithAggregatesFilter<"Club"> | number | null
   tableCounts?: Prisma.JsonNullableWithAggregatesFilter<"Club">
   floorPlan?: Prisma.JsonNullableWithAggregatesFilter<"Club">
   gamePrice?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
+  gamePriceEn?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   priceTiers?: Prisma.JsonNullableWithAggregatesFilter<"Club">
+  priceTiersEn?: Prisma.JsonNullableWithAggregatesFilter<"Club">
   bookingEnabled?: Prisma.BoolWithAggregatesFilter<"Club"> | boolean
   bookingSlotMinutes?: Prisma.IntWithAggregatesFilter<"Club"> | number
   bookingAdvanceDays?: Prisma.IntWithAggregatesFilter<"Club"> | number
@@ -573,16 +629,21 @@ export type ClubCreateInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -614,16 +675,21 @@ export type ClubUncheckedCreateInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -653,16 +719,21 @@ export type ClubUpdateInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -694,16 +765,21 @@ export type ClubUncheckedUpdateInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -734,16 +810,21 @@ export type ClubCreateManyInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -764,16 +845,21 @@ export type ClubUpdateManyMutationInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -795,16 +881,21 @@ export type ClubUncheckedUpdateManyInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -842,16 +933,21 @@ export type ClubCountOrderByAggregateInput = {
   photoUrl?: Prisma.SortOrder
   galleryUrls?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  addressEn?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   workingHours?: Prisma.SortOrder
+  workingHoursEn?: Prisma.SortOrder
   weeklyHours?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
   tableCounts?: Prisma.SortOrder
   floorPlan?: Prisma.SortOrder
   gamePrice?: Prisma.SortOrder
+  gamePriceEn?: Prisma.SortOrder
   priceTiers?: Prisma.SortOrder
+  priceTiersEn?: Prisma.SortOrder
   bookingEnabled?: Prisma.SortOrder
   bookingSlotMinutes?: Prisma.SortOrder
   bookingAdvanceDays?: Prisma.SortOrder
@@ -880,12 +976,16 @@ export type ClubMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  addressEn?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   workingHours?: Prisma.SortOrder
+  workingHoursEn?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
   gamePrice?: Prisma.SortOrder
+  gamePriceEn?: Prisma.SortOrder
   bookingEnabled?: Prisma.SortOrder
   bookingSlotMinutes?: Prisma.SortOrder
   bookingAdvanceDays?: Prisma.SortOrder
@@ -906,12 +1006,16 @@ export type ClubMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   description?: Prisma.SortOrder
+  descriptionEn?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  addressEn?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   workingHours?: Prisma.SortOrder
+  workingHoursEn?: Prisma.SortOrder
   tableCount?: Prisma.SortOrder
   gamePrice?: Prisma.SortOrder
+  gamePriceEn?: Prisma.SortOrder
   bookingEnabled?: Prisma.SortOrder
   bookingSlotMinutes?: Prisma.SortOrder
   bookingAdvanceDays?: Prisma.SortOrder
@@ -981,10 +1085,6 @@ export type ClubUncheckedUpdateManyWithoutCityNestedInput = {
   update?: Prisma.ClubUpdateWithWhereUniqueWithoutCityInput | Prisma.ClubUpdateWithWhereUniqueWithoutCityInput[]
   updateMany?: Prisma.ClubUpdateManyWithWhereWithoutCityInput | Prisma.ClubUpdateManyWithWhereWithoutCityInput[]
   deleteMany?: Prisma.ClubScalarWhereInput | Prisma.ClubScalarWhereInput[]
-}
-
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
 }
 
 export type NullableIntFieldUpdateOperationsInput = {
@@ -1154,16 +1254,21 @@ export type ClubCreateWithoutCityInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1193,16 +1298,21 @@ export type ClubUncheckedCreateWithoutCityInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1262,16 +1372,21 @@ export type ClubScalarWhereInput = {
   photoUrl?: Prisma.StringNullableFilter<"Club"> | string | null
   galleryUrls?: Prisma.JsonNullableFilter<"Club">
   description?: Prisma.StringNullableFilter<"Club"> | string | null
+  descriptionEn?: Prisma.StringNullableFilter<"Club"> | string | null
   address?: Prisma.StringNullableFilter<"Club"> | string | null
+  addressEn?: Prisma.StringNullableFilter<"Club"> | string | null
   latitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   longitude?: Prisma.FloatNullableFilter<"Club"> | number | null
   workingHours?: Prisma.StringNullableFilter<"Club"> | string | null
+  workingHoursEn?: Prisma.StringNullableFilter<"Club"> | string | null
   weeklyHours?: Prisma.JsonNullableFilter<"Club">
   tableCount?: Prisma.IntNullableFilter<"Club"> | number | null
   tableCounts?: Prisma.JsonNullableFilter<"Club">
   floorPlan?: Prisma.JsonNullableFilter<"Club">
   gamePrice?: Prisma.StringNullableFilter<"Club"> | string | null
+  gamePriceEn?: Prisma.StringNullableFilter<"Club"> | string | null
   priceTiers?: Prisma.JsonNullableFilter<"Club">
+  priceTiersEn?: Prisma.JsonNullableFilter<"Club">
   bookingEnabled?: Prisma.BoolFilter<"Club"> | boolean
   bookingSlotMinutes?: Prisma.IntFilter<"Club"> | number
   bookingAdvanceDays?: Prisma.IntFilter<"Club"> | number
@@ -1292,16 +1407,21 @@ export type ClubCreateWithoutStaffInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1332,16 +1452,21 @@ export type ClubUncheckedCreateWithoutStaffInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1386,16 +1511,21 @@ export type ClubUpdateWithoutStaffInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1426,16 +1556,21 @@ export type ClubUncheckedUpdateWithoutStaffInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1464,16 +1599,21 @@ export type ClubCreateWithoutTableBookingsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1504,16 +1644,21 @@ export type ClubUncheckedCreateWithoutTableBookingsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1558,16 +1703,21 @@ export type ClubUpdateWithoutTableBookingsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1598,16 +1748,21 @@ export type ClubUncheckedUpdateWithoutTableBookingsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1636,16 +1791,21 @@ export type ClubCreateWithoutNewsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1676,16 +1836,21 @@ export type ClubUncheckedCreateWithoutNewsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1730,16 +1895,21 @@ export type ClubUpdateWithoutNewsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1770,16 +1940,21 @@ export type ClubUncheckedUpdateWithoutNewsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1808,16 +1983,21 @@ export type ClubCreateWithoutPlayerRatingsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1848,16 +2028,21 @@ export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -1902,16 +2087,21 @@ export type ClubUpdateWithoutPlayerRatingsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1942,16 +2132,21 @@ export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1980,16 +2175,21 @@ export type ClubCreateWithoutTournamentsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2020,16 +2220,21 @@ export type ClubUncheckedCreateWithoutTournamentsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2074,16 +2279,21 @@ export type ClubUpdateWithoutTournamentsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2114,16 +2324,21 @@ export type ClubUncheckedUpdateWithoutTournamentsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2152,16 +2367,21 @@ export type ClubCreateWithoutTeamsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2192,16 +2412,21 @@ export type ClubUncheckedCreateWithoutTeamsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2246,16 +2471,21 @@ export type ClubUpdateWithoutTeamsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2286,16 +2516,21 @@ export type ClubUncheckedUpdateWithoutTeamsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2324,16 +2559,21 @@ export type ClubCreateWithoutRegistrationsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2364,16 +2604,21 @@ export type ClubUncheckedCreateWithoutRegistrationsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2418,16 +2663,21 @@ export type ClubUpdateWithoutRegistrationsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2458,16 +2708,21 @@ export type ClubUncheckedUpdateWithoutRegistrationsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2496,16 +2751,21 @@ export type ClubCreateWithoutIdeasInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2536,16 +2796,21 @@ export type ClubUncheckedCreateWithoutIdeasInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2590,16 +2855,21 @@ export type ClubUpdateWithoutIdeasInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2630,16 +2900,21 @@ export type ClubUncheckedUpdateWithoutIdeasInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2668,16 +2943,21 @@ export type ClubCreateWithoutPlayListingsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2708,16 +2988,21 @@ export type ClubUncheckedCreateWithoutPlayListingsInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2762,16 +3047,21 @@ export type ClubUpdateWithoutPlayListingsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2802,16 +3092,21 @@ export type ClubUncheckedUpdateWithoutPlayListingsInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2840,16 +3135,21 @@ export type ClubCreateManyCityInput = {
   photoUrl?: string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: string | null
+  descriptionEn?: string | null
   address?: string | null
+  addressEn?: string | null
   latitude?: number | null
   longitude?: number | null
   workingHours?: string | null
+  workingHoursEn?: string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: string | null
+  gamePriceEn?: string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: boolean
   bookingSlotMinutes?: number
   bookingAdvanceDays?: number
@@ -2870,16 +3170,21 @@ export type ClubUpdateWithoutCityInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2909,16 +3214,21 @@ export type ClubUncheckedUpdateWithoutCityInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2948,16 +3258,21 @@ export type ClubUncheckedUpdateManyWithoutCityInput = {
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   galleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  addressEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   workingHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workingHoursEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   weeklyHours?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   tableCounts?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   floorPlan?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   gamePrice?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gamePriceEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceTiers?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  priceTiersEn?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   bookingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bookingSlotMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   bookingAdvanceDays?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3082,16 +3397,21 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   photoUrl?: boolean
   galleryUrls?: boolean
   description?: boolean
+  descriptionEn?: boolean
   address?: boolean
+  addressEn?: boolean
   latitude?: boolean
   longitude?: boolean
   workingHours?: boolean
+  workingHoursEn?: boolean
   weeklyHours?: boolean
   tableCount?: boolean
   tableCounts?: boolean
   floorPlan?: boolean
   gamePrice?: boolean
+  gamePriceEn?: boolean
   priceTiers?: boolean
+  priceTiersEn?: boolean
   bookingEnabled?: boolean
   bookingSlotMinutes?: boolean
   bookingAdvanceDays?: boolean
@@ -3126,16 +3446,21 @@ export type ClubSelectScalar = {
   photoUrl?: boolean
   galleryUrls?: boolean
   description?: boolean
+  descriptionEn?: boolean
   address?: boolean
+  addressEn?: boolean
   latitude?: boolean
   longitude?: boolean
   workingHours?: boolean
+  workingHoursEn?: boolean
   weeklyHours?: boolean
   tableCount?: boolean
   tableCounts?: boolean
   floorPlan?: boolean
   gamePrice?: boolean
+  gamePriceEn?: boolean
   priceTiers?: boolean
+  priceTiersEn?: boolean
   bookingEnabled?: boolean
   bookingSlotMinutes?: boolean
   bookingAdvanceDays?: boolean
@@ -3147,7 +3472,7 @@ export type ClubSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "cityId" | "phone" | "displayPhone" | "email" | "photoUrl" | "galleryUrls" | "description" | "address" | "latitude" | "longitude" | "workingHours" | "weeklyHours" | "tableCount" | "tableCounts" | "floorPlan" | "gamePrice" | "priceTiers" | "bookingEnabled" | "bookingSlotMinutes" | "bookingAdvanceDays" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
+export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "cityId" | "phone" | "displayPhone" | "email" | "photoUrl" | "galleryUrls" | "description" | "descriptionEn" | "address" | "addressEn" | "latitude" | "longitude" | "workingHours" | "workingHoursEn" | "weeklyHours" | "tableCount" | "tableCounts" | "floorPlan" | "gamePrice" | "gamePriceEn" | "priceTiers" | "priceTiersEn" | "bookingEnabled" | "bookingSlotMinutes" | "bookingAdvanceDays" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
 export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   tournaments?: boolean | Prisma.Club$tournamentsArgs<ExtArgs>
@@ -3186,16 +3511,21 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     photoUrl: string | null
     galleryUrls: runtime.JsonValue | null
     description: string | null
+    descriptionEn: string | null
     address: string | null
+    addressEn: string | null
     latitude: number | null
     longitude: number | null
     workingHours: string | null
+    workingHoursEn: string | null
     weeklyHours: runtime.JsonValue | null
     tableCount: number | null
     tableCounts: runtime.JsonValue | null
     floorPlan: runtime.JsonValue | null
     gamePrice: string | null
+    gamePriceEn: string | null
     priceTiers: runtime.JsonValue | null
+    priceTiersEn: runtime.JsonValue | null
     bookingEnabled: boolean
     bookingSlotMinutes: number
     bookingAdvanceDays: number
@@ -3593,16 +3923,21 @@ export interface ClubFieldRefs {
   readonly photoUrl: Prisma.FieldRef<"Club", 'String'>
   readonly galleryUrls: Prisma.FieldRef<"Club", 'Json'>
   readonly description: Prisma.FieldRef<"Club", 'String'>
+  readonly descriptionEn: Prisma.FieldRef<"Club", 'String'>
   readonly address: Prisma.FieldRef<"Club", 'String'>
+  readonly addressEn: Prisma.FieldRef<"Club", 'String'>
   readonly latitude: Prisma.FieldRef<"Club", 'Float'>
   readonly longitude: Prisma.FieldRef<"Club", 'Float'>
   readonly workingHours: Prisma.FieldRef<"Club", 'String'>
+  readonly workingHoursEn: Prisma.FieldRef<"Club", 'String'>
   readonly weeklyHours: Prisma.FieldRef<"Club", 'Json'>
   readonly tableCount: Prisma.FieldRef<"Club", 'Int'>
   readonly tableCounts: Prisma.FieldRef<"Club", 'Json'>
   readonly floorPlan: Prisma.FieldRef<"Club", 'Json'>
   readonly gamePrice: Prisma.FieldRef<"Club", 'String'>
+  readonly gamePriceEn: Prisma.FieldRef<"Club", 'String'>
   readonly priceTiers: Prisma.FieldRef<"Club", 'Json'>
+  readonly priceTiersEn: Prisma.FieldRef<"Club", 'Json'>
   readonly bookingEnabled: Prisma.FieldRef<"Club", 'Boolean'>
   readonly bookingSlotMinutes: Prisma.FieldRef<"Club", 'Int'>
   readonly bookingAdvanceDays: Prisma.FieldRef<"Club", 'Int'>

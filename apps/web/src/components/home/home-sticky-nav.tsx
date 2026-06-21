@@ -1,15 +1,16 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { GeoFilterBar } from "@/components/site/geo-filter";
 import { useSiteStickyTop } from "@/hooks/use-site-sticky-top";
 
-const LINKS = [
-  { href: "#news", label: "Новости" },
-  { href: "#tournaments", label: "Турниры" },
-  { href: "#players", label: "Игроки" },
-  { href: "#announcements", label: "Объявления" },
-  { href: "#clubs", label: "Клубы" },
+const LINK_KEYS = [
+  { href: "#news", key: "news" },
+  { href: "#tournaments", key: "tournaments" },
+  { href: "#players", key: "players" },
+  { href: "#announcements", key: "announcements" },
+  { href: "#clubs", key: "clubs" },
 ] as const;
 
 type HomeStickyNavProps = {
@@ -21,11 +22,12 @@ function HomeStickyNavInner({
   initialCountryId,
   initialCityId,
 }: HomeStickyNavProps) {
+  const t = useTranslations("home.stickyNav");
   const [active, setActive] = useState<string>("#news");
   const stickyTop = useSiteStickyTop();
 
   useEffect(() => {
-    const sections = LINKS.map((l) => document.querySelector(l.href)).filter(
+    const sections = LINK_KEYS.map((l) => document.querySelector(l.href)).filter(
       (el): el is Element => el != null,
     );
     if (sections.length === 0) return;
@@ -50,12 +52,11 @@ function HomeStickyNavInner({
     <nav
       className="home-sticky-nav-stuck sticky top-[var(--site-sticky-top)] z-30 border-b"
       style={stickyTop != null ? { top: stickyTop } : undefined}
-      aria-label="Навигация по разделам главной"
+      aria-label={t("label")}
     >
       <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-2.5 sm:px-6 md:flex-row md:flex-wrap md:items-center md:gap-x-3 md:gap-y-2">
-        {/* Якоря по секциям — на мобильном лишние: лента и так скроллится, разделы есть в шапке */}
         <div className="hidden min-w-0 flex-1 gap-1 overflow-x-auto scrollbar-none md:flex">
-          {LINKS.map((link) => (
+          {LINK_KEYS.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -65,7 +66,7 @@ function HomeStickyNavInner({
                   : "home-card-body hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
               }`}
             >
-              {link.label}
+              {t(link.key)}
             </a>
           ))}
         </div>

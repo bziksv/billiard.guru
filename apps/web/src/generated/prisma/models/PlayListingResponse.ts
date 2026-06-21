@@ -29,6 +29,7 @@ export type PlayListingResponseMinAggregateOutputType = {
   listingId: string | null
   playerId: string | null
   message: string | null
+  messageEn: string | null
   status: $Enums.PlayListingResponseStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -39,6 +40,7 @@ export type PlayListingResponseMaxAggregateOutputType = {
   listingId: string | null
   playerId: string | null
   message: string | null
+  messageEn: string | null
   status: $Enums.PlayListingResponseStatus | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -49,6 +51,7 @@ export type PlayListingResponseCountAggregateOutputType = {
   listingId: number
   playerId: number
   message: number
+  messageEn: number
   status: number
   createdAt: number
   updatedAt: number
@@ -61,6 +64,7 @@ export type PlayListingResponseMinAggregateInputType = {
   listingId?: true
   playerId?: true
   message?: true
+  messageEn?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -71,6 +75,7 @@ export type PlayListingResponseMaxAggregateInputType = {
   listingId?: true
   playerId?: true
   message?: true
+  messageEn?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -81,6 +86,7 @@ export type PlayListingResponseCountAggregateInputType = {
   listingId?: true
   playerId?: true
   message?: true
+  messageEn?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -164,6 +170,7 @@ export type PlayListingResponseGroupByOutputType = {
   listingId: string
   playerId: string
   message: string | null
+  messageEn: string | null
   status: $Enums.PlayListingResponseStatus
   createdAt: Date
   updatedAt: Date
@@ -195,6 +202,7 @@ export type PlayListingResponseWhereInput = {
   listingId?: Prisma.StringFilter<"PlayListingResponse"> | string
   playerId?: Prisma.StringFilter<"PlayListingResponse"> | string
   message?: Prisma.StringNullableFilter<"PlayListingResponse"> | string | null
+  messageEn?: Prisma.StringNullableFilter<"PlayListingResponse"> | string | null
   status?: Prisma.EnumPlayListingResponseStatusFilter<"PlayListingResponse"> | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFilter<"PlayListingResponse"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlayListingResponse"> | Date | string
@@ -207,6 +215,7 @@ export type PlayListingResponseOrderByWithRelationInput = {
   listingId?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
+  messageEn?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -224,6 +233,7 @@ export type PlayListingResponseWhereUniqueInput = Prisma.AtLeast<{
   listingId?: Prisma.StringFilter<"PlayListingResponse"> | string
   playerId?: Prisma.StringFilter<"PlayListingResponse"> | string
   message?: Prisma.StringNullableFilter<"PlayListingResponse"> | string | null
+  messageEn?: Prisma.StringNullableFilter<"PlayListingResponse"> | string | null
   status?: Prisma.EnumPlayListingResponseStatusFilter<"PlayListingResponse"> | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFilter<"PlayListingResponse"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlayListingResponse"> | Date | string
@@ -236,6 +246,7 @@ export type PlayListingResponseOrderByWithAggregationInput = {
   listingId?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
   message?: Prisma.SortOrderInput | Prisma.SortOrder
+  messageEn?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -252,6 +263,7 @@ export type PlayListingResponseScalarWhereWithAggregatesInput = {
   listingId?: Prisma.StringWithAggregatesFilter<"PlayListingResponse"> | string
   playerId?: Prisma.StringWithAggregatesFilter<"PlayListingResponse"> | string
   message?: Prisma.StringNullableWithAggregatesFilter<"PlayListingResponse"> | string | null
+  messageEn?: Prisma.StringNullableWithAggregatesFilter<"PlayListingResponse"> | string | null
   status?: Prisma.EnumPlayListingResponseStatusWithAggregatesFilter<"PlayListingResponse"> | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PlayListingResponse"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PlayListingResponse"> | Date | string
@@ -260,6 +272,7 @@ export type PlayListingResponseScalarWhereWithAggregatesInput = {
 export type PlayListingResponseCreateInput = {
   id?: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -272,6 +285,7 @@ export type PlayListingResponseUncheckedCreateInput = {
   listingId: string
   playerId: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -280,6 +294,7 @@ export type PlayListingResponseUncheckedCreateInput = {
 export type PlayListingResponseUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -292,6 +307,7 @@ export type PlayListingResponseUncheckedUpdateInput = {
   listingId?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -302,6 +318,7 @@ export type PlayListingResponseCreateManyInput = {
   listingId: string
   playerId: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -310,6 +327,7 @@ export type PlayListingResponseCreateManyInput = {
 export type PlayListingResponseUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -320,6 +338,7 @@ export type PlayListingResponseUncheckedUpdateManyInput = {
   listingId?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,6 +370,7 @@ export type PlayListingResponseCountOrderByAggregateInput = {
   listingId?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  messageEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -361,6 +381,7 @@ export type PlayListingResponseMaxOrderByAggregateInput = {
   listingId?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  messageEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -371,6 +392,7 @@ export type PlayListingResponseMinOrderByAggregateInput = {
   listingId?: Prisma.SortOrder
   playerId?: Prisma.SortOrder
   message?: Prisma.SortOrder
+  messageEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -467,6 +489,7 @@ export type EnumPlayListingResponseStatusFieldUpdateOperationsInput = {
 export type PlayListingResponseCreateWithoutPlayerInput = {
   id?: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -477,6 +500,7 @@ export type PlayListingResponseUncheckedCreateWithoutPlayerInput = {
   id?: string
   listingId: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -516,6 +540,7 @@ export type PlayListingResponseScalarWhereInput = {
   listingId?: Prisma.StringFilter<"PlayListingResponse"> | string
   playerId?: Prisma.StringFilter<"PlayListingResponse"> | string
   message?: Prisma.StringNullableFilter<"PlayListingResponse"> | string | null
+  messageEn?: Prisma.StringNullableFilter<"PlayListingResponse"> | string | null
   status?: Prisma.EnumPlayListingResponseStatusFilter<"PlayListingResponse"> | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFilter<"PlayListingResponse"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlayListingResponse"> | Date | string
@@ -524,6 +549,7 @@ export type PlayListingResponseScalarWhereInput = {
 export type PlayListingResponseCreateWithoutListingInput = {
   id?: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -534,6 +560,7 @@ export type PlayListingResponseUncheckedCreateWithoutListingInput = {
   id?: string
   playerId: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -569,6 +596,7 @@ export type PlayListingResponseCreateManyPlayerInput = {
   id?: string
   listingId: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -577,6 +605,7 @@ export type PlayListingResponseCreateManyPlayerInput = {
 export type PlayListingResponseUpdateWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -587,6 +616,7 @@ export type PlayListingResponseUncheckedUpdateWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   listingId?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -596,6 +626,7 @@ export type PlayListingResponseUncheckedUpdateManyWithoutPlayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   listingId?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -605,6 +636,7 @@ export type PlayListingResponseCreateManyListingInput = {
   id?: string
   playerId: string
   message?: string | null
+  messageEn?: string | null
   status?: $Enums.PlayListingResponseStatus
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -613,6 +645,7 @@ export type PlayListingResponseCreateManyListingInput = {
 export type PlayListingResponseUpdateWithoutListingInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -623,6 +656,7 @@ export type PlayListingResponseUncheckedUpdateWithoutListingInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -632,6 +666,7 @@ export type PlayListingResponseUncheckedUpdateManyWithoutListingInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   playerId?: Prisma.StringFieldUpdateOperationsInput | string
   message?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  messageEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumPlayListingResponseStatusFieldUpdateOperationsInput | $Enums.PlayListingResponseStatus
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -644,6 +679,7 @@ export type PlayListingResponseSelect<ExtArgs extends runtime.Types.Extensions.I
   listingId?: boolean
   playerId?: boolean
   message?: boolean
+  messageEn?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -658,12 +694,13 @@ export type PlayListingResponseSelectScalar = {
   listingId?: boolean
   playerId?: boolean
   message?: boolean
+  messageEn?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PlayListingResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listingId" | "playerId" | "message" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["playListingResponse"]>
+export type PlayListingResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "listingId" | "playerId" | "message" | "messageEn" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["playListingResponse"]>
 export type PlayListingResponseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   listing?: boolean | Prisma.PlayListingDefaultArgs<ExtArgs>
   player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
@@ -680,6 +717,7 @@ export type $PlayListingResponsePayload<ExtArgs extends runtime.Types.Extensions
     listingId: string
     playerId: string
     message: string | null
+    messageEn: string | null
     status: $Enums.PlayListingResponseStatus
     createdAt: Date
     updatedAt: Date
@@ -1058,6 +1096,7 @@ export interface PlayListingResponseFieldRefs {
   readonly listingId: Prisma.FieldRef<"PlayListingResponse", 'String'>
   readonly playerId: Prisma.FieldRef<"PlayListingResponse", 'String'>
   readonly message: Prisma.FieldRef<"PlayListingResponse", 'String'>
+  readonly messageEn: Prisma.FieldRef<"PlayListingResponse", 'String'>
   readonly status: Prisma.FieldRef<"PlayListingResponse", 'PlayListingResponseStatus'>
   readonly createdAt: Prisma.FieldRef<"PlayListingResponse", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PlayListingResponse", 'DateTime'>

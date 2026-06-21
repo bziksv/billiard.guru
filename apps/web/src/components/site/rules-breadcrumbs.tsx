@@ -1,10 +1,13 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 type Crumb = { href?: string; label: string };
 
-export function RulesBreadcrumbs({ items }: { items: Crumb[] }) {
+export async function RulesBreadcrumbs({ items }: { items: Crumb[] }) {
+  const t = await getTranslations("rules.breadcrumbs");
+
   return (
-    <nav aria-label="Навигация" className="rules-breadcrumbs">
+    <nav aria-label={t("aria")} className="rules-breadcrumbs">
       <ol className="flex flex-wrap items-center gap-1.5 text-sm">
         {items.map((item, i) => (
           <li key={item.label} className="inline-flex items-center gap-1.5">

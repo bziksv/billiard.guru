@@ -1,6 +1,6 @@
 ---
 description: SEO meta-теги для публичных страниц billiard.guru
-globs: apps/web/src/app/(site)/**,apps/web/src/lib/seo.ts,apps/web/src/lib/bracket-formats/seo.ts,apps/web/src/lib/legal.ts
+globs: apps/web/src/app/[locale]/(site)/**,apps/web/src/app/(site)/**,apps/web/src/lib/seo.ts,apps/web/src/lib/bracket-formats/seo.ts,apps/web/src/lib/legal.ts
 alwaysApply: true
 ---
 

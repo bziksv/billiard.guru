@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { LocaleSwitcher } from "@/components/site/locale-switcher";
+import { SiteThemeToggle } from "@/components/site/site-theme-toggle";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { cn } from "@/lib/cn";
-import { SITE_GUIDE_NAV, SITE_NAV_CTA, SITE_NAV_MAIN, t } from "@/lib/site";
+import { SITE_GUIDE_NAV, SITE_NAV_CTA, SITE_NAV_MAIN } from "@/lib/site";
 
 function NavLink({
   href,
@@ -65,6 +66,7 @@ export type SiteHeaderAccount = {
 };
 
 export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
+  const t = useTranslations();
   const pathname = usePathname();
   const router = useRouter();
   const [guideOpen, setGuideOpen] = useState(false);
@@ -138,11 +140,11 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
         className="site-mobile-menu-btn site-header-nav-mobile"
         aria-expanded={mobileOpen}
         aria-controls="site-mobile-nav"
-        aria-label={mobileOpen ? "Закрыть меню" : "Открыть меню разделов"}
+        aria-label={mobileOpen ? t("nav.closeMenu") : t("nav.openMenu")}
         onClick={() => setMobileOpen((v) => !v)}
       >
         <MenuIcon open={mobileOpen} />
-        <span>{mobileOpen ? "Закрыть" : "Разделы"}</span>
+        <span>{mobileOpen ? t("nav.close") : t("nav.sections")}</span>
       </button>
 
       {/* Десктоп — только от 1024px (см. globals.css .site-header-nav-desktop) */}
@@ -167,7 +169,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
           </Link>
         </nav>
 
-        <div ref={guideRef} className="relative shrink-0">
+        <div ref={guideRef} className="site-header-nav-guide relative shrink-0">
           <button
             type="button"
             onClick={() => setGuideOpen((v) => !v)}
@@ -217,7 +219,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
               <header className="site-mobile-nav-header">
                 <div>
                   <p id="site-mobile-nav-heading" className="site-mobile-nav-heading">
-                    Меню
+                    {t("nav.mobileMenu")}
                   </p>
                   {account && (
                     <p className="site-mobile-nav-account-name">
@@ -228,7 +230,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
                 <button
                   type="button"
                   className="site-mobile-nav-close"
-                  aria-label="Закрыть меню"
+                  aria-label={t("nav.closeMenu")}
                   onClick={closeMobile}
                 >
                   <span aria-hidden>×</span>
@@ -236,7 +238,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
               </header>
 
               <div className="site-mobile-nav-scroll">
-                <p className="site-mobile-nav-title">Разделы</p>
+                <p className="site-mobile-nav-title">{t("nav.sections")}</p>
                 <nav className="site-mobile-nav-group">
                   {SITE_NAV_MAIN.map((item) => (
                     <NavLink
@@ -262,7 +264,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
                   </Link>
                 </nav>
 
-                <p className="site-mobile-nav-title">Справочник</p>
+                <p className="site-mobile-nav-title">{t("nav.guide")}</p>
                 <nav className="site-mobile-nav-group">
                   {SITE_GUIDE_NAV.map((item) => (
                     <NavLink
@@ -276,7 +278,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
                   ))}
                 </nav>
 
-                <p className="site-mobile-nav-title">Аккаунт</p>
+                <p className="site-mobile-nav-title">{t("nav.accountSection")}</p>
                 <nav className="site-mobile-nav-group">
                   {account ? (
                     <>
@@ -289,7 +291,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
                           onClick={closeMobile}
                           className="site-mobile-nav-link site-mobile-nav-link-accent"
                         >
-                          Управление клубом
+                          {t("nav.manageClub")}
                         </Link>
                       )}
                       {account.isAdmin && (
@@ -307,7 +309,7 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
                         disabled={loggingOut}
                         className="site-mobile-nav-link text-left disabled:opacity-60"
                       >
-                        {loggingOut ? "Выход…" : t("nav.logout")}
+                        {loggingOut ? t("nav.loggingOut") : t("nav.logout")}
                       </button>
                     </>
                   ) : (
@@ -323,7 +325,8 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
               </div>
 
               <footer className="site-mobile-nav-footer">
-                <ThemeToggle variant="site" showLabel className="w-full justify-start px-3 py-2.5" />
+                <LocaleSwitcher variant="footer" className="mb-2 px-3" />
+                <SiteThemeToggle showLabel className="w-full justify-start px-3 py-2.5" />
               </footer>
             </div>
           </div>,

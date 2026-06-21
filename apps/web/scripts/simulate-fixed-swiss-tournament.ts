@@ -2,7 +2,7 @@
  * Сформировать сетку и прогнать все доступные встречи (team1 побеждает).
  * Проверка: все auto-advance links после каждого тура.
  *
- * npx tsx scripts/simulate-fixed-swiss-tournament.ts [tournamentId] [--regenerate] [--verbose]
+ * npx tsx scripts/simulate-fixed-swiss-tournament.ts [tournamentId] [--regenerate] [--replay] [--verbose]
  */
 import { prisma } from "../src/lib/prisma";
 import {
@@ -10,6 +10,7 @@ import {
   generateTournamentPairing,
   processByes,
   regenerateBracket,
+  replayFixedSwissAdvances,
 } from "../src/lib/bracket-service";
 import {
   fixedSwissMatchNo,
@@ -19,6 +20,7 @@ import { shouldAutoAdvanceFixedSwissLink } from "../src/lib/fixed-swiss-layout";
 
 const args = process.argv.slice(2);
 const regenerate = args.includes("--regenerate");
+const replay = args.includes("--replay");
 const verbose = args.includes("--verbose");
 const tournamentId =
   args.find((a) => !a.startsWith("--")) ?? "cmqf3zlvf00003i3kcusdpfnz";
@@ -158,6 +160,11 @@ async function main() {
     0,
   );
   console.log(`Matches: ${matchCount}, maxRound: ${maxRound}`);
+
+  if (replay) {
+    console.log("Replaying fixed-swiss advances from finished matches…");
+    await replayFixedSwissAdvances(prisma, tournamentId);
+  }
 
   let played = 0;
   let lastRound = 0;

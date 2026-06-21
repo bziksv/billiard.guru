@@ -28,6 +28,8 @@ export type SiteNewsMinAggregateOutputType = {
   id: string | null
   title: string | null
   body: string | null
+  titleEn: string | null
+  bodyEn: string | null
   status: $Enums.IdeaStatus | null
   authorId: string | null
   publishedAt: Date | null
@@ -38,6 +40,8 @@ export type SiteNewsMaxAggregateOutputType = {
   id: string | null
   title: string | null
   body: string | null
+  titleEn: string | null
+  bodyEn: string | null
   status: $Enums.IdeaStatus | null
   authorId: string | null
   publishedAt: Date | null
@@ -48,6 +52,8 @@ export type SiteNewsCountAggregateOutputType = {
   id: number
   title: number
   body: number
+  titleEn: number
+  bodyEn: number
   status: number
   authorId: number
   publishedAt: number
@@ -60,6 +66,8 @@ export type SiteNewsMinAggregateInputType = {
   id?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   status?: true
   authorId?: true
   publishedAt?: true
@@ -70,6 +78,8 @@ export type SiteNewsMaxAggregateInputType = {
   id?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   status?: true
   authorId?: true
   publishedAt?: true
@@ -80,6 +90,8 @@ export type SiteNewsCountAggregateInputType = {
   id?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   status?: true
   authorId?: true
   publishedAt?: true
@@ -163,6 +175,8 @@ export type SiteNewsGroupByOutputType = {
   id: string
   title: string
   body: string
+  titleEn: string | null
+  bodyEn: string | null
   status: $Enums.IdeaStatus
   authorId: string | null
   publishedAt: Date | null
@@ -194,6 +208,8 @@ export type SiteNewsWhereInput = {
   id?: Prisma.StringFilter<"SiteNews"> | string
   title?: Prisma.StringFilter<"SiteNews"> | string
   body?: Prisma.StringFilter<"SiteNews"> | string
+  titleEn?: Prisma.StringNullableFilter<"SiteNews"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"SiteNews"> | string | null
   status?: Prisma.EnumIdeaStatusFilter<"SiteNews"> | $Enums.IdeaStatus
   authorId?: Prisma.StringNullableFilter<"SiteNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"SiteNews"> | Date | string | null
@@ -205,6 +221,8 @@ export type SiteNewsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  bodyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   authorId?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -220,6 +238,8 @@ export type SiteNewsWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.SiteNewsWhereInput | Prisma.SiteNewsWhereInput[]
   title?: Prisma.StringFilter<"SiteNews"> | string
   body?: Prisma.StringFilter<"SiteNews"> | string
+  titleEn?: Prisma.StringNullableFilter<"SiteNews"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"SiteNews"> | string | null
   status?: Prisma.EnumIdeaStatusFilter<"SiteNews"> | $Enums.IdeaStatus
   authorId?: Prisma.StringNullableFilter<"SiteNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"SiteNews"> | Date | string | null
@@ -231,6 +251,8 @@ export type SiteNewsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  bodyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   authorId?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -247,6 +269,8 @@ export type SiteNewsScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"SiteNews"> | string
   title?: Prisma.StringWithAggregatesFilter<"SiteNews"> | string
   body?: Prisma.StringWithAggregatesFilter<"SiteNews"> | string
+  titleEn?: Prisma.StringNullableWithAggregatesFilter<"SiteNews"> | string | null
+  bodyEn?: Prisma.StringNullableWithAggregatesFilter<"SiteNews"> | string | null
   status?: Prisma.EnumIdeaStatusWithAggregatesFilter<"SiteNews"> | $Enums.IdeaStatus
   authorId?: Prisma.StringNullableWithAggregatesFilter<"SiteNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SiteNews"> | Date | string | null
@@ -257,6 +281,8 @@ export type SiteNewsCreateInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   publishedAt?: Date | string | null
   createdAt?: Date | string
@@ -267,6 +293,8 @@ export type SiteNewsUncheckedCreateInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   authorId?: string | null
   publishedAt?: Date | string | null
@@ -277,6 +305,8 @@ export type SiteNewsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -287,6 +317,8 @@ export type SiteNewsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   authorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -297,6 +329,8 @@ export type SiteNewsCreateManyInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   authorId?: string | null
   publishedAt?: Date | string | null
@@ -307,6 +341,8 @@ export type SiteNewsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -316,6 +352,8 @@ export type SiteNewsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   authorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -332,6 +370,8 @@ export type SiteNewsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
@@ -342,6 +382,8 @@ export type SiteNewsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
@@ -352,6 +394,8 @@ export type SiteNewsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   authorId?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
@@ -414,6 +458,8 @@ export type SiteNewsCreateWithoutAuthorInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   publishedAt?: Date | string | null
   createdAt?: Date | string
@@ -423,6 +469,8 @@ export type SiteNewsUncheckedCreateWithoutAuthorInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   publishedAt?: Date | string | null
   createdAt?: Date | string
@@ -461,6 +509,8 @@ export type SiteNewsScalarWhereInput = {
   id?: Prisma.StringFilter<"SiteNews"> | string
   title?: Prisma.StringFilter<"SiteNews"> | string
   body?: Prisma.StringFilter<"SiteNews"> | string
+  titleEn?: Prisma.StringNullableFilter<"SiteNews"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"SiteNews"> | string | null
   status?: Prisma.EnumIdeaStatusFilter<"SiteNews"> | $Enums.IdeaStatus
   authorId?: Prisma.StringNullableFilter<"SiteNews"> | string | null
   publishedAt?: Prisma.DateTimeNullableFilter<"SiteNews"> | Date | string | null
@@ -471,6 +521,8 @@ export type SiteNewsCreateManyAuthorInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   publishedAt?: Date | string | null
   createdAt?: Date | string
@@ -480,6 +532,8 @@ export type SiteNewsUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -489,6 +543,8 @@ export type SiteNewsUncheckedUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -498,6 +554,8 @@ export type SiteNewsUncheckedUpdateManyWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -509,6 +567,8 @@ export type SiteNewsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   title?: boolean
   body?: boolean
+  titleEn?: boolean
+  bodyEn?: boolean
   status?: boolean
   authorId?: boolean
   publishedAt?: boolean
@@ -522,13 +582,15 @@ export type SiteNewsSelectScalar = {
   id?: boolean
   title?: boolean
   body?: boolean
+  titleEn?: boolean
+  bodyEn?: boolean
   status?: boolean
   authorId?: boolean
   publishedAt?: boolean
   createdAt?: boolean
 }
 
-export type SiteNewsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "body" | "status" | "authorId" | "publishedAt" | "createdAt", ExtArgs["result"]["siteNews"]>
+export type SiteNewsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "body" | "titleEn" | "bodyEn" | "status" | "authorId" | "publishedAt" | "createdAt", ExtArgs["result"]["siteNews"]>
 export type SiteNewsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.SiteNews$authorArgs<ExtArgs>
 }
@@ -542,6 +604,8 @@ export type $SiteNewsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     title: string
     body: string
+    titleEn: string | null
+    bodyEn: string | null
     status: $Enums.IdeaStatus
     authorId: string | null
     publishedAt: Date | null
@@ -919,6 +983,8 @@ export interface SiteNewsFieldRefs {
   readonly id: Prisma.FieldRef<"SiteNews", 'String'>
   readonly title: Prisma.FieldRef<"SiteNews", 'String'>
   readonly body: Prisma.FieldRef<"SiteNews", 'String'>
+  readonly titleEn: Prisma.FieldRef<"SiteNews", 'String'>
+  readonly bodyEn: Prisma.FieldRef<"SiteNews", 'String'>
   readonly status: Prisma.FieldRef<"SiteNews", 'IdeaStatus'>
   readonly authorId: Prisma.FieldRef<"SiteNews", 'String'>
   readonly publishedAt: Prisma.FieldRef<"SiteNews", 'DateTime'>

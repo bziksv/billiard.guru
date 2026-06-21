@@ -9,11 +9,13 @@ import {
   type BracketFormatCode,
   isBracketFormatCode,
 } from "@/lib/bracket-formats/catalog";
+import { BRACKET_ADMIN_LABEL_EN } from "@/lib/bracket-formats/en/display-labels";
 import {
   getBracketFormatCatalogLabel,
   resolveBracketFormatAdminLabel,
   resolveBracketFormatLabelsMap,
 } from "@/lib/bracket-formats/resolve-label";
+import type { AppLocale } from "@/i18n/routing";
 
 export type BracketFormatAdminSettings = {
   /** null — подпись из каталога */
@@ -107,6 +109,20 @@ export async function getAllBracketFormatLabels(): Promise<Record<string, string
     settingsMap,
     DEFAULT_BRACKET_FORMAT_SETTINGS,
   );
+}
+
+export async function getLocalizedBracketFormatLabels(
+  locale: AppLocale,
+): Promise<Record<string, string>> {
+  const ruLabels = await getAllBracketFormatLabels();
+  if (locale !== "en") return ruLabels;
+
+  const out: Record<string, string> = { ...ruLabels };
+  for (const f of BRACKET_FORMAT_CATALOG) {
+    const enLabel = BRACKET_ADMIN_LABEL_EN[f.code];
+    if (enLabel) out[f.code] = enLabel;
+  }
+  return out;
 }
 
 export async function withTournamentFormatLabel<T extends { format: string }>(

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 export function BookingCancelButton({
@@ -15,13 +16,14 @@ export function BookingCancelButton({
   className?: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("pages.cabinet");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (new Date(startsAt) <= new Date()) return null;
 
   async function cancel() {
-    if (!confirm("Отменить бронь?")) return;
+    if (!confirm(t("cancelBookingConfirm"))) return;
     setLoading(true);
     setError(null);
     const res = await fetch(`/api/clubs/${clubId}/bookings/${bookingId}`, {
@@ -32,7 +34,7 @@ export function BookingCancelButton({
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось отменить");
+      setError(data.error ?? t("cancelBookingFailed"));
       return;
     }
     router.refresh();
@@ -46,7 +48,7 @@ export function BookingCancelButton({
         disabled={loading}
         className="text-sm text-red-400 hover:underline disabled:opacity-60"
       >
-        {loading ? "…" : "Отменить бронь"}
+        {loading ? "…" : t("cancelBooking")}
       </button>
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
     </div>

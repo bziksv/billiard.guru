@@ -21,6 +21,7 @@ import {
   weeklyHoursToJson,
 } from "@/lib/club-schedule";
 import { clubRegisterSchema } from "@/lib/validators";
+import { buildClubLocalizedUpdate } from "@/lib/translation";
 
 export async function GET() {
   const clubs = await prisma.club.findMany({
@@ -70,6 +71,13 @@ export async function POST(request: NextRequest) {
       : (data.tableCount ?? null);
     const weeklyHoursJson = weeklyHoursToJson(parseWeeklyHours(body.weeklyHours));
     const priceTiersJson = priceTiersToJson(parsePriceTiers(body.priceTiers));
+    const localizedFields = await buildClubLocalizedUpdate({
+      description: data.description,
+      address: data.address,
+      workingHours: data.workingHours,
+      gamePrice: data.gamePrice,
+      priceTiers: parsePriceTiers(body.priceTiers),
+    });
 
     const club = await prisma.club.create({
       data: {
@@ -79,13 +87,18 @@ export async function POST(request: NextRequest) {
         displayPhone,
         email: data.email || null,
         address: data.address || null,
-        description: data.description || null,
+        description: (localizedFields.description as string | null) ?? null,
+        descriptionEn: (localizedFields.descriptionEn as string | null) ?? null,
+        addressEn: (localizedFields.addressEn as string | null) ?? null,
         workingHours: data.workingHours || null,
+        workingHoursEn: (localizedFields.workingHoursEn as string | null) ?? null,
         weeklyHours: jsonUpdateValue(weeklyHoursJson),
         tableCount: tableCountTotal,
         tableCounts: jsonUpdateValue(tableCountsJson),
         gamePrice: data.gamePrice || null,
+        gamePriceEn: (localizedFields.gamePriceEn as string | null) ?? null,
         priceTiers: jsonUpdateValue(priceTiersJson),
+        priceTiersEn: jsonUpdateValue(localizedFields.priceTiersEn as ReturnType<typeof priceTiersToJson>),
         latitude: coords.latitude,
         longitude: coords.longitude,
         confirmToken,

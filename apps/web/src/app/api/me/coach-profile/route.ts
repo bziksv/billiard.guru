@@ -3,6 +3,7 @@ import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { parseCoachGalleryUrls } from "@/lib/coach-profile";
 import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
+import { syncLocalizedDescription } from "@/lib/translation";
 import { coachProfileUpdateSchema } from "@/lib/validators";
 
 export async function GET() {
@@ -15,6 +16,7 @@ export async function GET() {
     return NextResponse.json({
       isCoach: player.isCoach,
       coachBio: player.coachBio,
+      coachBioEn: player.coachBioEn,
       coachGalleryUrls: parseCoachGalleryUrls(player.coachGalleryUrls),
     });
   } catch (error) {
@@ -35,11 +37,21 @@ export async function PATCH(request: NextRequest) {
     const data = coachProfileUpdateSchema.parse(body);
     const gallery = data.coachGalleryUrls ?? parseCoachGalleryUrls(player.coachGalleryUrls);
 
+    let coachBio: string | null = null;
+    let coachBioEn: string | null = null;
+
+    if (data.isCoach && data.coachBio?.trim()) {
+      const localized = await syncLocalizedDescription({ description: data.coachBio });
+      coachBio = localized.description;
+      coachBioEn = localized.descriptionEn;
+    }
+
     const updated = await prisma.player.update({
       where: { id: player.id },
       data: {
         isCoach: data.isCoach,
-        coachBio: data.isCoach ? (data.coachBio?.trim() || null) : null,
+        coachBio: data.isCoach ? coachBio : null,
+        coachBioEn: data.isCoach ? coachBioEn : null,
         coachGalleryUrls: data.isCoach
           ? jsonUpdateValue(gallery.length > 0 ? gallery : null)
           : jsonUpdateValue(null),
@@ -47,6 +59,7 @@ export async function PATCH(request: NextRequest) {
       select: {
         isCoach: true,
         coachBio: true,
+        coachBioEn: true,
         coachGalleryUrls: true,
       },
     });
@@ -54,6 +67,7 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({
       isCoach: updated.isCoach,
       coachBio: updated.coachBio,
+      coachBioEn: updated.coachBioEn,
       coachGalleryUrls: parseCoachGalleryUrls(updated.coachGalleryUrls),
     });
   } catch (error) {

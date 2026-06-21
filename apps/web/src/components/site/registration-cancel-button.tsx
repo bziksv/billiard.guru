@@ -1,11 +1,18 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
-import {
-  canCancelRegistration,
-  cancelRegistrationLabel,
-} from "@/lib/tournament-registration";
+import { canCancelRegistration } from "@/lib/tournament-registration";
+
+function cancelRegistrationLabel(
+  registrationStatus: string,
+  t: ReturnType<typeof useTranslations<"detail.tournament">>,
+): string {
+  if (registrationStatus === "PENDING") return t("cancelPending");
+  if (registrationStatus === "CONFIRMED") return t("cancelConfirmed");
+  return t("cancelDefault");
+}
 
 export function RegistrationCancelButton({
   registrationId,
@@ -21,6 +28,7 @@ export function RegistrationCancelButton({
   className?: string;
 }) {
   const router = useRouter();
+  const t = useTranslations("detail.tournament");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +40,7 @@ export function RegistrationCancelButton({
   }
 
   async function cancel() {
-    const label = cancelRegistrationLabel(registrationStatus);
+    const label = cancelRegistrationLabel(registrationStatus, t);
     if (!confirm(`${label}?`)) return;
 
     setLoading(true);
@@ -45,7 +53,7 @@ export function RegistrationCancelButton({
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось отменить");
+      setError(data.error ?? t("cancelFailed"));
       return;
     }
     router.refresh();
@@ -62,7 +70,7 @@ export function RegistrationCancelButton({
         {loading && (
           <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
         )}
-        {loading ? "…" : cancelRegistrationLabel(registrationStatus)}
+        {loading ? "…" : cancelRegistrationLabel(registrationStatus, t)}
       </button>
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
     </div>

@@ -1,6 +1,10 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 export function ClubBookingScrollButton() {
+  const t = useTranslations("detail.club");
+
   function scrollToBooking() {
     document.getElementById("club-booking")?.scrollIntoView({
       behavior: "smooth",
@@ -14,7 +18,7 @@ export function ClubBookingScrollButton() {
       onClick={scrollToBooking}
       className="club-booking-scroll-btn site-btn-primary w-full"
     >
-      Забронировать стол
+      {t("bookTable")}
     </button>
   );
 }

@@ -260,6 +260,12 @@ beget_ensure_htaccess() {
 
   mkdir -p "$SITE_ROOT"
   cat > "$BEGET_HTACCESS" << EOF
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTP_HOST} ^www\.(.+)\$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+</IfModule>
+
 PassengerNodejs $node_path
 PassengerAppRoot $app_root
 PassengerAppType node

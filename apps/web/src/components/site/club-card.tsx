@@ -1,5 +1,10 @@
+"use client";
+
+import { useLocale, useTranslations } from "next-intl";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { SiteCard } from "@/components/site/site-card";
+import { localizedGeoName } from "@/lib/geo-display";
+import type { AppLocale } from "@/i18n/routing";
 
 type ClubListItem = {
   id: string;
@@ -8,7 +13,7 @@ type ClubListItem = {
   photoUrl?: string | null;
   tableCount?: number | null;
   isVerified: boolean;
-  city: { nameRu: string; country: { nameRu: string } };
+  city: { nameRu: string; nameEn?: string | null; country: { nameRu: string; nameEn?: string | null } };
   _count?: { tournaments: number };
 };
 
@@ -19,6 +24,10 @@ export function ClubCard({
   club: ClubListItem;
   href?: string;
 }) {
+  const t = useTranslations("clubCard");
+  const locale = useLocale() as AppLocale;
+  const location = `${localizedGeoName(club.city.nameRu, locale, club.city.nameEn)}, ${localizedGeoName(club.city.country.nameRu, locale, club.city.country.nameEn)}`;
+
   const body = (
     <div className="flex gap-4">
       {club.photoUrl ? (
@@ -38,18 +47,22 @@ export function ClubCard({
           <h3 className="home-card-title font-semibold">{club.name}</h3>
           <StatusBadge
             status={club.isVerified ? "CONFIRMED" : "PENDING"}
-            label={club.isVerified ? "Подтверждён" : "Ожидает Telegram"}
+            label={club.isVerified ? t("verified") : t("pendingTelegram")}
           />
         </div>
         <p className="home-card-body mt-2 text-sm">
-          {club.city.nameRu}, {club.city.country.nameRu}
+          {location}
         </p>
         {club.tableCount != null && club.tableCount > 0 && (
-          <p className="home-card-muted mt-1 text-xs">{club.tableCount} столов</p>
+          <p className="home-card-muted mt-1 text-xs">
+            {t("tables", { count: club.tableCount })}
+          </p>
         )}
         {club.email && <p className="home-card-muted mt-1 text-sm">{club.email}</p>}
         {club._count && (
-          <p className="home-card-muted mt-2 text-xs">Турниров: {club._count.tournaments}</p>
+          <p className="home-card-muted mt-2 text-xs">
+            {t("tournaments", { count: club._count.tournaments })}
+          </p>
         )}
       </div>
     </div>

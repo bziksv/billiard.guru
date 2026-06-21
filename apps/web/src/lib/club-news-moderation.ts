@@ -8,6 +8,7 @@ import {
   sendTelegramMessage,
 } from "@/lib/telegram";
 import { getSuperadminTelegramIds } from "@/lib/telegram-admin-ids";
+import { syncLocalizedTitleBody, type PublishLocale } from "@/lib/translation";
 
 function appUrl(path = "") {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
@@ -97,6 +98,8 @@ export async function submitClubNewsForModeration(input: {
   authorId: string;
   title: string;
   body: string;
+  titleEn?: string;
+  bodyEn?: string;
   cityBroadcastRequested?: boolean;
 }) {
   const token = randomUUID();
@@ -106,6 +109,8 @@ export async function submitClubNewsForModeration(input: {
       authorId: input.authorId,
       title: input.title.trim(),
       body: input.body.trim(),
+      titleEn: input.titleEn?.trim() || null,
+      bodyEn: input.bodyEn?.trim() || null,
       status: "PENDING",
       moderationToken: token,
       publishedAt: null,
@@ -137,6 +142,12 @@ export async function approveClubNews(
     return { ok: false, message: "Новость уже модерирована." };
   }
 
+  const localized = await syncLocalizedTitleBody({
+    publishLocale: "ru",
+    title: item.title,
+    body: item.body,
+  });
+
   await prisma.clubNews.update({
     where: { id: item.id },
     data: {
@@ -146,6 +157,8 @@ export async function approveClubNews(
       moderatedById: moderatorId,
       rejectReason: null,
       publishedAt: new Date(),
+      titleEn: localized.titleEn,
+      bodyEn: localized.bodyEn,
     },
   });
 

@@ -9,11 +9,23 @@ export const CLUB_TABLE_FORMATS = [
 
 export type ClubTableFormatId = (typeof CLUB_TABLE_FORMATS)[number]["id"];
 
+const FORMAT_LABELS_EN: Record<ClubTableFormatId, string> = {
+  PYRAMID: "Pyramid",
+  POOL: "Pool",
+  SNOOKER: "Snooker",
+  CHINESE_POOL: "Chinese pool",
+  CAROM: "Carom",
+};
+
 export type ClubTableCounts = Partial<Record<ClubTableFormatId, number>>;
 
 const FORMAT_IDS = new Set<string>(CLUB_TABLE_FORMATS.map((f) => f.id));
 
-export function clubTableFormatLabel(id: ClubTableFormatId): string {
+export function clubTableFormatLabel(
+  id: ClubTableFormatId,
+  locale: "ru" | "en" = "ru",
+): string {
+  if (locale === "en") return FORMAT_LABELS_EN[id] ?? id;
   return CLUB_TABLE_FORMATS.find((f) => f.id === id)?.label ?? id;
 }
 
@@ -33,10 +45,10 @@ export function clubTableCountsTotal(counts: ClubTableCounts): number {
   return Object.values(counts).reduce((sum, n) => sum + (n ?? 0), 0);
 }
 
-export function clubTableCountsEntries(counts: ClubTableCounts) {
+export function clubTableCountsEntries(counts: ClubTableCounts, locale: "ru" | "en" = "ru") {
   return CLUB_TABLE_FORMATS.filter((f) => (counts[f.id] ?? 0) > 0).map((f) => ({
     id: f.id,
-    label: f.label,
+    label: clubTableFormatLabel(f.id, locale),
     count: counts[f.id]!,
   }));
 }

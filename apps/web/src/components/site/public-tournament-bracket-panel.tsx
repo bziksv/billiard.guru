@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { BracketPresentationShell } from "@/components/bracket/bracket-presentation-shell";
 import type { BracketMatchView, SwissStandingView } from "@/lib/bracket-view";
@@ -28,6 +29,13 @@ export function PublicTournamentBracketPanel({
   standings,
   handicapHalfStep,
 }: Props) {
+  const t = useTranslations("tournamentView.bracket");
+  const siteLabels = {
+    presentationTitle: t("presentationTitle"),
+    presentationAria: (title: string) => t("presentationAria", { title }),
+    presentationAriaDefault: t("presentationAriaDefault"),
+    exit: t("exit"),
+  };
   const [presentationOpen, setPresentationOpen] = useState(false);
   const [display, setDisplay] = useState<BracketCardDisplayPrefs>(() =>
     readBracketDisplayPrefs(tournamentId),
@@ -39,9 +47,7 @@ export function PublicTournamentBracketPanel({
 
   if (matches.length === 0) {
     return (
-      <p className="text-sm text-[var(--text-muted)]">
-        Сетка ещё не сформирована. Следите за обновлениями на странице турнира.
-      </p>
+      <p className="text-sm text-[var(--text-muted)]">{t("notFormed")}</p>
     );
   }
 
@@ -67,6 +73,7 @@ export function PublicTournamentBracketPanel({
         title={tournamentName}
         onClose={() => setPresentationOpen(false)}
         variant="site"
+        siteLabels={siteLabels}
         toolbar={
           <PublicBracketDisplayToolbar
             display={display}

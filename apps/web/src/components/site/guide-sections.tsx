@@ -1,4 +1,5 @@
 import type { GuideExample, GuideSection } from "@/lib/guide-content";
+import { getTranslations } from "next-intl/server";
 import { SiteCard } from "@/components/site/site-card";
 
 function GuideTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
@@ -80,10 +81,12 @@ export function GuideSections({ sections }: { sections: GuideSection[] }) {
   );
 }
 
-export function GuideToc({ sections }: { sections: GuideSection[] }) {
+export async function GuideToc({ sections }: { sections: GuideSection[] }) {
+  const t = await getTranslations("guide");
+
   return (
     <nav className="site-card p-5">
-      <p className="guide-toc-label">Содержание</p>
+      <p className="guide-toc-label">{t("toc")}</p>
       <ul className="mt-3 space-y-2 text-sm">
         {sections.map((section) => (
           <li key={section.id}>

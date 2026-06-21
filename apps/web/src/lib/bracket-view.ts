@@ -73,7 +73,7 @@ export function groupMatchesByRound(matches: BracketMatchView[]) {
     }));
 }
 
-import { describeHandicapShort } from "@/lib/handicap";
+import { calculateHandicap } from "@/lib/handicap";
 import { OLYMPIC_BRONZE_MATCH_SLOT, teamRating } from "@/lib/pair-tournament";
 import {
   GRID_FOOTER_LINE_H,
@@ -186,12 +186,12 @@ function olympicMatchHasHandicap(
   halfStep = true,
 ): boolean {
   if (!match.team1 || !match.team2) return false;
-  const short = describeHandicapShort(
+  const h = calculateHandicap(
     Math.max(teamRating(match.team1), teamRating(match.team2)),
     Math.min(teamRating(match.team1), teamRating(match.team2)),
     { halfStep },
   );
-  return Boolean(short && short !== "Без форы");
+  return h.ratingDiff > 0;
 }
 
 function olympicTeamBlockHeight(_match: BracketMatchView): number {

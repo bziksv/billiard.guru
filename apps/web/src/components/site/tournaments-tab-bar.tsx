@@ -1,7 +1,9 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
+import { useRouter } from "@/i18n/navigation";
 import {
   TOURNAMENT_TAB_CONFIG,
   type TournamentTab,
@@ -16,6 +18,7 @@ export function TournamentsTabBar({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("pages.tournaments.tabs");
 
   function setTab(tab: TournamentTab) {
     const params = new URLSearchParams(searchParams.toString());
@@ -43,7 +46,7 @@ export function TournamentsTabBar({
             )}
             aria-current={active ? "true" : undefined}
           >
-            {item.label}
+            {t(`${item.id}.label`)}
             {count > 0 && (
               <span
                 className={cn(

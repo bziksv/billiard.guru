@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@/i18n/navigation";
 import { SiteContainer } from "@/components/site/site-container";
 import { COOKIE_CONSENT_STORAGE_KEY, LEGAL_URLS } from "@/lib/legal";
 
 export function CookieConsentPopup() {
+  const t = useTranslations("cookie.consent");
   const [visible, setVisible] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
 
@@ -65,16 +67,14 @@ export function CookieConsentPopup() {
     >
       <SiteContainer className="cookie-consent-bar-inner">
         <p id="cookie-consent-desc" className="cookie-consent-bar-text">
-          Этот сайт использует cookie-файлы для настройки рекламы и сбора статистики.
-          Оставаясь на сайте, вы соглашаетесь на обработку ваших персональных данных
-          в соответствии с нашей{" "}
+          {t("beforeLink")}
           <Link href={LEGAL_URLS.cookies} className="cookie-consent-bar-link">
-            политикой cookies
+            {t("link")}
           </Link>
           .
         </p>
         <button type="button" onClick={accept} className="cookie-consent-bar-accept">
-          Принять
+          {t("accept")}
         </button>
       </SiteContainer>
     </div>

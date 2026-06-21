@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 
 type PreferenceItem = {
@@ -13,6 +14,7 @@ type PreferenceItem = {
 };
 
 type PreferenceGroup = {
+  category: string;
   categoryLabel: string;
   items: PreferenceItem[];
 };
@@ -23,10 +25,26 @@ type PreferencesResponse = {
 };
 
 export function NotificationPreferencesEditor() {
+  const t = useTranslations("pages.cabinet");
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<PreferencesResponse | null>(null);
+
+  function itemTitle(item: PreferenceItem) {
+    const key = `notificationItems.${item.id}.title` as Parameters<typeof t>[0];
+    return t.has(key) ? t(key) : item.title;
+  }
+
+  function itemDescription(item: PreferenceItem) {
+    const key = `notificationItems.${item.id}.description` as Parameters<typeof t>[0];
+    return t.has(key) ? t(key) : item.description;
+  }
+
+  function categoryLabel(group: PreferenceGroup) {
+    const key = `notificationCategories.${group.category}` as Parameters<typeof t>[0];
+    return t.has(key) ? t(key) : group.categoryLabel;
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -35,11 +53,11 @@ export function NotificationPreferencesEditor() {
     const json = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(json.error ?? "Не удалось загрузить настройки");
+      setError(json.error ?? t("loadError"));
       return;
     }
     setData(json as PreferencesResponse);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void load();
@@ -59,14 +77,14 @@ export function NotificationPreferencesEditor() {
     setSavingId(null);
 
     if (!res.ok) {
-      setError(json.error ?? "Не удалось сохранить");
+      setError(json.error ?? t("saveError"));
       return;
     }
     setData(json as PreferencesResponse);
   }
 
   if (loading) {
-    return <p className="text-sm text-zinc-500">Загрузка…</p>;
+    return <p className="text-sm text-zinc-500">{t("loading")}</p>;
   }
 
   if (!data) {
@@ -76,15 +94,11 @@ export function NotificationPreferencesEditor() {
   return (
     <section className="site-card space-y-5 p-5">
       <div>
-        <h2 className="site-section-title text-lg">Уведомления в Telegram</h2>
-        <p className="mt-1 text-sm text-zinc-500">
-          Выберите, о чём присылать сообщения в бот. По умолчанию включены все типы, кроме
-          обязательных.
-        </p>
+        <h2 className="site-section-title text-lg">{t("notificationsTitle")}</h2>
+        <p className="mt-1 text-sm text-zinc-500">{t("notificationsLead")}</p>
         {!data.hasTelegram && (
           <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
-            Telegram не привязан — уведомления не дойдут, пока вы не подтвердите аккаунт в боте
-            (регистрация или вход на сайте).
+            {t("notificationsNoTelegram")}
           </p>
         )}
       </div>
@@ -93,9 +107,9 @@ export function NotificationPreferencesEditor() {
 
       <div className="space-y-6">
         {data.groups.map((group) => (
-          <div key={group.categoryLabel}>
+          <div key={group.category}>
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-              {group.categoryLabel}
+              {categoryLabel(group)}
             </h3>
             <ul className="divide-y divide-zinc-800/80 rounded-xl border border-zinc-800/80">
               {group.items.map((item) => (
@@ -118,7 +132,7 @@ export function NotificationPreferencesEditor() {
                       checked={item.enabled}
                       disabled={item.locked || savingId === item.id}
                       onChange={(e) => void toggle(item, e.target.checked)}
-                      aria-label={item.title}
+                      aria-label={itemTitle(item)}
                     />
                     <span
                       className={cn(
@@ -131,12 +145,10 @@ export function NotificationPreferencesEditor() {
                     />
                   </label>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-zinc-100">{item.title}</p>
-                    <p className="mt-0.5 text-xs text-zinc-500">{item.description}</p>
+                    <p className="text-sm font-medium text-zinc-100">{itemTitle(item)}</p>
+                    <p className="mt-0.5 text-xs text-zinc-500">{itemDescription(item)}</p>
                     {item.locked && (
-                      <p className="mt-1 text-xs text-zinc-400">
-                        Нельзя отключить — нужно для безопасного входа на сайт
-                      </p>
+                      <p className="mt-1 text-xs text-zinc-400">{t("notificationsLocked")}</p>
                     )}
                   </div>
                 </li>

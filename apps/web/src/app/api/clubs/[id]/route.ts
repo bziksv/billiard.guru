@@ -22,6 +22,7 @@ import {
 } from "@/lib/club-schedule";
 import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
+import { buildClubLocalizedUpdate, clubLocalizedToPrisma } from "@/lib/translation";
 import { Prisma } from "@/generated/prisma/client";
 import { normalizePhoneForCity } from "@/lib/phone-server";
 import { clubUpdateSchema } from "@/lib/validators";
@@ -195,13 +196,20 @@ export async function PATCH(
       photoUrl = syncedPhotos.photoUrl;
       const galleryJson = syncedPhotos.galleryUrls;
 
+      const localizedFields = await buildClubLocalizedUpdate({
+        ...(data.description !== undefined && { description: data.description }),
+        ...(data.address !== undefined && { address: data.address }),
+        ...(data.workingHours !== undefined && { workingHours: data.workingHours }),
+        ...(data.gamePrice !== undefined && { gamePrice: data.gamePrice }),
+        priceTiers: priceTiersParsed,
+      });
+
       const club = await prisma.club.update({
         where: { id },
         data: {
           ...(data.name !== undefined && { name: data.name }),
           ...(data.cityId !== undefined && { cityId: data.cityId }),
           ...(data.email !== undefined && { email: data.email }),
-          ...(data.description !== undefined && { description: data.description }),
           ...(data.address !== undefined && { address: data.address }),
           ...(data.workingHours !== undefined && { workingHours: data.workingHours }),
           tableCount: tables.tableCount,
@@ -209,6 +217,7 @@ export async function PATCH(
           weeklyHours: jsonUpdateValue(weeklyHoursToJson(weeklyHoursParsed)),
           priceTiers: jsonUpdateValue(priceTiersToJson(priceTiersParsed)),
           ...(data.gamePrice !== undefined && { gamePrice: data.gamePrice }),
+          ...clubLocalizedToPrisma(localizedFields),
           ...(data.bookingEnabled !== undefined && { bookingEnabled: data.bookingEnabled }),
           ...(data.bookingSlotMinutes !== undefined && {
             bookingSlotMinutes: data.bookingSlotMinutes,
@@ -223,7 +232,7 @@ export async function PATCH(
           }),
           photoUrl,
           galleryUrls: jsonUpdateValue(galleryJson),
-        },
+        } as Prisma.ClubUpdateInput,
         include: { city: { include: { country: true } } },
       });
 
@@ -303,11 +312,18 @@ export async function PATCH(
         ? syncClubPhotoFields(parseClubGalleryUrls(body.galleryUrls))
         : null;
 
+    const localizedFields = await buildClubLocalizedUpdate({
+      ...(data.description !== undefined && { description: data.description }),
+      ...(data.address !== undefined && { address: data.address }),
+      ...(data.workingHours !== undefined && { workingHours: data.workingHours }),
+      ...(data.gamePrice !== undefined && { gamePrice: data.gamePrice }),
+      ...(body.priceTiers !== undefined && { priceTiers: priceTiersParsed }),
+    });
+
     const updateData: Prisma.ClubUpdateInput = {
         ...(data.name !== undefined && { name: data.name }),
         ...(data.cityId !== undefined && { cityId: data.cityId }),
         ...(data.email !== undefined && { email: data.email }),
-        ...(data.description !== undefined && { description: data.description }),
         ...(data.address !== undefined && { address: data.address }),
         ...(data.workingHours !== undefined && { workingHours: data.workingHours }),
         ...(body.tableCounts !== undefined && {
@@ -322,6 +338,7 @@ export async function PATCH(
         }),
         ...(floorPlanJson !== undefined && { floorPlan: jsonUpdateValue(floorPlanJson) }),
         ...(data.gamePrice !== undefined && { gamePrice: data.gamePrice }),
+        ...clubLocalizedToPrisma(localizedFields),
         ...(displayPhone !== undefined && { displayPhone }),
         ...(coords !== undefined && {
           latitude: coords.latitude,

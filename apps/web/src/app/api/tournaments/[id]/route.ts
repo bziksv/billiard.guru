@@ -31,6 +31,7 @@ import {
   validateTournamentTableIds,
 } from "@/lib/tournament-table-pick";
 import { tournamentUpdateSchema } from "@/lib/validators";
+import { syncLocalizedDescription, syncLocalizedLabel } from "@/lib/translation";
 
 export async function GET(
   _request: NextRequest,
@@ -182,12 +183,20 @@ export async function PATCH(
       }
     }
 
+    const descriptionFields =
+      data.description !== undefined
+        ? await syncLocalizedDescription({ description: data.description })
+        : undefined;
+    const nameFields =
+      data.name !== undefined ? await syncLocalizedLabel({ text: data.name }) : undefined;
+
     const tournament = await prisma.tournament.update({
       where: { id },
       data: {
-        ...(data.name !== undefined && { name: data.name }),
-        ...(data.description !== undefined && {
-          description: data.description || null,
+        ...(nameFields && { name: nameFields.text, nameEn: nameFields.textEn }),
+        ...(descriptionFields && {
+          description: descriptionFields.description,
+          descriptionEn: descriptionFields.descriptionEn,
         }),
         ...(data.clubId !== undefined && { clubId: data.clubId }),
         ...(data.format !== undefined && { format: data.format }),

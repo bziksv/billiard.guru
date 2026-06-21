@@ -1,11 +1,13 @@
+import type { AppLocale } from "@/i18n/routing";
+
 export const PUBLIC_TOURNAMENT_STATUSES = ["OPEN", "ACTIVE", "FINISHED"] as const;
 
 /** Участники и заявки, видимые на публичной странице турнира. */
 export const PUBLIC_PARTICIPANT_STATUSES = ["CONFIRMED", "PENDING"] as const;
 
-export function formatStartsAt(date: Date | null) {
-  if (!date) return "Дата уточняется";
-  return new Intl.DateTimeFormat("ru-RU", {
+export function formatStartsAt(date: Date | null, locale: AppLocale = "ru") {
+  if (!date) return locale === "en" ? "Date TBD" : "Дата уточняется";
+  return new Intl.DateTimeFormat(locale === "en" ? "en-GB" : "ru-RU", {
     day: "numeric",
     month: "long",
     year: "numeric",

@@ -1,7 +1,11 @@
+import { getLocale, getTranslations } from "next-intl/server";
+import { LocalizedUserText } from "@/components/site/localized-user-text";
 import { SiteCard } from "@/components/site/site-card";
-import { coachCoverPhoto, coachTeaser } from "@/lib/coach-profile";
+import { coachCoverPhoto } from "@/lib/coach-profile";
 import { formatCoachReviewAvg } from "@/lib/coach-review-display";
 import { CoachReviewStars } from "@/components/site/coach-review-stars";
+import type { AppLocale } from "@/i18n/routing";
+import { formatGeoLocation } from "@/lib/geo-display";
 import { playerName } from "@/lib/public-display";
 
 export type CoachListItem = {
@@ -13,13 +17,19 @@ export type CoachListItem = {
   coachReviewCount: number;
   photoUrl: string | null;
   coachBio: string | null;
+  coachBioEn?: string | null;
   coachGalleryUrls?: unknown;
-  city: { nameRu: string; country: { nameRu: string } };
+  city: {
+    nameRu: string;
+    nameEn?: string | null;
+    country: { nameRu: string; nameEn?: string | null };
+  };
 };
 
-export function CoachCard({ coach, href }: { coach: CoachListItem; href: string }) {
+export async function CoachCard({ coach, href }: { coach: CoachListItem; href: string }) {
+  const t = await getTranslations("detail.coach");
+  const locale = (await getLocale()) as AppLocale;
   const cover = coachCoverPhoto(coach);
-  const teaser = coachTeaser(coach.coachBio);
 
   return (
     <SiteCard href={href} className="coach-card overflow-hidden p-0">
@@ -44,12 +54,20 @@ export function CoachCard({ coach, href }: { coach: CoachListItem; href: string 
       <div className="p-4">
         <h3 className="home-card-title font-semibold">{playerName(coach)}</h3>
         <p className="home-card-muted mt-1 text-xs">
-          {coach.city.nameRu}, {coach.city.country.nameRu}
+          {formatGeoLocation(
+            coach.city.nameRu,
+            coach.city.country.nameRu,
+            locale,
+            coach.city.nameEn,
+            coach.city.country.nameEn,
+          )}
         </p>
-        <p className="coach-card-teaser mt-3 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-          {teaser}
-        </p>
-        <p className="mt-3 text-xs font-medium text-emerald-600">Подробнее →</p>
+        {coach.coachBio?.trim() ? (
+          <div className="coach-card-teaser mt-3 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+            <LocalizedUserText text={coach.coachBio} textEn={coach.coachBioEn} />
+          </div>
+        ) : null}
+        <p className="mt-3 text-xs font-medium text-emerald-600">{t("moreLink")}</p>
       </div>
     </SiteCard>
   );

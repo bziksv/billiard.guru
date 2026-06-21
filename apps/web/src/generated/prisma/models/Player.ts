@@ -52,8 +52,10 @@ export type PlayerMinAggregateOutputType = {
   telegramUsername: string | null
   rating: number | null
   about: string | null
+  aboutEn: string | null
   isCoach: boolean | null
   coachBio: string | null
+  coachBioEn: string | null
   coachReviewAvg: number | null
   coachReviewCount: number | null
   role: $Enums.UserRole | null
@@ -77,8 +79,10 @@ export type PlayerMaxAggregateOutputType = {
   telegramUsername: string | null
   rating: number | null
   about: string | null
+  aboutEn: string | null
   isCoach: boolean | null
   coachBio: string | null
+  coachBioEn: string | null
   coachReviewAvg: number | null
   coachReviewCount: number | null
   role: $Enums.UserRole | null
@@ -102,8 +106,10 @@ export type PlayerCountAggregateOutputType = {
   telegramUsername: number
   rating: number
   about: number
+  aboutEn: number
   isCoach: number
   coachBio: number
+  coachBioEn: number
   coachGalleryUrls: number
   coachReviewAvg: number
   coachReviewCount: number
@@ -142,8 +148,10 @@ export type PlayerMinAggregateInputType = {
   telegramUsername?: true
   rating?: true
   about?: true
+  aboutEn?: true
   isCoach?: true
   coachBio?: true
+  coachBioEn?: true
   coachReviewAvg?: true
   coachReviewCount?: true
   role?: true
@@ -167,8 +175,10 @@ export type PlayerMaxAggregateInputType = {
   telegramUsername?: true
   rating?: true
   about?: true
+  aboutEn?: true
   isCoach?: true
   coachBio?: true
+  coachBioEn?: true
   coachReviewAvg?: true
   coachReviewCount?: true
   role?: true
@@ -192,8 +202,10 @@ export type PlayerCountAggregateInputType = {
   telegramUsername?: true
   rating?: true
   about?: true
+  aboutEn?: true
   isCoach?: true
   coachBio?: true
+  coachBioEn?: true
   coachGalleryUrls?: true
   coachReviewAvg?: true
   coachReviewCount?: true
@@ -305,8 +317,10 @@ export type PlayerGroupByOutputType = {
   telegramUsername: string | null
   rating: number
   about: string | null
+  aboutEn: string | null
   isCoach: boolean
   coachBio: string | null
+  coachBioEn: string | null
   coachGalleryUrls: runtime.JsonValue | null
   coachReviewAvg: number | null
   coachReviewCount: number
@@ -354,8 +368,10 @@ export type PlayerWhereInput = {
   telegramUsername?: Prisma.StringNullableFilter<"Player"> | string | null
   rating?: Prisma.FloatFilter<"Player"> | number
   about?: Prisma.StringNullableFilter<"Player"> | string | null
+  aboutEn?: Prisma.StringNullableFilter<"Player"> | string | null
   isCoach?: Prisma.BoolFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
+  coachBioEn?: Prisma.StringNullableFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
   coachReviewAvg?: Prisma.FloatNullableFilter<"Player"> | number | null
   coachReviewCount?: Prisma.IntFilter<"Player"> | number
@@ -399,8 +415,10 @@ export type PlayerOrderByWithRelationInput = {
   telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrder
   about?: Prisma.SortOrderInput | Prisma.SortOrder
+  aboutEn?: Prisma.SortOrderInput | Prisma.SortOrder
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachBioEn?: Prisma.SortOrderInput | Prisma.SortOrder
   coachGalleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   coachReviewAvg?: Prisma.SortOrderInput | Prisma.SortOrder
   coachReviewCount?: Prisma.SortOrder
@@ -449,8 +467,10 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   telegramUsername?: Prisma.StringNullableFilter<"Player"> | string | null
   rating?: Prisma.FloatFilter<"Player"> | number
   about?: Prisma.StringNullableFilter<"Player"> | string | null
+  aboutEn?: Prisma.StringNullableFilter<"Player"> | string | null
   isCoach?: Prisma.BoolFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
+  coachBioEn?: Prisma.StringNullableFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
   coachReviewAvg?: Prisma.FloatNullableFilter<"Player"> | number | null
   coachReviewCount?: Prisma.IntFilter<"Player"> | number
@@ -493,8 +513,10 @@ export type PlayerOrderByWithAggregationInput = {
   telegramUsername?: Prisma.SortOrderInput | Prisma.SortOrder
   rating?: Prisma.SortOrder
   about?: Prisma.SortOrderInput | Prisma.SortOrder
+  aboutEn?: Prisma.SortOrderInput | Prisma.SortOrder
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrderInput | Prisma.SortOrder
+  coachBioEn?: Prisma.SortOrderInput | Prisma.SortOrder
   coachGalleryUrls?: Prisma.SortOrderInput | Prisma.SortOrder
   coachReviewAvg?: Prisma.SortOrderInput | Prisma.SortOrder
   coachReviewCount?: Prisma.SortOrder
@@ -527,8 +549,10 @@ export type PlayerScalarWhereWithAggregatesInput = {
   telegramUsername?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   rating?: Prisma.FloatWithAggregatesFilter<"Player"> | number
   about?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
+  aboutEn?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   isCoach?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
+  coachBioEn?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableWithAggregatesFilter<"Player">
   coachReviewAvg?: Prisma.FloatNullableWithAggregatesFilter<"Player"> | number | null
   coachReviewCount?: Prisma.IntWithAggregatesFilter<"Player"> | number
@@ -552,8 +576,10 @@ export type PlayerCreateInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -597,8 +623,10 @@ export type PlayerUncheckedCreateInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -640,8 +668,10 @@ export type PlayerUpdateInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -685,8 +715,10 @@ export type PlayerUncheckedUpdateInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -729,8 +761,10 @@ export type PlayerCreateManyInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -754,8 +788,10 @@ export type PlayerUpdateManyMutationInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -780,8 +816,10 @@ export type PlayerUncheckedUpdateManyInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -832,8 +870,10 @@ export type PlayerCountOrderByAggregateInput = {
   telegramUsername?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   about?: Prisma.SortOrder
+  aboutEn?: Prisma.SortOrder
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrder
+  coachBioEn?: Prisma.SortOrder
   coachGalleryUrls?: Prisma.SortOrder
   coachReviewAvg?: Prisma.SortOrder
   coachReviewCount?: Prisma.SortOrder
@@ -864,8 +904,10 @@ export type PlayerMaxOrderByAggregateInput = {
   telegramUsername?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   about?: Prisma.SortOrder
+  aboutEn?: Prisma.SortOrder
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrder
+  coachBioEn?: Prisma.SortOrder
   coachReviewAvg?: Prisma.SortOrder
   coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -889,8 +931,10 @@ export type PlayerMinOrderByAggregateInput = {
   telegramUsername?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   about?: Prisma.SortOrder
+  aboutEn?: Prisma.SortOrder
   isCoach?: Prisma.SortOrder
   coachBio?: Prisma.SortOrder
+  coachBioEn?: Prisma.SortOrder
   coachReviewAvg?: Prisma.SortOrder
   coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -1235,8 +1279,10 @@ export type PlayerCreateWithoutCityInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1278,8 +1324,10 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1351,8 +1399,10 @@ export type PlayerScalarWhereInput = {
   telegramUsername?: Prisma.StringNullableFilter<"Player"> | string | null
   rating?: Prisma.FloatFilter<"Player"> | number
   about?: Prisma.StringNullableFilter<"Player"> | string | null
+  aboutEn?: Prisma.StringNullableFilter<"Player"> | string | null
   isCoach?: Prisma.BoolFilter<"Player"> | boolean
   coachBio?: Prisma.StringNullableFilter<"Player"> | string | null
+  coachBioEn?: Prisma.StringNullableFilter<"Player"> | string | null
   coachGalleryUrls?: Prisma.JsonNullableFilter<"Player">
   coachReviewAvg?: Prisma.FloatNullableFilter<"Player"> | number | null
   coachReviewCount?: Prisma.IntFilter<"Player"> | number
@@ -1376,8 +1426,10 @@ export type PlayerCreateWithoutClubStaffInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1420,8 +1472,10 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1478,8 +1532,10 @@ export type PlayerUpdateWithoutClubStaffInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1522,8 +1578,10 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1564,8 +1622,10 @@ export type PlayerCreateWithoutTableBookingsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1608,8 +1668,10 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1666,8 +1728,10 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1710,8 +1774,10 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1752,8 +1818,10 @@ export type PlayerCreateWithoutClubNewsAuthoredInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1796,8 +1864,10 @@ export type PlayerUncheckedCreateWithoutClubNewsAuthoredInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1854,8 +1924,10 @@ export type PlayerUpdateWithoutClubNewsAuthoredInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1898,8 +1970,10 @@ export type PlayerUncheckedUpdateWithoutClubNewsAuthoredInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1940,8 +2014,10 @@ export type PlayerCreateWithoutSiteNewsAuthoredInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -1984,8 +2060,10 @@ export type PlayerUncheckedCreateWithoutSiteNewsAuthoredInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2042,8 +2120,10 @@ export type PlayerUpdateWithoutSiteNewsAuthoredInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2086,8 +2166,10 @@ export type PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2128,8 +2210,10 @@ export type PlayerCreateWithoutPageViewsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2172,8 +2256,10 @@ export type PlayerUncheckedCreateWithoutPageViewsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2230,8 +2316,10 @@ export type PlayerUpdateWithoutPageViewsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2274,8 +2362,10 @@ export type PlayerUncheckedUpdateWithoutPageViewsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2316,8 +2406,10 @@ export type PlayerCreateWithoutNotificationPreferencesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2360,8 +2452,10 @@ export type PlayerUncheckedCreateWithoutNotificationPreferencesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2418,8 +2512,10 @@ export type PlayerUpdateWithoutNotificationPreferencesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2462,8 +2558,10 @@ export type PlayerUncheckedUpdateWithoutNotificationPreferencesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2504,8 +2602,10 @@ export type PlayerCreateWithoutCoachReviewsReceivedInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2548,8 +2648,10 @@ export type PlayerUncheckedCreateWithoutCoachReviewsReceivedInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2595,8 +2697,10 @@ export type PlayerCreateWithoutCoachReviewsGivenInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2639,8 +2743,10 @@ export type PlayerUncheckedCreateWithoutCoachReviewsGivenInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2697,8 +2803,10 @@ export type PlayerUpdateWithoutCoachReviewsReceivedInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2741,8 +2849,10 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2794,8 +2904,10 @@ export type PlayerUpdateWithoutCoachReviewsGivenInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2838,8 +2950,10 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsGivenInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2880,8 +2994,10 @@ export type PlayerCreateWithoutClubRatingsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2924,8 +3040,10 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -2982,8 +3100,10 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3026,8 +3146,10 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3068,8 +3190,10 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3112,8 +3236,10 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3170,8 +3296,10 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3214,8 +3342,10 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3256,8 +3386,10 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3300,8 +3432,10 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3347,8 +3481,10 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3391,8 +3527,10 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3449,8 +3587,10 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3493,8 +3633,10 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3546,8 +3688,10 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3590,8 +3734,10 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3632,8 +3778,10 @@ export type PlayerCreateWithoutRegistrationsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3676,8 +3824,10 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3734,8 +3884,10 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3778,8 +3930,10 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3820,8 +3974,10 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3864,8 +4020,10 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -3922,8 +4080,10 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3966,8 +4126,10 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4008,8 +4170,10 @@ export type PlayerCreateWithoutIdeasInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4052,8 +4216,10 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4110,8 +4276,10 @@ export type PlayerUpdateWithoutIdeasInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4154,8 +4322,10 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4196,8 +4366,10 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4240,8 +4412,10 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4298,8 +4472,10 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4342,8 +4518,10 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4384,8 +4562,10 @@ export type PlayerCreateWithoutPlayListingsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4428,8 +4608,10 @@ export type PlayerUncheckedCreateWithoutPlayListingsInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4486,8 +4668,10 @@ export type PlayerUpdateWithoutPlayListingsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4530,8 +4714,10 @@ export type PlayerUncheckedUpdateWithoutPlayListingsInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4572,8 +4758,10 @@ export type PlayerCreateWithoutPlayListingResponsesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4616,8 +4804,10 @@ export type PlayerUncheckedCreateWithoutPlayListingResponsesInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4674,8 +4864,10 @@ export type PlayerUpdateWithoutPlayListingResponsesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4718,8 +4910,10 @@ export type PlayerUncheckedUpdateWithoutPlayListingResponsesInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4760,8 +4954,10 @@ export type PlayerCreateManyCityInput = {
   telegramUsername?: string | null
   rating?: number
   about?: string | null
+  aboutEn?: string | null
   isCoach?: boolean
   coachBio?: string | null
+  coachBioEn?: string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: number | null
   coachReviewCount?: number
@@ -4785,8 +4981,10 @@ export type PlayerUpdateWithoutCityInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4828,8 +5026,10 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4871,8 +5071,10 @@ export type PlayerUncheckedUpdateManyWithoutCityInput = {
   telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
   coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5081,8 +5283,10 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   telegramUsername?: boolean
   rating?: boolean
   about?: boolean
+  aboutEn?: boolean
   isCoach?: boolean
   coachBio?: boolean
+  coachBioEn?: boolean
   coachGalleryUrls?: boolean
   coachReviewAvg?: boolean
   coachReviewCount?: boolean
@@ -5129,8 +5333,10 @@ export type PlayerSelectScalar = {
   telegramUsername?: boolean
   rating?: boolean
   about?: boolean
+  aboutEn?: boolean
   isCoach?: boolean
   coachBio?: boolean
+  coachBioEn?: boolean
   coachGalleryUrls?: boolean
   coachReviewAvg?: boolean
   coachReviewCount?: boolean
@@ -5141,7 +5347,7 @@ export type PlayerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "isCoach" | "coachBio" | "coachGalleryUrls" | "coachReviewAvg" | "coachReviewCount" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "aboutEn" | "isCoach" | "coachBio" | "coachBioEn" | "coachGalleryUrls" | "coachReviewAvg" | "coachReviewCount" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Player$registrationsArgs<ExtArgs>
@@ -5202,8 +5408,10 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     telegramUsername: string | null
     rating: number
     about: string | null
+    aboutEn: string | null
     isCoach: boolean
     coachBio: string | null
+    coachBioEn: string | null
     coachGalleryUrls: runtime.JsonValue | null
     coachReviewAvg: number | null
     coachReviewCount: number
@@ -5613,8 +5821,10 @@ export interface PlayerFieldRefs {
   readonly telegramUsername: Prisma.FieldRef<"Player", 'String'>
   readonly rating: Prisma.FieldRef<"Player", 'Float'>
   readonly about: Prisma.FieldRef<"Player", 'String'>
+  readonly aboutEn: Prisma.FieldRef<"Player", 'String'>
   readonly isCoach: Prisma.FieldRef<"Player", 'Boolean'>
   readonly coachBio: Prisma.FieldRef<"Player", 'String'>
+  readonly coachBioEn: Prisma.FieldRef<"Player", 'String'>
   readonly coachGalleryUrls: Prisma.FieldRef<"Player", 'Json'>
   readonly coachReviewAvg: Prisma.FieldRef<"Player", 'Float'>
   readonly coachReviewCount: Prisma.FieldRef<"Player", 'Int'>

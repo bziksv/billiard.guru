@@ -10,6 +10,8 @@ function serializeNews(item: {
   id: string;
   title: string;
   body: string;
+  titleEn?: string | null;
+  bodyEn?: string | null;
   status: string;
   rejectReason: string | null;
   publishedAt: Date | null;
@@ -20,6 +22,8 @@ function serializeNews(item: {
     id: item.id,
     title: item.title,
     body: item.body,
+    titleEn: item.titleEn ?? null,
+    bodyEn: item.bodyEn ?? null,
     status: item.status,
     rejectReason: item.rejectReason,
     publishedAt: item.publishedAt?.toISOString() ?? null,

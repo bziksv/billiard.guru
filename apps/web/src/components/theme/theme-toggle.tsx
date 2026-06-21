@@ -36,11 +36,28 @@ function IconMoon({ className }: { className?: string }) {
   );
 }
 
+export type ThemeToggleLabels = {
+  dark: string;
+  light: string;
+  switchToLight: string;
+  switchToDark: string;
+  aria: string;
+};
+
+const ADMIN_LABELS: ThemeToggleLabels = {
+  dark: "Тёмная тема",
+  light: "Светлая тема",
+  switchToLight: "Включить светлую тему",
+  switchToDark: "Включить тёмную тему",
+  aria: "Тема",
+};
+
 type ThemeToggleProps = {
   className?: string;
   showLabel?: boolean;
   collapsed?: boolean;
   variant?: "site" | "admin";
+  themeLabels?: ThemeToggleLabels;
 };
 
 export function ThemeToggle({
@@ -48,6 +65,7 @@ export function ThemeToggle({
   showLabel = false,
   collapsed = false,
   variant = "site",
+  themeLabels,
 }: ThemeToggleProps) {
   const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
@@ -55,13 +73,15 @@ export function ThemeToggle({
   useEffect(() => setMounted(true), []);
 
   const isDark = mounted ? resolvedTheme === "dark" : THEME_DEFAULT === "dark";
+  const labels =
+    variant === "site" && themeLabels ? themeLabels : ADMIN_LABELS;
 
   function toggleTheme() {
     setTheme(isDark ? "light" : "dark");
   }
 
-  const label = isDark ? "Тёмная тема" : "Светлая тема";
-  const nextHint = isDark ? "Включить светлую тему" : "Включить тёмную тему";
+  const label = isDark ? labels.dark : labels.light;
+  const nextHint = isDark ? labels.switchToLight : labels.switchToDark;
 
   const baseClass =
     variant === "admin"
@@ -76,7 +96,7 @@ export function ThemeToggle({
       <button
         type="button"
         className={cn(baseClass, className)}
-        aria-label="Тема"
+        aria-label={labels.aria}
         disabled
       >
         {THEME_DEFAULT === "dark" ? (

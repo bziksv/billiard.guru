@@ -5,11 +5,15 @@ import {
   buildOlympicBracketLayout,
   groupMatchesByRound,
   olympicConnectorY,
-  olympicMatchFooterRows,
   OLYMPIC_LABEL_OFFSET,
   type BracketMatchView,
   type OlympicDisplayOpts,
 } from "@/lib/bracket-view";
+import {
+  localizedOlympicColumnLabel,
+  localizedOlympicMatchFooterRows,
+} from "@/lib/bracket-view-labels";
+import type { AppLocale } from "@/i18n/routing";
 import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
 import { BracketScrollCenter } from "@/components/bracket/bracket-scroll-center";
 import { GRID_CARD_W } from "@/lib/swiss-bracket-layout";
@@ -31,18 +35,6 @@ function lineX(colIndex: number, side: "left" | "right") {
   return side === "right" ? base + CARD_W : base;
 }
 
-function roundColumnLabel(
-  round: number,
-  maxRound: number,
-  withBronzeMatch: boolean,
-) {
-  if (round === maxRound) {
-    return withBronzeMatch ? "Финал / 3–4" : "Финал";
-  }
-  if (round === maxRound - 1) return "Полуфинал";
-  return `1/${2 ** (maxRound - round)}`;
-}
-
 export function OlympicBracketView({
   matches,
   matchNumbers,
@@ -57,6 +49,7 @@ export function OlympicBracketView({
   showCardHandicap = true,
   showCardPlacement = true,
   presentation = false,
+  uiLocale = "ru",
 }: {
   matches: BracketMatchView[];
   matchNumbers?: Map<string, number>;
@@ -65,13 +58,13 @@ export function OlympicBracketView({
   highlightedPlayerId?: string | null;
   onPlayerHighlight?: (playerId: string) => void;
   showMatchScore?: boolean;
-  /** Матч за 3–4 в финальном туре (слот 2). */
   withBronzeMatch?: boolean;
   handicapHalfStep?: boolean;
   showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   presentation?: boolean;
+  uiLocale?: AppLocale;
 }) {
   const [localHighlightedPlayerId, setLocalHighlightedPlayerId] = useState<
     string | null
@@ -213,7 +206,7 @@ export function OlympicBracketView({
           >
             <div className="bracket-col-header text-center text-[10px] font-medium uppercase tracking-wider">
               <span className={round === 1 ? "text-emerald-700 dark:text-emerald-400" : undefined}>
-                {roundColumnLabel(round, maxRound, withBronzeMatch)}
+                {localizedOlympicColumnLabel(uiLocale, round, maxRound, withBronzeMatch)}
               </span>
             </div>
           </div>
@@ -249,7 +242,8 @@ export function OlympicBracketView({
                 }
                 footerRows={
                   showCardPlacement && matchNumbers
-                    ? olympicMatchFooterRows(
+                    ? localizedOlympicMatchFooterRows(
+                        uiLocale,
                         match,
                         matches,
                         matchNumbers,
@@ -264,6 +258,7 @@ export function OlympicBracketView({
                 handicapHalfStep={handicapHalfStep}
                 showCardHandicap={showCardHandicap}
                 highlightedPlayerId={highlightedPlayerId}
+                uiLocale={uiLocale}
               />
             </div>
             );

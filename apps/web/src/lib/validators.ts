@@ -218,6 +218,7 @@ export const tournamentSchema = z.object({
     "FIXED_SWISS_16_BRONZE",
     "FIXED_SWISS_16R4_1_3_mesto",
     "FIXED_SWISS_16R4_2_3_mesta",
+    "FIXED_SWISS_16R2_1_3_mesto",
     "FIXED_SWISS_8R4_1_3_mesto",
     "FIXED_SWISS_32",
     "FIXED_SWISS_32_BRONZE",
@@ -241,6 +242,7 @@ export const tournamentSchema = z.object({
     "FIXED_PAIR_SWISS_16_BRONZE",
     "FIXED_PAIR_SWISS_16R4_1_3_mesto",
     "FIXED_PAIR_SWISS_16R4_2_3_mesto",
+    "FIXED_PAIR_SWISS_16R2_1_3_mesto",
     "FIXED_PAIR_SWISS_8R4_1_3_mesto",
     "FIXED_PAIR_SWISS_32",
     "FIXED_PAIR_SWISS_32_BRONZE",
@@ -271,6 +273,7 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_SWISS_16_BRONZE",
     "FIXED_SWISS_16R4_1_3_mesto",
     "FIXED_SWISS_16R4_2_3_mesta",
+    "FIXED_SWISS_16R2_1_3_mesto",
     "FIXED_SWISS_8R4_1_3_mesto",
       "FIXED_SWISS_32",
       "FIXED_SWISS_32_BRONZE",
@@ -294,6 +297,7 @@ export const tournamentUpdateSchema = z.object({
       "FIXED_PAIR_SWISS_16_BRONZE",
     "FIXED_PAIR_SWISS_16R4_1_3_mesto",
     "FIXED_PAIR_SWISS_16R4_2_3_mesto",
+    "FIXED_PAIR_SWISS_16R2_1_3_mesto",
     "FIXED_PAIR_SWISS_8R4_1_3_mesto",
       "FIXED_PAIR_SWISS_32",
       "FIXED_PAIR_SWISS_32_BRONZE",
@@ -527,10 +531,10 @@ export const FIXED_SWISS_128R8_FORMAT_LABEL =
 
 /** 128→64 (216): R8 elim + матч проигравших полуфиналистов за 3–4. */
 export const FIXED_SWISS_128R8_1_3_mesto_FORMAT_LABEL =
-  "Сетка на 128 до 2 поражений, oлимпийka с 1/8 с определением 3 и 4 места (доп.игра)";
+  "Сетка на 128 до 2 поражений, олимпийка с 1/8 с определением 3 и 4 места (доп.игра)";
 
 export const FIXED_SWISS_256R8_1_3_mesto_FORMAT_LABEL =
-  "Сетка на 256 до 2 поражений, oлимпийka с 1/16 с определением 3 и 4 места (доп.игра)";
+  "Сетка на 256 до 2 поражений, олимпийка с 1/16 с определением 3 и 4 места (доп.игра)";
 
 /** 64→32 (115 встреч) — #105–#112→#113–#116, #117 1/4, #118 полуфинал, #119 финал. */
 export const FIXED_SWISS_64_FORMAT_LABEL =
@@ -568,6 +572,10 @@ export const FIXED_SWISS_16_8_FORMAT_LABEL =
 export const FIXED_SWISS_16_BRONZE_FORMAT_LABEL =
   "Сетка на 16 до 2 поражений, олимпийка с 1/4 с определением 3 и 4 места (доп.игра)";
 
+/** 16→8 (24 встречи): без 1/4, олимпийка с 1/2, проигравшие полуфинала → #28 вниз. */
+export const FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL =
+  "Сетка на 16 до 2 поражений, олимпийка с 1/2 с определением 3 и 4 места (доп.игра)";
+
 /** Одиночная олимпийская фикс. сетка (код OLYMPIC в Prisma). */
 export const OLYMPIC_SINGLE_FORMAT_LABEL =
   "Сетка (олимпийская) до 1 поражения, с двумя 3 местами";
@@ -583,6 +591,7 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_SWISS: FIXED_SWISS_16_8_FORMAT_LABEL,
   FIXED_SWISS_16_BRONZE: FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_16R4_1_3_mesto: FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_16R2_1_3_mesto: FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_16R4_2_3_mesta: FIXED_SWISS_16_8_FORMAT_LABEL,
   FIXED_SWISS_8R4_1_3_mesto: FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32: FIXED_SWISS_32_FORMAT_LABEL,
@@ -606,6 +615,7 @@ export const TOURNAMENT_FORMAT_LABELS: Record<string, string> = {
   FIXED_PAIR_SWISS: `Парная: ${FIXED_SWISS_16_8_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_16_BRONZE: `Парная: ${FIXED_SWISS_16_BRONZE_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_16R4_1_3_mesto: `Парная: ${FIXED_SWISS_16_BRONZE_FORMAT_LABEL}`,
+  FIXED_PAIR_SWISS_16R2_1_3_mesto: `Парная: ${FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_16R4_2_3_mesto: `Парная: ${FIXED_SWISS_16_8_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_8R4_1_3_mesto: `Парная: ${FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL}`,
   FIXED_PAIR_SWISS_32: `Парная: ${FIXED_SWISS_32_FORMAT_LABEL}`,

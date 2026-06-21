@@ -1,11 +1,14 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
+import { Link, useRouter } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
 import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { SiteCard } from "@/components/site/site-card";
 import { AsyncButton } from "@/components/ui/async-text-button";
+import { formatGeoLocation } from "@/lib/geo-display";
+import { resolveLocalizedField } from "@/lib/localized-db-text";
 import { formatRating } from "@/lib/rating";
 import {
   formatGameFormat,
@@ -13,10 +16,6 @@ import {
   formatPlayListingSchedule,
   formatRatingRange,
   shouldShowPlayersNeededBadge,
-  PLAY_LISTING_KIND_LABELS,
-  PLAY_LISTING_RESPONSE_STATUS_LABELS,
-  PLAY_LISTING_SCHEDULE_LABELS,
-  PLAY_LISTING_STATUS_LABELS,
 } from "@/lib/play-listing-display";
 import type { SerializedPlayListing } from "@/lib/play-listing-server";
 
@@ -48,6 +47,9 @@ export function PlayListingDetailClient({
   isVerified: boolean;
   isAuthor: boolean;
 }) {
+  const locale = useLocale() as AppLocale;
+  const t = useTranslations("playListing");
+  const td = useTranslations("playListing.detail");
   const router = useRouter();
   const [listing, setListing] = useState(initialListing);
   const [responses, setResponses] = useState(initialResponses);
@@ -56,15 +58,31 @@ export function PlayListingDetailClient({
   const [responding, setResponding] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
 
-  const ratingRange = formatRatingRange(listing.ratingMin, listing.ratingMax);
-  const gameFormat = formatGameFormat(listing.gameFormat);
-  const schedule = formatPlayListingSchedule(listing);
+  const title = resolveLocalizedField(locale, listing.title, listing.titleEn);
+  const body = listing.body
+    ? resolveLocalizedField(locale, listing.body, listing.bodyEn)
+    : null;
+  const ratingRange = formatRatingRange(listing.ratingMin, listing.ratingMax, locale);
+  const gameFormat = formatGameFormat(listing.gameFormat, locale);
+  const schedule = formatPlayListingSchedule(listing, locale);
+  const location = formatGeoLocation(
+    listing.city.nameRu,
+    listing.city.country?.nameRu,
+    locale,
+    listing.city.nameEn,
+    listing.city.country?.nameEn,
+  );
   const isOpen = listing.status === "OPEN";
+
+  function responseStatusLabel(status: string) {
+    const key = `responseStatus.${status}` as "responseStatus.PENDING";
+    return t.has(key) ? t(key) : status;
+  }
 
   async function respond() {
     setError(null);
     if (!consentAccepted) {
-      setError("Подтвердите согласие на обработку персональных данных");
+      setError(td("consentRequired"));
       return;
     }
     setResponding(true);
@@ -76,7 +94,7 @@ export function PlayListingDetailClient({
     const data = await res.json();
     setResponding(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось откликнуться");
+      setError(data.error ?? td("respondFailed"));
       return;
     }
     setListing((l) => ({ ...l, myResponseStatus: "PENDING" }));
@@ -92,7 +110,7 @@ export function PlayListingDetailClient({
     });
     if (!res.ok) {
       const data = await res.json();
-      alert(data.error ?? "Ошибка");
+      alert(data.error ?? td("genericError"));
       return;
     }
     const data = await res.json();
@@ -108,7 +126,7 @@ export function PlayListingDetailClient({
     });
     if (!res.ok) {
       const data = await res.json();
-      alert(data.error ?? "Ошибка");
+      alert(data.error ?? td("genericError"));
       return;
     }
     if (status === "ACCEPTED") {
@@ -121,11 +139,11 @@ export function PlayListingDetailClient({
   }
 
   async function removeListing() {
-    if (!confirm("Удалить объявление?")) return;
+    if (!confirm(td("deleteConfirm"))) return;
     const res = await fetch(`/api/play-listings/${listing.id}`, { method: "DELETE" });
     if (!res.ok) {
       const data = await res.json();
-      alert(data.error ?? "Ошибка");
+      alert(data.error ?? td("genericError"));
       return;
     }
     router.push("/pokatat?tab=mine");
@@ -136,63 +154,65 @@ export function PlayListingDetailClient({
       <SiteCard>
         <div className="flex flex-wrap items-start gap-2">
           <span className="rounded-full bg-emerald-950/60 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
-            {PLAY_LISTING_KIND_LABELS[listing.kind]}
+            {t(`kind.${listing.kind}` as "kind.SPARRING")}
           </span>
           <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-400">
-            {PLAY_LISTING_SCHEDULE_LABELS[listing.scheduleType]}
+            {t(`schedule.${listing.scheduleType}` as "schedule.ONE_TIME")}
           </span>
           {listing.status !== "OPEN" && (
             <span className="rounded-full bg-zinc-800 px-2.5 py-0.5 text-xs text-zinc-400">
-              {PLAY_LISTING_STATUS_LABELS[listing.status]}
+              {t(`status.${listing.status}` as "status.OPEN")}
             </span>
           )}
         </div>
 
-        <h1 className="site-page-title mt-4">{listing.title}</h1>
+        <h1 className="site-page-title mt-4">{title}</h1>
 
-        {listing.body && (
-          <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">
-            {listing.body}
-          </p>
+        {body && (
+          <p className="mt-4 whitespace-pre-wrap text-sm leading-relaxed text-zinc-300">{body}</p>
         )}
 
         <dl className="mt-6 grid gap-4 border-t border-zinc-800 pt-6 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Когда</dt>
+            <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("when")}</dt>
             <dd className="mt-1 text-zinc-200">{schedule}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Где</dt>
+            <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("where")}</dt>
             <dd className="mt-1 text-zinc-200">
               {listing.club ? (
                 <Link href={`/clubs/${listing.club.id}`} className="text-emerald-400 hover:underline">
                   {listing.club.name}
                 </Link>
               ) : (
-                "Любой клуб"
+                td("anyClub")
               )}
               <span className="text-zinc-500"> · </span>
-              {listing.city.nameRu}, {listing.city.country.nameRu}
+              {location}
             </dd>
           </div>
           {ratingRange && (
             <div>
               <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">
-                Рейтинг партнёра
+                {t("rating")}
               </dt>
               <dd className="mt-1 text-zinc-200">{ratingRange}</dd>
             </div>
           )}
           {gameFormat && (
             <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Формат</dt>
+              <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("format")}</dt>
               <dd className="mt-1 text-zinc-200">{gameFormat}</dd>
             </div>
           )}
           {shouldShowPlayersNeededBadge(listing.playersNeeded) && (
             <div>
-              <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Ищет</dt>
-              <dd className="mt-1 text-zinc-200">{formatPlayersNeeded(listing.playersNeeded)}</dd>
+              <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                {t("seekingLabel")}
+              </dt>
+              <dd className="mt-1 text-zinc-200">
+                {formatPlayersNeeded(listing.playersNeeded, locale)}
+              </dd>
             </div>
           )}
         </dl>
@@ -219,7 +239,7 @@ export function PlayListingDetailClient({
                 {listing.author.lastName} {listing.author.firstName}
               </span>
               <span className="text-xs text-zinc-500">
-                Рейтинг {formatRating(listing.author.rating)}
+                {td("authorRating", { rating: formatRating(listing.author.rating) })}
               </span>
             </span>
           </Link>
@@ -231,7 +251,7 @@ export function PlayListingDetailClient({
               rel="noopener noreferrer"
               className="site-btn-secondary text-sm"
             >
-              Написать в Telegram
+              {td("writeTelegram")}
             </a>
           )}
         </div>
@@ -239,7 +259,7 @@ export function PlayListingDetailClient({
 
       {isAuthor && (
         <SiteCard>
-          <h2 className="text-sm font-medium text-zinc-300">Управление объявлением</h2>
+          <h2 className="text-sm font-medium text-zinc-300">{td("manageTitle")}</h2>
           <div className="mt-4 flex flex-wrap gap-2">
             {listing.status === "OPEN" && (
               <AsyncButton
@@ -247,7 +267,7 @@ export function PlayListingDetailClient({
                 className="site-btn-secondary text-sm"
                 loadingLabel="…"
               >
-                Нашёл партнёра
+                {td("markMatched")}
               </AsyncButton>
             )}
             {listing.status !== "CLOSED" && (
@@ -256,7 +276,7 @@ export function PlayListingDetailClient({
                 className="site-btn-ghost text-sm text-zinc-400"
                 loadingLabel="…"
               >
-                Закрыть
+                {td("close")}
               </AsyncButton>
             )}
             <AsyncButton
@@ -264,7 +284,7 @@ export function PlayListingDetailClient({
               className="text-sm text-red-400 hover:underline"
               loadingLabel="…"
             >
-              Удалить
+              {td("delete")}
             </AsyncButton>
           </div>
         </SiteCard>
@@ -272,30 +292,28 @@ export function PlayListingDetailClient({
 
       {!isAuthor && isOpen && (
         <SiteCard>
-          <h2 className="text-sm font-medium text-zinc-300">Откликнуться</h2>
+          <h2 className="text-sm font-medium text-zinc-300">{td("respondTitle")}</h2>
           {!isLoggedIn ? (
             <p className="mt-2 text-sm text-zinc-400">
               <Link href={`/login?next=/pokatat/${listing.id}`} className="text-emerald-400 hover:underline">
-                Войдите
+                {td("login")}
               </Link>
-              , чтобы откликнуться или написать автору.
+              {td("loginToRespondSuffix")}
             </p>
           ) : !isVerified ? (
-            <p className="mt-2 text-sm text-amber-400/90">
-              Подтвердите профиль через Telegram, чтобы откликнуться.
-            </p>
+            <p className="mt-2 text-sm text-amber-400/90">{td("verifyToRespond")}</p>
           ) : listing.myResponseStatus && listing.myResponseStatus !== "WITHDRAWN" ? (
             <p className="mt-2 text-sm text-emerald-400">
-              Вы откликнулись ·{" "}
-              {PLAY_LISTING_RESPONSE_STATUS_LABELS[listing.myResponseStatus] ??
-                listing.myResponseStatus}
+              {td("respondedStatus", {
+                status: responseStatusLabel(listing.myResponseStatus),
+              })}
             </p>
           ) : (
             <div className="mt-4 space-y-3">
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Коротко о себе: рейтинг, когда удобно…"
+                placeholder={td("messagePlaceholder")}
                 rows={3}
                 maxLength={500}
                 className="site-input w-full resize-y"
@@ -312,7 +330,7 @@ export function PlayListingDetailClient({
                 disabled={responding || !consentAccepted}
                 className="site-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {responding ? "Отправка…" : "Откликнуться"}
+                {responding ? td("responding") : td("respond")}
               </button>
             </div>
           )}
@@ -321,7 +339,7 @@ export function PlayListingDetailClient({
 
       {isAuthor && responses.length > 0 && (
         <section className="space-y-3">
-          <h2 className="site-section-title">Отклики ({responses.length})</h2>
+          <h2 className="site-section-title">{td("responsesTitle", { count: responses.length })}</h2>
           {responses.map((r) => (
             <SiteCard key={r.id}>
               <div className="flex flex-wrap items-start justify-between gap-3">
@@ -334,7 +352,7 @@ export function PlayListingDetailClient({
                   </span>
                 </Link>
                 <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
-                  {PLAY_LISTING_RESPONSE_STATUS_LABELS[r.status] ?? r.status}
+                  {responseStatusLabel(r.status)}
                 </span>
               </div>
               {r.message && (
@@ -348,14 +366,14 @@ export function PlayListingDetailClient({
                       className="text-sm text-emerald-400 hover:underline"
                       loadingLabel="…"
                     >
-                      Принять
+                      {td("accept")}
                     </AsyncButton>
                     <AsyncButton
                       onClick={() => updateResponse(r.id, "DECLINED")}
                       className="text-sm text-zinc-400 hover:underline"
                       loadingLabel="…"
                     >
-                      Отклонить
+                      {td("decline")}
                     </AsyncButton>
                   </>
                 )}
@@ -376,7 +394,7 @@ export function PlayListingDetailClient({
       )}
 
       <Link href="/pokatat" className="site-btn-ghost inline-flex text-sm">
-        ← Все объявления
+        {td("allListings")}
       </Link>
     </div>
   );

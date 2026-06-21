@@ -107,7 +107,7 @@ export function SiteNewsAdminPage() {
           <h2 className="text-lg font-semibold">Новая новость сервиса</h2>
           <p className="admin-muted mt-1 text-sm">
             Публикация от имени {APP_NAME} — сразу на главной, без модерации и без привязки к
-            клубу.
+            клубу. Английский перевод создаётся автоматически при публикации.
           </p>
         </div>
         <form onSubmit={publish} className="space-y-3">

@@ -78,6 +78,7 @@ TELEGRAM_WEBHOOK_SECRET=случайная_строка
 SESSION_SECRET=длинная_случайная_строка
 LOG_LEVEL=info
 APP_VERSION=0.1.0
+DEEPSEEK_API_KEY=...
 ```
 
 Пароль в `DATABASE_URL` URL-encode: `&` → `%26`, `!` → `%21`.

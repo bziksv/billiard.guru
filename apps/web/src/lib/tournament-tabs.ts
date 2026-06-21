@@ -4,32 +4,11 @@ export type TournamentTab = "upcoming" | "active" | "finished";
 
 export const TOURNAMENT_TAB_CONFIG: {
   id: TournamentTab;
-  label: string;
-  emptyTitle: string;
-  emptyDescription: string;
   status: TournamentStatus;
 }[] = [
-  {
-    id: "upcoming",
-    label: "Предстоящие",
-    emptyTitle: "Нет предстоящих турниров",
-    emptyDescription: "В выбранном регионе пока нет турниров с открытой регистрацией.",
-    status: "OPEN",
-  },
-  {
-    id: "active",
-    label: "Текущие",
-    emptyTitle: "Нет текущих турниров",
-    emptyDescription: "Сейчас в регионе никто не играет — загляните в предстоящие.",
-    status: "ACTIVE",
-  },
-  {
-    id: "finished",
-    label: "Завершённые",
-    emptyTitle: "Нет завершённых турниров",
-    emptyDescription: "Архив турниров в этом регионе пока пуст.",
-    status: "FINISHED",
-  },
+  { id: "upcoming", status: "OPEN" },
+  { id: "active", status: "ACTIVE" },
+  { id: "finished", status: "FINISHED" },
 ];
 
 export function parseTournamentTab(raw: string | undefined): TournamentTab {

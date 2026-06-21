@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link, useRouter } from "@/i18n/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/cn";
-import { t } from "@/lib/site";
 
 function useIsMobileMenu() {
   const [mobile, setMobile] = useState(
@@ -35,6 +34,7 @@ export function UserMenu({
   isAdmin: boolean;
   manageHref?: string | null;
 }) {
+  const t = useTranslations();
   const router = useRouter();
   const isMobile = useIsMobileMenu();
   const [open, setOpen] = useState(false);
@@ -131,7 +131,7 @@ export function UserMenu({
             className="site-popover-item site-popover-item-active"
             role="menuitem"
           >
-            Управление клубом
+            {t("nav.manageClub")}
           </Link>
         )}
         {isAdmin && (
@@ -154,7 +154,7 @@ export function UserMenu({
           {loggingOut && (
             <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
           )}
-          {loggingOut ? "Выход…" : t("nav.logout")}
+          {loggingOut ? t("nav.loggingOut") : t("nav.logout")}
         </button>
       </div>
     ) : null;
@@ -172,14 +172,14 @@ export function UserMenu({
               <header className="site-mobile-nav-header">
                 <div>
                   <p id="site-user-menu-heading" className="site-mobile-nav-heading">
-                    Аккаунт
+                    {t("nav.accountMenu")}
                   </p>
                   <p className="site-mobile-nav-account-name">{fullName}</p>
                 </div>
                 <button
                   type="button"
                   className="site-mobile-nav-close"
-                  aria-label="Закрыть меню"
+                  aria-label={t("nav.closeMenu")}
                   onClick={close}
                 >
                   <span aria-hidden>×</span>
@@ -197,7 +197,7 @@ export function UserMenu({
                     className="site-mobile-nav-link site-mobile-nav-link-accent"
                     role="menuitem"
                   >
-                    Управление клубом
+                    {t("nav.manageClub")}
                   </Link>
                 )}
                 {isAdmin && (
@@ -217,7 +217,7 @@ export function UserMenu({
                   role="menuitem"
                   className="site-mobile-nav-link text-left disabled:opacity-60"
                 >
-                  {loggingOut ? "Выход…" : t("nav.logout")}
+                  {loggingOut ? t("nav.loggingOut") : t("nav.logout")}
                 </button>
               </nav>
             </div>
@@ -241,7 +241,7 @@ export function UserMenu({
           )}
           aria-expanded={open}
           aria-haspopup="menu"
-          aria-label={`Меню: ${fullName}`}
+          aria-label={t("nav.menuFor", { name: fullName })}
         >
           <span className="site-user-avatar">{initial}</span>
           <span className="site-user-name">{shortLabel}</span>

@@ -43,6 +43,8 @@ export type PlayListingMinAggregateOutputType = {
   clubId: string | null
   title: string | null
   body: string | null
+  titleEn: string | null
+  bodyEn: string | null
   kind: $Enums.PlayListingKind | null
   scheduleType: $Enums.PlayListingScheduleType | null
   playAt: Date | null
@@ -66,6 +68,8 @@ export type PlayListingMaxAggregateOutputType = {
   clubId: string | null
   title: string | null
   body: string | null
+  titleEn: string | null
+  bodyEn: string | null
   kind: $Enums.PlayListingKind | null
   scheduleType: $Enums.PlayListingScheduleType | null
   playAt: Date | null
@@ -89,6 +93,8 @@ export type PlayListingCountAggregateOutputType = {
   clubId: number
   title: number
   body: number
+  titleEn: number
+  bodyEn: number
   kind: number
   scheduleType: number
   playAt: number
@@ -125,6 +131,8 @@ export type PlayListingMinAggregateInputType = {
   clubId?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   kind?: true
   scheduleType?: true
   playAt?: true
@@ -148,6 +156,8 @@ export type PlayListingMaxAggregateInputType = {
   clubId?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   kind?: true
   scheduleType?: true
   playAt?: true
@@ -171,6 +181,8 @@ export type PlayListingCountAggregateInputType = {
   clubId?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   kind?: true
   scheduleType?: true
   playAt?: true
@@ -282,6 +294,8 @@ export type PlayListingGroupByOutputType = {
   clubId: string | null
   title: string
   body: string | null
+  titleEn: string | null
+  bodyEn: string | null
   kind: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt: Date | null
@@ -329,6 +343,8 @@ export type PlayListingWhereInput = {
   clubId?: Prisma.StringNullableFilter<"PlayListing"> | string | null
   title?: Prisma.StringFilter<"PlayListing"> | string
   body?: Prisma.StringNullableFilter<"PlayListing"> | string | null
+  titleEn?: Prisma.StringNullableFilter<"PlayListing"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"PlayListing"> | string | null
   kind?: Prisma.EnumPlayListingKindFilter<"PlayListing"> | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFilter<"PlayListing"> | $Enums.PlayListingScheduleType
   playAt?: Prisma.DateTimeNullableFilter<"PlayListing"> | Date | string | null
@@ -357,6 +373,8 @@ export type PlayListingOrderByWithRelationInput = {
   clubId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrderInput | Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  bodyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   kind?: Prisma.SortOrder
   scheduleType?: Prisma.SortOrder
   playAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -389,6 +407,8 @@ export type PlayListingWhereUniqueInput = Prisma.AtLeast<{
   clubId?: Prisma.StringNullableFilter<"PlayListing"> | string | null
   title?: Prisma.StringFilter<"PlayListing"> | string
   body?: Prisma.StringNullableFilter<"PlayListing"> | string | null
+  titleEn?: Prisma.StringNullableFilter<"PlayListing"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"PlayListing"> | string | null
   kind?: Prisma.EnumPlayListingKindFilter<"PlayListing"> | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFilter<"PlayListing"> | $Enums.PlayListingScheduleType
   playAt?: Prisma.DateTimeNullableFilter<"PlayListing"> | Date | string | null
@@ -417,6 +437,8 @@ export type PlayListingOrderByWithAggregationInput = {
   clubId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrderInput | Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  bodyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   kind?: Prisma.SortOrder
   scheduleType?: Prisma.SortOrder
   playAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -449,6 +471,8 @@ export type PlayListingScalarWhereWithAggregatesInput = {
   clubId?: Prisma.StringNullableWithAggregatesFilter<"PlayListing"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"PlayListing"> | string
   body?: Prisma.StringNullableWithAggregatesFilter<"PlayListing"> | string | null
+  titleEn?: Prisma.StringNullableWithAggregatesFilter<"PlayListing"> | string | null
+  bodyEn?: Prisma.StringNullableWithAggregatesFilter<"PlayListing"> | string | null
   kind?: Prisma.EnumPlayListingKindWithAggregatesFilter<"PlayListing"> | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeWithAggregatesFilter<"PlayListing"> | $Enums.PlayListingScheduleType
   playAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PlayListing"> | Date | string | null
@@ -470,6 +494,8 @@ export type PlayListingCreateInput = {
   id?: string
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -498,6 +524,8 @@ export type PlayListingUncheckedCreateInput = {
   clubId?: string | null
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -520,6 +548,8 @@ export type PlayListingUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -548,6 +578,8 @@ export type PlayListingUncheckedUpdateInput = {
   clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -573,6 +605,8 @@ export type PlayListingCreateManyInput = {
   clubId?: string | null
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -594,6 +628,8 @@ export type PlayListingUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -618,6 +654,8 @@ export type PlayListingUncheckedUpdateManyInput = {
   clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -658,6 +696,8 @@ export type PlayListingCountOrderByAggregateInput = {
   clubId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   scheduleType?: Prisma.SortOrder
   playAt?: Prisma.SortOrder
@@ -687,6 +727,8 @@ export type PlayListingMaxOrderByAggregateInput = {
   clubId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   scheduleType?: Prisma.SortOrder
   playAt?: Prisma.SortOrder
@@ -710,6 +752,8 @@ export type PlayListingMinOrderByAggregateInput = {
   clubId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   kind?: Prisma.SortOrder
   scheduleType?: Prisma.SortOrder
   playAt?: Prisma.SortOrder
@@ -892,6 +936,8 @@ export type PlayListingCreateWithoutCityInput = {
   id?: string
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -918,6 +964,8 @@ export type PlayListingUncheckedCreateWithoutCityInput = {
   clubId?: string | null
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -972,6 +1020,8 @@ export type PlayListingScalarWhereInput = {
   clubId?: Prisma.StringNullableFilter<"PlayListing"> | string | null
   title?: Prisma.StringFilter<"PlayListing"> | string
   body?: Prisma.StringNullableFilter<"PlayListing"> | string | null
+  titleEn?: Prisma.StringNullableFilter<"PlayListing"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"PlayListing"> | string | null
   kind?: Prisma.EnumPlayListingKindFilter<"PlayListing"> | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFilter<"PlayListing"> | $Enums.PlayListingScheduleType
   playAt?: Prisma.DateTimeNullableFilter<"PlayListing"> | Date | string | null
@@ -993,6 +1043,8 @@ export type PlayListingCreateWithoutClubInput = {
   id?: string
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1019,6 +1071,8 @@ export type PlayListingUncheckedCreateWithoutClubInput = {
   cityId: string
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1067,6 +1121,8 @@ export type PlayListingCreateWithoutAuthorInput = {
   id?: string
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1093,6 +1149,8 @@ export type PlayListingUncheckedCreateWithoutAuthorInput = {
   clubId?: string | null
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1141,6 +1199,8 @@ export type PlayListingCreateWithoutResponsesInput = {
   id?: string
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1168,6 +1228,8 @@ export type PlayListingUncheckedCreateWithoutResponsesInput = {
   clubId?: string | null
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1205,6 +1267,8 @@ export type PlayListingUpdateWithoutResponsesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1232,6 +1296,8 @@ export type PlayListingUncheckedUpdateWithoutResponsesInput = {
   clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1255,6 +1321,8 @@ export type PlayListingCreateManyCityInput = {
   clubId?: string | null
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1276,6 +1344,8 @@ export type PlayListingUpdateWithoutCityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1302,6 +1372,8 @@ export type PlayListingUncheckedUpdateWithoutCityInput = {
   clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1326,6 +1398,8 @@ export type PlayListingUncheckedUpdateManyWithoutCityInput = {
   clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1349,6 +1423,8 @@ export type PlayListingCreateManyClubInput = {
   cityId: string
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1370,6 +1446,8 @@ export type PlayListingUpdateWithoutClubInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1396,6 +1474,8 @@ export type PlayListingUncheckedUpdateWithoutClubInput = {
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1420,6 +1500,8 @@ export type PlayListingUncheckedUpdateManyWithoutClubInput = {
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1443,6 +1525,8 @@ export type PlayListingCreateManyAuthorInput = {
   clubId?: string | null
   title: string
   body?: string | null
+  titleEn?: string | null
+  bodyEn?: string | null
   kind?: $Enums.PlayListingKind
   scheduleType: $Enums.PlayListingScheduleType
   playAt?: Date | string | null
@@ -1464,6 +1548,8 @@ export type PlayListingUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1490,6 +1576,8 @@ export type PlayListingUncheckedUpdateWithoutAuthorInput = {
   clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1514,6 +1602,8 @@ export type PlayListingUncheckedUpdateManyWithoutAuthorInput = {
   clubId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   kind?: Prisma.EnumPlayListingKindFieldUpdateOperationsInput | $Enums.PlayListingKind
   scheduleType?: Prisma.EnumPlayListingScheduleTypeFieldUpdateOperationsInput | $Enums.PlayListingScheduleType
   playAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1569,6 +1659,8 @@ export type PlayListingSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   clubId?: boolean
   title?: boolean
   body?: boolean
+  titleEn?: boolean
+  bodyEn?: boolean
   kind?: boolean
   scheduleType?: boolean
   playAt?: boolean
@@ -1600,6 +1692,8 @@ export type PlayListingSelectScalar = {
   clubId?: boolean
   title?: boolean
   body?: boolean
+  titleEn?: boolean
+  bodyEn?: boolean
   kind?: boolean
   scheduleType?: boolean
   playAt?: boolean
@@ -1617,7 +1711,7 @@ export type PlayListingSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlayListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "cityId" | "clubId" | "title" | "body" | "kind" | "scheduleType" | "playAt" | "weekdays" | "timeFrom" | "timeTo" | "gameFormat" | "ratingMin" | "ratingMax" | "playersNeeded" | "publishedByClub" | "status" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["playListing"]>
+export type PlayListingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "cityId" | "clubId" | "title" | "body" | "titleEn" | "bodyEn" | "kind" | "scheduleType" | "playAt" | "weekdays" | "timeFrom" | "timeTo" | "gameFormat" | "ratingMin" | "ratingMax" | "playersNeeded" | "publishedByClub" | "status" | "expiresAt" | "createdAt" | "updatedAt", ExtArgs["result"]["playListing"]>
 export type PlayListingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
@@ -1641,6 +1735,8 @@ export type $PlayListingPayload<ExtArgs extends runtime.Types.Extensions.Interna
     clubId: string | null
     title: string
     body: string | null
+    titleEn: string | null
+    bodyEn: string | null
     kind: $Enums.PlayListingKind
     scheduleType: $Enums.PlayListingScheduleType
     /**
@@ -2047,6 +2143,8 @@ export interface PlayListingFieldRefs {
   readonly clubId: Prisma.FieldRef<"PlayListing", 'String'>
   readonly title: Prisma.FieldRef<"PlayListing", 'String'>
   readonly body: Prisma.FieldRef<"PlayListing", 'String'>
+  readonly titleEn: Prisma.FieldRef<"PlayListing", 'String'>
+  readonly bodyEn: Prisma.FieldRef<"PlayListing", 'String'>
   readonly kind: Prisma.FieldRef<"PlayListing", 'PlayListingKind'>
   readonly scheduleType: Prisma.FieldRef<"PlayListing", 'PlayListingScheduleType'>
   readonly playAt: Prisma.FieldRef<"PlayListing", 'DateTime'>

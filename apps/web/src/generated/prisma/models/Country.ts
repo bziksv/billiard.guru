@@ -27,16 +27,19 @@ export type AggregateCountry = {
 export type CountryMinAggregateOutputType = {
   id: string | null
   nameRu: string | null
+  nameEn: string | null
 }
 
 export type CountryMaxAggregateOutputType = {
   id: string | null
   nameRu: string | null
+  nameEn: string | null
 }
 
 export type CountryCountAggregateOutputType = {
   id: number
   nameRu: number
+  nameEn: number
   _all: number
 }
 
@@ -44,16 +47,19 @@ export type CountryCountAggregateOutputType = {
 export type CountryMinAggregateInputType = {
   id?: true
   nameRu?: true
+  nameEn?: true
 }
 
 export type CountryMaxAggregateInputType = {
   id?: true
   nameRu?: true
+  nameEn?: true
 }
 
 export type CountryCountAggregateInputType = {
   id?: true
   nameRu?: true
+  nameEn?: true
   _all?: true
 }
 
@@ -132,6 +138,7 @@ export type CountryGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type CountryGroupByOutputType = {
   id: string
   nameRu: string
+  nameEn: string | null
   _count: CountryCountAggregateOutputType | null
   _min: CountryMinAggregateOutputType | null
   _max: CountryMaxAggregateOutputType | null
@@ -158,12 +165,14 @@ export type CountryWhereInput = {
   NOT?: Prisma.CountryWhereInput | Prisma.CountryWhereInput[]
   id?: Prisma.StringFilter<"Country"> | string
   nameRu?: Prisma.StringFilter<"Country"> | string
+  nameEn?: Prisma.StringNullableFilter<"Country"> | string | null
   cities?: Prisma.CityListRelationFilter
 }
 
 export type CountryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nameRu?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrderInput | Prisma.SortOrder
   cities?: Prisma.CityOrderByRelationAggregateInput
   _relevance?: Prisma.CountryOrderByRelevanceInput
 }
@@ -174,12 +183,14 @@ export type CountryWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.CountryWhereInput | Prisma.CountryWhereInput[]
   OR?: Prisma.CountryWhereInput[]
   NOT?: Prisma.CountryWhereInput | Prisma.CountryWhereInput[]
+  nameEn?: Prisma.StringNullableFilter<"Country"> | string | null
   cities?: Prisma.CityListRelationFilter
 }, "id" | "nameRu">
 
 export type CountryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nameRu?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CountryCountOrderByAggregateInput
   _max?: Prisma.CountryMaxOrderByAggregateInput
   _min?: Prisma.CountryMinOrderByAggregateInput
@@ -191,45 +202,53 @@ export type CountryScalarWhereWithAggregatesInput = {
   NOT?: Prisma.CountryScalarWhereWithAggregatesInput | Prisma.CountryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Country"> | string
   nameRu?: Prisma.StringWithAggregatesFilter<"Country"> | string
+  nameEn?: Prisma.StringNullableWithAggregatesFilter<"Country"> | string | null
 }
 
 export type CountryCreateInput = {
   id?: string
   nameRu: string
+  nameEn?: string | null
   cities?: Prisma.CityCreateNestedManyWithoutCountryInput
 }
 
 export type CountryUncheckedCreateInput = {
   id?: string
   nameRu: string
+  nameEn?: string | null
   cities?: Prisma.CityUncheckedCreateNestedManyWithoutCountryInput
 }
 
 export type CountryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cities?: Prisma.CityUpdateManyWithoutCountryNestedInput
 }
 
 export type CountryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cities?: Prisma.CityUncheckedUpdateManyWithoutCountryNestedInput
 }
 
 export type CountryCreateManyInput = {
   id?: string
   nameRu: string
+  nameEn?: string | null
 }
 
 export type CountryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CountryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CountryOrderByRelevanceInput = {
@@ -241,16 +260,19 @@ export type CountryOrderByRelevanceInput = {
 export type CountryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nameRu?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
 }
 
 export type CountryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nameRu?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
 }
 
 export type CountryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nameRu?: Prisma.SortOrder
+  nameEn?: Prisma.SortOrder
 }
 
 export type CountryScalarRelationFilter = {
@@ -260,6 +282,10 @@ export type CountryScalarRelationFilter = {
 
 export type StringFieldUpdateOperationsInput = {
   set?: string
+}
+
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type CountryCreateNestedOneWithoutCitiesInput = {
@@ -279,11 +305,13 @@ export type CountryUpdateOneRequiredWithoutCitiesNestedInput = {
 export type CountryCreateWithoutCitiesInput = {
   id?: string
   nameRu: string
+  nameEn?: string | null
 }
 
 export type CountryUncheckedCreateWithoutCitiesInput = {
   id?: string
   nameRu: string
+  nameEn?: string | null
 }
 
 export type CountryCreateOrConnectWithoutCitiesInput = {
@@ -305,11 +333,13 @@ export type CountryUpdateToOneWithWhereWithoutCitiesInput = {
 export type CountryUpdateWithoutCitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CountryUncheckedUpdateWithoutCitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nameRu?: Prisma.StringFieldUpdateOperationsInput | string
+  nameEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -346,6 +376,7 @@ export type CountryCountOutputTypeCountCitiesArgs<ExtArgs extends runtime.Types.
 export type CountrySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nameRu?: boolean
+  nameEn?: boolean
   cities?: boolean | Prisma.Country$citiesArgs<ExtArgs>
   _count?: boolean | Prisma.CountryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["country"]>
@@ -355,9 +386,10 @@ export type CountrySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
 export type CountrySelectScalar = {
   id?: boolean
   nameRu?: boolean
+  nameEn?: boolean
 }
 
-export type CountryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nameRu", ExtArgs["result"]["country"]>
+export type CountryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nameRu" | "nameEn", ExtArgs["result"]["country"]>
 export type CountryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   cities?: boolean | Prisma.Country$citiesArgs<ExtArgs>
   _count?: boolean | Prisma.CountryCountOutputTypeDefaultArgs<ExtArgs>
@@ -371,6 +403,7 @@ export type $CountryPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     nameRu: string
+    nameEn: string | null
   }, ExtArgs["result"]["country"]>
   composites: {}
 }
@@ -743,6 +776,7 @@ export interface Prisma__CountryClient<T, Null = never, ExtArgs extends runtime.
 export interface CountryFieldRefs {
   readonly id: Prisma.FieldRef<"Country", 'String'>
   readonly nameRu: Prisma.FieldRef<"Country", 'String'>
+  readonly nameEn: Prisma.FieldRef<"Country", 'String'>
 }
     
 

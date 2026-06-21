@@ -19,6 +19,8 @@ enum TournamentFormat {
   FIXED_SWISS_16R4_1_3_mesto
   /** 16→8 (27): копия FIXED_SWISS, подпись 1/4, два 3-их */
   FIXED_SWISS_16R4_2_3_mesta
+  /** 16→8 (24): олимпийка с 1/2 + матч за 3–4 (#28), без 1/4 */
+  FIXED_SWISS_16R2_1_3_mesto
   /** 8→4 (13+1): oлимпийka с 1/4 + матч за 3–4 (#14) */
   FIXED_SWISS_8R4_1_3_mesto
   /** 32→16 (59/60): олимпийка с 1/4 */
@@ -58,6 +60,7 @@ enum TournamentFormat {
   FIXED_PAIR_SWISS_16_BRONZE
   FIXED_PAIR_SWISS_16R4_1_3_mesto
   FIXED_PAIR_SWISS_16R4_2_3_mesto
+  FIXED_PAIR_SWISS_16R2_1_3_mesto
   FIXED_PAIR_SWISS_8R4_1_3_mesto
   FIXED_PAIR_SWISS_32
   FIXED_PAIR_SWISS_32_BRONZE
@@ -161,6 +164,7 @@ enum PlayListingResponseStatus {
 model Country {
   id     String @id @default(cuid())
   nameRu String @unique @map("name_ru")
+  nameEn String? @map("name_en")
   cities City[]
 
   @@map("countries")
@@ -169,6 +173,7 @@ model Country {
 model City {
   id        String  @id @default(cuid())
   nameRu    String  @map("name_ru")
+  nameEn    String? @map("name_en")
   countryId String  @map("country_id")
   country   Country @relation(fields: [countryId], references: [id])
   latitude  Float?  @map("latitude")
@@ -192,16 +197,21 @@ model Club {
   photoUrl         String?  @map("photo_url")
   galleryUrls      Json?    @map("gallery_urls")
   description      String?  @db.Text
+  descriptionEn    String?  @map("description_en") @db.Text
   address          String?  @db.Text
+  addressEn        String?  @map("address_en") @db.Text
   latitude         Float?   @map("latitude")
   longitude        Float?   @map("longitude")
   workingHours     String?  @map("working_hours") @db.Text
+  workingHoursEn   String?  @map("working_hours_en") @db.Text
   weeklyHours      Json?    @map("weekly_hours")
   tableCount       Int?     @map("table_count")
   tableCounts      Json?    @map("table_counts")
   floorPlan          Json?    @map("floor_plan")
   gamePrice        String?  @map("game_price") @db.Text
+  gamePriceEn      String?  @map("game_price_en") @db.Text
   priceTiers       Json?    @map("price_tiers")
+  priceTiersEn     Json?    @map("price_tiers_en")
   bookingEnabled   Boolean  @default(true) @map("booking_enabled")
   bookingSlotMinutes Int    @default(60) @map("booking_slot_minutes")
   bookingAdvanceDays Int    @default(14) @map("booking_advance_days")
@@ -279,6 +289,8 @@ model ClubNews {
   author          Player?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
   title           String
   body            String     @db.Text
+  titleEn         String?    @map("title_en")
+  bodyEn          String?    @map("body_en") @db.Text
   status          IdeaStatus @default(APPROVED)
   moderationToken String?    @unique @map("moderation_token")
   moderatedAt     DateTime?  @map("moderated_at")
@@ -299,6 +311,8 @@ model SiteNews {
   id          String     @id @default(cuid())
   title       String
   body        String     @db.Text
+  titleEn     String?    @map("title_en")
+  bodyEn      String?    @map("body_en") @db.Text
   status      IdeaStatus @default(APPROVED)
   authorId    String?    @map("author_id")
   author      Player?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
@@ -324,8 +338,10 @@ model Player {
   telegramUsername String?  @map("telegram_username")
   rating           Float    @default(0)
   about            String?  @db.Text
+  aboutEn          String?  @map("about_en") @db.Text
   isCoach          Boolean  @default(false) @map("is_coach")
   coachBio         String?  @map("coach_bio") @db.Text
+  coachBioEn       String?  @map("coach_bio_en") @db.Text
   coachGalleryUrls Json?    @map("coach_gallery_urls")
   coachReviewAvg   Float?   @map("coach_review_avg")
   coachReviewCount Int      @default(0) @map("coach_review_count")
@@ -406,6 +422,7 @@ model CoachRating {
   rater     Player   @relation("CoachReviewsGiven", fields: [raterId], references: [id], onDelete: Cascade)
   score     Int
   comment   String?  @db.Text
+  commentEn String?  @map("comment_en") @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -446,7 +463,9 @@ model LoginChallenge {
 model Tournament {
   id          String           @id @default(cuid())
   name        String
+  nameEn      String?          @map("name_en")
   description String?          @db.Text
+  descriptionEn String?          @map("description_en") @db.Text
   clubId      String           @map("club_id")
   club        Club             @relation(fields: [clubId], references: [id])
   format              TournamentFormat
@@ -588,6 +607,8 @@ model Idea {
   club            Club?      @relation(fields: [clubId], references: [id], onDelete: SetNull)
   title           String
   body            String     @db.Text
+  titleEn         String?    @map("title_en")
+  bodyEn          String?    @map("body_en")
   status          IdeaStatus @default(PENDING)
   moderationToken String?    @unique @map("moderation_token")
   likesCount      Int        @default(0) @map("likes_count")
@@ -627,6 +648,8 @@ model PlayListing {
   club         Club?                   @relation(fields: [clubId], references: [id], onDelete: SetNull)
   title        String
   body         String?                 @db.Text
+  titleEn      String?                 @map("title_en")
+  bodyEn       String?                 @map("body_en") @db.Text
   kind         PlayListingKind         @default(SPARRING)
   scheduleType PlayListingScheduleType @map("schedule_type")
   /// Для разовой игры — дата и время начала.
@@ -663,6 +686,7 @@ model PlayListingResponse {
   playerId  String                    @map("player_id")
   player    Player                    @relation(fields: [playerId], references: [id], onDelete: Cascade)
   message   String?                   @db.Text
+  messageEn String?                   @map("message_en") @db.Text
   status    PlayListingResponseStatus @default(PENDING)
   createdAt DateTime                  @default(now()) @map("created_at")
   updatedAt DateTime                  @updatedAt @map("updated_at")

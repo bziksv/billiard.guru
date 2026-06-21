@@ -30,6 +30,8 @@ export type ClubNewsMinAggregateOutputType = {
   authorId: string | null
   title: string | null
   body: string | null
+  titleEn: string | null
+  bodyEn: string | null
   status: $Enums.IdeaStatus | null
   moderationToken: string | null
   moderatedAt: Date | null
@@ -46,6 +48,8 @@ export type ClubNewsMaxAggregateOutputType = {
   authorId: string | null
   title: string | null
   body: string | null
+  titleEn: string | null
+  bodyEn: string | null
   status: $Enums.IdeaStatus | null
   moderationToken: string | null
   moderatedAt: Date | null
@@ -62,6 +66,8 @@ export type ClubNewsCountAggregateOutputType = {
   authorId: number
   title: number
   body: number
+  titleEn: number
+  bodyEn: number
   status: number
   moderationToken: number
   moderatedAt: number
@@ -80,6 +86,8 @@ export type ClubNewsMinAggregateInputType = {
   authorId?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   status?: true
   moderationToken?: true
   moderatedAt?: true
@@ -96,6 +104,8 @@ export type ClubNewsMaxAggregateInputType = {
   authorId?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   status?: true
   moderationToken?: true
   moderatedAt?: true
@@ -112,6 +122,8 @@ export type ClubNewsCountAggregateInputType = {
   authorId?: true
   title?: true
   body?: true
+  titleEn?: true
+  bodyEn?: true
   status?: true
   moderationToken?: true
   moderatedAt?: true
@@ -201,6 +213,8 @@ export type ClubNewsGroupByOutputType = {
   authorId: string | null
   title: string
   body: string
+  titleEn: string | null
+  bodyEn: string | null
   status: $Enums.IdeaStatus
   moderationToken: string | null
   moderatedAt: Date | null
@@ -238,6 +252,8 @@ export type ClubNewsWhereInput = {
   authorId?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   title?: Prisma.StringFilter<"ClubNews"> | string
   body?: Prisma.StringFilter<"ClubNews"> | string
+  titleEn?: Prisma.StringNullableFilter<"ClubNews"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   status?: Prisma.EnumIdeaStatusFilter<"ClubNews"> | $Enums.IdeaStatus
   moderationToken?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   moderatedAt?: Prisma.DateTimeNullableFilter<"ClubNews"> | Date | string | null
@@ -256,6 +272,8 @@ export type ClubNewsOrderByWithRelationInput = {
   authorId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  bodyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationToken?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -279,6 +297,8 @@ export type ClubNewsWhereUniqueInput = Prisma.AtLeast<{
   authorId?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   title?: Prisma.StringFilter<"ClubNews"> | string
   body?: Prisma.StringFilter<"ClubNews"> | string
+  titleEn?: Prisma.StringNullableFilter<"ClubNews"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   status?: Prisma.EnumIdeaStatusFilter<"ClubNews"> | $Enums.IdeaStatus
   moderatedAt?: Prisma.DateTimeNullableFilter<"ClubNews"> | Date | string | null
   moderatedById?: Prisma.StringNullableFilter<"ClubNews"> | string | null
@@ -296,6 +316,8 @@ export type ClubNewsOrderByWithAggregationInput = {
   authorId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrderInput | Prisma.SortOrder
+  bodyEn?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationToken?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -318,6 +340,8 @@ export type ClubNewsScalarWhereWithAggregatesInput = {
   authorId?: Prisma.StringNullableWithAggregatesFilter<"ClubNews"> | string | null
   title?: Prisma.StringWithAggregatesFilter<"ClubNews"> | string
   body?: Prisma.StringWithAggregatesFilter<"ClubNews"> | string
+  titleEn?: Prisma.StringNullableWithAggregatesFilter<"ClubNews"> | string | null
+  bodyEn?: Prisma.StringNullableWithAggregatesFilter<"ClubNews"> | string | null
   status?: Prisma.EnumIdeaStatusWithAggregatesFilter<"ClubNews"> | $Enums.IdeaStatus
   moderationToken?: Prisma.StringNullableWithAggregatesFilter<"ClubNews"> | string | null
   moderatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"ClubNews"> | Date | string | null
@@ -332,6 +356,8 @@ export type ClubNewsCreateInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -350,6 +376,8 @@ export type ClubNewsUncheckedCreateInput = {
   authorId?: string | null
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -364,6 +392,8 @@ export type ClubNewsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -382,6 +412,8 @@ export type ClubNewsUncheckedUpdateInput = {
   authorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -398,6 +430,8 @@ export type ClubNewsCreateManyInput = {
   authorId?: string | null
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -412,6 +446,8 @@ export type ClubNewsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -428,6 +464,8 @@ export type ClubNewsUncheckedUpdateManyInput = {
   authorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -460,6 +498,8 @@ export type ClubNewsCountOrderByAggregateInput = {
   authorId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationToken?: Prisma.SortOrder
   moderatedAt?: Prisma.SortOrder
@@ -476,6 +516,8 @@ export type ClubNewsMaxOrderByAggregateInput = {
   authorId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationToken?: Prisma.SortOrder
   moderatedAt?: Prisma.SortOrder
@@ -492,6 +534,8 @@ export type ClubNewsMinOrderByAggregateInput = {
   authorId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   body?: Prisma.SortOrder
+  titleEn?: Prisma.SortOrder
+  bodyEn?: Prisma.SortOrder
   status?: Prisma.SortOrder
   moderationToken?: Prisma.SortOrder
   moderatedAt?: Prisma.SortOrder
@@ -598,6 +642,8 @@ export type ClubNewsCreateWithoutClubInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -614,6 +660,8 @@ export type ClubNewsUncheckedCreateWithoutClubInput = {
   authorId?: string | null
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -659,6 +707,8 @@ export type ClubNewsScalarWhereInput = {
   authorId?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   title?: Prisma.StringFilter<"ClubNews"> | string
   body?: Prisma.StringFilter<"ClubNews"> | string
+  titleEn?: Prisma.StringNullableFilter<"ClubNews"> | string | null
+  bodyEn?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   status?: Prisma.EnumIdeaStatusFilter<"ClubNews"> | $Enums.IdeaStatus
   moderationToken?: Prisma.StringNullableFilter<"ClubNews"> | string | null
   moderatedAt?: Prisma.DateTimeNullableFilter<"ClubNews"> | Date | string | null
@@ -673,6 +723,8 @@ export type ClubNewsCreateWithoutAuthorInput = {
   id?: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -689,6 +741,8 @@ export type ClubNewsUncheckedCreateWithoutAuthorInput = {
   clubId: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -730,6 +784,8 @@ export type ClubNewsCreateManyClubInput = {
   authorId?: string | null
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -744,6 +800,8 @@ export type ClubNewsUpdateWithoutClubInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -760,6 +818,8 @@ export type ClubNewsUncheckedUpdateWithoutClubInput = {
   authorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -775,6 +835,8 @@ export type ClubNewsUncheckedUpdateManyWithoutClubInput = {
   authorId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -790,6 +852,8 @@ export type ClubNewsCreateManyAuthorInput = {
   clubId: string
   title: string
   body: string
+  titleEn?: string | null
+  bodyEn?: string | null
   status?: $Enums.IdeaStatus
   moderationToken?: string | null
   moderatedAt?: Date | string | null
@@ -804,6 +868,8 @@ export type ClubNewsUpdateWithoutAuthorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -820,6 +886,8 @@ export type ClubNewsUncheckedUpdateWithoutAuthorInput = {
   clubId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -835,6 +903,8 @@ export type ClubNewsUncheckedUpdateManyWithoutAuthorInput = {
   clubId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   body?: Prisma.StringFieldUpdateOperationsInput | string
+  titleEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bodyEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumIdeaStatusFieldUpdateOperationsInput | $Enums.IdeaStatus
   moderationToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -853,6 +923,8 @@ export type ClubNewsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   authorId?: boolean
   title?: boolean
   body?: boolean
+  titleEn?: boolean
+  bodyEn?: boolean
   status?: boolean
   moderationToken?: boolean
   moderatedAt?: boolean
@@ -873,6 +945,8 @@ export type ClubNewsSelectScalar = {
   authorId?: boolean
   title?: boolean
   body?: boolean
+  titleEn?: boolean
+  bodyEn?: boolean
   status?: boolean
   moderationToken?: boolean
   moderatedAt?: boolean
@@ -883,7 +957,7 @@ export type ClubNewsSelectScalar = {
   createdAt?: boolean
 }
 
-export type ClubNewsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "authorId" | "title" | "body" | "status" | "moderationToken" | "moderatedAt" | "moderatedById" | "rejectReason" | "publishedAt" | "cityBroadcastRequested" | "createdAt", ExtArgs["result"]["clubNews"]>
+export type ClubNewsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clubId" | "authorId" | "title" | "body" | "titleEn" | "bodyEn" | "status" | "moderationToken" | "moderatedAt" | "moderatedById" | "rejectReason" | "publishedAt" | "cityBroadcastRequested" | "createdAt", ExtArgs["result"]["clubNews"]>
 export type ClubNewsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   author?: boolean | Prisma.ClubNews$authorArgs<ExtArgs>
@@ -901,6 +975,8 @@ export type $ClubNewsPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     authorId: string | null
     title: string
     body: string
+    titleEn: string | null
+    bodyEn: string | null
     status: $Enums.IdeaStatus
     moderationToken: string | null
     moderatedAt: Date | null
@@ -1288,6 +1364,8 @@ export interface ClubNewsFieldRefs {
   readonly authorId: Prisma.FieldRef<"ClubNews", 'String'>
   readonly title: Prisma.FieldRef<"ClubNews", 'String'>
   readonly body: Prisma.FieldRef<"ClubNews", 'String'>
+  readonly titleEn: Prisma.FieldRef<"ClubNews", 'String'>
+  readonly bodyEn: Prisma.FieldRef<"ClubNews", 'String'>
   readonly status: Prisma.FieldRef<"ClubNews", 'IdeaStatus'>
   readonly moderationToken: Prisma.FieldRef<"ClubNews", 'String'>
   readonly moderatedAt: Prisma.FieldRef<"ClubNews", 'DateTime'>

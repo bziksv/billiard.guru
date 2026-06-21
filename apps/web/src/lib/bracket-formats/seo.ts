@@ -3,6 +3,7 @@ import {
   FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_16_8_FORMAT_LABEL,
   FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
@@ -206,7 +207,18 @@ const BRACKET_FORMAT_SEO: Record<BracketFormatCode, BracketFormatSeoEntry> = {
       "Турнирная таблица на 16 с oлимпийкой с 1/4 и матчем за бронзу (#28). Демо 28 встреч на billiard.guru.",
     lead: "Сетка 16→8 (27+1 встреч) с oлимпийкой с 1/4 плюс матч #28 за 3–4 между проигравшими полуфиналистами.",
     participantBadge: "16 человек",
-    keywords: ["сетка 16 бронза", "турнирная таблица 16", "матч за 3 место"],
+    keywords: ["сетка 16 полуфинал", "турнирная таблица 16", "матч за 3 место"],
+  },
+  FIXED_SWISS_16R2_1_3_mesto: {
+    code: "FIXED_SWISS_16R2_1_3_mesto",
+    slug: "setka-16-chelovek-1-2-s-bronzoy",
+    pageTitle: "Сетка на 16 человека с 1/2 и матчем за 3–4 место",
+    metaTitle: "Сетка на 16 человека (1/2) + матч за 3–4",
+    metaDescription:
+      "Турнирная таблица на 16: oлимпийka с 1/2 (24 встречи), проигравшие полуфинала играют #28 за 3–4.",
+    lead: "Сетка 16→8 без 1/4: верхняя ветка сразу в полуфинал, проигравшие полуфиналисты падают вниз на матч #28.",
+    participantBadge: "16 человек",
+    keywords: ["сетка 16 полуфинал", "турнирная таблица 16", "матч за 3 место"],
   },
   FIXED_SWISS_256R8_1_3_mesto: {
     code: "FIXED_SWISS_256R8_1_3_mesto",
@@ -243,6 +255,7 @@ export function bracketFormatDisplayLabel(code: BracketFormatCode): string {
   if (code === "FIXED_SWISS_8R4_1_3_mesto") return FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL;
   if (code === "FIXED_SWISS_16R4_2_3_mesta") return FIXED_SWISS_16_8_FORMAT_LABEL;
   if (code === "FIXED_SWISS_16R4_1_3_mesto") return FIXED_SWISS_16_BRONZE_FORMAT_LABEL;
+  if (code === "FIXED_SWISS_16R2_1_3_mesto") return FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R4_2_3_mesta") return FIXED_SWISS_32_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R4_1_3_mesto") return FIXED_SWISS_32_BRONZE_FORMAT_LABEL;
   if (code === "FIXED_SWISS_32R8_2_3_mesta") return FIXED_SWISS_32R8_FORMAT_LABEL;

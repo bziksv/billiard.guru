@@ -1,6 +1,8 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { TournamentBracket } from "@/components/bracket/tournament-bracket";
+import type { AppLocale } from "@/i18n/routing";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { isLargeBracketDemo } from "@/lib/bracket-formats/demo-bracket";
 
@@ -13,19 +15,19 @@ export function BracketFormatDemoPreview({
 }: {
   format: string;
   matches: BracketMatchView[];
-  /** Схема колонок для сеток 32/64 */
   structureDiagram?: string | null;
-  /** Интерактивный фрагмент 16→8 для больших сеток */
   compactDemoMatches?: BracketMatchView[] | null;
   compactDemoFormat?: string;
 }) {
+  const t = useTranslations("brackets.demo");
+  const locale = useLocale() as AppLocale;
   const useStructure = isLargeBracketDemo(matches) && Boolean(structureDiagram);
 
   return (
     <div className="bracket-format-demo">
       <div className="bracket-format-demo-toolbar">
         <span className="bracket-format-demo-badge" aria-hidden>
-          Демо-схема
+          {t("badge")}
         </span>
       </div>
 
@@ -35,9 +37,7 @@ export function BracketFormatDemoPreview({
           {compactDemoMatches && compactDemoMatches.length > 0 && (
             <div>
               <p className="guide-body-text mb-2 text-xs leading-relaxed">
-                Фрагмент интерактивной сетки (16→8): так выглядят карточки встреч и переходы
-                победителя / проигравшего. Полная схема на {matches.length} встреч — в
-                турнире после формирования сетки.
+                {t("structureFragment", { count: matches.length })}
               </p>
               <div className="bracket-format-demo-scroll bracket-format-demo-scroll--compact">
                 <TournamentBracket
@@ -45,6 +45,7 @@ export function BracketFormatDemoPreview({
                   matches={compactDemoMatches}
                   demoPreview
                   handicapHalfStep
+                  uiLocale={locale}
                 />
               </div>
             </div>
@@ -57,14 +58,13 @@ export function BracketFormatDemoPreview({
             matches={matches}
             demoPreview
             handicapHalfStep
+            uiLocale={locale}
           />
         </div>
       )}
 
       <p className="bracket-format-demo-note">
-        {useStructure
-          ? "Структура колонок и номера встреч (#). В турнире — реальные участники и результаты."
-          : "Пример первого тура с вымышленными игроками. В вашем турнире — реальные участники и актуальные результаты."}
+        {useStructure ? t("structureNote") : t("sampleNote")}
       </p>
     </div>
   );

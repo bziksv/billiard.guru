@@ -1,0 +1,908 @@
+{
+  "nav": {
+    "home": "Home",
+    "tournaments": "Tournaments",
+    "clubs": "Clubs",
+    "players": "Players",
+    "coaches": "Coaches",
+    "rules": "Rules",
+    "brackets": "Brackets",
+    "ideas": "Ideas",
+    "pokatat": "Play a match",
+    "guide": "Guide",
+    "login": "Sign in",
+    "logout": "Sign out",
+    "cabinet": "Account",
+    "admin": "Admin",
+    "loggingOut": "Signing out…",
+    "manageClub": "Club management",
+    "closeMenu": "Close menu",
+    "openMenu": "Open site sections menu",
+    "mobileMenu": "Menu",
+    "sections": "Sections",
+    "close": "Close",
+    "accountSection": "Account",
+    "accountMenu": "Account",
+    "menuFor": "Menu: {name}"
+  },
+  "footer": {
+    "tagline": "Tournaments, news, and the billiards community — find games and partners near you.",
+    "sections": {
+      "play": "Play",
+      "playAria": "Play sections",
+      "guide": "Guide",
+      "guideAria": "Guide",
+      "home": "On home",
+      "homeAria": "Home page"
+    },
+    "home": {
+      "news": "News",
+      "tournaments": "Tournaments on home",
+      "players": "Rankings on home",
+      "clubs": "Clubs on home"
+    },
+    "features": {
+      "tournaments": "Tournaments",
+      "rating": "Ratings",
+      "tables": "Table booking",
+      "sparring": "Sparring partner"
+    }
+  },
+  "devBanner": {
+    "label": "Beta",
+    "desktopBeforeLink": "Dear friends, the project is in development and testing. You can already ",
+    "register": "sign up",
+    "desktopAfterLink": " and start using the features.",
+    "mobileBeforeLink": "Testing — ",
+    "mobileAfterLink": " open"
+  },
+  "cookie": {
+    "footer": {
+      "beforeCookies": "This site uses ",
+      "cookiesLink": "cookies",
+      "and": " and ",
+      "recommendationLink": "recommendation technologies",
+      "middle": " to improve functionality, tailor ads, and collect visit statistics. By continuing to use the site, you agree to personal data processing under our ",
+      "privacyLink": "privacy policy",
+      "after": ". You can disable cookies in your browser settings."
+    },
+    "consent": {
+      "beforeLink": "This site uses cookies for ad settings and statistics. By staying on the site, you agree to personal data processing under our ",
+      "link": "cookie policy",
+      "accept": "Accept"
+    }
+  },
+  "theme": {
+    "dark": "Dark theme",
+    "light": "Light theme",
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme",
+    "aria": "Theme"
+  },
+  "geo": {
+    "all": "All regions",
+    "country": "Country",
+    "city": "City",
+    "region": "Region",
+    "searchCountry": "Search country…",
+    "searchCity": "Search city…",
+    "noResults": "Nothing found"
+  },
+  "home": {
+    "hero": {
+      "badge": "pyramid · snooker · pool",
+      "taglineLead": "Billiards",
+      "taglineEmphasis": "precision turned into art",
+      "title": "Tournaments, news, and the",
+      "titleHighlight": "billiards community",
+      "body": "Publish tournaments with interactive brackets, find a partner via Play a match, book tables in clubs — on the site and in the Telegram bot.",
+      "scroll": "scroll"
+    },
+    "cta": {
+      "tournaments": "Browse tournaments",
+      "create": "Create a tournament",
+      "brackets": "Bracket formats"
+    },
+    "stats": {
+      "tournaments": "Tournaments",
+      "clubs": "Clubs",
+      "players": "Players"
+    },
+    "local": "Tournaments in your region",
+    "upcoming": "Upcoming tournaments",
+    "explore": "Explore",
+    "stickyNav": {
+      "label": "Home sections",
+      "news": "News",
+      "tournaments": "Tournaments",
+      "players": "Players",
+      "announcements": "Listings",
+      "clubs": "Clubs"
+    },
+    "ticker": {
+      "0": "Tournaments and brackets for 16, 32, and 64",
+      "1": "Format guide with interactive demos",
+      "2": "Play a match — player and club listings",
+      "3": "Telegram bot: tournaments and alerts",
+      "4": "Online table booking",
+      "5": "Player ratings and profiles",
+      "6": "Club news and announcements"
+    },
+    "sections": {
+      "news": {
+        "eyebrow": "Feed",
+        "title": "News",
+        "lead": "Announcements from billiard.guru and clubs in your region — tournaments, promos, platform updates.",
+        "action": "All news"
+      },
+      "tournaments": {
+        "eyebrow": "Competition",
+        "lead": "Registration, interactive brackets, and results — on each tournament page.",
+        "action": "All tournaments",
+        "emptyDescription": "Try another region or check back later."
+      },
+      "players": {
+        "eyebrow": "Ratings",
+        "title": "Players",
+        "lead": "Top players in your region — profile, rating, and tournament history.",
+        "action": "Full rankings"
+      },
+      "announcements": {
+        "eyebrow": "Board",
+        "title": "Play a match",
+        "lead": "Sparring, partners, and open tables — listings from players and clubs.",
+        "action": "All listings"
+      },
+      "clubs": {
+        "eyebrow": "Venues",
+        "title": "Clubs",
+        "lead": "Photos, prices, table booking, and tournaments — club profile on billiard.guru.",
+        "action": "All clubs"
+      }
+    },
+    "news": {
+      "service": "Service",
+      "club": "Club",
+      "player": "Player",
+      "preview": "sample",
+      "emptyTitle": "No news yet",
+      "emptyLead": "News from {appName} and clubs in your region will appear here.",
+      "browseClubs": "Browse clubs",
+      "clubLogin": "Sign in as a club",
+      "network": "Nationwide"
+    },
+    "featuredTournament": {
+      "eyebrow": "Next tournament",
+      "participants": "{count} participants",
+      "details": "Details & bracket"
+    },
+    "clubs": {
+      "empty": "Clubs will appear in your region soon.",
+      "verified": "verified",
+      "tournamentOne": "tournament",
+      "tournamentFew": "tournaments",
+      "tournamentMany": "tournaments",
+      "booking": "table booking"
+    },
+    "players": {
+      "empty": "No verified players in this region yet."
+    },
+    "announcements": {
+      "fromPlayers": "From players",
+      "fromClubs": "From clubs",
+      "emptyPlayerTitle": "No player listings yet",
+      "emptyClubTitle": "No club listings yet",
+      "emptyPlayerLead": "Post a Play a match listing — sparring, a partner, or regular games in your city.",
+      "emptyClubLead": "Clubs can post open tables and invites via Play a match.",
+      "cta": "Go to Play a match",
+      "footerBefore": "Looking for a partner?",
+      "footerAfter": "— post a listing or respond to others. Available on the site and in the Telegram bot.",
+      "preview": "sample"
+    },
+    "mission": {
+      "eyebrow": "About the platform",
+      "title": "Tournaments, local play, and tools for clubs",
+      "body": "is a platform for running tournaments, publishing news, and finding games in your city. Organizers manage brackets and scores; clubs handle bookings and listings; players use ratings and Play a match.",
+      "telegram": "Telegram bot @{bot}: tournaments, match alerts, club management, and the listings board — no app install required.",
+      "features": {
+        "tournaments": {
+          "title": "Tournaments",
+          "desc": "Publishing, registration, interactive brackets, and scores — singles and teams."
+        },
+        "brackets": {
+          "title": "Bracket formats",
+          "desc": "Single elimination, Swiss, and reference brackets for 16, 32, and 64 — with demos in the guide."
+        },
+        "pokatat": {
+          "title": "Play a match",
+          "desc": "Player and club listings: sparring, partners, open tables — on the site and in Telegram."
+        },
+        "telegram": {
+          "title": "Telegram bot",
+          "desc": "Tournaments, match alerts, club tools, bookings, and Play a match — in @{bot}."
+        },
+        "clubNews": {
+          "title": "Club news",
+          "desc": "Tournament and promo announcements — clubs publish in their profile; players see them on the home feed."
+        },
+        "booking": {
+          "title": "Table booking",
+          "desc": "Online booking with a floor plan — players pick table and time; clubs confirm."
+        }
+      }
+    },
+    "ctaBlock": {
+      "title": "Join the community",
+      "lead": "Register as a player or club — publish tournaments and news, reach billiards players in your city.",
+      "login": "Sign in & create a tournament",
+      "brackets": "Bracket guide",
+      "players": "Player rankings"
+    },
+    "guide": {
+      "eyebrow": "Guide",
+      "title": "Rules and tournament formats",
+      "lead": "Before your first tournament: game rules and interactive demo diagrams for each bracket format on the platform.",
+      "readMore": "Read →",
+      "formatsTitle": "Bracket formats on the platform",
+      "formatsLead": "Each format has its own page with a demo diagram and description. Only formats enabled by organizers are listed.",
+      "allFormats": "All {count} formats →",
+      "rulesBtn": "Billiards rules",
+      "bracketsBtn": "All bracket formats",
+      "rulesCardTitle": "Billiards rules",
+      "rulesCardLead": "Five table types — pyramid, pool, snooker, Chinese pool, and carom. Each section covers games and a short ruleset.",
+      "bracketsCardTitle": "Tournament brackets",
+      "bracketsCardLead": "Bracket formats on the platform — with interactive demos and dedicated pages for 16, 32, and 64 players."
+    }
+  },
+  "pages": {
+    "tournaments": {
+      "leadDefault": "Upcoming tournaments with open registration, live events, and finished events. Filter by region.",
+      "leadGeo": "Tournaments in {city} first, then nearby cities (up to {radius} km). Pick a status tab.",
+      "localSubtitle": "In your city · {city}",
+      "nearbySubtitle": "Nearby · neighboring cities",
+      "searchLabel": "Search tournaments",
+      "searchPlaceholder": "Name, club, city, or format…",
+      "searchEmptyTitle": "No matches",
+      "searchEmptyDescription": "Try another query or clear the search field.",
+      "tabs": {
+        "upcoming": {
+          "label": "Upcoming",
+          "emptyTitle": "No upcoming tournaments",
+          "emptyDescription": "No tournaments with open registration in the selected region yet."
+        },
+        "active": {
+          "label": "Live",
+          "emptyTitle": "No live tournaments",
+          "emptyDescription": "Nothing is running in this region — check upcoming events."
+        },
+        "finished": {
+          "label": "Finished",
+          "emptyTitle": "No finished tournaments",
+          "emptyDescription": "The tournament archive is empty in this region for now."
+        }
+      }
+    },
+    "clubs": {
+      "leadDefault": "Billiards clubs: photos, table types, prices, and upcoming tournaments.",
+      "leadGeo": "Clubs in {city} first, then nearby cities (up to {radius} km).",
+      "inYourCity": "In your city",
+      "nearby": "Nearby",
+      "nearbyCities": "neighboring cities",
+      "emptyInCity": "No clubs on the platform in {city} yet."
+    },
+    "players": {
+      "lead": "Player rankings and profiles. Filter by country and city.",
+      "columns": {
+        "player": "Player",
+        "city": "City",
+        "rating": "Rating"
+      }
+    },
+    "coaches": {
+      "lead": "Coaches with a verified profile. The rating on the card is from players who rated them as a coach (1–5).",
+      "emptyDescription": "Enable “I coach” in your account to appear in the directory."
+    },
+    "pokatat": {
+      "lead": "Find a sparring partner or opponent at your level. One-off or regular — post when and where you want to play.",
+      "loading": "Loading…",
+      "client": {
+        "tabBrowse": "Listings",
+        "tabCreate": "Post",
+        "tabMine": "Mine",
+        "filterAllKinds": "All types",
+        "filterKindPlaceholder": "Type",
+        "filterAllSchedules": "One-off and regular",
+        "filterSchedulePlaceholder": "Schedule",
+        "scheduleOneTime": "One-off",
+        "scheduleRecurring": "Regular",
+        "loading": "Loading…",
+        "emptyTitle": "No listings yet",
+        "emptyDescription": "Be the first — post when and with whom you want to play",
+        "post": "Post a listing",
+        "loginToPost": "Sign in and post",
+        "loginRequired": "Only registered players can post listings.",
+        "login": "Sign in",
+        "verifyRequired": "Confirm your profile in Telegram — then you can post listings.",
+        "sectionAbout": "About the listing",
+        "titlePlaceholder": "e.g. Wednesday sparring at my club",
+        "bodyPlaceholder": "Optional: playing style, level, preferences…",
+        "autoTranslateHint": "An English translation is created automatically when you publish.",
+        "kindLabel": "What you need",
+        "tableFormatLabel": "Table format",
+        "anyFormat": "Any",
+        "sectionWhen": "When you play",
+        "date": "Date",
+        "time": "Time",
+        "weekdays": "Weekdays",
+        "from": "From",
+        "to": "To",
+        "sectionWhere": "Where and with whom",
+        "clubOptional": "Club (optional)",
+        "chooseClub": "Choose a club",
+        "chooseCityFirst": "Select a city first",
+        "ratingFrom": "Rating from",
+        "ratingTo": "Rating to",
+        "playersNeeded": "Players needed",
+        "submit": "Publish",
+        "submitting": "Publishing…",
+        "submitError": "Could not publish",
+        "mineEmpty": "You have no listings yet.",
+        "mineCreate": "Post your first listing"
+      }
+    },
+    "news": {
+      "title": "News",
+      "lead": "Updates from billiard.guru and club announcements. Service news is nationwide; club news follows the selected region.",
+      "network": "Nationwide",
+      "count": "{count, plural, one {# item} other {# items}}",
+      "backHome": "← Home",
+      "serviceBadge": "Service news",
+      "allNews": "All news",
+      "notFound": "News not found"
+    },
+    "tournamentBracket": {
+      "title": "Bracket — {name}",
+      "back": "← Tournament",
+      "publicLink": "Public bracket link (no sign-in required):",
+      "notFound": "Bracket not found"
+    },
+    "ideas": {
+      "lead": "Suggest improvements for billiard.guru. Ideas are moderated; after approval everyone can see and vote on them.",
+      "loading": "Loading…",
+      "client": {
+        "tabIdeas": "Ideas",
+        "tabSubmit": "Suggest",
+        "tabMine": "Mine",
+        "loading": "Loading…",
+        "emptyTitle": "No published ideas yet",
+        "emptyDescription": "Be the first — suggest an improvement for billiard.guru",
+        "clubAuthor": "Club «{club}»",
+        "loginToVote": "Sign in to vote",
+        "loginRequired": "Only registered players can suggest ideas.",
+        "login": "Sign in",
+        "verifyRequired": "Confirm your profile in Telegram — then you can submit ideas.",
+        "titlePlaceholder": "Idea title",
+        "bodyPlaceholder": "Describe your idea: what to improve and why it helps the community",
+        "consentRequired": "Confirm personal data processing consent",
+        "submitError": "Could not submit",
+        "submitSuccess": "Idea sent for moderation. We will notify you in Telegram after review.",
+        "submit": "Submit for moderation",
+        "submitting": "Submitting…",
+        "mineEmpty": "You have not suggested any ideas yet.",
+        "rejectReason": "Reason: {reason}",
+        "status": {
+          "PENDING": "Under review",
+          "APPROVED": "Published",
+          "REJECTED": "Rejected",
+          "UNPUBLISHED": "Unpublished"
+        }
+      }
+    },
+    "cabinet": {
+      "city": "City",
+      "phone": "Phone",
+      "rating": "Rating",
+      "role": "Role",
+      "publicProfile": "Public profile",
+      "bookingsTitle": "My table bookings",
+      "bookingsEmpty": "No upcoming bookings.",
+      "chooseClub": "Find a club",
+      "registrationsTitle": "My registrations",
+      "registrationsEmpty": "No registrations yet.",
+      "browseTournaments": "Browse tournaments",
+      "teamsTitle": "My teams",
+      "partner": "Partner",
+      "pokatatTitle": "Play a match",
+      "pokatatPublish": "Post a listing",
+      "pokatatLead": "Listings for when and with whom you want to play — one-off or regular.",
+      "pokatatMine": "My listings and responses →",
+      "loading": "Loading…",
+      "save": "Save",
+      "saving": "Saving…",
+      "loadError": "Could not load",
+      "saveError": "Could not save",
+      "notificationCategories": {
+        "auth": "Sign-in",
+        "tournaments": "Tournaments",
+        "bookings": "Table bookings",
+        "ideas": "Ideas"
+      },
+      "notificationsTitle": "Telegram notifications",
+      "notificationsLead": "Choose what the bot sends you. All types are on by default except mandatory ones.",
+      "notificationsNoTelegram": "Telegram is not linked — notifications will not arrive until you verify your account in the bot (sign up or log in on the site).",
+      "notificationsLocked": "Cannot disable — required for secure sign-in",
+      "aboutTitle": "About me",
+      "aboutLead": "Tell others about your game: formats, cue, favourite clubs. Shown on your",
+      "aboutProfileLink": "public profile",
+      "aboutPlaceholder": "e.g. pool and pyramid, Predator cue, usually play at …",
+      "aboutSaved": "Saved — visible on your public profile",
+      "coachTitle": "Coach profile",
+      "coachLead": "When enabled, you appear in the",
+      "coachCatalogLink": "coaches directory",
+      "coachLeadSuffix": "with rating and description.",
+      "coachToggle": "I coach",
+      "coachToggleHint": "Show my card on the coaches page",
+      "coachBioLabel": "About you (short in directory, full on your page)",
+      "coachBioPlaceholder": "Experience, disciplines, lesson format, rates, contacts…",
+      "coachPhotos": "Photos",
+      "coachAddPhoto": "+ Add photo",
+      "coachUploading": "Uploading…",
+      "coachRemovePhoto": "Remove",
+      "coachOpenPage": "Open your coach page",
+      "coachSaved": "Coach profile saved",
+      "coachDisabled": "You are no longer listed as a coach",
+      "coachSave": "Save coach profile",
+      "cancelBooking": "Cancel booking",
+      "cancelBookingConfirm": "Cancel this booking?",
+      "cancelBookingFailed": "Could not cancel",
+      "coachUploadFailed": "Could not upload photo",
+      "notificationItems": {
+        "auth-login-request": {
+          "title": "Sign-in confirmation",
+          "description": "When you sign in with your phone on /login — confirm or cancel in the bot."
+        },
+        "tournament-nearby-announce": {
+          "title": "New tournament nearby",
+          "description": "When a tournament opens within 150 km of your city."
+        },
+        "match-start-scheduled": {
+          "title": "Match scheduled",
+          "description": "When a start time is set for your match on the bracket."
+        },
+        "tournament-registration-by-club": {
+          "title": "Registered for a tournament",
+          "description": "When a club adds you to a tournament (pending application)."
+        },
+        "tournament-registration-self": {
+          "title": "You registered for a tournament",
+          "description": "After you submit an application on the tournament page."
+        },
+        "tournament-registration-confirmed": {
+          "title": "Tournament registration confirmed",
+          "description": "When the organizer confirms your application."
+        },
+        "tournament-registration-rejected": {
+          "title": "Tournament application rejected",
+          "description": "When the organizer rejects your application."
+        },
+        "player-booking-confirmed": {
+          "title": "Booking confirmed",
+          "description": "When the club confirms your table booking."
+        },
+        "player-booking-rejected": {
+          "title": "Booking rejected",
+          "description": "When the club rejects your table request."
+        },
+        "player-booking-cancelled": {
+          "title": "Booking cancelled",
+          "description": "When the club cancels a confirmed booking."
+        },
+        "idea-author-approved": {
+          "title": "Idea approved",
+          "description": "When your idea passes moderation."
+        },
+        "idea-author-rejected": {
+          "title": "Idea rejected",
+          "description": "When your idea is rejected (with reason if provided)."
+        },
+        "idea-broadcast": {
+          "title": "New idea on the site",
+          "description": "When a new idea is published — vote in the bot."
+        }
+      }
+    }
+  },
+  "userRole": {
+    "PLAYER": "Player",
+    "SUPERADMIN": "Superadmin"
+  },
+  "playListing": {
+    "kind": {
+      "SPARRING": "Sparring",
+      "PARTNER": "Partner",
+      "OPPONENT": "Opponent",
+      "TRAINING": "Training",
+      "OTHER": "Other"
+    },
+    "schedule": {
+      "ONE_TIME": "One-off",
+      "RECURRING": "Regular"
+    },
+    "status": {
+      "OPEN": "Active",
+      "MATCHED": "Matched",
+      "CLOSED": "Closed"
+    },
+    "when": "When",
+    "where": "Where",
+    "rating": "Partner rating",
+    "format": "Format",
+    "responses": "{count} responses",
+    "seeking": "Looking for {label}",
+    "seekingLabel": "Looking for",
+    "youResponded": "You responded",
+    "responseStatus": {
+      "PENDING": "Pending",
+      "ACCEPTED": "Accepted",
+      "DECLINED": "Declined",
+      "WITHDRAWN": "Withdrawn"
+    },
+    "detail": {
+      "lead": "Player listing",
+      "anyClub": "Any club",
+      "authorRating": "Rating {rating}",
+      "writeTelegram": "Message on Telegram",
+      "manageTitle": "Manage listing",
+      "markMatched": "Found a partner",
+      "close": "Close",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this listing?",
+      "respondTitle": "Respond",
+      "login": "Sign in",
+      "loginToRespondSuffix": ", to respond or contact the author.",
+      "verifyToRespond": "Confirm your profile in Telegram to respond.",
+      "respondedStatus": "You responded · {status}",
+      "messagePlaceholder": "Brief note: your rating, when you are free…",
+      "respond": "Respond",
+      "responding": "Sending…",
+      "responsesTitle": "Responses ({count})",
+      "accept": "Accept",
+      "decline": "Decline",
+      "allListings": "← All listings",
+      "consentRequired": "Confirm consent to personal data processing",
+      "respondFailed": "Could not respond",
+      "genericError": "Something went wrong",
+      "notFound": "Listing not found"
+    }
+  },
+  "tournamentStatus": {
+    "OPEN": "Registration open",
+    "ACTIVE": "Live",
+    "FINISHED": "Finished"
+  },
+  "tournamentCard": {
+    "participants": "{count} participants"
+  },
+  "clubCard": {
+    "verified": "Verified",
+    "pendingTelegram": "Awaiting Telegram",
+    "tables": "{count} tables",
+    "tournaments": "Tournaments: {count}"
+  },
+  "registrationStatus": {
+    "PENDING": "Awaiting confirmation",
+    "CONFIRMED": "Confirmed",
+    "REJECTED": "Rejected",
+    "CANCELLED": "Cancelled"
+  },
+  "detail": {
+    "ruOnly": {
+      "notice": "This description is available in Russian only."
+    },
+    "notFound": {
+      "tournament": "Tournament not found",
+      "club": "Club not found",
+      "player": "Player not found",
+      "coach": "Coach not found"
+    },
+    "back": {
+      "tournaments": "← Tournaments",
+      "clubs": "← Clubs",
+      "players": "← Players",
+      "coaches": "← Coaches"
+    },
+    "player": {
+      "city": "City",
+      "rating": "Rating",
+      "coachProfile": "Coach profile",
+      "about": "About",
+      "tournaments": "Tournaments",
+      "noTournaments": "No tournament entries yet.",
+      "reviewCount": "{count, plural, one {# review} other {# reviews}}",
+      "noReviews": "No reviews yet"
+    },
+    "coach": {
+      "city": "City",
+      "coachRating": "Coach rating",
+      "playerRating": "Player rating",
+      "playerProfile": "Player profile",
+      "about": "About the coach",
+      "noBio": "No description yet.",
+      "moreLink": "Details →"
+    },
+    "club": {
+      "floorPlan": "Floor plan",
+      "onMap": "On the map",
+      "booking": "Table booking",
+      "bookTable": "Book a table",
+      "bookTelegram": "Book in Telegram",
+      "news": "Club news",
+      "upcomingTournaments": "Current tournaments",
+      "pastTournaments": "Past tournaments",
+      "noUpcoming": "No open or live tournaments right now.",
+      "noPast": "No finished tournaments yet."
+    },
+    "tournament": {
+      "participantsMatches": "{participants} participants · {matches} matches",
+      "participantsLabel": "Participants: {range} (club rating first, then overall)",
+      "handicapHalfStep": "Handicap: includes 0.5 rating steps",
+      "handicapInteger": "Handicap: integer rating difference only (no +1 in odd games)",
+      "signInToRegister": "Sign in",
+      "signInSuffix": "to register for this tournament.",
+      "pairParticipating": "You are playing as a pair {team}",
+      "applicationPending": "Application submitted — awaiting organizer confirmation",
+      "youAreRegistered": "You are registered for this tournament",
+      "applicationStatus": "Application status: {status}",
+      "cabinet": "Account",
+      "pairRegistration": "Pair registration is handled by the host club. Ask the club admin to register your pair.",
+      "pendingNote": "application awaiting confirmation",
+      "ratingBlocked": "Your rating is {rating} — {limit}. Registration is not available.",
+      "cancelPending": "Withdraw application",
+      "cancelConfirmed": "Withdraw from tournament",
+      "cancelDefault": "Cancel",
+      "cancelFailed": "Could not cancel"
+    }
+  },
+  "tournamentView": {
+    "title": "Tournament",
+    "tabs": {
+      "results": "Results",
+      "participants": "Participants",
+      "teams": "Teams",
+      "matches": "Matches",
+      "bracket": "Bracket"
+    },
+    "results": {
+      "emptyWithMatches": "Standings will appear after matches are completed.",
+      "emptyNoParticipants": "No confirmed participants yet.",
+      "finished": "Tournament finished — final standings.",
+      "preliminary": "Places are preliminary and will update as the tournament progresses.",
+      "place": "Place",
+      "participant": "Participant",
+      "team": "Team",
+      "city": "City",
+      "rating": "Rating",
+      "placeSuffix": "place"
+    },
+    "participants": {
+      "empty": "No one has registered yet.",
+      "pendingList": "Preliminary list: confirmed participants and pending applications ({count} awaiting confirmation).",
+      "searchPlaceholder": "Search by name or city…",
+      "countOf": "{filtered} of {total} {unit}",
+      "teams": "teams",
+      "participants": "participants"
+    },
+    "bracket": {
+      "notFormed": "The bracket has not been formed yet. Check back on this page for updates.",
+      "fullscreen": "Fullscreen",
+      "presentationTitle": "Tournament bracket",
+      "presentationAria": "Bracket: {title}",
+      "presentationAriaDefault": "Fullscreen bracket",
+      "exit": "Exit · Esc",
+      "display": {
+        "match": "Match",
+        "matchTitle": "Card header: match number (#…)",
+        "handicap": "Handicap",
+        "placement": "Places",
+        "placementTitle": "Card footer: places and paths (winner/loser to #…)"
+      }
+    },
+    "matches": {
+      "empty": "Matches will appear after the bracket is formed.",
+      "filters": {
+        "all": "All",
+        "current": "Live",
+        "upcoming": "Upcoming",
+        "completed": "Finished",
+        "waiting": "Waiting"
+      },
+      "searchPlaceholder": "Search by participant, stage, or #…",
+      "countOf": "{filtered} of {total} matches",
+      "stage": "Stage",
+      "match": "Match",
+      "score": "Score",
+      "status": "Status",
+      "statusLabels": {
+        "completed": "Finished",
+        "current": "Live",
+        "upcoming": "Ready",
+        "waiting": "Waiting"
+      }
+    }
+  },
+  "clubPanel": {
+    "tables": "Tables",
+    "tableOne": "table",
+    "tableFew": "tables",
+    "tableMany": "tables",
+    "scheduleAndPrices": "Hours & prices",
+    "bookTelegram": "Book in Telegram"
+  },
+  "clubSchedule": {
+    "contactClub": "Contact the club for hours.",
+    "todayPrefix": "Today · {day}",
+    "todayBadge": "today",
+    "nowBadge": "now",
+    "costTitle": "Cost"
+  },
+  "tournamentRegister": {
+    "submit": "Apply to participate",
+    "submitting": "Submitting…",
+    "error": "Could not submit application",
+    "hint": "Your application goes to the organizer. After confirmation you will appear in the participant list."
+  },
+  "registrationCancel": {
+    "error": "Could not cancel"
+  },
+  "rules": {
+    "breadcrumbs": {
+      "aria": "Breadcrumb",
+      "rules": "Rules"
+    },
+    "notFound": {
+      "table": "Table type not found",
+      "game": "Game not found"
+    },
+    "index": {
+      "title": "Billiards rules",
+      "lead": "Guide to table types and disciplines — the same categories clubs use. Pick a table, then a game.",
+      "bracketsLink": "Bracket formats →",
+      "tournamentsLink": "Tournaments",
+      "gameOne": "game",
+      "gameFew": "games",
+      "gameMany": "games",
+      "pickDisciplines": "Browse disciplines →",
+      "tableTypesTitle": "Table types",
+      "tableTypesLead": "Five formats clubs list when booking or creating a tournament on billiard.guru.",
+      "generalTitle": "Common to all disciplines",
+      "generalLead": "Handicap, etiquette, and tournament regulations — independent of table type.",
+      "ctaTitle": "Ready to play a tournament?",
+      "ctaLead": "Find an upcoming event or create your own — table type and game are listed on each tournament card.",
+      "ctaTournaments": "Browse tournaments",
+      "ctaClubs": "Clubs & tables"
+    },
+    "table": {
+      "backAll": "← All tables",
+      "disciplineOne": "discipline",
+      "disciplineFew": "disciplines",
+      "disciplineMany": "disciplines",
+      "readRules": "Read rules →",
+      "navDisciplines": "Disciplines",
+      "navEquipment": "Table specs",
+      "navChecklist": "Checklist",
+      "navHistory": "History",
+      "disciplinesTitle": "Disciplines",
+      "disciplinesLead": "Pick a game — each page has the full ruleset, history, and discipline notes.",
+      "commonFoulsTitle": "Common fouls",
+      "foulsNotePyramid": "Different pyramid disciplines have different cue-ball pocket rules and penalties. See the discipline page and tournament card for exact rules.",
+      "foulsNoteDefault": "Penalties and ball-in-hand depend on the tournament regulations — confirm with the referee before the match.",
+      "otherTable": "Another table type",
+      "findClub": "Find a club with a {table} table"
+    },
+    "game": {
+      "toc": "Contents",
+      "relatedOnTable": "More on this table",
+      "disclaimer": "This is a short guide. The exact regulations are in the tournament description on billiard.guru or from the organizer. Official event rules take precedence.",
+      "allGames": "All games: {table}",
+      "allTables": "Table types"
+    }
+  },
+  "brackets": {
+    "index": {
+      "title": "Tournament brackets",
+      "lead": "Single elimination, Swiss, and ready-made formats for 16, 32, and 64 players — with demos and one-click tournament creation.",
+      "create": "Create a tournament",
+      "tournaments": "Browse tournaments",
+      "demoLink": "Demo diagram →",
+      "empty": "Bracket formats will appear on the platform soon. For now you can",
+      "emptyTournaments": "browse tournaments",
+      "emptyOr": "or create an event in your account.",
+      "platformTitle": "What the platform offers",
+      "platformLead": "Not just a bracket image — a live tournament with registration, results, and alerts.",
+      "chooseTitle": "Which format to pick",
+      "chooseLead": "A quick guide — no Excel or manual drawing.",
+      "chooseFormat": "Format",
+      "chooseWhen": "When it fits",
+      "chooseSize": "Field size",
+      "ctaTitle": "Ready to run a tournament?",
+      "ctaLead": "Sign up, pick a format, and invite players — the bracket and results update automatically.",
+      "ctaCreate": "Create a tournament",
+      "ctaBrowse": "Browse tournaments"
+    },
+    "landing": {
+      "notFound": "Format not found",
+      "create": "Create a tournament",
+      "tournaments": "Browse tournaments",
+      "singleEvent": "Singles",
+      "pairEvent": "Doubles",
+      "diagramTitle": "Bracket diagram",
+      "aboutTitle": "About this format",
+      "participants": "Participants",
+      "ctaTitle": "Run a tournament on billiard.guru",
+      "ctaLead": "Sign up, create an event, and pick the “{format}” format. The bracket is generated automatically — you only accept entries and enter scores.",
+      "ctaRegister": "Sign up free",
+      "ctaAllFormats": "All bracket formats",
+      "platformTitle": "Platform features",
+      "relatedTitle": "Other bracket formats"
+    },
+    "demo": {
+      "badge": "Demo diagram",
+      "structureFragment": "Interactive bracket fragment (16→8): this is how match cards and winner/loser paths look. The full {count}-match diagram appears in the tournament after the bracket is formed.",
+      "structureNote": "Column layout and match numbers (#). In a tournament — real participants and results.",
+      "sampleNote": "Sample first round with fictional players. In your tournament — real participants and live results."
+    }
+  },
+  "guide": {
+    "toc": "Contents"
+  },
+  "legal": {
+    "page": {
+      "notFound": "Document not found",
+      "updated": "Last updated: {date}",
+      "stubLead": "The full text will be published on this page. You can place a file at",
+      "stubOr": "or replace the page content in code.",
+      "download": "Download document (PDF)",
+      "downloadNote": "— the link will work after the file is uploaded.",
+      "backHome": "← Home"
+    }
+  },
+  "coachReviews": {
+    "loadError": "Could not load reviews",
+    "selectRating": "Choose a rating from 1 to 5 stars",
+    "consentRequired": "Confirm consent to personal data processing",
+    "saveError": "Could not save",
+    "yourReview": "Your review",
+    "rateCoach": "Rate this coach",
+    "commentPlaceholder": "How did the coach help, what did you like…",
+    "saving": "Saving…",
+    "update": "Update review",
+    "submit": "Submit review",
+    "title": "Reviews",
+    "empty": "No reviews yet.",
+    "sectionTitle": "Coach ratings",
+    "sectionLead": "Players who trained with this coach can rate them from 1 to 5. This is not a tournament rating.",
+    "noRatingsYet": "No one has rated this coach yet.",
+    "commentLabel": "Comment (optional)",
+    "thankYou": "Thank you, your review was saved.",
+    "cannotRateSelf": "You cannot rate your own coach page.",
+    "signInToRate": "Sign in",
+    "signInToRateSuffix": " to leave a review."
+  },
+  "empty": {
+    "tournaments": "No published tournaments in this region yet.",
+    "clubs": "No clubs in this region yet.",
+    "players": "No players yet.",
+    "coaches": "No coaches in this region yet.",
+    "pokatat": "No play listings in this region yet."
+  },
+  "locale": {
+    "switch": "Language",
+    "ru": "Русский",
+    "en": "English"
+  },
+  "enUnavailable": {
+    "title": "This page is not available in English yet",
+    "body": "We are translating the site section by section. You can read this page in Russian for now.",
+    "cta": "Read in Russian"
+  }
+}

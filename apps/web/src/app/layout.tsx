@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
+import { getCanonicalSiteOrigin } from "@/lib/canonical-site-url";
 import { THEME_DEFAULT } from "@/lib/theme-script";
 import "./globals.css";
 
@@ -21,9 +22,7 @@ export const metadata: Metadata = {
     default: `${APP_NAME} — ${APP_TAGLINE.toLowerCase()}`,
   },
   description: `${APP_TAGLINE} — ${APP_NAME}`,
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://billiard.guru",
-  ),
+  metadataBase: new URL(getCanonicalSiteOrigin()),
 };
 
 export default function RootLayout({

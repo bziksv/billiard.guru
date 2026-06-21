@@ -20,6 +20,8 @@ export type SerializedPlayListing = {
   id: string;
   title: string;
   body: string | null;
+  titleEn: string | null;
+  bodyEn: string | null;
   kind: string;
   scheduleType: string;
   playAt: string | null;
@@ -42,7 +44,7 @@ export type SerializedPlayListing = {
     photoUrl: string | null;
     telegramUsername: string | null;
   };
-  city: { id: string; nameRu: string; country: { nameRu: string } };
+  city: { id: string; nameRu: string; nameEn?: string | null; country: { nameRu: string; nameEn?: string | null } };
   club: { id: string; name: string } | null;
   isAuthor?: boolean;
   myResponseStatus?: string | null;
@@ -63,6 +65,8 @@ export function serializePlayListing(
     id: listing.id,
     title: listing.title,
     body: listing.body,
+    titleEn: listing.titleEn ?? null,
+    bodyEn: listing.bodyEn ?? null,
     kind: listing.kind,
     scheduleType: listing.scheduleType,
     playAt: listing.playAt?.toISOString() ?? null,

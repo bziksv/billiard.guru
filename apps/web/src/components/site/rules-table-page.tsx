@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { getTranslations } from "next-intl/server";
 import { RulesBreadcrumbs } from "@/components/site/rules-breadcrumbs";
 import {
   RulesChecklistBlock,
@@ -9,15 +10,23 @@ import {
 import { RulesTableIcon } from "@/components/site/rules-table-icon";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
-import type { BilliardTableType } from "@/lib/billiard-rules";
+import type { BilliardTableType } from "@/lib/billiard-rules/content";
 import { rulesTableAccentColor } from "@/lib/billiard-rules";
+
+function disciplineLabel(count: number, t: Awaited<ReturnType<typeof getTranslations>>) {
+  if (count === 1) return t("table.disciplineOne");
+  if (count >= 2 && count <= 4) return t("table.disciplineFew");
+  return t("table.disciplineMany");
+}
 
 function GameCard({
   table,
   game,
+  t,
 }: {
   table: BilliardTableType;
   game: BilliardTableType["games"][number];
+  t: Awaited<ReturnType<typeof getTranslations>>;
 }) {
   const accent = rulesTableAccentColor(table.id);
 
@@ -38,13 +47,14 @@ function GameCard({
         <p className="guide-body-text mt-2 flex-1 line-clamp-4 text-sm leading-relaxed">
           {game.tagline}
         </p>
-        <span className="rules-game-card-cta mt-4">Читать правила →</span>
+        <span className="rules-game-card-cta mt-4">{t("table.readRules")}</span>
       </SiteCard>
     </Link>
   );
 }
 
-export function RulesTablePage({ table }: { table: BilliardTableType }) {
+export async function RulesTablePage({ table }: { table: BilliardTableType }) {
+  const t = await getTranslations("rules");
   const accent = rulesTableAccentColor(table.id);
   const hasExtras = Boolean(table.equipment || table.checklist || table.history);
 
@@ -52,7 +62,7 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
     <>
       <PageHeader title={table.title} lead={table.lead}>
         <Link href="/rules" className="site-btn-secondary shrink-0">
-          ← Все столы
+          {t("table.backAll")}
         </Link>
       </PageHeader>
 
@@ -63,7 +73,7 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
         >
           <RulesBreadcrumbs
             items={[
-              { href: "/rules", label: "Правила" },
+              { href: "/rules", label: t("breadcrumbs.rules") },
               { label: table.title },
             ]}
           />
@@ -75,12 +85,7 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
                   <div className="flex flex-wrap gap-2">
                     <span className="rules-table-chip">{table.pocketsLabel}</span>
                     <span className="rules-table-chip rules-table-chip-muted">
-                      {table.games.length}{" "}
-                      {table.games.length === 1
-                        ? "дисциплина"
-                        : table.games.length < 5
-                          ? "дисциплины"
-                          : "дисциплин"}
+                      {table.games.length} {disciplineLabel(table.games.length, t)}
                     </span>
                   </div>
                   {table.overview.map((text) => (
@@ -91,13 +96,13 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
                   {hasExtras && (
                     <div className="mt-4 flex flex-wrap gap-2 text-sm">
                       <a href="#disciplines" className="text-emerald-400 hover:underline">
-                        Дисциплины
+                        {t("table.navDisciplines")}
                       </a>
                       {table.equipment && (
                         <>
                           <span className="text-[var(--text-muted)]">·</span>
                           <a href="#equipment" className="text-emerald-400 hover:underline">
-                            Параметры стола
+                            {t("table.navEquipment")}
                           </a>
                         </>
                       )}
@@ -105,7 +110,7 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
                         <>
                           <span className="text-[var(--text-muted)]">·</span>
                           <a href="#checklist" className="text-emerald-400 hover:underline">
-                            Чек-лист
+                            {t("table.navChecklist")}
                           </a>
                         </>
                       )}
@@ -113,7 +118,7 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
                         <>
                           <span className="text-[var(--text-muted)]">·</span>
                           <a href="#history" className="text-emerald-400 hover:underline">
-                            История
+                            {t("table.navHistory")}
                           </a>
                         </>
                       )}
@@ -140,14 +145,11 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
           </div>
 
           <section id="disciplines" className="scroll-mt-28">
-            <h2 className="site-section-title text-xl">Дисциплины</h2>
-            <p className="guide-body-text mt-2 max-w-2xl text-sm">
-              Выберите игру — на отдельной странице полный регламент, историческая справка и
-              нюансы дисциплины.
-            </p>
+            <h2 className="site-section-title text-xl">{t("table.disciplinesTitle")}</h2>
+            <p className="guide-body-text mt-2 max-w-2xl text-sm">{t("table.disciplinesLead")}</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {table.games.map((game) => (
-                <GameCard key={game.slug} table={table} game={game} />
+                <GameCard key={game.slug} table={table} game={game} t={t} />
               ))}
             </div>
           </section>
@@ -157,16 +159,14 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
 
           {table.commonFouls && table.commonFouls.length > 0 && (
             <SiteCard>
-              <h2 className="site-section-title text-lg">Типичные нарушения</h2>
+              <h2 className="site-section-title text-lg">{t("table.commonFoulsTitle")}</h2>
               <ul className="guide-body-text mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed">
                 {table.commonFouls.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
               <p className="guide-note mt-4 text-sm">
-                {table.slug === "pyramid"
-                  ? "На одном столе играют разные дисциплины — зачёт битка в лузу, выбор битка и штрафы различаются. Точный регламент — на странице дисциплины и в карточке турнира."
-                  : "Санкции и порядок ввода шара зависят от регламента турнира — уточняйте у судьи перед матчем."}
+                {table.slug === "pyramid" ? t("table.foulsNotePyramid") : t("table.foulsNoteDefault")}
               </p>
             </SiteCard>
           )}
@@ -175,10 +175,10 @@ export function RulesTablePage({ table }: { table: BilliardTableType }) {
 
           <section className="flex flex-wrap gap-3">
             <Link href="/rules" className="site-btn-secondary">
-              Другой тип стола
+              {t("table.otherTable")}
             </Link>
             <Link href="/clubs" className="site-btn-secondary">
-              Найти клуб со столом «{table.title.split(" ")[0]}»
+              {t("table.findClub", { table: table.title.split(" ")[0] })}
             </Link>
           </section>
         </div>

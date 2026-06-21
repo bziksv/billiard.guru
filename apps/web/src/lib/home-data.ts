@@ -1,7 +1,13 @@
 import type { PublicBracketFormat } from "@/lib/bracket-formats/public-formats";
 import { getPublicEnabledBracketFormats } from "@/lib/bracket-formats/public-formats";
 import { APP_NAME } from "@/lib/brand";
+import { localizedGeoName } from "@/lib/geo-display";
+import type { AppLocale } from "@/i18n/routing";
 import type { HomeAnnouncement, HomeNewsItem } from "@/lib/home-content";
+import {
+  newsHasEnTranslation,
+  resolveLocalizedField,
+} from "@/lib/localized-db-text";
 import {
   clubGeoWhere,
   playListingGeoWhere,
@@ -18,8 +24,11 @@ import {
   PLAY_LISTING_SCHEDULE_LABELS,
 } from "@/lib/play-listing-display";
 
-function formatNewsDate(date: Date) {
-  return date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
+function formatNewsDate(date: Date, locale: AppLocale) {
+  return date.toLocaleDateString(locale === "en" ? "en-GB" : "ru-RU", {
+    day: "numeric",
+    month: "short",
+  });
 }
 
 function excerpt(text: string, max = 160) {
@@ -38,43 +47,61 @@ function clubNewsGeoWhere(geo: GeoSearchParams) {
   };
 }
 
-function mapSiteNewsRow(row: {
-  id: string;
-  title: string;
-  body: string;
-  publishedAt: Date | null;
-  createdAt: Date;
-}): HomeNewsItem & { sortAt: number } {
+function mapSiteNewsRow(
+  row: {
+    id: string;
+    title: string;
+    body: string;
+    titleEn?: string | null;
+    bodyEn?: string | null;
+    publishedAt: Date | null;
+    createdAt: Date;
+  },
+  locale: AppLocale,
+  networkLabel: string,
+): HomeNewsItem & { sortAt: number } {
+  const title = resolveLocalizedField(locale, row.title, row.titleEn);
+  const body = resolveLocalizedField(locale, row.body, row.bodyEn);
   return {
     id: row.id,
-    title: row.title,
-    excerpt: excerpt(row.body),
+    title,
+    excerpt: excerpt(body),
     authorType: "service",
     authorName: APP_NAME,
-    city: "Вся сеть",
-    date: formatNewsDate(row.publishedAt ?? row.createdAt),
+    city: networkLabel,
+    date: formatNewsDate(row.publishedAt ?? row.createdAt, locale),
     href: `/news/${row.id}`,
     sortAt: (row.publishedAt ?? row.createdAt).getTime(),
   };
 }
 
-function mapClubNewsRow(row: {
-  id: string;
-  title: string;
-  body: string;
-  clubId: string;
-  publishedAt: Date | null;
-  createdAt: Date;
-  club: { name: string; city: { nameRu: string } };
-}): HomeNewsItem & { sortAt: number } {
+function mapClubNewsRow(
+  row: {
+    id: string;
+    title: string;
+    body: string;
+    titleEn?: string | null;
+    bodyEn?: string | null;
+    clubId: string;
+    publishedAt: Date | null;
+    createdAt: Date;
+    club: {
+      name: string;
+      city: { nameRu: string; nameEn?: string | null };
+    };
+  },
+  locale: AppLocale,
+): HomeNewsItem & { sortAt: number } {
+  const title = resolveLocalizedField(locale, row.title, row.titleEn);
+  const body = resolveLocalizedField(locale, row.body, row.bodyEn);
   return {
     id: row.id,
-    title: row.title,
-    excerpt: excerpt(row.body),
+    title,
+    excerpt: excerpt(body),
     authorType: "club",
     authorName: row.club.name,
-    city: row.club.city.nameRu,
-    date: formatNewsDate(row.publishedAt ?? row.createdAt),
+    city: localizedGeoName(row.club.city.nameRu, locale, row.club.city.nameEn),
+    date: formatNewsDate(row.publishedAt ?? row.createdAt, locale),
     href: `/clubs/${row.clubId}#club-news`,
     sortAt: (row.publishedAt ?? row.createdAt).getTime(),
   };
@@ -83,8 +110,10 @@ function mapClubNewsRow(row: {
 /** Новости сервиса + клубов. limit — сколько вернуть после сортировки (для главной — 6). */
 export async function loadNewsFeed(
   geo: GeoSearchParams,
-  options?: { limit?: number },
+  options?: { limit?: number; locale?: AppLocale; networkLabel?: string },
 ): Promise<HomeNewsItem[]> {
+  const locale = options?.locale ?? "ru";
+  const networkLabel = options?.networkLabel ?? "Вся сеть";
   const fetchCap = options?.limit ? 50 : 100;
 
   const [siteRows, clubRows] = await Promise.all([
@@ -108,17 +137,27 @@ export async function loadNewsFeed(
     }),
   ]);
 
-  const merged = [...siteRows.map(mapSiteNewsRow), ...clubRows.map(mapClubNewsRow)].sort(
-    (a, b) => b.sortAt - a.sortAt,
-  );
+  const siteFiltered =
+    locale === "en" ? siteRows.filter(newsHasEnTranslation) : siteRows;
+  const clubFiltered =
+    locale === "en" ? clubRows.filter(newsHasEnTranslation) : clubRows;
+
+  const merged = [
+    ...siteFiltered.map((row) => mapSiteNewsRow(row, locale, networkLabel)),
+    ...clubFiltered.map((row) => mapClubNewsRow(row, locale)),
+  ].sort((a, b) => b.sortAt - a.sortAt);
 
   const slice = options?.limit ? merged.slice(0, options.limit) : merged;
   return slice.map(({ sortAt: _ignored, ...item }) => item);
 }
 
 /** Превью на главной — 6 последних */
-export async function loadHomeNews(geo: GeoSearchParams): Promise<HomeNewsItem[]> {
-  return loadNewsFeed(geo, { limit: 6 });
+export async function loadHomeNews(
+  geo: GeoSearchParams,
+  locale: AppLocale = "ru",
+  networkLabel = "Вся сеть",
+): Promise<HomeNewsItem[]> {
+  return loadNewsFeed(geo, { limit: 6, locale, networkLabel });
 }
 
 type PlayListingRow = Awaited<

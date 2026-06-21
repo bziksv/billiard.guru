@@ -40,6 +40,7 @@ export type CoachRatingMinAggregateOutputType = {
   raterId: string | null
   score: number | null
   comment: string | null
+  commentEn: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -50,6 +51,7 @@ export type CoachRatingMaxAggregateOutputType = {
   raterId: string | null
   score: number | null
   comment: string | null
+  commentEn: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -60,6 +62,7 @@ export type CoachRatingCountAggregateOutputType = {
   raterId: number
   score: number
   comment: number
+  commentEn: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -80,6 +83,7 @@ export type CoachRatingMinAggregateInputType = {
   raterId?: true
   score?: true
   comment?: true
+  commentEn?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -90,6 +94,7 @@ export type CoachRatingMaxAggregateInputType = {
   raterId?: true
   score?: true
   comment?: true
+  commentEn?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +105,7 @@ export type CoachRatingCountAggregateInputType = {
   raterId?: true
   score?: true
   comment?: true
+  commentEn?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -197,6 +203,7 @@ export type CoachRatingGroupByOutputType = {
   raterId: string
   score: number
   comment: string | null
+  commentEn: string | null
   createdAt: Date
   updatedAt: Date
   _count: CoachRatingCountAggregateOutputType | null
@@ -230,6 +237,7 @@ export type CoachRatingWhereInput = {
   raterId?: Prisma.StringFilter<"CoachRating"> | string
   score?: Prisma.IntFilter<"CoachRating"> | number
   comment?: Prisma.StringNullableFilter<"CoachRating"> | string | null
+  commentEn?: Prisma.StringNullableFilter<"CoachRating"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CoachRating"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CoachRating"> | Date | string
   coach?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
@@ -242,6 +250,7 @@ export type CoachRatingOrderByWithRelationInput = {
   raterId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   comment?: Prisma.SortOrderInput | Prisma.SortOrder
+  commentEn?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   coach?: Prisma.PlayerOrderByWithRelationInput
@@ -259,6 +268,7 @@ export type CoachRatingWhereUniqueInput = Prisma.AtLeast<{
   raterId?: Prisma.StringFilter<"CoachRating"> | string
   score?: Prisma.IntFilter<"CoachRating"> | number
   comment?: Prisma.StringNullableFilter<"CoachRating"> | string | null
+  commentEn?: Prisma.StringNullableFilter<"CoachRating"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CoachRating"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CoachRating"> | Date | string
   coach?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
@@ -271,6 +281,7 @@ export type CoachRatingOrderByWithAggregationInput = {
   raterId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   comment?: Prisma.SortOrderInput | Prisma.SortOrder
+  commentEn?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.CoachRatingCountOrderByAggregateInput
@@ -289,6 +300,7 @@ export type CoachRatingScalarWhereWithAggregatesInput = {
   raterId?: Prisma.StringWithAggregatesFilter<"CoachRating"> | string
   score?: Prisma.IntWithAggregatesFilter<"CoachRating"> | number
   comment?: Prisma.StringNullableWithAggregatesFilter<"CoachRating"> | string | null
+  commentEn?: Prisma.StringNullableWithAggregatesFilter<"CoachRating"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CoachRating"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"CoachRating"> | Date | string
 }
@@ -297,6 +309,7 @@ export type CoachRatingCreateInput = {
   id?: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   coach: Prisma.PlayerCreateNestedOneWithoutCoachReviewsReceivedInput
@@ -309,6 +322,7 @@ export type CoachRatingUncheckedCreateInput = {
   raterId: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -317,6 +331,7 @@ export type CoachRatingUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coach?: Prisma.PlayerUpdateOneRequiredWithoutCoachReviewsReceivedNestedInput
@@ -329,6 +344,7 @@ export type CoachRatingUncheckedUpdateInput = {
   raterId?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -339,6 +355,7 @@ export type CoachRatingCreateManyInput = {
   raterId: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -347,6 +364,7 @@ export type CoachRatingUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -357,6 +375,7 @@ export type CoachRatingUncheckedUpdateManyInput = {
   raterId?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -388,6 +407,7 @@ export type CoachRatingCountOrderByAggregateInput = {
   raterId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   comment?: Prisma.SortOrder
+  commentEn?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -402,6 +422,7 @@ export type CoachRatingMaxOrderByAggregateInput = {
   raterId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   comment?: Prisma.SortOrder
+  commentEn?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -412,6 +433,7 @@ export type CoachRatingMinOrderByAggregateInput = {
   raterId?: Prisma.SortOrder
   score?: Prisma.SortOrder
   comment?: Prisma.SortOrder
+  commentEn?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -508,6 +530,7 @@ export type CoachRatingCreateWithoutCoachInput = {
   id?: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   rater: Prisma.PlayerCreateNestedOneWithoutCoachReviewsGivenInput
@@ -518,6 +541,7 @@ export type CoachRatingUncheckedCreateWithoutCoachInput = {
   raterId: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -536,6 +560,7 @@ export type CoachRatingCreateWithoutRaterInput = {
   id?: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   coach: Prisma.PlayerCreateNestedOneWithoutCoachReviewsReceivedInput
@@ -546,6 +571,7 @@ export type CoachRatingUncheckedCreateWithoutRaterInput = {
   coachId: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -585,6 +611,7 @@ export type CoachRatingScalarWhereInput = {
   raterId?: Prisma.StringFilter<"CoachRating"> | string
   score?: Prisma.IntFilter<"CoachRating"> | number
   comment?: Prisma.StringNullableFilter<"CoachRating"> | string | null
+  commentEn?: Prisma.StringNullableFilter<"CoachRating"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CoachRating"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CoachRating"> | Date | string
 }
@@ -610,6 +637,7 @@ export type CoachRatingCreateManyCoachInput = {
   raterId: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -619,6 +647,7 @@ export type CoachRatingCreateManyRaterInput = {
   coachId: string
   score: number
   comment?: string | null
+  commentEn?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -627,6 +656,7 @@ export type CoachRatingUpdateWithoutCoachInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rater?: Prisma.PlayerUpdateOneRequiredWithoutCoachReviewsGivenNestedInput
@@ -637,6 +667,7 @@ export type CoachRatingUncheckedUpdateWithoutCoachInput = {
   raterId?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -646,6 +677,7 @@ export type CoachRatingUncheckedUpdateManyWithoutCoachInput = {
   raterId?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -654,6 +686,7 @@ export type CoachRatingUpdateWithoutRaterInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   coach?: Prisma.PlayerUpdateOneRequiredWithoutCoachReviewsReceivedNestedInput
@@ -664,6 +697,7 @@ export type CoachRatingUncheckedUpdateWithoutRaterInput = {
   coachId?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -673,6 +707,7 @@ export type CoachRatingUncheckedUpdateManyWithoutRaterInput = {
   coachId?: Prisma.StringFieldUpdateOperationsInput | string
   score?: Prisma.IntFieldUpdateOperationsInput | number
   comment?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commentEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -685,6 +720,7 @@ export type CoachRatingSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   raterId?: boolean
   score?: boolean
   comment?: boolean
+  commentEn?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   coach?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
@@ -699,11 +735,12 @@ export type CoachRatingSelectScalar = {
   raterId?: boolean
   score?: boolean
   comment?: boolean
+  commentEn?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type CoachRatingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "coachId" | "raterId" | "score" | "comment" | "createdAt" | "updatedAt", ExtArgs["result"]["coachRating"]>
+export type CoachRatingOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "coachId" | "raterId" | "score" | "comment" | "commentEn" | "createdAt" | "updatedAt", ExtArgs["result"]["coachRating"]>
 export type CoachRatingInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   coach?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   rater?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
@@ -721,6 +758,7 @@ export type $CoachRatingPayload<ExtArgs extends runtime.Types.Extensions.Interna
     raterId: string
     score: number
     comment: string | null
+    commentEn: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["coachRating"]>
@@ -1099,6 +1137,7 @@ export interface CoachRatingFieldRefs {
   readonly raterId: Prisma.FieldRef<"CoachRating", 'String'>
   readonly score: Prisma.FieldRef<"CoachRating", 'Int'>
   readonly comment: Prisma.FieldRef<"CoachRating", 'String'>
+  readonly commentEn: Prisma.FieldRef<"CoachRating", 'String'>
   readonly createdAt: Prisma.FieldRef<"CoachRating", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"CoachRating", 'DateTime'>
 }

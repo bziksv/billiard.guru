@@ -1,13 +1,16 @@
+"use client";
+
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { formatRating } from "@/lib/rating";
+import { formatGeoLocation } from "@/lib/geo-display";
+import type { AppLocale } from "@/i18n/routing";
+import { resolveLocalizedField } from "@/lib/localized-db-text";
 import {
   formatGameFormat,
   formatPlayersNeeded,
   formatPlayListingSchedule,
   formatRatingRange,
-  PLAY_LISTING_KIND_LABELS,
-  PLAY_LISTING_SCHEDULE_LABELS,
-  PLAY_LISTING_STATUS_LABELS,
   shouldShowPlayersNeededBadge,
 } from "@/lib/play-listing-display";
 import type { SerializedPlayListing } from "@/lib/play-listing-server";
@@ -20,9 +23,22 @@ export function PlayListingCard({
   listing: SerializedPlayListing;
   showStatus?: boolean;
 }) {
-  const ratingRange = formatRatingRange(listing.ratingMin, listing.ratingMax);
-  const gameFormat = formatGameFormat(listing.gameFormat);
-  const schedule = formatPlayListingSchedule(listing);
+  const locale = useLocale() as AppLocale;
+  const t = useTranslations("playListing");
+  const title = resolveLocalizedField(locale, listing.title, listing.titleEn);
+  const body = listing.body
+    ? resolveLocalizedField(locale, listing.body, listing.bodyEn)
+    : null;
+  const ratingRange = formatRatingRange(listing.ratingMin, listing.ratingMax, locale);
+  const gameFormat = formatGameFormat(listing.gameFormat, locale);
+  const schedule = formatPlayListingSchedule(listing, locale);
+  const location = formatGeoLocation(
+    listing.city.nameRu,
+    listing.city.country?.nameRu,
+    locale,
+    listing.city.nameEn,
+    listing.city.country?.nameEn,
+  );
 
   return (
     <SiteCard className="group transition hover:border-emerald-800/60">
@@ -31,37 +47,37 @@ export function PlayListingCard({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="site-badge site-badge--accent">
-                {PLAY_LISTING_KIND_LABELS[listing.kind] ?? listing.kind}
+                {t(`kind.${listing.kind}` as "kind.SPARRING")}
               </span>
               <span className="site-badge site-badge--muted">
-                {PLAY_LISTING_SCHEDULE_LABELS[listing.scheduleType] ?? listing.scheduleType}
+                {t(`schedule.${listing.scheduleType}` as "schedule.ONE_TIME")}
               </span>
               {showStatus && listing.status !== "OPEN" && (
                 <span className="site-badge site-badge--muted">
-                  {PLAY_LISTING_STATUS_LABELS[listing.status] ?? listing.status}
+                  {t(`status.${listing.status}` as "status.OPEN")}
                 </span>
               )}
             </div>
-            <h2 className="play-listing-card-title">{listing.title}</h2>
+            <h2 className="play-listing-card-title">{title}</h2>
           </div>
           {listing.responseCount > 0 && (
             <span className="site-badge site-badge--muted shrink-0 px-2 py-1">
-              {listing.responseCount} откл.
+              {t("responses", { count: listing.responseCount })}
             </span>
           )}
         </div>
 
-        {listing.body && (
-          <p className="play-listing-card-body mt-2 line-clamp-2 text-sm">{listing.body}</p>
+        {body && (
+          <p className="play-listing-card-body mt-2 line-clamp-2 text-sm">{body}</p>
         )}
 
         <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
           <div>
-            <dt className="play-listing-card-meta text-xs">Когда</dt>
+            <dt className="play-listing-card-meta text-xs">{t("when")}</dt>
             <dd className="play-listing-card-value mt-0.5">{schedule}</dd>
           </div>
           <div>
-            <dt className="play-listing-card-meta text-xs">Где</dt>
+            <dt className="play-listing-card-meta text-xs">{t("where")}</dt>
             <dd className="play-listing-card-value mt-0.5">
               {listing.club ? (
                 <>
@@ -69,18 +85,18 @@ export function PlayListingCard({
                   <span className="play-listing-card-meta"> · </span>
                 </>
               ) : null}
-              {listing.city.nameRu}
+              {location}
             </dd>
           </div>
           {ratingRange && (
             <div>
-              <dt className="play-listing-card-meta text-xs">Рейтинг партнёра</dt>
+              <dt className="play-listing-card-meta text-xs">{t("rating")}</dt>
               <dd className="play-listing-card-value mt-0.5">{ratingRange}</dd>
             </div>
           )}
           {gameFormat && (
             <div>
-              <dt className="play-listing-card-meta text-xs">Формат</dt>
+              <dt className="play-listing-card-meta text-xs">{t("format")}</dt>
               <dd className="play-listing-card-value mt-0.5">{gameFormat}</dd>
             </div>
           )}
@@ -93,10 +109,10 @@ export function PlayListingCard({
             {formatRating(listing.author.rating)}
           </span>
           {shouldShowPlayersNeededBadge(listing.playersNeeded) && (
-            <span>Ищет {formatPlayersNeeded(listing.playersNeeded)}</span>
+            <span>{t("seeking", { label: formatPlayersNeeded(listing.playersNeeded, locale) })}</span>
           )}
           {listing.myResponseStatus && listing.myResponseStatus !== "WITHDRAWN" && (
-            <span className="font-medium text-emerald-500">Вы откликнулись</span>
+            <span className="font-medium text-emerald-500">{t("youResponded")}</span>
           )}
         </div>
       </Link>

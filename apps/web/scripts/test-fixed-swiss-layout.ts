@@ -14,6 +14,7 @@ import {
   fixedSwissTsMatchCol,
   gridFixedConnectorPath,
   gridFixedCrossToQuarterConnectorPath,
+  gridFixedLegacy29FarSemiConnectorPath,
   gridFixedEdgePoints,
   gridFixedForkConnectorPath,
   gridFixedR12ConnectorPath,
@@ -39,6 +40,7 @@ import {
   fixedSwissEdgeFromY,
   fixedSwissEdgeToY,
   fixedSwissTs28PlacementByMatchNo,
+  fixedSwissTs16R2ElimPlacementByMatchNo,
   fixedSwissTs32MatchCol,
   fixedSwissTs32PlacementByMatchNo,
   fixedSwissTs32R8ElimPlacementByMatchNo,
@@ -164,6 +166,250 @@ assert.equal(
   27,
   "FIXED_SWISS_16R4_2_3_mesta: та же сетка 27",
 );
+assert.equal(
+  buildFixedSwissTemplate(16, "FIXED_SWISS_16R2_1_3_mesto").matches.length,
+  30,
+  "FIXED_SWISS_16R2_1_3_mesto: 30 встреч, 9 колонок",
+);
+{
+  const r2Links = buildFixedSwissTemplate(16, "FIXED_SWISS_16R2_1_3_mesto").links;
+  assert.equal(
+    r2Links.some(
+      (l) => l.kind === "loss" && l.fromRound === 5 && l.fromSlot === 1 && l.toRound === 6 && l.toSlot === 2,
+    ),
+    true,
+    "16R2: проигравшие полуфинала → #30",
+  );
+  assert.equal(
+    r2Links.some(
+      (l) => l.kind === "loss" && l.fromRound === 2 && l.fromSlot === 5 && l.toRound === 3 && l.toSlot === 4,
+    ),
+    true,
+    "16R2: #9 → #20",
+  );
+  assert.equal(
+    r2Links.some(
+      (l) => l.kind === "loss" && l.fromRound === 3 && l.fromSlot === 5 && l.toRound === 4 && l.toSlot === 3,
+    ),
+    true,
+    "16R2: #21 → нижний тур 4 #25",
+  );
+  {
+    const loss12 = r2Links.find(
+      (l) => l.fromRound === 2 && l.fromSlot === 6 && l.kind === "loss",
+    );
+    const win15 = r2Links.find(
+      (l) => l.fromRound === 2 && l.fromSlot === 3 && l.kind === "win",
+    );
+    assert.equal(loss12?.toSlot, 3, "16R2: #12 loser → крест #19");
+    assert.equal(loss12?.toTeam, 2, "16R2: #12 loser → #19 team2");
+    assert.equal(win15?.toSlot, 3, "16R2: #15 winner → крест #19");
+    assert.equal(win15?.toTeam, 1, "16R2: #15 winner → #19 team1");
+    const loss21 = r2Links.find(
+      (l) => l.fromRound === 3 && l.fromSlot === 5 && l.kind === "loss",
+    );
+    const win23 = r2Links.find(
+      (l) => l.fromRound === 4 && l.fromSlot === 1 && l.kind === "win",
+    );
+    assert.equal(loss21?.toTeam, 2, "16R2: #21 loser → #25 team2");
+    assert.equal(win23?.toTeam, 1, "16R2: #23 winner → #25 team1");
+  }
+  assert.equal(
+    r2Links.some(
+      (l) => l.fromRound === 4 && l.fromSlot === 3 && l.toRound === 5 && l.toSlot === 2,
+    ),
+    true,
+    "16R2: #25 → полуфинал #28",
+  );
+}
+{
+  const tpl16R2ForNo = buildFixedSwissTemplate(16, "FIXED_SWISS_16R2_1_3_mesto");
+  const r2Matches = tpl16R2ForNo.matches;
+  assert.equal(fixedSwissMatchNo(4, 3, 30, 6, r2Matches), 25, "16R2: #25 нижний тур 4");
+  assert.equal(fixedSwissMatchNo(5, 1, 30, 6, r2Matches), 27, "16R2: #27 полуфинал");
+  assert.equal(fixedSwissMatchNo(6, 2, 30, 6, r2Matches), 30, "16R2: #30 bronze");
+}
+assertProtocolPlace(30, "winner", 30, { place: 3 }, 6);
+assertProtocolPlace(27, "loser", 30, null, 6);
+assert.equal(fixedSwissTs16R2ElimPlacementByMatchNo(27, true), "полуфинал");
+assert.equal(fixedSwissTs16R2ElimPlacementByMatchNo(25, true), "место 5–6");
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 5, 5, 30, 6),
+  true,
+  "16R2 SVG: #9 → #21",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 6, 5, 30, 6),
+  true,
+  "16R2 SVG: #10 → #21",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 7, 6, 30, 6),
+  true,
+  "16R2 SVG: #11 → #22",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 8, 6, 30, 6),
+  true,
+  "16R2 SVG: #12 → #22",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 5, 1, 30, 6),
+  true,
+  "16R2 SVG: #21 → #27",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 6, 2, 30, 6),
+  true,
+  "16R2 SVG: #22 → #28",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 1, 1, 30, 6),
+  true,
+  "16R2 SVG: #17 → #23",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 2, 1, 30, 6),
+  true,
+  "16R2 SVG: #18 → #23",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 3, 2, 30, 6),
+  true,
+  "16R2 SVG: #19 → #24",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 4, 2, 30, 6),
+  true,
+  "16R2 SVG: #20 → #24",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-3, -4, 4, 4, "win", 1, 3, 30, 6),
+  true,
+  "16R2 SVG: #23 → #25",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-3, -4, 4, 4, "win", 2, 4, 30, 6),
+  true,
+  "16R2 SVG: #24 → #26",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-4, 3, 4, 5, "win", 3, 2, 30, 6),
+  false,
+  "16R2 SVG: #25 → #28 — только подпись",
+);
+assert.equal(
+  shouldDrawFixedSwissWinEdge(-4, 3, 4, 5, "win", 4, 1, 30, 6),
+  false,
+  "16R2 SVG: #26 → #27 — только подпись",
+);
+assert.equal(
+  isFixedSwissForkEdge(3, 4, 30, 1, 1, 6),
+  true,
+  "16R2: крест #17+#18 → #23 — вилка",
+);
+assert.equal(
+  isFixedSwissForkEdge(2, 3, 30, 5, 5, 6),
+  true,
+  "16R2: #9+#10 → #21 fork",
+);
+assert.equal(
+  isFixedSwissForkEdge(3, 5, 30, 5, 1, 6),
+  false,
+  "16R2: #21 → #27 — прямая, не вилка",
+);
+assert.equal(
+  isFixedSwissForkEdge(4, 5, 30, 3, 2, 6),
+  false,
+  "16R2: #25 → #28 — прямая, не вилка",
+);
+assert.equal(
+  isFixedSwissForkEdge(5, 6, 30, 1, 1, 6),
+  true,
+  "16R2: полуфинал → финал — вилка",
+);
+{
+  const tpl16R2Path = buildFixedSwissTemplate(16, "FIXED_SWISS_16R2_1_3_mesto");
+  const grid16R2Path = tpl16R2Path.matches.map((m) => mkMatch(m.round, m.slot));
+  const layout16R2Path = buildFixedSwissBracketLayout(grid16R2Path);
+  const fromPos = layout16R2Path.positions.get("r4s3")!;
+  const toPos = layout16R2Path.positions.get("r5s2")!;
+  const pts = gridFixedEdgePoints(
+    fromPos,
+    toPos,
+    1,
+    1,
+    "win",
+    layout16R2Path.minCol,
+    layout16R2Path.cardDisplay,
+  );
+  const path = gridFixedLegacy29FarSemiConnectorPath(
+    pts.from,
+    pts.to,
+    fromPos.col,
+    toPos.col,
+    layout16R2Path.minCol,
+    layout16R2Path.colWidth ?? 900,
+    0,
+  );
+  assert.match(path, /V 713 H 456/, "16R2: #25→#28 — ступени на Y полуфинала");
+  assert.doesNotMatch(path, /V 713 H 1622/, "16R2: #25→#28 — без одной длинной горизонтали");
+  assert.doesNotMatch(path, /^M [\d.]+ 257 V 713/, "16R2: #25→#28 — сначала в gutter, не вертикаль с карточки");
+  const pathLane1 = gridFixedLegacy29FarSemiConnectorPath(
+    pts.from,
+    pts.to,
+    fromPos.col,
+    toPos.col,
+    layout16R2Path.minCol,
+    layout16R2Path.colWidth ?? 900,
+    1,
+  );
+  assert.match(pathLane1, /H [\d.]+ V 713/, "16R2: #25→#28 lane1 — горизонталь в gutter перед вертикалью");
+}
+assert.equal(
+  shouldDrawFixedSwissWinEdge(3, 4, 5, 6, "win", 1, 1, 30, 6),
+  true,
+  "16R2 SVG: semi → final",
+);
+{
+  const tpl16R2 = buildFixedSwissTemplate(16, "FIXED_SWISS_16R2_1_3_mesto");
+  const grid16R2 = tpl16R2.matches.map((m) => mkMatch(m.round, m.slot));
+  const layout16R2 = buildFixedSwissBracketLayout(grid16R2);
+  assert.ok(Number.isFinite(layout16R2.totalHeight), "16R2 layout height finite");
+  assert.equal(layout16R2.positions.size, 30, "16R2 layout: 30 positions");
+  assert.equal(layout16R2.minCol, -4, "16R2 layout minCol");
+  assert.equal(layout16R2.maxCol, 4, "16R2 layout maxCol");
+  assert.equal(
+    layout16R2.positions.get("r3s1")!.y,
+    layout16R2.positions.get("r2s1")!.y,
+    "16R2: #17 opposite #13",
+  );
+  assert.equal(
+    layout16R2.positions.get("r3s2")!.y,
+    layout16R2.positions.get("r2s2")!.y,
+    "16R2: #18 opposite #14",
+  );
+  assert.equal(
+    layout16R2.positions.get("r3s3")!.y,
+    layout16R2.positions.get("r2s3")!.y,
+    "16R2: #19 opposite #15",
+  );
+  assert.equal(
+    layout16R2.positions.get("r3s4")!.y,
+    layout16R2.positions.get("r2s4")!.y,
+    "16R2: #20 opposite #16",
+  );
+  assert.equal(
+    layout16R2.positions.get("r4s3")!.y,
+    layout16R2.positions.get("r4s1")!.y,
+    "16R2: #25 opposite #23",
+  );
+  assert.equal(
+    layout16R2.positions.get("r4s4")!.y,
+    layout16R2.positions.get("r4s2")!.y,
+    "16R2: #26 opposite #24",
+  );
+}
 assert.equal(
   buildFixedSwissTemplate(8, "FIXED_SWISS_8R4_1_3_mesto").matches.length,
   14,
@@ -391,6 +637,11 @@ assert.equal(
   "cross #18 same Y as lower #14",
 );
 assert.equal(
+  layoutTs.positions.get("r3s3")!.y,
+  layoutTs.positions.get("r2s3")!.y,
+  "cross #19 same Y as lower #15",
+);
+assert.equal(
   layoutTs.positions.get("r3s4")!.y,
   layoutTs.positions.get("r2s4")!.y,
   "cross #20 same Y as lower #16",
@@ -603,7 +854,11 @@ const win13 = forkPath(layoutTs, "r1s1", "win", r12Trunk);
 const loss13 = forkPath(layoutTs, "r1s1", "loss", r12Trunk);
 
 for (const d of [win13, loss13]) {
-  assert.match(d, /^M [\d.]+ [\d.]+ H [\d.]+ V [\d.]+ V [\d.]+ H [\d.]+$/, "R12 stepped path");
+  assert.match(
+    d,
+    /^M [\d.]+ [\d.]+ H [\d.]+ V [\d.]+( V [\d.]+)? H [\d.]+$/,
+    "R12 fork path",
+  );
 }
 assert.ok(win13.includes(`V ${r12Trunk.get("r2s5")}`), "win uses shared trunk");
 
@@ -2256,11 +2511,15 @@ assert.equal(
     layout64.colWidth ?? FIXED_SWISS_COL_W,
     0,
   );
-  assert.match(
-    path85109,
-    new RegExp(`V ${pts85109.to.y} H \\d+$`),
-    "#85→#109 reaches #109 Y",
-  );
+  if (pts85109.from.y === pts85109.to.y) {
+    assert.match(path85109, /^M \d+ [\d.]+ H \d+$/, "#85→#109 same Y — прямая");
+  } else {
+    assert.match(
+      path85109,
+      new RegExp(`V ${pts85109.to.y} H \\d+$`),
+      "#85→#109 reaches #109 Y",
+    );
+  }
   const pts4585 = gridFixedEdgePoints(
     layout64.positions.get("r2s13")!,
     layout64.positions.get("r3s21")!,
@@ -3680,7 +3939,11 @@ assert.equal(
     FIXED_SWISS_COL_W,
     13,
   );
-  assert.match(path445, /^M [\d.]+ [\d.]+ H [\d.]+ V [\d.]+ H/, "#445→#461 short H–V–H");
+  if (pts445.from.y === pts445.to.y) {
+    assert.match(path445, /^M [\d.]+ [\d.]+ H [\d.]+$/, "#445→#461 same Y — прямая");
+  } else {
+    assert.match(path445, /^M [\d.]+ [\d.]+ H [\d.]+ V [\d.]+ H/, "#445→#461 short H–V–H");
+  }
   assert.doesNotMatch(path445, /V \d+ V/, "#445→#461 no fork trunk bus");
   const p481 = layout256.positions.get("r6s1");
   const p465 = layout256.positions.get("r5s17");

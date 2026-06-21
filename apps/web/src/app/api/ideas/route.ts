@@ -12,6 +12,8 @@ function serializeIdea(
     id: string;
     title: string;
     body: string;
+    titleEn?: string | null;
+    bodyEn?: string | null;
     status: string;
     clubId: string | null;
     likesCount: number;
@@ -28,6 +30,8 @@ function serializeIdea(
     id: idea.id,
     title: idea.title,
     body: idea.body,
+    titleEn: idea.titleEn ?? null,
+    bodyEn: idea.bodyEn ?? null,
     clubId: idea.clubId,
     clubName: idea.club?.name ?? null,
     status: idea.status,

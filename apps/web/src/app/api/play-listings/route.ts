@@ -16,6 +16,7 @@ import {
   resolveGeoForPlayer,
 } from "@/lib/public-queries";
 import type { GeoSearchParams } from "@/lib/site";
+import { syncLocalizedTitleBody } from "@/lib/translation";
 import { playListingCreateSchema } from "@/lib/validators";
 
 export async function GET(request: NextRequest) {
@@ -138,13 +139,20 @@ export async function POST(request: NextRequest) {
       playAt,
     });
 
+    const localized = await syncLocalizedTitleBody({
+      title: data.title,
+      body: data.body,
+    });
+
     const listing = await prisma.playListing.create({
       data: {
         authorId: player.id,
         cityId: data.cityId,
         clubId: data.clubId || null,
-        title: data.title.trim(),
-        body: data.body?.trim() || null,
+        title: localized.title,
+        body: localized.body,
+        titleEn: localized.titleEn,
+        bodyEn: localized.bodyEn,
         kind: data.kind,
         scheduleType: data.scheduleType,
         playAt,

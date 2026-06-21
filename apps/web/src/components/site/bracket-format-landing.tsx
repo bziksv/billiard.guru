@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { BracketFormatDemoPreview } from "@/components/site/bracket-format-demo-preview";
 import { GuideExampleBlock } from "@/components/site/guide-sections";
 import { PageHeader, PageMain } from "@/components/site/page-header";
@@ -7,44 +8,74 @@ import {
   buildBracketFormatDemo,
   isLargeBracketDemo,
 } from "@/lib/bracket-formats/demo-bracket";
-import type { PublicBracketFormat } from "@/lib/bracket-formats/public-formats";
 import {
-  BRACKET_PLATFORM_FEATURES,
-  bracketFormatDisplayLabel,
-} from "@/lib/bracket-formats/seo";
+  bracketFormatCardTitle,
+  bracketFormatParticipantBadge,
+  bracketIndexTeaser,
+  getBracketsIndexContent,
+} from "@/lib/bracket-formats/get-brackets-index-content";
+import {
+  getLocalizedBracketAdminLabel,
+  getLocalizedBracketGuideSection,
+  getLocalizedBracketShortDescription,
+  localizeParticipantRules,
+  localizedBracketSeoEntry,
+} from "@/lib/bracket-formats/get-bracket-format-display";
+import type { PublicBracketFormat } from "@/lib/bracket-formats/public-formats";
+import { bracketFormatDisplayLabel } from "@/lib/bracket-formats/seo";
 import { TOURNAMENT_BRACKETS_SECTIONS } from "@/lib/tournament-brackets-guide";
+import type { AppLocale } from "@/i18n/routing";
 
-export function BracketFormatLanding({
+export async function BracketFormatLanding({
   format,
   relatedFormats,
 }: {
   format: PublicBracketFormat;
   relatedFormats: PublicBracketFormat[];
 }) {
-  const { definition, seo, participantRules, guideSection } = format;
-  const demoMatches = buildBracketFormatDemo(definition.code, definition.pairing);
+  const locale = (await getLocale()) as AppLocale;
+  const t = await getTranslations("brackets.landing");
+  const { platformFeatures } = getBracketsIndexContent(locale);
+
+  const { definition } = format;
+  const seo = localizedBracketSeoEntry(locale, format.seo);
+  const participantRules = localizeParticipantRules(locale, format.participantRules);
+  const guideSection =
+    getLocalizedBracketGuideSection(locale, definition.guideSectionId) ?? format.guideSection;
+  const adminLabel = getLocalizedBracketAdminLabel(
+    locale,
+    definition.code,
+    bracketFormatDisplayLabel(definition.code),
+  );
+  const shortDescription = getLocalizedBracketShortDescription(
+    locale,
+    definition.code,
+    definition.shortDescription,
+  );
+
+  const demoMatches = buildBracketFormatDemo(definition.code, definition.pairing, locale);
   const structureDiagram =
     guideSection?.examples?.find((e) => e.diagram)?.diagram ??
     TOURNAMENT_BRACKETS_SECTIONS.find(
-      (s) => s.format === definition.code || s.id === definition.guideSectionId?.replace(/-bronze$/, ""),
+      (s) =>
+        s.format === definition.code ||
+        s.id === definition.guideSectionId?.replace(/-bronze$/, ""),
     )?.examples?.find((e) => e.diagram)?.diagram ??
     null;
-  const compactDemoMatches =
-    isLargeBracketDemo(demoMatches)
-      ? buildBracketFormatDemo("FIXED_SWISS_32R8_2_3_mesta", definition.pairing)
-      : null;
+  const compactDemoMatches = isLargeBracketDemo(demoMatches)
+    ? buildBracketFormatDemo("FIXED_SWISS_32R8_2_3_mesta", definition.pairing, locale)
+    : null;
   const compactDemoFormat = "FIXED_SWISS_32R8_2_3_mesta";
-  const adminLabel = bracketFormatDisplayLabel(definition.code);
 
   return (
     <>
       <PageHeader title={seo.pageTitle} lead={seo.lead}>
         <div className="flex flex-wrap gap-3">
           <Link href="/login?next=/cabinet" className="site-btn-primary shrink-0">
-            Создать турнир
+            {t("create")}
           </Link>
           <Link href="/tournaments" className="site-btn-secondary shrink-0">
-            Смотреть турниры
+            {t("tournaments")}
           </Link>
         </div>
       </PageHeader>
@@ -53,13 +84,13 @@ export function BracketFormatLanding({
         <div className="flex flex-wrap gap-2">
           <span className="bracket-format-chip">{seo.participantBadge}</span>
           <span className="bracket-format-chip bracket-format-chip-muted">
-            {definition.pairing === "pair" ? "Парный турнир" : "Одиночный"}
+            {definition.pairing === "pair" ? t("pairEvent") : t("singleEvent")}
           </span>
           <span className="bracket-format-chip bracket-format-chip-muted">{adminLabel}</span>
         </div>
 
         <SiteCard className="bracket-format-demo-card">
-          <h2 className="site-section-title text-xl">Схема сетки</h2>
+          <h2 className="site-section-title text-xl">{t("diagramTitle")}</h2>
           <p className="guide-body-text mt-2 text-sm leading-relaxed">{seo.lead}</p>
           <div className="mt-5">
             <BracketFormatDemoPreview
@@ -100,12 +131,10 @@ export function BracketFormatLanding({
 
         {!guideSection && (
           <SiteCard>
-            <h2 className="site-section-title text-xl">О формате</h2>
+            <h2 className="site-section-title text-xl">{t("aboutTitle")}</h2>
+            <p className="guide-body-text mt-3 text-sm leading-relaxed">{shortDescription}</p>
             <p className="guide-body-text mt-3 text-sm leading-relaxed">
-              {definition.shortDescription}
-            </p>
-            <p className="guide-body-text mt-3 text-sm leading-relaxed">
-              Участников: {participantRules.label}. {participantRules.hint}
+              {t("participants")}: {participantRules.label}. {participantRules.hint}
             </p>
           </SiteCard>
         )}
@@ -113,27 +142,26 @@ export function BracketFormatLanding({
         <SiteCard className="bracket-format-cta">
           <div className="bracket-format-cta-inner">
             <div>
-              <h2 className="site-section-title text-xl">Проведите турнир на billiard.guru</h2>
+              <h2 className="site-section-title text-xl">{t("ctaTitle")}</h2>
               <p className="guide-body-text mt-2 max-w-2xl text-sm leading-relaxed">
-                Зарегистрируйтесь, создайте событие и выберите формат «{adminLabel}». Сетка
-                сформируется автоматически — останется принимать заявки и вносить результаты.
+                {t("ctaLead", { format: adminLabel })}
               </p>
             </div>
             <div className="flex shrink-0 flex-wrap gap-3">
               <Link href="/login?next=/cabinet" className="site-btn-primary">
-                Регистрация бесплатно
+                {t("ctaRegister")}
               </Link>
               <Link href="/brackets" className="site-btn-secondary">
-                Все форматы сеток
+                {t("ctaAllFormats")}
               </Link>
             </div>
           </div>
         </SiteCard>
 
         <section>
-          <h2 className="site-section-title mb-4 text-xl">Возможности платформы</h2>
+          <h2 className="site-section-title mb-4 text-xl">{t("platformTitle")}</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {BRACKET_PLATFORM_FEATURES.map((feature) => (
+            {platformFeatures.map((feature) => (
               <SiteCard key={feature.title} className="h-full">
                 <h3 className="font-semibold">{feature.title}</h3>
                 <p className="guide-body-text mt-2 text-sm leading-relaxed">{feature.text}</p>
@@ -144,7 +172,7 @@ export function BracketFormatLanding({
 
         {relatedFormats.length > 0 && (
           <section>
-            <h2 className="site-section-title mb-4 text-xl">Другие форматы сеток</h2>
+            <h2 className="site-section-title mb-4 text-xl">{t("relatedTitle")}</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {relatedFormats.map((related) => (
                 <Link
@@ -154,11 +182,15 @@ export function BracketFormatLanding({
                 >
                   <SiteCard className="h-full transition-colors hover:border-emerald-700/50">
                     <span className="bracket-format-chip text-xs">
-                      {related.seo.participantBadge}
+                      {bracketFormatParticipantBadge(locale, related)}
                     </span>
-                    <h3 className="mt-3 font-semibold leading-snug">{related.seo.pageTitle}</h3>
+                    <h3 className="mt-3 font-semibold leading-snug">
+                      {bracketFormatCardTitle(locale, related)}
+                    </h3>
                     <p className="guide-body-text mt-2 line-clamp-2 text-sm">
-                      {related.definition.shortDescription}
+                      {locale === "en"
+                        ? bracketIndexTeaser(locale, related)
+                        : related.definition.shortDescription}
                     </p>
                   </SiteCard>
                 </Link>

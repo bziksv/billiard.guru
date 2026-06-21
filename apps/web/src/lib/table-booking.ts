@@ -64,7 +64,11 @@ export function clubBookableFormats(club: ClubBookingContext): ClubTableFormatId
   return clubBookingFormatEntries(club.tableCounts, club.floorPlan).map((e) => e.id);
 }
 
-export function clubBookingFormatEntries(tableCounts: unknown, floorPlanRaw: unknown) {
+export function clubBookingFormatEntries(
+  tableCounts: unknown,
+  floorPlanRaw: unknown,
+  locale: "ru" | "en" = "ru",
+) {
   const plan = parseFloorPlan(floorPlanRaw);
   const counts = parseClubTableCounts(tableCounts);
   return CLUB_TABLE_FORMATS.filter((f) => {
@@ -76,19 +80,25 @@ export function clubBookingFormatEntries(tableCounts: unknown, floorPlanRaw: unk
     const fromProfile = counts[f.id] ?? 0;
     return {
       id: f.id,
-      label: f.label,
+      label: clubTableFormatLabel(f.id, locale),
       count: onPlan > 0 ? onPlan : fromProfile,
     };
   });
 }
 
-export function formatBookingRange(startsAt: Date, endsAt: Date, timeZone = BOOKING_TIMEZONE) {
-  const dateFmt = new Intl.DateTimeFormat("ru-RU", {
+export function formatBookingRange(
+  startsAt: Date,
+  endsAt: Date,
+  locale: "ru" | "en" = "ru",
+  timeZone = BOOKING_TIMEZONE,
+) {
+  const intlLocale = locale === "en" ? "en-US" : "ru-RU";
+  const dateFmt = new Intl.DateTimeFormat(intlLocale, {
     day: "numeric",
     month: "long",
     timeZone,
   });
-  const timeFmt = new Intl.DateTimeFormat("ru-RU", {
+  const timeFmt = new Intl.DateTimeFormat(intlLocale, {
     hour: "2-digit",
     minute: "2-digit",
     timeZone,
@@ -452,13 +462,17 @@ function formatSlotLabel(startsAt: Date, endsAt: Date) {
   return `${fmt.format(startsAt)} – ${fmt.format(endsAt)}`;
 }
 
-export function bookingDateOptions(advanceDays: number, now = new Date()) {
+export function bookingDateOptions(
+  advanceDays: number,
+  locale: "ru" | "en" = "ru",
+  now = new Date(),
+) {
   const options: Array<{ value: string; label: string }> = [];
   const start = startOfDayInZone(now);
   for (let i = 0; i <= advanceDays; i++) {
     const day = addDays(start, i);
     const value = formatDateInZone(day);
-    const label = new Intl.DateTimeFormat("ru-RU", {
+    const label = new Intl.DateTimeFormat(locale === "en" ? "en-US" : "ru-RU", {
       weekday: "short",
       day: "numeric",
       month: "short",

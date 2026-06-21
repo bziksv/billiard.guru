@@ -1,15 +1,20 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
+import { LocalizedUserText } from "@/components/site/localized-user-text";
 import { EmptyState, SiteCard } from "@/components/site/site-card";
-import { IDEA_STATUS_LABELS } from "@/lib/validators";
+import type { AppLocale } from "@/i18n/routing";
+import { resolveLocalizedField } from "@/lib/localized-db-text";
 
 interface IdeaView {
   id: string;
   title: string;
   body: string;
+  titleEn?: string | null;
+  bodyEn?: string | null;
   status: string;
   clubId?: string | null;
   clubName?: string | null;
@@ -23,6 +28,17 @@ interface IdeaView {
 
 type Tab = "ideas" | "submit" | "mine";
 
+function ideaStatusLabel(
+  status: string,
+  t: ReturnType<typeof useTranslations<"pages.ideas.client">>,
+) {
+  if (status === "PENDING") return t("status.PENDING");
+  if (status === "APPROVED") return t("status.APPROVED");
+  if (status === "REJECTED") return t("status.REJECTED");
+  if (status === "UNPUBLISHED") return t("status.UNPUBLISHED");
+  return status;
+}
+
 export function IdeasPageClient({
   isLoggedIn,
   isVerified,
@@ -30,6 +46,8 @@ export function IdeasPageClient({
   isLoggedIn: boolean;
   isVerified: boolean;
 }) {
+  const t = useTranslations("pages.ideas.client");
+  const locale = useLocale() as AppLocale;
   const [tab, setTab] = useState<Tab>("ideas");
   const [approved, setApproved] = useState<IdeaView[]>([]);
   const [mine, setMine] = useState<IdeaView[]>([]);
@@ -58,7 +76,7 @@ export function IdeasPageClient({
     setSubmitError(null);
     setSubmitMessage(null);
     if (!consentAccepted) {
-      setSubmitError("Подтвердите согласие на обработку персональных данных");
+      setSubmitError(t("consentRequired"));
       return;
     }
     setSubmitting(true);
@@ -70,12 +88,12 @@ export function IdeasPageClient({
     const data = await res.json();
     setSubmitting(false);
     if (!res.ok) {
-      setSubmitError(data.error ?? "Ошибка отправки");
+      setSubmitError(data.error ?? t("submitError"));
       return;
     }
     setTitle("");
     setBody("");
-    setSubmitMessage("Идея отправлена на модерацию. Мы уведомим вас в Telegram после проверки.");
+    setSubmitMessage(t("submitSuccess"));
     setTab("mine");
     await reload();
   }
@@ -91,7 +109,7 @@ export function IdeasPageClient({
     const data = await res.json();
     setVotingId(null);
     if (!res.ok) {
-      alert(data.error ?? "Не удалось проголосовать");
+      alert(data.error ?? t("submitError"));
       return;
     }
     setApproved((list) =>
@@ -117,18 +135,20 @@ export function IdeasPageClient({
     <div className="space-y-6">
       <div className="home-tab-bar inline-flex flex-wrap gap-1 rounded-xl p-1">
         <button type="button" onClick={() => setTab("ideas")} className={tabClass(tab === "ideas")}>
-          Идеи{approved.length > 0 ? ` (${approved.length})` : ""}
+          {t("tabIdeas")}
+          {approved.length > 0 ? ` (${approved.length})` : ""}
         </button>
         <button
           type="button"
           onClick={() => setTab("submit")}
           className={tabClass(tab === "submit")}
         >
-          Предложить
+          {t("tabSubmit")}
         </button>
         {isLoggedIn && (
           <button type="button" onClick={() => setTab("mine")} className={tabClass(tab === "mine")}>
-            Мои{mine.length > 0 ? ` (${mine.length})` : ""}
+            {t("tabMine")}
+            {mine.length > 0 ? ` (${mine.length})` : ""}
           </button>
         )}
       </div>
@@ -136,21 +156,22 @@ export function IdeasPageClient({
       {tab === "ideas" && (
         <section className="space-y-4">
           {loading ? (
-            <p className="text-sm text-zinc-500">Загрузка…</p>
+            <p className="text-sm text-zinc-500">{t("loading")}</p>
           ) : approved.length === 0 ? (
-            <EmptyState
-              title="Пока нет опубликованных идей"
-              description="Станьте первым — предложите улучшение для billiard.guru"
-            />
+            <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
           ) : (
             approved.map((idea) => (
               <SiteCard key={idea.id}>
-                <h2 className="text-lg font-semibold text-zinc-100">{idea.title}</h2>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-300">{idea.body}</p>
+                <h2 className="text-lg font-semibold text-zinc-100">
+                  {resolveLocalizedField(locale, idea.title, idea.titleEn)}
+                </h2>
+                <div className="mt-2 text-sm text-zinc-300">
+                  <LocalizedUserText text={idea.body} textEn={idea.bodyEn} />
+                </div>
                 <p className="mt-3 text-xs text-zinc-500">
                   {idea.clubName ? (
                     <>
-                      <span className="text-amber-400/90">Клуб «{idea.clubName}»</span>
+                      <span className="text-amber-400/90">{t("clubAuthor", { club: idea.clubName })}</span>
                       {" · "}
                       {idea.author.lastName} {idea.author.firstName}
                     </>
@@ -177,7 +198,7 @@ export function IdeasPageClient({
                   />
                   {!isLoggedIn && (
                     <Link href="/login?next=/ideas" className="text-xs text-emerald-400 hover:underline">
-                      Войдите, чтобы голосовать
+                      {t("loginToVote")}
                     </Link>
                   )}
                 </div>
@@ -191,28 +212,26 @@ export function IdeasPageClient({
         <SiteCard>
           {!isLoggedIn ? (
             <div className="space-y-3 text-sm text-zinc-400">
-              <p>Предлагать идеи могут зарегистрированные игроки.</p>
+              <p>{t("loginRequired")}</p>
               <Link href="/login?next=/ideas" className="text-emerald-400 hover:underline">
-                Войти
+                {t("login")}
               </Link>
             </div>
           ) : !isVerified ? (
-            <p className="text-sm text-amber-400/90">
-              Подтвердите регистрацию в Telegram — после этого можно отправлять идеи.
-            </p>
+            <p className="text-sm text-amber-400/90">{t("verifyRequired")}</p>
           ) : (
             <div className="space-y-4">
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Заголовок идеи"
+                placeholder={t("titlePlaceholder")}
                 maxLength={120}
                 className="w-full rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
               />
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                placeholder="Опишите идею: что улучшить, зачем это нужно сообществу"
+                placeholder={t("bodyPlaceholder")}
                 rows={6}
                 maxLength={2000}
                 className="w-full resize-y rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm"
@@ -235,7 +254,7 @@ export function IdeasPageClient({
                 onClick={submitIdea}
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
               >
-                {submitting ? "Отправка…" : "Отправить на модерацию"}
+                {submitting ? t("submitting") : t("submit")}
               </button>
             </div>
           )}
@@ -245,24 +264,30 @@ export function IdeasPageClient({
       {tab === "mine" && isLoggedIn && (
         <section className="space-y-4">
           {mine.length === 0 ? (
-            <EmptyState title="Вы ещё не предлагали идей" />
+            <EmptyState title={t("mineEmpty")} />
           ) : (
             mine.map((idea) => (
               <SiteCard key={idea.id}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h2 className="font-semibold text-zinc-100">{idea.title}</h2>
+                  <h2 className="font-semibold text-zinc-100">
+                    {resolveLocalizedField(locale, idea.title, idea.titleEn)}
+                  </h2>
                   <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
-                    {IDEA_STATUS_LABELS[idea.status] ?? idea.status}
+                    {ideaStatusLabel(idea.status, t)}
                   </span>
                 </div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-zinc-300">{idea.body}</p>
+                <div className="mt-2 text-sm text-zinc-300">
+                  <LocalizedUserText text={idea.body} textEn={idea.bodyEn} />
+                </div>
                 {idea.status === "APPROVED" && (
                   <p className="mt-3 text-xs text-zinc-500">
                     👍 {idea.likesCount} · 👎 {idea.dislikesCount}
                   </p>
                 )}
                 {idea.status === "REJECTED" && idea.rejectReason && (
-                  <p className="mt-2 text-xs text-red-400/90">Причина: {idea.rejectReason}</p>
+                  <p className="mt-2 text-xs text-red-400/90">
+                    {t("rejectReason", { reason: idea.rejectReason })}
+                  </p>
                 )}
               </SiteCard>
             ))

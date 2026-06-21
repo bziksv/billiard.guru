@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "next-intl";
 import {
   groupMatchesByRound,
   type BracketMatchView,
@@ -11,6 +14,8 @@ import {
   isOlympicFormat,
 } from "@/lib/pair-tournament";
 import { mapBracketMatchesByExcelNo } from "@/lib/excel-bracket-match-map";
+import { getBracketUILabels } from "@/lib/bracket-view-labels";
+import type { AppLocale } from "@/i18n/routing";
 import { ExcelBracketView } from "@/components/bracket/excel-bracket-view";
 import { BracketMatchCard } from "@/components/bracket/bracket-match-card";
 import { OlympicBracketView } from "@/components/bracket/olympic-bracket-view";
@@ -27,25 +32,28 @@ export function TournamentBracket({
   showCardHandicap = true,
   showCardPlacement = true,
   presentation = false,
+  uiLocale: uiLocaleProp,
 }: {
   format: string;
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
   handicapHalfStep?: boolean;
-  /** Лендинг / демо: без вертикального центрирования огромных сеток */
   demoPreview?: boolean;
-  /** Таблица мест над сеткой (на странице турнира — в протоколе). */
   showStandings?: boolean;
   showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
-  /** Полноэкранный режим: сетка на всю высоту. */
   presentation?: boolean;
+  uiLocale?: AppLocale;
 }) {
+  const locale = useLocale() as AppLocale;
+  const uiLocale = uiLocaleProp ?? locale;
+  const labels = getBracketUILabels(uiLocale);
+
   if (matches.length === 0) {
     return (
       <p className="rounded-xl border border-zinc-800 bg-zinc-950/50 px-4 py-8 text-center text-sm text-zinc-500">
-        Сетка ещё не сформирована.
+        {labels.notFormedShort}
       </p>
     );
   }
@@ -70,6 +78,7 @@ export function TournamentBracket({
         showCardHandicap={showCardHandicap}
         showCardPlacement={showCardPlacement}
         presentation={presentation}
+        uiLocale={uiLocale}
       />
     );
   }
@@ -85,6 +94,7 @@ export function TournamentBracket({
         showCardHandicap={showCardHandicap}
         showCardPlacement={showCardPlacement}
         presentation={presentation}
+        uiLocale={uiLocale}
       />
     );
   }
@@ -99,6 +109,7 @@ export function TournamentBracket({
         showCardHandicap={showCardHandicap}
         showCardPlacement={showCardPlacement}
         presentation={presentation}
+        uiLocale={uiLocale}
       />
     );
   }
@@ -110,7 +121,7 @@ export function TournamentBracket({
         {rounds.map(({ round, matches: roundMatches }) => (
           <div key={round} className="flex w-60 flex-col gap-3">
             <p className="text-xs font-semibold uppercase text-zinc-500">
-              Раунд {round}
+              {labels.round(round)}
             </p>
             {roundMatches.map((match) => (
               <BracketMatchCard
@@ -118,6 +129,7 @@ export function TournamentBracket({
                 match={match}
                 handicapHalfStep={handicapHalfStep}
                 showCardHandicap={showCardHandicap}
+                uiLocale={uiLocale}
               />
             ))}
           </div>

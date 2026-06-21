@@ -15,12 +15,18 @@ interface SearchableSelectProps {
   onChange: (value: string) => void;
   placeholder?: string;
   searchPlaceholder?: string;
+  emptyMessage?: string;
   disabled?: boolean;
   required?: boolean;
   name?: string;
   label?: string;
   labelClassName?: string;
   className?: string;
+  inputClassName?: string;
+  dropdownClassName?: string;
+  optionClassName?: string;
+  selectedOptionClassName?: string;
+  emptyClassName?: string;
 }
 
 export function SearchableSelect({
@@ -29,12 +35,18 @@ export function SearchableSelect({
   onChange,
   placeholder = "Выберите…",
   searchPlaceholder = "Поиск…",
+  emptyMessage = "Ничего не найдено",
   disabled = false,
   required = false,
   name,
   label,
   labelClassName,
   className,
+  inputClassName,
+  dropdownClassName,
+  optionClassName,
+  selectedOptionClassName,
+  emptyClassName,
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -72,6 +84,7 @@ export function SearchableSelect({
     onChange(option.value);
     setOpen(false);
     setQuery("");
+    inputRef.current?.blur();
   }
 
   return (
@@ -118,16 +131,28 @@ export function SearchableSelect({
               }
             }
           }}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          className={
+            inputClassName ??
+            "w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          }
         />
         {open && !disabled && (
           <ul
             id={listId}
             role="listbox"
-            className="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
+            className={
+              dropdownClassName ??
+              "absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
+            }
           >
             {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-zinc-500">Ничего не найдено</li>
+              <li
+                className={
+                  emptyClassName ?? "px-3 py-2 text-sm text-zinc-500"
+                }
+              >
+                {emptyMessage}
+              </li>
             ) : (
               filtered.map((option) => (
                 <li key={option.value}>
@@ -137,15 +162,22 @@ export function SearchableSelect({
                     aria-selected={option.value === value}
                     aria-disabled={option.disabled || undefined}
                     disabled={option.disabled}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => select(option)}
-                    className={`w-full px-3 py-2 text-left text-sm ${
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      select(option);
+                    }}
+                    className={
                       option.disabled
-                        ? "cursor-not-allowed text-zinc-500 opacity-60"
+                        ? optionClassName
+                          ? `${optionClassName} cursor-not-allowed opacity-60`
+                          : "w-full cursor-not-allowed px-3 py-2 text-left text-sm text-zinc-500 opacity-60"
                         : option.value === value
-                          ? "bg-zinc-800 text-emerald-400"
-                          : "text-zinc-200 hover:bg-zinc-800"
-                    }`}
+                          ? (selectedOptionClassName ??
+                            "w-full bg-zinc-800 px-3 py-2 text-left text-sm text-emerald-400")
+                          : (optionClassName ??
+                            "w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-zinc-800")
+                    }
                   >
                     {option.label}
                   </button>

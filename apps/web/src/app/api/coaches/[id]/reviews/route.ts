@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { refreshCoachReviewStats, getCoachForReview } from "@/lib/coach-reviews-server";
 import { prisma } from "@/lib/prisma";
+import { translateText } from "@/lib/translation";
 import { ZodError } from "zod";
 import { coachReviewSchema } from "@/lib/validators";
 
@@ -51,6 +52,7 @@ export async function GET(_request: NextRequest, ctx: RouteCtx) {
         id: r.id,
         score: r.score,
         comment: r.comment,
+        commentEn: r.commentEn,
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt.toISOString(),
         rater: {
@@ -86,6 +88,7 @@ export async function POST(request: NextRequest, ctx: RouteCtx) {
     const body = await request.json();
     const data = coachReviewSchema.parse(body);
     const comment = data.comment?.trim() ? data.comment.trim() : null;
+    const commentEn = comment ? (await translateText(comment, "ru", "en")) ?? null : null;
 
     await prisma.coachRating.upsert({
       where: { coachId_raterId: { coachId, raterId: viewer.id } },
@@ -94,10 +97,12 @@ export async function POST(request: NextRequest, ctx: RouteCtx) {
         raterId: viewer.id,
         score: data.score,
         comment,
+        commentEn,
       },
       update: {
         score: data.score,
         comment,
+        commentEn,
       },
     });
 

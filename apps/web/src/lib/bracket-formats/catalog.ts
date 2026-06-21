@@ -2,6 +2,7 @@ import {
   FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_16_8_FORMAT_LABEL,
   FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_32_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_32_FORMAT_LABEL,
   FIXED_SWISS_32R8_BRONZE_FORMAT_LABEL,
@@ -23,6 +24,7 @@ export type BracketFormatCode =
   | "FIXED_SWISS_8R4_1_3_mesto"
   | "FIXED_SWISS_16R4_2_3_mesta"
   | "FIXED_SWISS_16R4_1_3_mesto"
+  | "FIXED_SWISS_16R2_1_3_mesto"
   | "FIXED_SWISS_32R4_2_3_mesta"
   | "FIXED_SWISS_32R4_1_3_mesto"
   | "FIXED_SWISS_32R8_2_3_mesta"
@@ -172,6 +174,22 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     implementation: [
       "fixed-swiss-ts-grid.ts — buildFixedSwissTsTemplateForGridSize(16, true)",
       "fixed-swiss-layout.ts — buildTsPositions16Bronze",
+      "swiss-bracket-view.tsx",
+    ],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
+    code: "FIXED_SWISS_16R2_1_3_mesto",
+    adminLabel: FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    shortDescription:
+      "30 встреч, 9 колонок — нижний тур 4 (#25–#26), полуфинал #27–#28, финал #29, доп. #30 за 3–4.",
+    guideSectionId: "swiss-fixed-bronze",
+    docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
+    implementation: [
+      "fixed-swiss-ts-grid.ts — buildFixedSwissTs16R2ElimAtSemiBronzeTemplate",
+      "fixed-swiss-layout.ts — buildTsPositions16R2ElimAtSemiBronze",
       "swiss-bracket-view.tsx",
     ],
     testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",

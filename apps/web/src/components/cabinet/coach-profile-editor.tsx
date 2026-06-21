@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function CoachProfileEditor({ playerId }: { playerId: string }) {
+  const t = useTranslations("pages.cabinet");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -20,13 +22,13 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
     const data = await res.json();
     setLoading(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось загрузить");
+      setError(data.error ?? t("loadError"));
       return;
     }
     setIsCoach(Boolean(data.isCoach));
     setCoachBio(data.coachBio ?? "");
     setGallery(Array.isArray(data.coachGalleryUrls) ? data.coachGalleryUrls : []);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     void load();
@@ -48,13 +50,14 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
     const data = await res.json();
     setSaving(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось сохранить");
+      setError(data.error ?? t("saveError"));
       return;
     }
-    setIsCoach(Boolean(data.isCoach));
+    const savedCoach = Boolean(data.isCoach);
+    setIsCoach(savedCoach);
     setCoachBio(data.coachBio ?? "");
     setGallery(Array.isArray(data.coachGalleryUrls) ? data.coachGalleryUrls : []);
-    setMessage(isCoach ? "Профиль тренера сохранён" : "Вы больше не отображаетесь в каталоге тренеров");
+    setMessage(savedCoach ? t("coachSaved") : t("coachDisabled"));
   }
 
   async function onPhotoSelected(file: File | null) {
@@ -67,7 +70,7 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
     const data = await res.json();
     setUploading(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось загрузить фото");
+      setError(data.error ?? t("coachUploadFailed"));
       return;
     }
     setGallery(Array.isArray(data.coachGalleryUrls) ? data.coachGalleryUrls : []);
@@ -78,19 +81,19 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
   }
 
   if (loading) {
-    return <p className="text-sm text-zinc-500">Загрузка…</p>;
+    return <p className="text-sm text-zinc-500">{t("loading")}</p>;
   }
 
   return (
     <section className="site-card space-y-4 p-5">
       <div>
-        <h2 className="site-section-title text-lg">Профиль тренера</h2>
+        <h2 className="site-section-title text-lg">{t("coachTitle")}</h2>
         <p className="mt-1 text-sm text-zinc-500">
-          Если включено, вас увидят в{" "}
+          {t("coachLead")}{" "}
           <Link href="/coaches" className="text-emerald-600 hover:underline">
-            каталоге тренеров
+            {t("coachCatalogLink")}
           </Link>{" "}
-          с рейтингом и описанием.
+          {t("coachLeadSuffix")}
         </p>
       </div>
 
@@ -102,29 +105,27 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
           className="mt-1"
         />
         <span>
-          <span className="font-medium">Я тренирую</span>
-          <span className="mt-0.5 block text-zinc-500">
-            Показывать мою карточку на странице тренеров
-          </span>
+          <span className="font-medium">{t("coachToggle")}</span>
+          <span className="mt-0.5 block text-zinc-500">{t("coachToggleHint")}</span>
         </span>
       </label>
 
       {isCoach && (
         <>
           <label className="block text-sm">
-            <span className="mb-1 block font-medium">О себе (кратко в каталоге, полностью на странице)</span>
+            <span className="mb-1 block font-medium">{t("coachBioLabel")}</span>
             <textarea
               value={coachBio}
               onChange={(e) => setCoachBio(e.target.value)}
               rows={8}
               maxLength={8000}
-              placeholder="Опыт, дисциплины, формат занятий, цены, контакты…"
+              placeholder={t("coachBioPlaceholder")}
               className="site-input w-full resize-y"
             />
           </label>
 
           <div>
-            <p className="mb-2 text-sm font-medium">Фото</p>
+            <p className="mb-2 text-sm font-medium">{t("coachPhotos")}</p>
             <div className="flex flex-wrap gap-2">
               {gallery.map((url) => (
                 <div key={url} className="relative h-20 w-20 overflow-hidden rounded-lg border border-[var(--border-subtle)]">
@@ -134,7 +135,7 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
                     type="button"
                     onClick={() => removePhoto(url)}
                     className="absolute right-0.5 top-0.5 rounded bg-black/60 px-1 text-[10px] text-white"
-                    aria-label="Удалить"
+                    aria-label={t("coachRemovePhoto")}
                   >
                     ×
                   </button>
@@ -153,14 +154,14 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
                   e.target.value = "";
                 }}
               />
-              {uploading ? "Загрузка…" : "+ Добавить фото"}
+              {uploading ? t("coachUploading") : t("coachAddPhoto")}
             </label>
           </div>
 
           {isCoach && (
             <p className="text-xs text-zinc-500">
               <Link href={`/coaches/${playerId}`} className="text-emerald-600 hover:underline">
-                Открыть вашу страницу тренера
+                {t("coachOpenPage")}
               </Link>
             </p>
           )}
@@ -171,7 +172,7 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
       {message && <p className="text-sm text-emerald-600">{message}</p>}
 
       <button type="button" onClick={() => void save()} disabled={saving} className="site-btn-primary">
-        {saving ? "Сохранение…" : "Сохранить профиль тренера"}
+        {saving ? t("saving") : t("coachSave")}
       </button>
     </section>
   );

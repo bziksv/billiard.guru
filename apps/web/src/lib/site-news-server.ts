@@ -1,10 +1,13 @@
 import { writeAuditLog } from "@/lib/audit";
 import { prisma } from "@/lib/prisma";
+import { syncLocalizedTitleBody, type PublishLocale } from "@/lib/translation";
 
 export function serializeSiteNews(item: {
   id: string;
   title: string;
   body: string;
+  titleEn?: string | null;
+  bodyEn?: string | null;
   status: string;
   publishedAt: Date | null;
   createdAt: Date;
@@ -14,6 +17,8 @@ export function serializeSiteNews(item: {
     id: item.id,
     title: item.title,
     body: item.body,
+    titleEn: item.titleEn ?? null,
+    bodyEn: item.bodyEn ?? null,
     status: item.status,
     publishedAt: item.publishedAt?.toISOString() ?? null,
     createdAt: item.createdAt.toISOString(),
@@ -29,12 +34,20 @@ export async function createSiteNews(input: {
   authorId: string;
   title: string;
   body: string;
+  publishLocale?: PublishLocale;
 }) {
+  const localized = await syncLocalizedTitleBody({
+    publishLocale: input.publishLocale,
+    title: input.title,
+    body: input.body,
+  });
   const now = new Date();
   const item = await prisma.siteNews.create({
     data: {
-      title: input.title.trim(),
-      body: input.body.trim(),
+      title: localized.title,
+      body: localized.body ?? "",
+      titleEn: localized.titleEn,
+      bodyEn: localized.bodyEn,
       status: "APPROVED",
       authorId: input.authorId,
       publishedAt: now,
