@@ -104,10 +104,12 @@ export async function requestClubTournamentApproval(tournamentId: string) {
   logger.info({ tournamentId, clubId: club.id }, "Club approval requested");
 }
 
-async function notifyNearbyPlayers(tournamentId: string) {
+export async function notifyNearbyPlayersAboutTournament(tournamentId: string) {
   const batchId = randomUUID();
   const tournament = await loadTournamentForApproval(tournamentId);
-  if (!tournament) return;
+  if (!tournament) {
+    return { batchId, sent: 0, failed: 0, skipped: 0 };
+  }
   if (tournamentNotificationsSuppressed(tournament)) {
     logger.info({ tournamentId }, "Nearby player notifications skipped (suppressNotifications)");
     return { batchId, sent: 0, failed: 0, skipped: 0 };
@@ -595,7 +597,7 @@ export async function approveTournamentByClub(
 
   if (!tournamentNotificationsSuppressed(tournament)) {
     try {
-      await notifyNearbyPlayers(tournament.id);
+      await notifyNearbyPlayersAboutTournament(tournament.id);
     } catch (err) {
       logger.error({ err, tournamentId: tournament.id }, "Nearby player notifications failed");
     }
@@ -749,7 +751,7 @@ export async function publishTournamentFromManage(
 
   if (!suppressNotifications) {
     try {
-      await notifyNearbyPlayers(tournament.id);
+      await notifyNearbyPlayersAboutTournament(tournament.id);
     } catch (err) {
       logger.error({ err, tournamentId: tournament.id }, "Nearby player notifications failed");
     }
