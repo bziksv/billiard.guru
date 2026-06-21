@@ -296,7 +296,7 @@ export function buildFixedSwissTs32R8ElimAtEighthBronzeTemplate(): FixedSwissTem
 
 /** 16R2 (30 встреч): R3×6 + финал/бронза в R6 — эталон legacy29 + #30. */
 export function isFixedSwissTs16R2ChartFromMatches(
-  matches: Array<{ round: number }>,
+  matches: Array<{ round: number; slot?: number }>,
 ): boolean {
   if (matches.filter((m) => m.round === 3).length !== 6) return false;
   return matches.some((m) => m.round === 6 && m.slot === 2);
