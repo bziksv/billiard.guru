@@ -289,18 +289,18 @@ export async function shareBracketScreenshot(options: {
   tournamentName: string;
   tournamentUrl: string;
 }): Promise<"shared" | "clipboard" | "download"> {
-  const file = new File([options.blob], options.filename, { type: "image/png" });
-  const shareText = `Сетка турнира «${options.tournamentName}»`;
+  const file = new File([options.blob], options.filename, {
+    type: "image/png",
+    lastModified: Date.now(),
+  });
 
   if (typeof navigator.share === "function") {
     try {
-      const payload: ShareData = {
-        title: options.tournamentName,
-        text: shareText,
-        files: [file],
-      };
-      if (!navigator.canShare || navigator.canShare(payload)) {
-        await navigator.share(payload);
+      // macOS Telegram (и часть других клиентов) отправляет только text/title,
+      // если передать их вместе с files — шарим только PNG.
+      const filePayload: ShareData = { files: [file] };
+      if (!navigator.canShare || navigator.canShare(filePayload)) {
+        await navigator.share(filePayload);
         return "shared";
       }
     } catch (error) {

@@ -36,6 +36,27 @@ export function BracketScreenshotModal({
 
   const filename = bracketScreenshotFilename(tournamentName);
 
+  async function handleCopy() {
+    if (!blob) return;
+    setSharing(true);
+    setHint(null);
+    try {
+      if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+        await navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blob }),
+        ]);
+        setHint("PNG скопирован — откройте Telegram и вставьте в чат (Cmd+V).");
+        return;
+      }
+      downloadBlob(blob, filename);
+      setHint("Буфер недоступен — PNG скачан, прикрепите файл в Telegram.");
+    } catch {
+      setHint("Не удалось скопировать — скачайте PNG и прикрепите в Telegram.");
+    } finally {
+      setSharing(false);
+    }
+  }
+
   async function handleShare() {
     if (!blob) return;
     setSharing(true);
@@ -48,11 +69,13 @@ export function BracketScreenshotModal({
         tournamentUrl,
       });
       if (result === "shared") {
-        setHint("Выберите Telegram (или другое приложение) в системном меню «Поделиться».");
+        setHint(
+          "Выберите Telegram в меню «Поделиться». Если ушёл только текст — нажмите «Скопировать PNG» и вставьте в чат (Cmd+V).",
+        );
       } else if (result === "clipboard") {
-        setHint("Изображение скопировано — вставьте в чат Telegram (Ctrl+V / Cmd+V).");
+        setHint("PNG скопирован — откройте Telegram и вставьте в чат (Cmd+V).");
       } else {
-        setHint("PNG скачан — прикрепите файл в Telegram вручную.");
+        setHint("PNG скачан — перетащите файл в чат Telegram или прикрепите через 📎.");
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
@@ -109,10 +132,18 @@ export function BracketScreenshotModal({
           <button
             type="button"
             disabled={sharing}
+            onClick={() => void handleCopy()}
+            className="admin-btn admin-btn--outline px-4 py-2 text-sm disabled:opacity-50"
+          >
+            Скопировать PNG
+          </button>
+          <button
+            type="button"
+            disabled={sharing}
             onClick={() => void handleShare()}
             className="admin-btn admin-btn--primary px-4 py-2 text-sm disabled:opacity-50"
           >
-            {sharing ? "…" : "Поделиться в Telegram"}
+            {sharing ? "…" : "Поделиться…"}
           </button>
           <button
             type="button"
