@@ -329,6 +329,8 @@ export const tournamentRegistrationSchema = z.object({
   playerId: z.string().min(1),
   clubId: z.string().optional(),
   source: z.enum(["CLUB", "SELF"]),
+  /** Сразу подтвердить заявку (организатор добавляет из кабинета). */
+  confirmImmediately: z.boolean().optional(),
 });
 
 export const tournamentRegistrationPatchSchema = z
@@ -349,6 +351,7 @@ export const tournamentTeamSchema = z
     name: z.string().max(120).optional().or(z.literal("")),
     clubId: z.string().optional(),
     source: z.enum(["CLUB", "SELF"]),
+    confirmImmediately: z.boolean().optional(),
   })
   .refine((d) => d.player1Id !== d.player2Id, {
     message: "Выберите двух разных игроков",

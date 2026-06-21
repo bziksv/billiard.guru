@@ -6,27 +6,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { TournamentManageView } from "@/components/admin/tournament-manage-view";
 import type { MatchResultPayload } from "@/components/bracket/match-result-modal";
-import { TournamentParticipantLimitNotice } from "@/components/tournament/tournament-participant-limit-notice";
-import { SearchableMultiSelect, SearchableSelect } from "@/components/ui/searchable-select";
-import { getDefaultBracketParticipantRules } from "@/lib/bracket-participant-rules";
-import {
-  countActiveTournamentSlots,
-  slotsRemaining,
-  validateCanAddParticipants,
-} from "@/lib/tournament-participant-limit";
+import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import {
   canStartTournament,
   countConfirmedParticipants,
   type AdminTournament,
 } from "@/lib/tournament-admin";
-import { isTournamentRegistrationOpen } from "@/lib/tournament-registration";
-import { isPairFormat } from "@/lib/pair-tournament";
 import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
-import {
-  formatTournamentPlayerSelectLabel,
-  playerExceedsTournamentRatingMax,
-} from "@/lib/tournament-rating-display";
-import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
+import { formatTournamentPlayerSelectLabel } from "@/lib/tournament-rating-display";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
@@ -55,13 +42,8 @@ export function ClubOwnerTournamentManagePage({
   const [starting, setStarting] = useState(false);
   const [finishing, setFinishing] = useState(false);
   const [bracketLoading, setBracketLoading] = useState(false);
-  const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([]);
-  const [selectedPlayer, setSelectedPlayer] = useState("");
-  const [selectedPlayer2, setSelectedPlayer2] = useState("");
-  const [teamName, setTeamName] = useState("");
   const [regError, setRegError] = useState<string | null>(null);
   const [regMessage, setRegMessage] = useState<string | null>(null);
-  const [regLoading, setRegLoading] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [publishWithoutNotifications, setPublishWithoutNotifications] = useState(false);
 
@@ -83,6 +65,18 @@ export function ClubOwnerTournamentManagePage({
     setTournament(data);
     setPublishWithoutNotifications(data.suppressNotifications === true);
   }, [clubId, router, tournamentId]);
+
+  const handlePlayerCreated = useCallback(
+    (player: { id: string; firstName: string; lastName: string; rating: number }) => {
+      setPlayers((prev) => {
+        if (prev.some((p) => p.id === player.id)) return prev;
+        return [...prev, player].sort((a, b) =>
+          `${a.lastName} ${a.firstName}`.localeCompare(`${b.lastName} ${b.firstName}`, "ru"),
+        );
+      });
+    },
+    [],
+  );
 
   useEffect(() => {
     Promise.all([
@@ -117,93 +111,6 @@ export function ClubOwnerTournamentManagePage({
       })),
     [players, clubPlayerRatings, tournament?.ratingSource],
   );
-
-  const isPair = tournament ? isPairFormat(tournament.format) : false;
-
-  const registeredPlayerIds = useMemo(() => {
-    if (!tournament || isPair) return new Set<string>();
-    return new Set(
-      tournament.registrations
-        .filter((r) => !["CANCELLED", "REJECTED"].includes(r.status))
-        .map((r) => r.player.id),
-    );
-  }, [tournament, isPair]);
-
-  const availablePlayerOptions = useMemo(() => {
-    const ratingMax = tournament?.ratingMax ?? null;
-    return playerOptions.filter((opt) => {
-      if (registeredPlayerIds.has(opt.value)) return false;
-      if (ratingMax == null) return true;
-      const player = players.find((p) => p.id === opt.value);
-      if (!player) return true;
-      return !playerExceedsTournamentRatingMax(
-        player.rating,
-        ratingMax,
-        clubPlayerRatings[player.id],
-        tournament?.ratingSource ?? "CLUB",
-      );
-    });
-  }, [
-    playerOptions,
-    registeredPlayerIds,
-    tournament?.ratingMax,
-    tournament?.ratingSource,
-    players,
-    clubPlayerRatings,
-  ]);
-
-  useEffect(() => {
-    if (tournament?.ratingMax == null) return;
-    setSelectedPlayerIds((ids) =>
-      ids.filter((id) => {
-        const player = players.find((p) => p.id === id);
-        if (!player) return false;
-        return !playerExceedsTournamentRatingMax(
-          player.rating,
-          tournament.ratingMax,
-          clubPlayerRatings[id],
-          tournament.ratingSource ?? "CLUB",
-        );
-      }),
-    );
-  }, [tournament?.ratingMax, tournament?.ratingSource, clubPlayerRatings, players]);
-
-  const activeParticipantCount = useMemo(
-    () => (tournament ? countActiveTournamentSlots(tournament) : 0),
-    [tournament],
-  );
-
-  const participantRules = useMemo(
-    () =>
-      tournament?.participantRules ??
-      (tournament ? getDefaultBracketParticipantRules(tournament.format) : null),
-    [tournament],
-  );
-
-  const slotsLeft = useMemo(
-    () => (participantRules ? slotsRemaining(participantRules, activeParticipantCount) : Infinity),
-    [participantRules, activeParticipantCount],
-  );
-
-  function handlePlayerSelectChange(ids: string[]) {
-    if (!participantRules) {
-      setSelectedPlayerIds(ids);
-      return;
-    }
-    const maxSelectable = slotsRemaining(participantRules, activeParticipantCount);
-    if (ids.length > maxSelectable) {
-      const check = validateCanAddParticipants(
-        participantRules,
-        activeParticipantCount,
-        ids.length,
-      );
-      setRegError(check.ok ? null : check.error);
-      setSelectedPlayerIds(ids.slice(0, maxSelectable));
-      return;
-    }
-    setRegError(null);
-    setSelectedPlayerIds(ids);
-  }
 
   async function publishTournament() {
     if (!tournament) return;
@@ -278,73 +185,6 @@ export function ClubOwnerTournamentManagePage({
       return;
     }
     router.push(`/manage/clubs/${clubId}/tournaments`);
-  }
-
-  async function registerParticipant() {
-    if (!tournament) return;
-    setRegError(null);
-    setRegMessage(null);
-
-    if (isPair) {
-      if (!selectedPlayer || !selectedPlayer2) {
-        setRegError("Выберите двух игроков в команде");
-        return;
-      }
-      setRegLoading(true);
-      const res = await fetch("/api/tournaments/teams", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tournamentId: tournament.id,
-          player1Id: selectedPlayer,
-          player2Id: selectedPlayer2,
-          name: teamName || undefined,
-          clubId,
-          source: "CLUB",
-        }),
-      });
-      const data = await res.json();
-      setRegLoading(false);
-      if (!res.ok) {
-        setRegError(data.error ?? "Ошибка регистрации");
-        return;
-      }
-      setSelectedPlayer("");
-      setSelectedPlayer2("");
-      setTeamName("");
-      setRegMessage("Команда зарегистрирована");
-    } else {
-      if (selectedPlayerIds.length === 0) {
-        setRegError("Выберите хотя бы одного игрока");
-        return;
-      }
-      setRegLoading(true);
-      let registered = 0;
-      let skipped = 0;
-      for (const playerId of selectedPlayerIds) {
-        const res = await fetch("/api/tournaments/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tournamentId: tournament.id,
-            playerId,
-            clubId,
-            source: "CLUB",
-          }),
-        });
-        if (res.status === 409) skipped++;
-        else if (res.ok) registered++;
-        else {
-          const data = await res.json();
-          setRegError(data.error ?? "Ошибка регистрации");
-          break;
-        }
-      }
-      setRegLoading(false);
-      setSelectedPlayerIds([]);
-      setRegMessage(`зарегистрировано: ${registered}${skipped ? ` · уже были: ${skipped}` : ""}`);
-    }
-    await reload();
   }
 
   async function confirmRegistration(regId: string) {
@@ -518,6 +358,8 @@ export function ClubOwnerTournamentManagePage({
             {tournament.suppressNotifications && (
               <p className="mt-2 text-sm text-zinc-500">Уведомления по турниру отключены.</p>
             )}
+            {regError && <p className="mt-2 text-sm text-red-400">{regError}</p>}
+            {regMessage && <p className="mt-2 text-sm text-emerald-400">{regMessage}</p>}
           </div>
           <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
             {tournament.status === "PENDING_CLUB_APPROVAL" && (
@@ -584,88 +426,14 @@ export function ClubOwnerTournamentManagePage({
         </div>
       </div>
 
-      {isTournamentRegistrationOpen(
-        tournament.status,
-        tournament.matches.length > 0,
-      ) && (
-        <section className="admin-card p-6">
-          <h2 className="mb-4 font-semibold">Регистрация участников</h2>
-          {participantRules && (
-            <TournamentParticipantLimitNotice
-              rules={participantRules}
-              activeCount={activeParticipantCount}
-              className="mb-4"
-            />
-          )}
-          <div className="max-w-2xl space-y-3">
-            {isPair ? (
-              <>
-                <SearchableSelect
-                  options={playerOptions}
-                  value={selectedPlayer}
-                  onChange={setSelectedPlayer}
-                  placeholder="Игрок 1"
-                  searchPlaceholder="Поиск игрока…"
-                />
-                <SearchableSelect
-                  options={playerOptions.filter((p) => p.value !== selectedPlayer)}
-                  value={selectedPlayer2}
-                  onChange={setSelectedPlayer2}
-                  placeholder="Игрок 2 (партнёр)"
-                  searchPlaceholder="Поиск игрока…"
-                />
-                <input
-                  value={teamName}
-                  onChange={(e) => setTeamName(e.target.value)}
-                  placeholder="Название команды (необязательно)"
-                  className="site-input w-full"
-                />
-              </>
-            ) : (
-              <SearchableMultiSelect
-                label="Игроки"
-                options={availablePlayerOptions}
-                values={selectedPlayerIds}
-                onChange={handlePlayerSelectChange}
-                placeholder={
-                  slotsLeft <= 0
-                    ? "Лимит сетки заполнен — смените формат или снимите участников"
-                    : "Выберите одного или нескольких игроков"
-                }
-                searchPlaceholder="Поиск игрока…"
-                disabled={slotsLeft <= 0}
-              />
-            )}
-            {regError && <p className="text-sm text-red-400">{regError}</p>}
-            {regMessage && <p className="text-sm text-emerald-400">{regMessage}</p>}
-            <button
-              type="button"
-              onClick={registerParticipant}
-              disabled={
-                regLoading ||
-                slotsLeft <= 0 ||
-                (isPair ? !selectedPlayer || !selectedPlayer2 : selectedPlayerIds.length === 0)
-              }
-              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
-            >
-              {regLoading
-                ? "Регистрация…"
-                : isPair
-                  ? "Зарегистрировать команду"
-                  : selectedPlayerIds.length > 0
-                    ? `Зарегистрировать (${selectedPlayerIds.length})`
-                    : "Зарегистрировать"}
-            </button>
-          </div>
-        </section>
-      )}
-
       <section className="admin-card min-w-0 max-w-full p-6">
         <TournamentManageView
           tournament={tournament}
           clubOptions={clubOptions}
           playerOptions={playerOptions}
           clubPlayerRatings={clubPlayerRatings}
+          registrationPlayers={players}
+          onPlayerCreated={handlePlayerCreated}
           bracketLoading={bracketLoading}
           embedded
           onConfirmRegistration={confirmRegistration}

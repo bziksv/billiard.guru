@@ -63,8 +63,12 @@ import {
 } from "@/lib/tournament-admin";
 import {
   canCancelRegistration,
-  isTournamentRegistrationOpen,
+  canOrganizerRegisterParticipants,
 } from "@/lib/tournament-registration";
+import {
+  TournamentParticipantRegistrationPanel,
+  type TournamentRegistrationPlayer,
+} from "@/components/tournament/tournament-participant-registration-panel";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
   REGISTRATION_STATUS_LABELS,
@@ -314,6 +318,8 @@ export function TournamentManageView({
   onPresentationOpenChange,
   showTabBarFullscreenButton = true,
   clubPlayerRatings,
+  registrationPlayers,
+  onPlayerCreated,
 }: {
   tournament: AdminTournament;
   clubOptions: { value: string; label: string }[];
@@ -321,6 +327,9 @@ export function TournamentManageView({
   bracketLoading: boolean;
   /** Клубные рейтинги для форы (источник CLUB). */
   clubPlayerRatings?: Record<string, number>;
+  /** Игроки для формы «Добавить игрока» на странице турнира. */
+  registrationPlayers?: TournamentRegistrationPlayer[];
+  onPlayerCreated?: (player: TournamentRegistrationPlayer) => void;
   embedded?: boolean;
   /** full — все вкладки (кабинет клуба); tournament — только участники; bracket — сетка и встречи */
   viewMode?: TournamentManageViewMode;
@@ -547,7 +556,7 @@ export function TournamentManageView({
   }, [t.matches]);
   const finalRound = rounds.at(-1)?.[0];
   const bracketLocked = t.matches.length > 0;
-  const registrationOpen = isTournamentRegistrationOpen(t.status, bracketLocked);
+  const registrationOpen = canOrganizerRegisterParticipants(t.status, bracketLocked);
   const activeTeams = t.teams.filter((team) => team.status !== "CANCELLED");
   const inactiveTeams = t.teams.filter(
     (team) => team.status === "CANCELLED" || team.status === "REJECTED",
@@ -697,6 +706,18 @@ export function TournamentManageView({
   }, [screenshotPreview?.url]);
 
   const presentationContentIsBracket = tab === "bracket";
+
+  const participantRegistrationPanel =
+    registrationOpen && registrationPlayers && clubPlayerRatings ? (
+      <TournamentParticipantRegistrationPanel
+        tournament={t}
+        players={registrationPlayers}
+        clubPlayerRatings={clubPlayerRatings}
+        onPlayerCreated={onPlayerCreated}
+        onUpdated={onUpdated}
+        collapsible
+      />
+    ) : null;
 
   const manageTabStrip = (
     <AdminHorizontalScroll className="min-w-0 w-full">
@@ -958,6 +979,8 @@ export function TournamentManageView({
         </div>
       )}
 
+      {!presentationOpen && !editing && participantRegistrationPanel}
+
       {!presentationOpen &&
         showParticipants &&
         (effectiveViewMode === "tournament" || !embedded || tab === "participants") && (
@@ -1066,6 +1089,8 @@ export function TournamentManageView({
           presentationContentIsBracket ? "flex flex-col" : "overflow-auto"
         }
       >
+        {!editing && participantRegistrationPanel}
+
         {showParticipants && tab === "participants" && (
           <ParticipantsTab
             t={t}

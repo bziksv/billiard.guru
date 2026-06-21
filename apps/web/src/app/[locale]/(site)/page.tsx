@@ -109,7 +109,7 @@ export default async function HomePage({
       orderBy: [{ rating: "desc" }, { lastName: "asc" }],
       take: 8,
     }),
-    loadHomePlayAnnouncements(geo),
+    loadHomePlayAnnouncements(geo, locale),
   ]);
 
   const [stats, news, bracketFormats, formatLabels] = await Promise.all([

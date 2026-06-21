@@ -322,10 +322,12 @@ export function SiteHeaderNav({ account }: { account?: SiteHeaderAccount }) {
                     </Link>
                   )}
                 </nav>
+
+                <p className="site-mobile-nav-title">{t("locale.switch")}</p>
+                <LocaleSwitcher variant="footer" className="px-1" />
               </div>
 
               <footer className="site-mobile-nav-footer">
-                <LocaleSwitcher variant="footer" className="mb-2 px-3" />
                 <SiteThemeToggle showLabel className="w-full justify-start px-3 py-2.5" />
               </footer>
             </div>

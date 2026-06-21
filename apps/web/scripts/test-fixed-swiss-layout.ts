@@ -25,6 +25,7 @@ import {
   FIXED_SWISS_CARD_H,
   FIXED_SWISS_COL_W,
   fixedSwissMatchCardHeight,
+  estimateFixedSwissCardHeight,
   fixedSwissFooterDestLabel,
   shouldDrawFixedSwissLossEdge,
   shouldDrawFixedSwissWinEdge,
@@ -1407,6 +1408,39 @@ assertProtocolPlace(17, "loser", 60, { place: 25, placeTo: 32 });
 const layout32Bronze = buildFixedSwissBracketLayout(mkGridTs32Bronze());
 const compactH = fixedSwissMatchCardHeight(false, 0);
 const compactNoMetaH = fixedSwissMatchCardHeight(false, 0, false);
+{
+  const team = (rating: number) => ({
+    id: `t-${rating}`,
+    player1: { id: `p-${rating}`, firstName: "A", lastName: "B", rating },
+    player2: null,
+  });
+  const noHandicapDiffMatch: BracketMatchView = {
+    id: "r1s6",
+    round: 1,
+    slot: 6,
+    status: "SCHEDULED",
+    team1: team(5.5),
+    team2: team(5),
+    winnerTeamId: null,
+    team1Score: null,
+    team2Score: null,
+    startedAt: null,
+    finishedAt: null,
+    tableId: null,
+    streamUrl: null,
+    tableLabel: null,
+  };
+  const h = estimateFixedSwissCardHeight(noHandicapDiffMatch, [], {
+    showCardHandicap: true,
+    showCardMatchNumber: true,
+    showCardPlacement: true,
+  });
+  assert.equal(
+    h,
+    fixedSwissMatchCardHeight(true, 0),
+    "«Без форы» (рейтинги 5.5 vs 5) — строка форы в высоте раскладки",
+  );
+}
 {
   const layoutCompact = buildFixedSwissBracketLayout(mkGridTs32Bronze(), {
     showCardHandicap: false,

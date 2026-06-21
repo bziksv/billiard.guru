@@ -319,6 +319,10 @@ export default function TournamentsPage() {
     setSelectedTableIds([]);
     setTableStreams({});
     formEl.reset();
+    if (data?.id) {
+      router.push(`/admin/tournaments/${data.id}`);
+      return;
+    }
     setCreateMessage(
       data.message ??
         "Турнир создан. Владельцу клуба отправлен запрос в Telegram.",

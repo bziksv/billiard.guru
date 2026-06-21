@@ -18,11 +18,8 @@ import type { PublicTournamentListItem } from "@/lib/tournament-public-read";
 import { findPublicTournamentsList } from "@/lib/tournament-public-read";
 import { pickHomeTournaments } from "@/lib/tournament-tabs";
 import type { GeoSearchParams } from "@/lib/site";
-import {
-  formatPlayListingSchedule,
-  PLAY_LISTING_KIND_LABELS,
-  PLAY_LISTING_SCHEDULE_LABELS,
-} from "@/lib/play-listing-display";
+import { formatPlayListingSchedule } from "@/lib/play-listing-display";
+import { getTranslations } from "next-intl/server";
 
 function formatNewsDate(date: Date, locale: AppLocale) {
   return date.toLocaleDateString(locale === "en" ? "en-GB" : "ru-RU", {
@@ -166,20 +163,37 @@ type PlayListingRow = Awaited<
   >
 >[number];
 
-function playListingToAnnouncement(listing: PlayListingRow): HomeAnnouncement {
+function playListingToAnnouncement(
+  listing: PlayListingRow,
+  locale: AppLocale,
+  labels: {
+    kind: (kind: string) => string;
+    schedule: (scheduleType: string) => string;
+    club: string;
+  },
+): HomeAnnouncement {
   const authorName = listing.publishedByClub
-    ? (listing.club?.name ?? "Клуб")
+    ? (listing.club?.name ?? labels.club)
     : `${listing.author.firstName} ${listing.author.lastName.charAt(0)}.`.trim();
+  const title = resolveLocalizedField(locale, listing.title, listing.titleEn);
+  const body = listing.body
+    ? resolveLocalizedField(locale, listing.body, listing.bodyEn)
+    : formatPlayListingSchedule(listing, locale);
+  const city = localizedGeoName(
+    listing.city.nameRu,
+    locale,
+    listing.city.nameEn,
+  );
 
   return {
     id: listing.id,
     kind: listing.publishedByClub ? "club" : "player",
-    title: listing.title,
-    body: listing.body ?? formatPlayListingSchedule(listing),
+    title,
+    body,
     meta: [
-      listing.publishedByClub ? "клуб" : PLAY_LISTING_KIND_LABELS[listing.kind],
-      PLAY_LISTING_SCHEDULE_LABELS[listing.scheduleType],
-      listing.city.nameRu,
+      listing.publishedByClub ? labels.club : labels.kind(listing.kind),
+      labels.schedule(listing.scheduleType),
+      city,
       authorName,
     ]
       .filter(Boolean)
@@ -189,10 +203,22 @@ function playListingToAnnouncement(listing: PlayListingRow): HomeAnnouncement {
 }
 
 /** Объявления «Покатать» — от игроков и клубов */
-export async function loadHomePlayAnnouncements(geo: GeoSearchParams): Promise<{
+export async function loadHomePlayAnnouncements(
+  geo: GeoSearchParams,
+  locale: AppLocale = "ru",
+): Promise<{
   playerAds: HomeAnnouncement[];
   clubAds: HomeAnnouncement[];
 }> {
+  const t = await getTranslations({ locale, namespace: "playListing" });
+  const tHome = await getTranslations({ locale, namespace: "home.announcements" });
+  const labels = {
+    kind: (kind: string) => t(`kind.${kind}` as "kind.SPARRING"),
+    schedule: (scheduleType: string) =>
+      t(`schedule.${scheduleType}` as "schedule.ONE_TIME"),
+    club: tHome("metaClub"),
+  };
+
   const listings = await prisma.playListing.findMany({
     where: playListingGeoWhere(geo),
     include: playListingListInclude,
@@ -203,12 +229,12 @@ export async function loadHomePlayAnnouncements(geo: GeoSearchParams): Promise<{
   const playerAds = listings
     .filter((l) => !l.publishedByClub)
     .slice(0, 4)
-    .map(playListingToAnnouncement);
+    .map((listing) => playListingToAnnouncement(listing, locale, labels));
 
   const clubAds = listings
     .filter((l) => l.publishedByClub)
     .slice(0, 4)
-    .map(playListingToAnnouncement);
+    .map((listing) => playListingToAnnouncement(listing, locale, labels));
 
   return { playerAds, clubAds };
 }

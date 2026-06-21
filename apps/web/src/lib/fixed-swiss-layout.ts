@@ -88,7 +88,10 @@ import {
   isFixedSwissTs256R16OlympicForkEdge,
   isFixedSwissTs256R16IntraRoundMirrorLossEdge,
 } from "@/lib/fixed-swiss-ts-256r8-grid";
-import { calculateHandicap } from "@/lib/handicap";
+import {
+  describeHandicap,
+  describeHandicapShort,
+} from "@/lib/handicap";
 import { teamRating } from "@/lib/pair-tournament";
 import {
   GRID_LABEL_OFFSET,
@@ -166,17 +169,21 @@ function layoutMatchCardHeight(matchId: string, fallback = FIXED_SWISS_CARD_H): 
   return layoutCardHeights?.get(matchId) ?? fallback;
 }
 
+/** Совпадает с `showHandicap` в llb-bracket-match (строка «Без форы» тоже занимает высоту). */
 function matchHasHandicap(
   match: BracketMatchView,
   halfStep = true,
 ): boolean {
   if (!match.team1 || !match.team2) return false;
-  const h = calculateHandicap(
-    Math.max(teamRating(match.team1), teamRating(match.team2)),
-    Math.min(teamRating(match.team1), teamRating(match.team2)),
-    { halfStep },
-  );
-  return h.ratingDiff > 0;
+  const r1 = teamRating(match.team1);
+  const r2 = teamRating(match.team2);
+  if (r1 === r2) return false;
+  const high = Math.max(r1, r2);
+  const low = Math.min(r1, r2);
+  const opts = { halfStep };
+  const handicap = describeHandicap(high, low, opts);
+  const handicapShort = describeHandicapShort(high, low, opts);
+  return Boolean(handicap && handicapShort);
 }
 
 export type FixedSwissDisplayOpts = {

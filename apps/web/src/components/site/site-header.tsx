@@ -49,7 +49,7 @@ export async function SiteHeader() {
         </div>
 
         <div className="site-header-actions">
-          <LocaleSwitcher className="hidden sm:flex" />
+          <LocaleSwitcher />
           <SiteThemeToggle className="site-header-theme-toggle inline-flex" />
           {player ? (
             <UserMenu

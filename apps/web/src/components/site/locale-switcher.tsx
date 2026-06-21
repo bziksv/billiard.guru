@@ -110,15 +110,23 @@ export function LocaleSwitcher({
         <span className="site-locale-trigger-label">
           {variant === "header" ? locale.toUpperCase() : t(locale as "ru" | "en")}
         </span>
-        <span className="site-locale-trigger-chevron" aria-hidden>
-          ▾
+        <span
+          className={cn(
+            "site-locale-trigger-chevron",
+            variant === "footer" && open && "site-locale-trigger-chevron-up",
+          )}
+          aria-hidden
+        >
+          {variant === "footer" ? "▴" : "▾"}
         </span>
       </button>
       {open && (
         <div
           className={cn(
-            "site-popover site-locale-popover top-full",
-            variant === "footer" ? "left-0 right-0" : "right-0",
+            "site-popover site-locale-popover",
+            variant === "footer"
+              ? "site-locale-popover-above left-0 right-0"
+              : "top-full right-0",
           )}
           role="listbox"
           aria-label={t("switch")}

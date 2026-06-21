@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { buildConfirmLink } from "@/lib/telegram";
 import { requireTournamentManageAccess, tournamentManageActorType } from "@/lib/tournament-manage";
 import {
+  canOrganizerRegisterParticipants,
   canCancelRegistration,
   isTournamentRegistrationOpen,
 } from "@/lib/tournament-registration";
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
       (await prisma.tournamentMatch.count({
         where: { tournamentId: data.tournamentId },
       })) > 0;
-    if (!tournament || !isTournamentRegistrationOpen(tournament.status, bracketFormed)) {
+    if (!tournament || !canOrganizerRegisterParticipants(tournament.status, bracketFormed)) {
       return NextResponse.json(
         { error: "Регистрация на турнир недоступна" },
         { status: 400 },
@@ -67,17 +68,19 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+    const confirmNow = data.confirmImmediately === true;
+
     if (existing) {
       if (existing.status === "CANCELLED") {
         await assertCanAddTournamentParticipants(data.tournamentId, 1);
         const registration = await prisma.tournamentRegistration.update({
           where: { id: existing.id },
           data: {
-            status: "PENDING",
+            status: confirmNow ? "CONFIRMED" : "PENDING",
             source: data.source,
             clubId: data.clubId ?? null,
-            confirmedAt: null,
-            feePaid: false,
+            confirmedAt: confirmNow ? new Date() : null,
+            feePaid: confirmNow,
           },
           include: {
             player: { include: { city: { include: { country: true } } } },
@@ -91,7 +94,9 @@ export async function POST(request: NextRequest) {
           entityType: "tournament_registration",
           entityId: registration.id,
         });
-        if (data.source === "CLUB") {
+        if (confirmNow) {
+          await notifyTournamentRegistrationConfirmed(registration.id);
+        } else if (data.source === "CLUB") {
           await notifyTournamentRegisteredByClub(registration.id);
         } else if (data.source === "SELF") {
           await notifyTournamentSelfRegistered(registration.id);
@@ -112,7 +117,9 @@ export async function POST(request: NextRequest) {
         playerId: data.playerId,
         clubId: data.clubId ?? null,
         source: data.source,
-        status: "PENDING",
+        status: confirmNow ? "CONFIRMED" : "PENDING",
+        feePaid: confirmNow,
+        confirmedAt: confirmNow ? new Date() : null,
       },
       include: {
         player: { include: { city: { include: { country: true } } } },
@@ -128,7 +135,9 @@ export async function POST(request: NextRequest) {
       entityId: registration.id,
     });
 
-    if (data.source === "CLUB") {
+    if (confirmNow) {
+      await notifyTournamentRegistrationConfirmed(registration.id);
+    } else if (data.source === "CLUB") {
       await notifyTournamentRegisteredByClub(registration.id);
     } else if (data.source === "SELF") {
       await notifyTournamentSelfRegistered(registration.id);
@@ -232,7 +241,7 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
       }
       if (
-        !isTournamentRegistrationOpen(existing.tournament.status, bracketFormed) &&
+        !canOrganizerRegisterParticipants(existing.tournament.status, bracketFormed) &&
         status === "CONFIRMED"
       ) {
         return NextResponse.json(

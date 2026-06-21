@@ -19,6 +19,7 @@ import {
   notifyTournamentTeamRegistrationConfirmed,
   notifyTournamentTeamRegistrationRejected,
 } from "@/lib/tournament-registration-notify";
+import { canOrganizerRegisterParticipants } from "@/lib/tournament-registration";
 import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
 import { assertPlayerEligibleForTournamentRating } from "@/lib/tournament-rating-limit-server";
 import { tournamentTeamSchema, tournamentTeamUpdateSchema } from "@/lib/validators";
@@ -51,6 +52,16 @@ export async function POST(request: NextRequest) {
     });
     if (!tournament) {
       return NextResponse.json({ error: "Турнир не найден" }, { status: 404 });
+    }
+    const bracketFormed =
+      (await prisma.tournamentMatch.count({
+        where: { tournamentId: data.tournamentId },
+      })) > 0;
+    if (!canOrganizerRegisterParticipants(tournament.status, bracketFormed)) {
+      return NextResponse.json(
+        { error: "Регистрация на турнир недоступна" },
+        { status: 400 },
+      );
     }
     if (!isPairFormat(tournament.format)) {
       return NextResponse.json(
@@ -106,6 +117,8 @@ export async function POST(request: NextRequest) {
 
     await assertCanAddTournamentParticipants(data.tournamentId, 1);
 
+    const confirmNow = data.confirmImmediately === true;
+
     const team = await prisma.tournamentTeam.create({
       data: {
         tournamentId: data.tournamentId,
@@ -114,7 +127,9 @@ export async function POST(request: NextRequest) {
         name: data.name || null,
         clubId: data.clubId ?? null,
         source: data.source,
-        status: "PENDING",
+        status: confirmNow ? "CONFIRMED" : "PENDING",
+        feePaid: confirmNow,
+        confirmedAt: confirmNow ? new Date() : null,
       },
       include: {
         player1: true,
@@ -133,7 +148,9 @@ export async function POST(request: NextRequest) {
     });
 
     log.info({ teamId: team.id }, "Pair team registered");
-    if (data.source === "CLUB") {
+    if (confirmNow) {
+      await notifyTournamentTeamRegistrationConfirmed(team.id);
+    } else if (data.source === "CLUB") {
       await notifyTournamentTeamRegisteredByClub(team.id);
     }
     return NextResponse.json(team, { status: 201 });
