@@ -201,6 +201,8 @@ interface SearchableMultiSelectProps {
   label?: string;
   labelClassName?: string;
   className?: string;
+  dropdownClassName?: string;
+  maxSelectable?: number;
 }
 
 export function SearchableMultiSelect({
@@ -213,6 +215,8 @@ export function SearchableMultiSelect({
   label,
   labelClassName,
   className,
+  dropdownClassName,
+  maxSelectable,
 }: SearchableMultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -246,11 +250,30 @@ export function SearchableMultiSelect({
   }
 
   function toggle(option: SearchableSelectOption) {
+    if (option.disabled) return;
     if (selectedSet.has(option.value)) {
       onChange(values.filter((v) => v !== option.value));
-    } else {
-      onChange([...values, option.value]);
+      return;
     }
+    if (maxSelectable != null && values.length >= maxSelectable) return;
+    onChange([...values, option.value]);
+  }
+
+  function selectAllFiltered() {
+    const pick = filtered.filter((o) => !o.disabled).map((o) => o.value);
+    if (pick.length === 0) return;
+    const merged = [...values];
+    for (const id of pick) {
+      if (merged.includes(id)) continue;
+      if (maxSelectable != null && merged.length >= maxSelectable) break;
+      merged.push(id);
+    }
+    onChange(merged);
+  }
+
+  function clearFiltered() {
+    const filteredIds = new Set(filtered.map((o) => o.value));
+    onChange(values.filter((v) => !filteredIds.has(v)));
   }
 
   function remove(value: string) {
@@ -315,22 +338,50 @@ export function SearchableMultiSelect({
             id={listId}
             role="listbox"
             aria-multiselectable
-            className="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
+            className={
+              dropdownClassName ??
+              "absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
+            }
           >
+            {filtered.length > 0 && (
+              <li className="sticky top-0 z-10 flex gap-2 border-b border-zinc-800 bg-zinc-900 px-2 py-1.5">
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={selectAllFiltered}
+                  className="rounded px-2 py-1 text-xs text-emerald-400 hover:bg-zinc-800"
+                >
+                  Выбрать все в списке
+                </button>
+                <button
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={clearFiltered}
+                  className="rounded px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-800"
+                >
+                  Снять в списке
+                </button>
+              </li>
+            )}
             {filtered.length === 0 ? (
               <li className="px-3 py-2 text-sm text-zinc-500">Ничего не найдено</li>
             ) : (
               filtered.map((option) => {
                 const checked = selectedSet.has(option.value);
+                const atLimit =
+                  maxSelectable != null &&
+                  !checked &&
+                  values.length >= maxSelectable;
                 return (
                   <li key={option.value}>
                     <button
                       type="button"
                       role="option"
                       aria-selected={checked}
+                      disabled={option.disabled || atLimit}
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => toggle(option)}
-                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-zinc-800 ${
+                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 ${
                         checked ? "bg-zinc-800 text-emerald-400" : "text-zinc-200"
                       }`}
                     >

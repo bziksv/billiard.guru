@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import {
   bracketScreenshotFilename,
+  copyScreenshotBlob,
   downloadBlob,
+  isMobileShareContext,
   shareBracketScreenshot,
 } from "@/lib/bracket-screenshot";
 
@@ -22,44 +24,26 @@ export function BracketScreenshotModal({
   previewUrl: string | null;
   onClose: () => void;
 }) {
-  const [sharing, setSharing] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
+  const [mobileShare, setMobileShare] = useState(false);
 
   useEffect(() => {
     if (!open) {
       setHint(null);
-      setSharing(false);
+      setBusy(false);
+      return;
     }
+    setMobileShare(isMobileShareContext());
   }, [open]);
 
   if (!open || !blob || !previewUrl) return null;
 
   const filename = bracketScreenshotFilename(tournamentName);
 
-  async function handleCopy() {
+  async function handleTelegram() {
     if (!blob) return;
-    setSharing(true);
-    setHint(null);
-    try {
-      if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
-        await navigator.clipboard.write([
-          new ClipboardItem({ "image/png": blob }),
-        ]);
-        setHint("PNG скопирован — откройте Telegram и вставьте в чат (Cmd+V).");
-        return;
-      }
-      downloadBlob(blob, filename);
-      setHint("Буфер недоступен — PNG скачан, прикрепите файл в Telegram.");
-    } catch {
-      setHint("Не удалось скопировать — скачайте PNG и прикрепите в Telegram.");
-    } finally {
-      setSharing(false);
-    }
-  }
-
-  async function handleShare() {
-    if (!blob) return;
-    setSharing(true);
+    setBusy(true);
     setHint(null);
     try {
       const result = await shareBracketScreenshot({
@@ -69,19 +53,35 @@ export function BracketScreenshotModal({
         tournamentUrl,
       });
       if (result === "shared") {
-        setHint(
-          "Выберите Telegram в меню «Поделиться». Если ушёл только текст — нажмите «Скопировать PNG» и вставьте в чат (Cmd+V).",
-        );
+        setHint("Выберите Telegram в системном меню «Поделиться».");
       } else if (result === "clipboard") {
-        setHint("PNG скопирован — откройте Telegram и вставьте в чат (Cmd+V).");
+        setHint("Картинка в буфере — откройте Telegram и вставьте в чат (Cmd+V или Ctrl+V).");
       } else {
         setHint("PNG скачан — перетащите файл в чат Telegram или прикрепите через 📎.");
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
-      setHint("Не удалось поделиться — скачайте PNG и отправьте в Telegram вручную.");
+      setHint("Не удалось — скачайте PNG и прикрепите в Telegram вручную.");
     } finally {
-      setSharing(false);
+      setBusy(false);
+    }
+  }
+
+  async function handleCopy() {
+    if (!blob) return;
+    setBusy(true);
+    setHint(null);
+    try {
+      if (await copyScreenshotBlob(blob)) {
+        setHint("PNG скопирован — вставьте в чат Telegram (Cmd+V или Ctrl+V).");
+        return;
+      }
+      downloadBlob(blob, filename);
+      setHint("Буфер недоступен — PNG скачан, прикрепите файл в Telegram.");
+    } catch {
+      setHint("Не удалось скопировать — скачайте PNG и прикрепите в Telegram.");
+    } finally {
+      setBusy(false);
     }
   }
 
@@ -102,7 +102,9 @@ export function BracketScreenshotModal({
             Скрин сетки
           </h2>
           <p className="bracket-modal-muted mt-1 text-sm">
-            Вся сетка на одном изображении — скачайте или отправьте в Telegram.
+            {mobileShare
+              ? "Вся сетка на одном изображении — «Поделиться» или скачайте PNG."
+              : "На Mac и ПК меню «Поделиться» в Telegram не прикрепляет PNG — копируем картинку в буфер, вставьте в чат (Cmd+V)."}
           </p>
         </div>
 
@@ -129,21 +131,27 @@ export function BracketScreenshotModal({
           >
             Закрыть
           </button>
+          {!mobileShare && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void handleCopy()}
+              className="admin-btn admin-btn--outline px-4 py-2 text-sm disabled:opacity-50"
+            >
+              Скопировать PNG
+            </button>
+          )}
           <button
             type="button"
-            disabled={sharing}
-            onClick={() => void handleCopy()}
-            className="admin-btn admin-btn--outline px-4 py-2 text-sm disabled:opacity-50"
-          >
-            Скопировать PNG
-          </button>
-          <button
-            type="button"
-            disabled={sharing}
-            onClick={() => void handleShare()}
+            disabled={busy}
+            onClick={() => void handleTelegram()}
             className="admin-btn admin-btn--primary px-4 py-2 text-sm disabled:opacity-50"
           >
-            {sharing ? "…" : "Поделиться…"}
+            {busy
+              ? "…"
+              : mobileShare
+                ? "Поделиться…"
+                : "В Telegram (скопировать)"}
           </button>
           <button
             type="button"

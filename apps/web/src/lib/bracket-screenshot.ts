@@ -274,6 +274,27 @@ export async function captureBracketScreenshot(tournamentName: string): Promise<
   return canvasToBlob(composed);
 }
 
+export function isMobileShareContext(): boolean {
+  if (typeof window === "undefined") return false;
+  const ua = navigator.userAgent;
+  if (/Android|iPhone|iPad|iPod/i.test(ua)) return true;
+  return navigator.maxTouchPoints > 1 && window.matchMedia("(pointer: coarse)").matches;
+}
+
+export async function copyScreenshotBlob(blob: Blob): Promise<boolean> {
+  if (typeof ClipboardItem === "undefined" || !navigator.clipboard?.write) {
+    return false;
+  }
+  try {
+    await navigator.clipboard.write([
+      new ClipboardItem({ "image/png": blob }),
+    ]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -289,6 +310,13 @@ export async function shareBracketScreenshot(options: {
   tournamentName: string;
   tournamentUrl: string;
 }): Promise<"shared" | "clipboard" | "download"> {
+  // macOS/Windows: Web Share → Telegram часто отправляет только текст, не PNG.
+  if (!isMobileShareContext()) {
+    if (await copyScreenshotBlob(options.blob)) return "clipboard";
+    downloadBlob(options.blob, options.filename);
+    return "download";
+  }
+
   const file = new File([options.blob], options.filename, {
     type: "image/png",
     lastModified: Date.now(),
@@ -296,8 +324,6 @@ export async function shareBracketScreenshot(options: {
 
   if (typeof navigator.share === "function") {
     try {
-      // macOS Telegram (и часть других клиентов) отправляет только text/title,
-      // если передать их вместе с files — шарим только PNG.
       const filePayload: ShareData = { files: [file] };
       if (!navigator.canShare || navigator.canShare(filePayload)) {
         await navigator.share(filePayload);
@@ -310,16 +336,7 @@ export async function shareBracketScreenshot(options: {
     }
   }
 
-  if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
-    try {
-      await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": options.blob }),
-      ]);
-      return "clipboard";
-    } catch {
-      // fallback to download
-    }
-  }
+  if (await copyScreenshotBlob(options.blob)) return "clipboard";
 
   downloadBlob(options.blob, options.filename);
   return "download";

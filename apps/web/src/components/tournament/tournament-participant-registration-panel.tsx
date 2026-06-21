@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CitySelect } from "@/components/admin/city-select";
 import { TournamentParticipantLimitNotice } from "@/components/tournament/tournament-participant-limit-notice";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { SearchableSelect } from "@/components/ui/searchable-select";
+import { SearchableMultiSelect, SearchableSelect } from "@/components/ui/searchable-select";
 import { getDefaultBracketParticipantRules } from "@/lib/bracket-participant-rules";
 import {
   countActiveTournamentSlots,
@@ -53,6 +53,7 @@ export function TournamentParticipantRegistrationPanel({
     tournament.club.city?.country?.nameRu ?? "Россия";
 
   const [selectedPlayerId, setSelectedPlayerId] = useState("");
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([]);
   const [selectedPlayer2Id, setSelectedPlayer2Id] = useState("");
   const [teamName, setTeamName] = useState("");
   const [expanded, setExpanded] = useState(!collapsible);
@@ -141,6 +142,17 @@ export function TournamentParticipantRegistrationPanel({
   }, [availablePlayerOptions, selectedPlayerId]);
 
   useEffect(() => {
+    setSelectedPlayerIds((prev) =>
+      prev.filter((id) => availablePlayerOptions.some((o) => o.value === id)),
+    );
+  }, [availablePlayerOptions]);
+
+  function setSelectedPlayerIdsLimited(ids: string[]) {
+    const max = Math.max(0, slotsLeft);
+    setSelectedPlayerIds(max > 0 ? ids.slice(0, max) : []);
+  }
+
+  useEffect(() => {
     if (!selectedPlayer2Id) return;
     if (
       selectedPlayer2Id === selectedPlayerId ||
@@ -152,32 +164,49 @@ export function TournamentParticipantRegistrationPanel({
 
   if (!canRegister) return null;
 
-  async function registerExistingPlayer(playerId: string) {
-    setRegLoading(true);
-    try {
-      const res = await fetch("/api/tournaments/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tournamentId: tournament.id,
-          playerId,
-          clubId: tournament.clubId,
-          source: "CLUB",
-          confirmImmediately: true,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setRegError(data.error ?? "Не удалось добавить игрока");
-        return false;
-      }
-      setSelectedPlayerId("");
-      setRegMessage("Игрок добавлен и подтверждён");
-      await onUpdated();
-      return true;
-    } finally {
-      setRegLoading(false);
+  async function registerExistingPlayer(
+    playerId: string,
+    opts?: { refresh?: boolean },
+  ): Promise<boolean> {
+    const res = await fetch("/api/tournaments/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tournamentId: tournament.id,
+        playerId,
+        clubId: tournament.clubId,
+        source: "CLUB",
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setRegError(data.error ?? "Не удалось добавить игрока");
+      return false;
     }
+    if (opts?.refresh !== false) {
+      setSelectedPlayerId("");
+      setSelectedPlayerIds([]);
+      setRegMessage("Игрок добавлен в заявки — отметьте взнос и подтвердите");
+      await onUpdated();
+    }
+    return true;
+  }
+
+  async function registerExistingPlayers(playerIds: string[]): Promise<number> {
+    let added = 0;
+    for (let i = 0; i < playerIds.length; i += 1) {
+      const ok = await registerExistingPlayer(playerIds[i]!, { refresh: false });
+      if (!ok) {
+        setSelectedPlayerIds(playerIds.slice(i));
+        break;
+      }
+      added += 1;
+    }
+    if (added > 0) {
+      if (added === playerIds.length) setSelectedPlayerIds([]);
+      await onUpdated();
+    }
+    return added;
   }
 
   async function addParticipant() {
@@ -201,7 +230,6 @@ export function TournamentParticipantRegistrationPanel({
             name: teamName || undefined,
             clubId: tournament.clubId,
             source: "CLUB",
-            confirmImmediately: true,
           }),
         });
         const data = await res.json();
@@ -212,7 +240,7 @@ export function TournamentParticipantRegistrationPanel({
         setSelectedPlayerId("");
         setSelectedPlayer2Id("");
         setTeamName("");
-        setRegMessage("Пара добавлена и подтверждена");
+        setRegMessage("Пара добавлена в заявки — отметьте взнос и подтвердите");
         await onUpdated();
       } finally {
         setRegLoading(false);
@@ -225,7 +253,41 @@ export function TournamentParticipantRegistrationPanel({
       return;
     }
 
-    await registerExistingPlayer(selectedPlayerId);
+    setRegLoading(true);
+    try {
+      await registerExistingPlayer(selectedPlayerId);
+    } finally {
+      setRegLoading(false);
+    }
+  }
+
+  async function addParticipantsBulk() {
+    setRegError(null);
+    setRegMessage(null);
+
+    if (selectedPlayerIds.length === 0) {
+      setRegError("Выберите одного или нескольких игроков");
+      return;
+    }
+
+    setRegLoading(true);
+    try {
+      const total = selectedPlayerIds.length;
+      const added = await registerExistingPlayers(selectedPlayerIds);
+      if (added === 0) return;
+      if (added === total) {
+        setRegError(null);
+        setRegMessage(
+          added === 1
+            ? "Игрок добавлен в заявки — отметьте взнос и подтвердите"
+            : `Добавлено заявок: ${added} — отметьте взнос и подтвердите`,
+        );
+      } else {
+        setRegMessage(`Добавлено ${added} из ${total}`);
+      }
+    } finally {
+      setRegLoading(false);
+    }
   }
 
   async function createAndAddPlayer(e: FormEvent) {
@@ -290,6 +352,11 @@ export function TournamentParticipantRegistrationPanel({
     }
   }
 
+  const bulkAddLabel =
+    !isPair && selectedPlayerIds.length > 1
+      ? `Добавить (${selectedPlayerIds.length})`
+      : addLabel;
+
   const statusHint =
     tournament.status === "PENDING_CLUB_APPROVAL" || tournament.status === "DRAFT"
       ? "Можно набирать участников до публикации турнира."
@@ -349,8 +416,8 @@ export function TournamentParticipantRegistrationPanel({
           className="mb-4 space-y-3 rounded-lg border border-zinc-800 bg-zinc-950/60 p-3"
         >
           <p className="text-xs text-zinc-500">
-            Новый игрок создаётся и сразу добавляется в турнир — без перехода на другую
-            страницу.
+            Новый игрок создаётся и попадает в заявки — отметьте взнос и подтвердите в списке
+            ниже.
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
             <input
@@ -431,22 +498,29 @@ export function TournamentParticipantRegistrationPanel({
       )}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="min-w-0 flex-1 space-y-3">
-          <SearchableSelect
-            options={availablePlayerOptions}
-            value={selectedPlayerId}
-            onChange={setSelectedPlayerId}
-            placeholder={
-              slotsLeft <= 0
-                ? "Лимит сетки заполнен"
-                : isPair
-                  ? "Игрок 1"
-                  : "Выберите игрока"
-            }
-            searchPlaceholder="Поиск игрока…"
-            disabled={slotsLeft <= 0}
-          />
-          {isPair && (
+          {!isPair ? (
+            <SearchableMultiSelect
+              options={availablePlayerOptions}
+              values={selectedPlayerIds}
+              onChange={setSelectedPlayerIdsLimited}
+              placeholder={
+                slotsLeft <= 0 ? "Лимит сетки заполнен" : "Выберите игроков"
+              }
+              searchPlaceholder="Поиск игрока…"
+              disabled={slotsLeft <= 0}
+              dropdownClassName="absolute z-50 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
+              maxSelectable={slotsLeft > 0 ? slotsLeft : undefined}
+            />
+          ) : (
             <>
+              <SearchableSelect
+                options={availablePlayerOptions}
+                value={selectedPlayerId}
+                onChange={setSelectedPlayerId}
+                placeholder={slotsLeft <= 0 ? "Лимит сетки заполнен" : "Игрок 1"}
+                searchPlaceholder="Поиск игрока…"
+                disabled={slotsLeft <= 0}
+              />
               <SearchableSelect
                 options={availablePlayerOptions.filter((o) => o.value !== selectedPlayerId)}
                 value={selectedPlayer2Id}
@@ -463,19 +537,27 @@ export function TournamentParticipantRegistrationPanel({
               />
             </>
           )}
+          {!isPair && slotsLeft > 0 && (
+            <p className="text-xs text-zinc-500">
+              Отметьте нескольких игроков в списке — добавятся одной кнопкой. Свободно мест:{" "}
+              {slotsLeft}.
+            </p>
+          )}
         </div>
         <button
           type="button"
-          onClick={() => void addParticipant()}
+          onClick={() => void (isPair ? addParticipant() : addParticipantsBulk())}
           disabled={
             regLoading ||
             newPlayerLoading ||
             slotsLeft <= 0 ||
-            (isPair ? !selectedPlayerId || !selectedPlayer2Id : !selectedPlayerId)
+            (isPair
+              ? !selectedPlayerId || !selectedPlayer2Id
+              : selectedPlayerIds.length === 0)
           }
           className="admin-btn admin-btn--primary shrink-0 px-4 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {regLoading ? "Добавляем…" : addLabel}
+          {regLoading ? "Добавляем…" : bulkAddLabel}
         </button>
       </div>
       {regError && <p className="mt-2 text-sm text-red-400">{regError}</p>}
