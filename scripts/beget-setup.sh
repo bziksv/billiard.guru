@@ -117,6 +117,10 @@ fi
 
 echo "→ npm run build (staging: .next/standalone, live не затрагивается)…"
 beget_load_env "$WEB/.env"
+# Docker на Beget видит все CPU хоста (~55), Next.js по умолчанию поднимает столько же
+# worker-процессов; cgroup не даёт столько потоков (tokio: Operation not permitted).
+export NEXT_BUILD_CPUS="${NEXT_BUILD_CPUS:-2}"
+echo "  NEXT_BUILD_CPUS=$NEXT_BUILD_CPUS"
 NODE_ENV=production npm run build:beget
 
 beget_prepare_standalone_staging
