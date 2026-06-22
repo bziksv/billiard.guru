@@ -84,7 +84,7 @@ fi
 
 echo ""
 echo "→ HTTP $CHECK_URL …"
-http_code="$(curl -sS -o /dev/null -w "%{http_code}" -L "$CHECK_URL" --max-time 45 2>/dev/null || echo "000")"
+http_code="$(beget_fetch_http_code "$CHECK_URL" 45 || echo "000")"
 echo "   код ответа: $http_code"
 
 case "$http_code" in

@@ -329,6 +329,37 @@ beget_prune_old_releases() {
     | sort -rn | awk '{print $2}')
 }
 
+# HTTP-код ответа: сначала публичный URL, при 000 — localhost+Host (из Docker Beget внешний curl часто недоступен).
+beget_fetch_http_code() {
+  local url="$1"
+  local max_time="${2:-45}"
+  local code host path
+
+  url="${url%/}"
+  code="$(curl -sS -o /dev/null -w "%{http_code}" -L "$url" --max-time "$max_time" 2>/dev/null || echo "000")"
+  case "$code" in
+    200|301|302|307|308)
+      echo "$code"
+      return 0
+      ;;
+    000)
+      if [[ "$url" =~ ^https?://([^/]+)(/.*)?$ ]]; then
+        host="${BASH_REMATCH[1]}"
+        path="${BASH_REMATCH[2]:-/}"
+        code="$(curl -sS -o /dev/null -w "%{http_code}" -L -H "Host: $host" "http://127.0.0.1${path}" --max-time "$max_time" 2>/dev/null || echo "000")"
+        if [ "$code" != "000" ]; then
+          echo "  (health-check: localhost+Host $host → HTTP $code)" >&2
+        fi
+      fi
+      ;;
+  esac
+  echo "$code"
+  case "$code" in
+    200|301|302|307|308) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 beget_health_check_url() {
   local url="${1:-}"
   local retries="${2:-$BEGET_HEALTH_RETRIES}"
@@ -339,12 +370,12 @@ beget_health_check_url() {
     if [ -f "$BEGET_WEB/.env" ]; then
       beget_load_env "$BEGET_WEB/.env"
     fi
-    url="${APP_URL:-https://billiard.guru}"
+    url="${BEGET_HEALTH_URL:-${APP_URL:-https://billiard.guru}}"
   fi
   url="${url%/}"
 
   for attempt in $(seq 1 "$retries"); do
-    code="$(curl -sS -o /dev/null -w "%{http_code}" -L "$url" --max-time 45 2>/dev/null || echo "000")"
+    code="$(beget_fetch_http_code "$url" 45 || echo "000")"
     case "$code" in
       200|301|302|307|308)
         echo "$code"
