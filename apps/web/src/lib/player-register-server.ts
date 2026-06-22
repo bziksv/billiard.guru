@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { buildConfirmLink } from "@/lib/telegram";
 import { normalizePhoneForCity } from "@/lib/phone-server";
 import { resolveUploadsSubdir } from "@/lib/uploads-dir";
+import { buildPlayerLatinFields } from "@/lib/latin-names";
 import { playerRegisterSchema } from "@/lib/validators";
 
 export async function registerPlayerFromFormData(formData: FormData) {
@@ -48,6 +49,7 @@ export async function registerPlayerFromFormData(formData: FormData) {
       firstName: data.firstName,
       lastName: data.lastName,
       middleName: data.middleName || null,
+      ...buildPlayerLatinFields(data),
       cityId: data.cityId,
       phone: data.phone,
       email: data.email || null,

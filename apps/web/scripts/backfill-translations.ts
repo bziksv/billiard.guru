@@ -21,6 +21,7 @@ import {
 } from "../src/lib/translation";
 import { parsePriceTiers } from "../src/lib/club-schedule";
 import { COUNTRY_NAME_EN } from "../src/lib/geo-display";
+import { buildClubLatinFields, buildPlayerLatinFields } from "../src/lib/latin-names";
 
 const dryRun = process.argv.includes("--dry-run");
 const countOnly = process.argv.includes("--count");
@@ -69,6 +70,10 @@ async function countMissingTranslations() {
     playResponses: await prisma.playListingResponse.count({
       where: { message: { not: null }, messageEn: null },
     }),
+    playersLatin: await prisma.player.count({
+      where: { OR: [{ firstNameLatin: null }, { lastNameLatin: null }] },
+    }),
+    clubsNameLatin: await prisma.club.count({ where: { nameLatin: null } }),
   };
   const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
   console.log(JSON.stringify(counts, null, 2));
@@ -94,6 +99,38 @@ async function backfillTitleBody(
   return updated;
 }
 
+async function backfillLatinNames() {
+  let playerCount = 0;
+  const players = await prisma.player.findMany({
+    where: { OR: [{ firstNameLatin: null }, { lastNameLatin: null }] },
+    select: { id: true, firstName: true, lastName: true, middleName: true },
+  });
+  for (const row of players) {
+    const latin = buildPlayerLatinFields(row);
+    console.log(`[playerLatin] ${row.id}: ${row.lastName} ${row.firstName}`);
+    if (!dryRun) {
+      await prisma.player.update({ where: { id: row.id }, data: latin });
+    }
+    playerCount += 1;
+  }
+
+  let clubCount = 0;
+  const clubs = await prisma.club.findMany({
+    where: { nameLatin: null },
+    select: { id: true, name: true },
+  });
+  for (const row of clubs) {
+    const latin = buildClubLatinFields(row.name);
+    console.log(`[clubLatin] ${row.id}: ${row.name.slice(0, 50)}`);
+    if (!dryRun) {
+      await prisma.club.update({ where: { id: row.id }, data: latin });
+    }
+    clubCount += 1;
+  }
+
+  return { playerCount, clubCount };
+}
+
 async function main() {
   if (countOnly) {
     await countMissingTranslations();
@@ -106,6 +143,9 @@ async function main() {
   }
 
   if (dryRun) console.log("Dry run — записи в БД не меняются\n");
+
+  const { playerCount: playerLatinCount, clubCount: clubLatinCount } =
+    await backfillLatinNames();
 
   const siteNews = await prisma.siteNews.findMany({
     where: { OR: [{ titleEn: null }, { bodyEn: null }] },
@@ -329,7 +369,8 @@ async function main() {
   }
 
   console.log(
-    `\nDone${dryRun ? " (dry run)" : ""}: siteNews=${siteCount}, clubNews=${clubNewsCount}, ` +
+    `\nDone${dryRun ? " (dry run)" : ""}: playerLatin=${playerLatinCount}, clubLatin=${clubLatinCount}, ` +
+      `siteNews=${siteCount}, clubNews=${clubNewsCount}, ` +
       `playListing=${listingCount}, clubDesc=${clubDescCount}, clubExtra=${clubExtraCount}, ` +
       `tournamentDesc=${tournamentDescCount}, ` +
       `tournamentNames=${tournamentNameCount}, ideas=${ideaCount}, coachBio=${coachBioCount}, ` +

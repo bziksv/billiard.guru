@@ -12,9 +12,9 @@ import { CoachReviewsSection } from "@/components/site/coach-reviews-section";
 import { CoachReviewStars } from "@/components/site/coach-review-stars";
 import { formatCoachReviewAvg } from "@/lib/coach-review-display";
 import { formatGeoLocation } from "@/lib/geo-display";
+import { localizedPlayerName } from "@/lib/latin-names";
 import { formatRating } from "@/lib/rating";
 import { getCurrentPlayer, getSession } from "@/lib/auth";
-import { playerName } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
 import { buildLocalizedCoachDetailMetadata } from "@/lib/seo-locale";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -42,7 +42,7 @@ export async function generateMetadata({
       )
     : null;
   return buildLocalizedCoachDetailMetadata(
-    playerName(coach),
+    localizedPlayerName(appLocale, coach),
     cityLabel,
     id,
     locale,
@@ -75,7 +75,7 @@ export default async function CoachDetailPage({
 
   return (
     <>
-      <PageHeader title={playerName(coach)}>
+      <PageHeader title={localizedPlayerName(locale, coach)}>
         <Link href="/coaches" className="site-btn-ghost text-emerald-400">
           {t("detail.back.coaches")}
         </Link>
@@ -83,7 +83,7 @@ export default async function CoachDetailPage({
       <PageMain className="space-y-8 pt-0">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <SiteCard className="overflow-hidden p-0">
-            <ClubPhotoGallery photos={photos} alt={playerName(coach)} />
+            <ClubPhotoGallery photos={photos} alt={localizedPlayerName(locale, coach)} />
           </SiteCard>
 
           <SiteCard>

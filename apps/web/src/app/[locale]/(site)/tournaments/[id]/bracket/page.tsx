@@ -13,6 +13,7 @@ import { getLocalizedBracketFormatLabels } from "@/lib/bracket-formats/settings-
 import type { AdminTournament } from "@/lib/tournament-admin";
 import { buildPublicTournamentBracketView } from "@/lib/tournament-public-bracket";
 import type { AppLocale } from "@/i18n/routing";
+import { localizedClubName } from "@/lib/latin-names";
 import { localizedGeoName } from "@/lib/geo-display";
 import { resolveLocalizedField } from "@/lib/localized-db-text";
 import { getCanonicalSiteOrigin } from "@/lib/canonical-site-url";
@@ -101,7 +102,7 @@ export default async function TournamentBracketPage({
           <StatusBadge status={tournament.status} label={statusLabel} />
           <span className="text-zinc-400">{formatDisplay}</span>
           <span className="text-zinc-500">
-            {localizedGeoName(tournament.club.name, locale)} ·{" "}
+            {localizedClubName(locale, tournament.club.name, tournament.club.nameLatin)} ·{" "}
             {formatStartsAt(tournament.startsAt, locale)}
           </span>
         </SiteCard>

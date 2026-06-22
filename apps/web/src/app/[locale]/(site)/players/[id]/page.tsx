@@ -8,7 +8,7 @@ import type { AppLocale } from "@/i18n/routing";
 import { formatGeoLocation } from "@/lib/geo-display";
 import { resolveLocalizedField } from "@/lib/localized-db-text";
 import { formatRating } from "@/lib/rating";
-import { playerName } from "@/lib/public-display";
+import { localizedClubName, localizedPlayerName } from "@/lib/latin-names";
 import { prisma } from "@/lib/prisma";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { buildLocalizedPlayerDetailMetadata } from "@/lib/seo-locale";
@@ -40,7 +40,7 @@ export async function generateMetadata({
       )
     : null;
   return buildLocalizedPlayerDetailMetadata(
-    playerName(player),
+    localizedPlayerName(appLocale, player),
     cityLabel,
     id,
     locale,
@@ -82,7 +82,7 @@ export default async function PlayerPage({
 
   return (
     <>
-      <PageHeader title={playerName(player)}>
+      <PageHeader title={localizedPlayerName(locale, player)}>
         <Link href="/players" className="site-btn-ghost text-emerald-400">
           {t("detail.back.players")}
         </Link>
@@ -148,7 +148,7 @@ export default async function PlayerPage({
                     {resolveLocalizedField(locale, r.tournament.name, r.tournament.nameEn)}
                   </Link>
                   <p className="mt-1 text-zinc-500">
-                    {r.tournament.club.name} · {tournamentStatusLabel(r.tournament.status)}
+                    {localizedClubName(locale, r.tournament.club.name, r.tournament.club.nameLatin)} · {tournamentStatusLabel(r.tournament.status)}
                   </p>
                   <StatusBadge
                     status={r.status}

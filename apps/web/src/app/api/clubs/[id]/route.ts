@@ -23,6 +23,7 @@ import {
 import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
 import { buildClubLocalizedUpdate, clubLocalizedToPrisma } from "@/lib/translation";
+import { buildClubLatinFields } from "@/lib/latin-names";
 import { Prisma } from "@/generated/prisma/client";
 import { normalizePhoneForCity } from "@/lib/phone-server";
 import { clubUpdateSchema } from "@/lib/validators";
@@ -207,7 +208,10 @@ export async function PATCH(
       const club = await prisma.club.update({
         where: { id },
         data: {
-          ...(data.name !== undefined && { name: data.name }),
+          ...(data.name !== undefined && {
+            name: data.name,
+            ...buildClubLatinFields(data.name),
+          }),
           ...(data.cityId !== undefined && { cityId: data.cityId }),
           ...(data.email !== undefined && { email: data.email }),
           ...(data.address !== undefined && { address: data.address }),
@@ -321,7 +325,10 @@ export async function PATCH(
     });
 
     const updateData: Prisma.ClubUpdateInput = {
-        ...(data.name !== undefined && { name: data.name }),
+        ...(data.name !== undefined && {
+          name: data.name,
+          ...buildClubLatinFields(data.name),
+        }),
         ...(data.cityId !== undefined && { cityId: data.cityId }),
         ...(data.email !== undefined && { email: data.email }),
         ...(data.address !== undefined && { address: data.address }),

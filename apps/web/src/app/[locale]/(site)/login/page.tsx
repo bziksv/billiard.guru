@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CitySelect } from "@/components/admin/city-select";
 import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { SiteContainer } from "@/components/site/site-container";
@@ -28,6 +29,7 @@ type CallLoginPayload = {
 };
 
 function LoginForm() {
+  const t = useTranslations("auth");
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/cabinet";
@@ -36,7 +38,7 @@ function LoginForm() {
   const [phone, setPhone] = useState("");
   const [phoneValid, setPhoneValid] = useState(false);
   const [cityId, setCityId] = useState("");
-  const [countryName, setCountryName] = useState("Россия");
+  const [countryName, setCountryName] = useState(t("defaultCountry"));
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -300,24 +302,24 @@ function LoginForm() {
 
   return (
     <div className="site-card mx-auto w-full max-w-md p-8">
-      <h1 className="text-2xl font-bold text-[var(--text-primary)]">Вход и регистрация</h1>
-      <p className="mt-2 text-sm text-[var(--text-secondary)]">
-        Введите номер телефона — мы проверим, есть ли вы в базе.
-      </p>
+      <h1 className="text-2xl font-bold text-[var(--text-primary)]">{t("title")}</h1>
+      <p className="mt-2 text-sm text-[var(--text-secondary)]">{t("lead")}</p>
       <ul className="mt-2 space-y-1 text-sm text-[var(--text-secondary)]">
         <li>
-          <span className="font-medium text-[var(--text-primary)]">Новый пользователь:</span>{" "}
-          заполните профиль, подтвердите номер коротким звонком, затем подключите бота{" "}
-          <TelegramLink
-            username={TELEGRAM_BOT_USERNAME}
-            className="font-medium text-emerald-700 underline dark:text-emerald-400"
-          />{" "}
-          для уведомлений о турнирах, проведения турниров, управления клубом, своей анкеты и
-          поиска партнёров для игры.
+          <span className="font-medium text-[var(--text-primary)]">{t("newUserLabel")}</span>{" "}
+          {t.rich("newUserText", {
+            bot: TELEGRAM_BOT_USERNAME,
+            link: () => (
+              <TelegramLink
+                username={TELEGRAM_BOT_USERNAME}
+                className="font-medium text-emerald-700 underline dark:text-emerald-400"
+              />
+            ),
+          })}
         </li>
         <li>
-          <span className="font-medium text-[var(--text-primary)]">Уже регистрировались:</span>{" "}
-          вход через Telegram или тем же коротким звонком.
+          <span className="font-medium text-[var(--text-primary)]">{t("existingUserLabel")}</span>{" "}
+          {t("existingUserText")}
         </li>
       </ul>
 
@@ -343,7 +345,7 @@ function LoginForm() {
             disabled={loading || !phoneValid || !consentAccepted}
             className="site-btn-primary w-full disabled:opacity-50"
           >
-            {loading ? "Проверка…" : "Продолжить"}
+            {loading ? t("checking") : t("continue")}
           </button>
         </form>
       )}
@@ -353,7 +355,7 @@ function LoginForm() {
           {info && <p className="text-sm text-emerald-800 dark:text-emerald-300/90">{info}</p>}
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-sm">
-              <span className="mb-1 block text-[var(--text-secondary)]">Фамилия</span>
+              <span className="mb-1 block text-[var(--text-secondary)]">{t("lastName")}</span>
               <input
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -363,7 +365,7 @@ function LoginForm() {
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block text-[var(--text-secondary)]">Имя</span>
+              <span className="mb-1 block text-[var(--text-secondary)]">{t("firstName")}</span>
               <input
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -376,7 +378,7 @@ function LoginForm() {
           <CitySelect
             value={cityId}
             onChange={setCityId}
-            onCountryChange={(c) => setCountryName(c?.nameRu ?? "Россия")}
+            onCountryChange={(c) => setCountryName(c?.nameRu ?? t("defaultCountry"))}
             required
           />
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
@@ -390,10 +392,10 @@ function LoginForm() {
             disabled={loading || !consentAccepted}
             className="site-btn-primary w-full disabled:opacity-50"
           >
-            {loading ? "Регистрация…" : "Зарегистрироваться"}
+            {loading ? t("registering") : t("register")}
           </button>
           <button type="button" onClick={resetToPhone} className="text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]">
-            Другой номер
+            {t("otherNumber")}
           </button>
         </form>
       )}
@@ -410,11 +412,11 @@ function LoginForm() {
                 rel="noreferrer"
                 className="font-medium text-emerald-700 underline dark:text-emerald-400"
               >
-                бота в Telegram
+                {t("openBot")}
               </a>
             </li>
-            <li>Нажмите «Поделиться контактом» или Start по ссылке</li>
-            <li>Вернитесь сюда и нажмите «Войти»</li>
+            <li>{t("shareContact")}</li>
+            <li>{t("returnAndSignIn")}</li>
           </ol>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
@@ -423,14 +425,14 @@ function LoginForm() {
             onClick={() => void startAuth()}
             className="site-btn-primary w-full disabled:opacity-50"
           >
-            {loading ? "Проверка…" : "Войти после подтверждения"}
+            {loading ? t("checking") : t("signInAfterConfirm")}
           </button>
           <button
             type="button"
             onClick={resetToPhone}
             className="pt-1 text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]"
           >
-            Другой номер
+            {t("otherNumber")}
           </button>
         </div>
       )}
@@ -440,20 +442,19 @@ function LoginForm() {
           {info && <p className="text-sm text-emerald-800 dark:text-emerald-300">{info}</p>}
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
             {polling
-              ? "Ждём ваш звонок…"
+              ? t("waitingCall")
               : authFlow === "register"
-                ? "Подтвердите номер коротким звонком"
-                : "Позвоните на номер ниже для входа"}
+                ? t("confirmByCall")
+                : t("callToSignIn")}
           </p>
           {callNumber ? (
             <>
               {phoneDisplay && (
                 <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                  Звоните <span className="font-medium text-[var(--text-primary)]">с номера {phoneDisplay}</span>{" "}
-                  — он должен совпасть с тем, что вы вводили.
+                  {t("callFromPhone", { phone: phoneDisplay })}
                 </p>
               )}
-              <p className="text-xs text-[var(--text-muted)]">Наберите короткий номер:</p>
+              <p className="text-xs text-[var(--text-muted)]">{t("dialShort")}</p>
               <p className="text-center text-2xl font-bold tracking-wide text-[var(--text-primary)] tabular-nums">
                 <a href={`tel:+${callNumber.replace(/\D/g, "")}`} className="hover:underline">
                   {callNumber}
@@ -462,15 +463,13 @@ function LoginForm() {
             </>
           ) : (
             <p className="text-sm text-amber-800 dark:text-amber-300">
-              Номер для звонка пока не активирован. Используйте Telegram.
+              {t("callNotActive")}
             </p>
           )}
           <ol className="list-decimal space-y-1 pl-4 text-xs text-zinc-600 dark:text-zinc-300">
-            <li>Дождитесь сброса — разговаривать не нужно</li>
+            <li>{t("callStep1")}</li>
             <li>
-              {authFlow === "register"
-                ? "После звонка предложим подключить Telegram для уведомлений"
-                : "Страница войдёт автоматически"}
+              {authFlow === "register" ? t("callStep2Register") : t("callStep2Login")}
             </li>
           </ol>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
@@ -479,7 +478,7 @@ function LoginForm() {
             onClick={resetToPhone}
             className="pt-1 text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]"
           >
-            Отменить
+            {t("cancel")}
           </button>
         </div>
       )}
@@ -487,17 +486,15 @@ function LoginForm() {
       {step === "login" && authMethod === "telegram" && (
         <div className={`mt-6 ${authPanelClass} space-y-3`}>
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-            {polling
-              ? "Откройте Telegram и нажмите «Подтвердить вход»…"
-              : "Обработка…"}
+            {polling ? t("openTelegramConfirm") : t("processing")}
           </p>
           <p className="text-xs text-[var(--text-muted)]">
-            Сообщение отправлено на привязанный аккаунт.
+            {t("messageSent")}
           </p>
           {callAuthEnabled && callNumber && (
             <div className="border-t border-emerald-200/80 pt-3 dark:border-emerald-900/50">
               <p className="text-xs text-[var(--text-muted)]">
-                Или позвоните с телефона, который вводили — звонок сбросится сам:
+                {t("orCallHint")}
               </p>
               <p className="mt-1 text-center text-lg font-bold tabular-nums text-[var(--text-primary)]">
                 <a href={`tel:+${callNumber.replace(/\D/g, "")}`} className="hover:underline">
@@ -510,7 +507,7 @@ function LoginForm() {
                 onClick={() => void switchToCallAuth()}
                 className="mt-2 w-full text-center text-xs text-emerald-800 underline hover:text-emerald-950 disabled:opacity-50 dark:text-emerald-300"
               >
-                Обновить ожидание звонка
+                {t("refreshCallWait")}
               </button>
             </div>
           )}
@@ -520,7 +517,7 @@ function LoginForm() {
             onClick={resetToPhone}
             className="pt-1 text-xs text-[var(--text-muted)] underline hover:text-[var(--text-primary)]"
           >
-            Отменить
+            {t("cancel")}
           </button>
         </div>
       )}
@@ -528,16 +525,18 @@ function LoginForm() {
       {step === "telegram_nudge" && (
         <div className={`mt-6 ${authPanelClass} space-y-4`}>
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
-            {authFlow === "register" ? "Регистрация завершена!" : "Вход выполнен!"}
+            {authFlow === "register" ? t("registerDone") : t("signInDone")}
           </p>
           <p className="text-sm text-zinc-600 dark:text-zinc-300">
-            Подключите бота{" "}
-            <TelegramLink
-              username={TELEGRAM_BOT_USERNAME}
-              className="font-medium text-emerald-700 underline dark:text-emerald-400"
-            />{" "}
-            — так вы будете получать уведомления о турнирах, проводить турниры, управлять клубом,
-            анкетой и искать партнёров для игры на billiard.guru.
+            {t.rich("connectBot", {
+              bot: TELEGRAM_BOT_USERNAME,
+              link: () => (
+                <TelegramLink
+                  username={TELEGRAM_BOT_USERNAME}
+                  className="font-medium text-emerald-700 underline dark:text-emerald-400"
+                />
+              ),
+            })}
           </p>
           <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-600 dark:text-zinc-300">
             <li>
@@ -548,11 +547,11 @@ function LoginForm() {
                 rel="noreferrer"
                 className="font-medium text-emerald-700 underline dark:text-emerald-400"
               >
-                бота в Telegram
+                {t("openBot")}
               </a>
             </li>
-            <li>Нажмите Start или «Поделиться контактом»</li>
-            <li>Можно сделать это позже — вход уже активен</li>
+            <li>{t("botStepStart")}</li>
+            <li>{t("botStepLater")}</li>
           </ol>
           <a
             href={botLink}
@@ -560,17 +559,17 @@ function LoginForm() {
             rel="noreferrer"
             className="site-btn-primary block w-full text-center"
           >
-            Открыть бота
+            {t("openBotBtn")}
           </a>
           <button type="button" onClick={goToCabinet} className="site-btn-secondary w-full">
-            Позже — в кабинет
+            {t("laterToCabinet")}
           </button>
         </div>
       )}
 
       <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
         <Link href="/" className="font-medium text-emerald-700 hover:underline dark:text-emerald-400">
-          На главную
+          {t("home")}
         </Link>
       </p>
     </div>
@@ -578,9 +577,10 @@ function LoginForm() {
 }
 
 export default function LoginPage() {
+  const t = useTranslations("auth");
   return (
     <SiteContainer className="flex flex-1 flex-col items-center justify-center py-16">
-      <Suspense fallback={<div className="text-[var(--text-muted)]">Загрузка…</div>}>
+      <Suspense fallback={<div className="text-[var(--text-muted)]">{t("loading")}</div>}>
         <LoginForm />
       </Suspense>
     </SiteContainer>

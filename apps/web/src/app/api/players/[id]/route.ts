@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
+import { buildPlayerLatinFields } from "@/lib/latin-names";
 import { prisma } from "@/lib/prisma";
 import { normalizePhoneForCity } from "@/lib/phone-server";
 import { playerUpdateSchema } from "@/lib/validators";
@@ -54,6 +55,22 @@ export async function PATCH(
       phone = phoneResult.e164;
     }
 
+    const nextFirstName = data.firstName ?? existing.firstName;
+    const nextLastName = data.lastName ?? existing.lastName;
+    const nextMiddleName =
+      data.middleName !== undefined ? data.middleName || null : existing.middleName;
+
+    const latinPatch =
+      data.firstName !== undefined ||
+      data.lastName !== undefined ||
+      data.middleName !== undefined
+        ? buildPlayerLatinFields({
+            firstName: nextFirstName,
+            lastName: nextLastName,
+            middleName: nextMiddleName,
+          })
+        : {};
+
     const player = await prisma.player.update({
       where: { id },
       data: {
@@ -62,6 +79,7 @@ export async function PATCH(
         ...(data.middleName !== undefined && {
           middleName: data.middleName || null,
         }),
+        ...latinPatch,
         ...(data.cityId !== undefined && { cityId: data.cityId }),
         ...(data.phone !== undefined && { phone }),
         ...(data.email !== undefined && { email: data.email || null }),

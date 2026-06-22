@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { localizedClubName } from "@/lib/latin-names";
 import { localizedGeoName } from "@/lib/geo-display";
 import type { AppLocale } from "@/i18n/routing";
 
 type ClubItem = {
   id: string;
   name: string;
+  nameLatin?: string | null;
   isVerified: boolean;
   gamePrice?: string | null;
   city: { nameRu: string; nameEn?: string | null; country: { nameRu: string; nameEn?: string | null } };
@@ -59,7 +61,7 @@ export async function HomeClubShowcase({ clubs }: { clubs: ClubItem[] }) {
               </div>
               <div className="home-club-header-fade absolute bottom-0 left-0 right-0 p-4 pt-12">
                 <h3 className="home-card-title text-lg font-semibold group-hover:text-emerald-600">
-                  {club.name}
+                  {localizedClubName(locale, club.name, club.nameLatin)}
                 </h3>
                 <p className="home-card-muted text-sm">
                   {localizedGeoName(club.city.nameRu, locale, club.city.nameEn)},{" "}

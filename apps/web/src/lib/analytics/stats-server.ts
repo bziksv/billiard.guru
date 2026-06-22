@@ -1,9 +1,12 @@
 import type { AnalyticsSurface, Prisma } from "@/generated/prisma/client";
 import {
   ANALYTICS_COUNTRY_UNKNOWN,
+  ANALYTICS_PERIOD_YESTERDAY,
   ANALYTICS_RETENTION_DAYS,
   ANALYTICS_RETENTION_LABEL,
   ANALYTICS_SURFACE_LABELS,
+  isAnalyticsHourlyPeriod,
+  isAnalyticsYesterdayPeriod,
   type AnalyticsSurfaceId,
 } from "@/lib/analytics/constants";
 import { prisma } from "@/lib/prisma";
@@ -110,10 +113,10 @@ export type RecentVisitsFilter = {
 };
 
 function buildRecentVisitsWhere(
-  since: Date,
+  periodDays: number,
   filter?: RecentVisitsFilter,
 ): Prisma.SitePageViewWhereInput {
-  const where: Prisma.SitePageViewWhereInput = { createdAt: { gte: since } };
+  const where: Prisma.SitePageViewWhereInput = { createdAt: createdAtRange(periodDays) };
 
   if (filter?.surface) {
     where.surface = filter.surface;
@@ -139,11 +142,39 @@ function buildRecentVisitsWhere(
   return where;
 }
 
-function startOfPeriod(days: number): Date {
+function startOfToday(): Date {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function startOfPeriod(days: number): Date {
+  if (days === ANALYTICS_PERIOD_YESTERDAY) {
+    const d = startOfToday();
+    d.setDate(d.getDate() - 1);
+    return d;
+  }
+  const d = startOfToday();
   d.setDate(d.getDate() - (days - 1));
   return d;
+}
+
+function periodEndExclusive(periodDays: number): Date | null {
+  if (periodDays === ANALYTICS_PERIOD_YESTERDAY) {
+    return startOfToday();
+  }
+  return null;
+}
+
+function periodDayCount(periodDays: number): number {
+  if (periodDays === ANALYTICS_PERIOD_YESTERDAY) return 1;
+  return periodDays;
+}
+
+function createdAtRange(periodDays: number): { gte: Date; lt?: Date } {
+  const gte = startOfPeriod(periodDays);
+  const until = periodEndExclusive(periodDays);
+  return until ? { gte, lt: until } : { gte };
 }
 
 function dayKey(date: Date): string {
@@ -200,12 +231,11 @@ export async function listRecentVisits(input: {
   pageSize: number;
   filter?: RecentVisitsFilter;
 }): Promise<RecentVisitsPage> {
-  const since = startOfPeriod(input.periodDays);
   const page = Math.max(1, input.page);
   const pageSize = Math.min(50, Math.max(10, input.pageSize));
   const skip = (page - 1) * pageSize;
 
-  const where = buildRecentVisitsWhere(since, input.filter);
+  const where = buildRecentVisitsWhere(input.periodDays, input.filter);
 
   const [total, rows] = await Promise.all([
     prisma.sitePageView.count({ where }),
@@ -234,9 +264,10 @@ export async function listRecentVisits(input: {
 }
 
 function buildDailySeries(
-  days: number,
+  periodDays: number,
   rows: { day: string; surface: AnalyticsSurface; views: bigint; visitors: bigint }[],
 ): AnalyticsDailyPoint[] {
+  const days = periodDayCount(periodDays);
   const byDay = new Map<
     string,
     {
@@ -250,7 +281,7 @@ function buildDailySeries(
   >();
 
   for (let i = 0; i < days; i++) {
-    const d = startOfPeriod(days);
+    const d = startOfPeriod(periodDays);
     d.setDate(d.getDate() + i);
     const key = dayKey(d);
     byDay.set(key, {
@@ -298,8 +329,9 @@ function currentHourInTimezone(): number {
 
 function buildHourlySeries(
   rows: { hour: number; surface: AnalyticsSurface; views: bigint }[],
+  options?: { maxHour?: number },
 ): AnalyticsHourlyPoint[] {
-  const maxHour = currentHourInTimezone();
+  const maxHour = options?.maxHour ?? currentHourInTimezone();
   const buckets = new Map<
     number,
     { marketingViews: number; adminViews: number; manageViews: number }
@@ -350,15 +382,16 @@ function mergeCountryStats(
 }
 
 function buildCountryDailySeries(
-  days: number,
+  periodDays: number,
   topCountries: { countryCode: string; countryName: string }[],
   rows: { day: string; countryCode: string; visitors: bigint }[],
 ): AnalyticsCountryDailySeries[] {
   if (topCountries.length === 0) return [];
 
+  const days = periodDayCount(periodDays);
   const dateKeys: string[] = [];
   for (let i = 0; i < days; i++) {
-    const d = startOfPeriod(days);
+    const d = startOfPeriod(periodDays);
     d.setDate(d.getDate() + i);
     dateKeys.push(dayKey(d));
   }
@@ -390,7 +423,12 @@ function buildCountryDailySeries(
 export async function getVisitorAnalyticsReport(
   periodDays: number,
 ): Promise<VisitorAnalyticsReport> {
-  const since = startOfPeriod(periodDays);
+  const range = createdAtRange(periodDays);
+  const since = range.gte;
+  const until = range.lt ?? null;
+  const createdAtSql = until
+    ? { gte: since, lt: until }
+    : { gte: since };
 
   const [
     surfaceCounts,
@@ -406,86 +444,142 @@ export async function getVisitorAnalyticsReport(
   ] = await Promise.all([
     prisma.sitePageView.groupBy({
       by: ["surface"],
-      where: { createdAt: { gte: since } },
+      where: { createdAt: createdAtSql },
       _count: { id: true },
     }),
     prisma.sitePageView.findMany({
-      where: { createdAt: { gte: since }, surface: "MARKETING" },
+      where: { createdAt: createdAtSql, surface: "MARKETING" },
       distinct: ["visitorId"],
       select: { visitorId: true },
     }),
     prisma.sitePageView.findMany({
-      where: { createdAt: { gte: since }, surface: "ADMIN" },
+      where: { createdAt: createdAtSql, surface: "ADMIN" },
       distinct: ["visitorId"],
       select: { visitorId: true },
     }),
     prisma.sitePageView.findMany({
-      where: { createdAt: { gte: since }, surface: "MANAGE" },
+      where: { createdAt: createdAtSql, surface: "MANAGE" },
       distinct: ["visitorId"],
       select: { visitorId: true },
     }),
     prisma.sitePageView.findMany({
-      where: { createdAt: { gte: since } },
+      where: { createdAt: createdAtSql },
       distinct: ["visitorId"],
       select: { visitorId: true },
     }),
     prisma.sitePageView.findMany({
-      where: { createdAt: { gte: since }, playerId: { not: null } },
+      where: { createdAt: createdAtSql, playerId: { not: null } },
       distinct: ["visitorId"],
       select: { visitorId: true },
     }),
-    prisma.$queryRaw<
-      { day: string; surface: AnalyticsSurface; views: bigint; visitors: bigint }[]
-    >`
-      SELECT DATE(created_at) AS day, surface,
-        COUNT(*) AS views,
-        COUNT(DISTINCT visitor_id) AS visitors
-      FROM site_page_views
-      WHERE created_at >= ${since}
-      GROUP BY day, surface
-      ORDER BY day ASC
-    `,
-    prisma.$queryRaw<
-      { path: string; surface: AnalyticsSurface; views: bigint; visitors: bigint }[]
-    >`
-      SELECT path, surface,
-        COUNT(*) AS views,
-        COUNT(DISTINCT visitor_id) AS visitors
-      FROM site_page_views
-      WHERE created_at >= ${since}
-      GROUP BY path, surface
-      ORDER BY views DESC
-      LIMIT 36
-    `,
-    prisma.$queryRaw<
-      {
-        countryCode: string;
-        views: bigint;
-        visitors: bigint;
-      }[]
-    >`
-      SELECT country_code AS countryCode,
-        COUNT(*) AS views,
-        COUNT(DISTINCT visitor_id) AS visitors
-      FROM site_page_views
-      WHERE created_at >= ${since}
-        AND country_code IS NOT NULL
-      GROUP BY country_code
-      ORDER BY visitors DESC
-      LIMIT 12
-    `,
-    prisma.$queryRaw<
-      { day: string; countryCode: string; visitors: bigint }[]
-    >`
-      SELECT DATE(created_at) AS day,
-        country_code AS countryCode,
-        COUNT(DISTINCT visitor_id) AS visitors
-      FROM site_page_views
-      WHERE created_at >= ${since}
-        AND country_code IS NOT NULL
-      GROUP BY day, country_code
-      ORDER BY day ASC
-    `,
+    until
+      ? prisma.$queryRaw<
+          { day: string; surface: AnalyticsSurface; views: bigint; visitors: bigint }[]
+        >`
+          SELECT DATE(created_at) AS day, surface,
+            COUNT(*) AS views,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since} AND created_at < ${until}
+          GROUP BY day, surface
+          ORDER BY day ASC
+        `
+      : prisma.$queryRaw<
+          { day: string; surface: AnalyticsSurface; views: bigint; visitors: bigint }[]
+        >`
+          SELECT DATE(created_at) AS day, surface,
+            COUNT(*) AS views,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since}
+          GROUP BY day, surface
+          ORDER BY day ASC
+        `,
+    until
+      ? prisma.$queryRaw<
+          { path: string; surface: AnalyticsSurface; views: bigint; visitors: bigint }[]
+        >`
+          SELECT path, surface,
+            COUNT(*) AS views,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since} AND created_at < ${until}
+          GROUP BY path, surface
+          ORDER BY views DESC
+          LIMIT 36
+        `
+      : prisma.$queryRaw<
+          { path: string; surface: AnalyticsSurface; views: bigint; visitors: bigint }[]
+        >`
+          SELECT path, surface,
+            COUNT(*) AS views,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since}
+          GROUP BY path, surface
+          ORDER BY views DESC
+          LIMIT 36
+        `,
+    until
+      ? prisma.$queryRaw<
+          {
+            countryCode: string;
+            views: bigint;
+            visitors: bigint;
+          }[]
+        >`
+          SELECT country_code AS countryCode,
+            COUNT(*) AS views,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since} AND created_at < ${until}
+            AND country_code IS NOT NULL
+          GROUP BY country_code
+          ORDER BY visitors DESC
+          LIMIT 12
+        `
+      : prisma.$queryRaw<
+          {
+            countryCode: string;
+            views: bigint;
+            visitors: bigint;
+          }[]
+        >`
+          SELECT country_code AS countryCode,
+            COUNT(*) AS views,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since}
+            AND country_code IS NOT NULL
+          GROUP BY country_code
+          ORDER BY visitors DESC
+          LIMIT 12
+        `,
+    until
+      ? prisma.$queryRaw<
+          { day: string; countryCode: string; visitors: bigint }[]
+        >`
+          SELECT DATE(created_at) AS day,
+            country_code AS countryCode,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since} AND created_at < ${until}
+            AND country_code IS NOT NULL
+          GROUP BY day, country_code
+          ORDER BY day ASC
+        `
+      : prisma.$queryRaw<
+          { day: string; countryCode: string; visitors: bigint }[]
+        >`
+          SELECT DATE(created_at) AS day,
+            country_code AS countryCode,
+            COUNT(DISTINCT visitor_id) AS visitors
+          FROM site_page_views
+          WHERE created_at >= ${since}
+            AND country_code IS NOT NULL
+          GROUP BY day, country_code
+          ORDER BY day ASC
+        `,
   ]);
 
   const pageViewsMarketing =
@@ -505,9 +599,18 @@ export async function getVisitorAnalyticsReport(
       ? Math.round((registeredCount / uniqueVisitorsAll) * 1000) / 10
       : 0;
 
-  const hourlyRows =
-    periodDays === 1
+  const hourlyRows = isAnalyticsHourlyPeriod(periodDays)
+    ? until
       ? await prisma.$queryRaw<
+          { hour: number; surface: AnalyticsSurface; views: bigint }[]
+        >`
+          SELECT HOUR(created_at) AS hour, surface, COUNT(*) AS views
+          FROM site_page_views
+          WHERE created_at >= ${since} AND created_at < ${until}
+          GROUP BY hour, surface
+          ORDER BY hour ASC
+        `
+      : await prisma.$queryRaw<
           { hour: number; surface: AnalyticsSurface; views: bigint }[]
         >`
           SELECT HOUR(created_at) AS hour, surface, COUNT(*) AS views
@@ -516,7 +619,7 @@ export async function getVisitorAnalyticsReport(
           GROUP BY hour, surface
           ORDER BY hour ASC
         `
-      : [];
+    : [];
 
   const topCountries = mergeCountryStats(
     topCountryRows.map((row) => ({
@@ -553,16 +656,16 @@ export async function getVisitorAnalyticsReport(
         visitors: r.visitors,
       })),
     ),
-    hourly:
-      periodDays === 1
-        ? buildHourlySeries(
-            hourlyRows.map((r) => ({
-              hour: Number(r.hour),
-              surface: r.surface,
-              views: r.views,
-            })),
-          )
-        : null,
+    hourly: isAnalyticsHourlyPeriod(periodDays)
+      ? buildHourlySeries(
+          hourlyRows.map((r) => ({
+            hour: Number(r.hour),
+            surface: r.surface,
+            views: r.views,
+          })),
+          isAnalyticsYesterdayPeriod(periodDays) ? { maxHour: 23 } : undefined,
+        )
+      : null,
     topPages: topPageRows.map((row) => ({
       path: row.path,
       surface: row.surface as AnalyticsSurfaceId,
@@ -572,21 +675,20 @@ export async function getVisitorAnalyticsReport(
       visitors: Number(row.visitors),
     })),
     topCountries,
-    countryDaily:
-      periodDays === 1
-        ? []
-        : buildCountryDailySeries(
-            periodDays,
-            topCountries.slice(0, COUNTRY_CHART_LIMIT).map((row) => ({
-              countryCode: row.countryCode,
-              countryName: row.countryName,
-            })),
-            dailyCountryRows.map((r) => ({
-              day: typeof r.day === "string" ? r.day.slice(0, 10) : dayKey(new Date(r.day)),
-              countryCode: r.countryCode,
-              visitors: r.visitors,
-            })),
-          ),
+    countryDaily: isAnalyticsHourlyPeriod(periodDays)
+      ? []
+      : buildCountryDailySeries(
+          periodDays,
+          topCountries.slice(0, COUNTRY_CHART_LIMIT).map((row) => ({
+            countryCode: row.countryCode,
+            countryName: row.countryName,
+          })),
+          dailyCountryRows.map((r) => ({
+            day: typeof r.day === "string" ? r.day.slice(0, 10) : dayKey(new Date(r.day)),
+            countryCode: r.countryCode,
+            visitors: r.visitors,
+          })),
+        ),
   };
 }
 

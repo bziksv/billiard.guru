@@ -6,6 +6,8 @@ import {
   ANALYTICS_PERIOD_OPTIONS,
   ANALYTICS_SURFACE_LABELS,
   ANALYTICS_SURFACE_SHORT_LABELS,
+  isAnalyticsHourlyPeriod,
+  isAnalyticsYesterdayPeriod,
   type AnalyticsSurfaceId,
 } from "@/lib/analytics/constants";
 import type {
@@ -671,17 +673,19 @@ export function VisitorAnalyticsPanel() {
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <h2 className="text-base font-semibold">
-                  {days === 1 ? "Активность по часам" : "Динамика по дням"}
+                  {isAnalyticsHourlyPeriod(days) ? "Активность по часам" : "Динамика по дням"}
                 </h2>
                 <p className="admin-muted text-sm">
                   {days === 1
                     ? "Просмотры страниц с 00:00 до текущего часа"
-                    : "Уникальные посетители в сутки"}
+                    : isAnalyticsYesterdayPeriod(days)
+                      ? "Просмотры страниц за вчера по часам"
+                      : "Уникальные посетители в сутки"}
                 </p>
               </div>
               {loading && <span className="admin-muted text-xs">Обновление…</span>}
             </div>
-            {days === 1 && report.hourly ? (
+            {isAnalyticsHourlyPeriod(days) && report.hourly ? (
               <TodayHourlyChart hourly={report.hourly} />
             ) : (
               <VisitorsChart daily={report.daily} />
@@ -691,15 +695,19 @@ export function VisitorAnalyticsPanel() {
           <div className="admin-card rounded-xl border border-[var(--admin-border)] p-5">
             <div className="mb-4">
               <h2 className="text-base font-semibold">
-                {days === 1 ? "Страны за сегодня" : "Динамика по странам"}
+                {isAnalyticsHourlyPeriod(days)
+                  ? isAnalyticsYesterdayPeriod(days)
+                    ? "Страны за вчера"
+                    : "Страны за сегодня"
+                  : "Динамика по странам"}
               </h2>
               <p className="admin-muted text-sm">
-                {days === 1
+                {isAnalyticsHourlyPeriod(days)
                   ? "Уникальные посетители по стране"
                   : "Уникальные посетители в сутки · топ-6 стран за период"}
               </p>
             </div>
-            {days === 1 ? (
+            {isAnalyticsHourlyPeriod(days) ? (
               <TodayCountriesChart countries={report.topCountries} />
             ) : (
               <CountriesChart series={report.countryDaily} />
@@ -712,7 +720,7 @@ export function VisitorAnalyticsPanel() {
             <TopPagesTable title="Популярные страницы — клуб" pages={manageTop} barClass="bg-rose-500/70" />
           </div>
 
-          {report.topCountries.length > 0 && days !== 1 && (
+          {report.topCountries.length > 0 && !isAnalyticsHourlyPeriod(days) && (
             <TopCountriesBlock countries={report.topCountries} />
           )}
 

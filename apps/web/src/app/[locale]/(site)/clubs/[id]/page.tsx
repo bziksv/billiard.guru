@@ -14,6 +14,7 @@ import { LocalizedUserText } from "@/components/site/localized-user-text";
 import { getCurrentPlayer } from "@/lib/auth";
 import { clubPhotoUrls } from "@/lib/club-photos";
 import { floorPlanHasItems } from "@/lib/club-floor-plan";
+import { localizedClubName } from "@/lib/latin-names";
 import { localizedGeoName } from "@/lib/geo-display";
 import { PUBLIC_TOURNAMENT_STATUSES } from "@/lib/public-display";
 import {
@@ -50,7 +51,7 @@ export async function generateMetadata({
   if (!club) return { title: t("club") };
   const appLocale = locale as AppLocale;
   return buildLocalizedClubDetailMetadata(
-    localizedGeoName(club.name, appLocale),
+    localizedClubName(appLocale, club.name, club.nameLatin),
     localizedGeoName(club.city.nameRu, appLocale, club.city.nameEn),
     id,
     locale,
@@ -97,9 +98,11 @@ export default async function ClubPage({
     resolveLocalizedPriceTiers(locale, club.priceTiers, club.priceTiersEn),
   );
 
+  const displayName = localizedClubName(locale, club.name, club.nameLatin);
+
   return (
     <>
-      <PageHeader title={club.name}>
+      <PageHeader title={displayName}>
         <Link href="/clubs" className="site-btn-ghost text-emerald-400">
           {t("detail.back.clubs")}
         </Link>
@@ -107,7 +110,7 @@ export default async function ClubPage({
       <PageMain className="space-y-8 pt-0">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <SiteCard className="overflow-hidden p-0">
-            <ClubPhotoGallery photos={photos} alt={club.name} />
+            <ClubPhotoGallery photos={photos} alt={displayName} />
             <div className="p-6">
               <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge
@@ -180,7 +183,7 @@ export default async function ClubPage({
           <h2 className="site-section-title mb-4">{t("detail.club.onMap")}</h2>
           <SiteCard>
             <ClubMap
-              name={club.name}
+              name={displayName}
               address={club.address}
               latitude={mapLat}
               longitude={mapLng}
@@ -196,7 +199,7 @@ export default async function ClubPage({
             <SiteCard>
               <ClubBookingWidget
                 clubId={club.id}
-                clubName={club.name}
+                clubName={displayName}
                 bookingEnabled={club.bookingEnabled}
                 bookingAdvanceDays={club.bookingAdvanceDays}
                 tableCounts={club.tableCounts}

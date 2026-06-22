@@ -10,13 +10,12 @@ import { RegistrationCancelButton } from "@/components/site/registration-cancel-
 import { TournamentPublicView } from "@/components/site/tournament-public-view";
 import type { PublicParticipantRow } from "@/lib/tournament-public-standings";
 import { getCurrentPlayer } from "@/lib/auth";
+import { localizedClubName, localizedPlayerName, localizedTeamLabel } from "@/lib/latin-names";
 import {
   formatStartsAt,
   isPairFormat,
-  playerName,
   PUBLIC_TOURNAMENT_STATUSES,
   PUBLIC_PARTICIPANT_STATUSES,
-  teamLabel,
 } from "@/lib/public-display";
 import { findPublicTournamentById } from "@/lib/tournament-public-read";
 import { formatRatingRange } from "@/lib/play-listing-display";
@@ -85,7 +84,7 @@ function buildParticipantRows(
     const teams = tournament.matches.length > 0 ? confirmedTeams : publicTeams;
     return teams.map((team) => ({
       id: team.id,
-      name: teamLabel(team),
+      name: localizedTeamLabel(locale, team),
       href: team.player2
         ? `/players/${team.player1.id}`
         : `/players/${team.player1.id}`,
@@ -104,7 +103,7 @@ function buildParticipantRows(
     .filter((r) => publicStatuses.has(r.status))
     .map((r) => ({
       id: r.player.id,
-      name: playerName(r.player),
+      name: localizedPlayerName(locale, r.player),
       href: `/players/${r.player.id}`,
       city: cityLabel(r.player.city),
       ratingLabel: formatRating(r.player.rating),
@@ -136,7 +135,7 @@ export async function generateMetadata({
   const appLocale = locale as AppLocale;
   return buildLocalizedTournamentDetailMetadata(
     resolveLocalizedField(appLocale, tournament.name, tournament.nameEn),
-    localizedGeoName(tournament.club.name, appLocale),
+    localizedClubName(appLocale, tournament.club.name, tournament.club.nameLatin),
     localizedGeoName(tournament.club.city.nameRu, appLocale, tournament.club.city.nameEn),
     id,
     locale,
@@ -281,7 +280,7 @@ export default async function TournamentPage({
           <p className="mt-3 text-[var(--text-secondary)]">{formatDisplay}</p>
           <p className="mt-1 text-sm text-zinc-500">
             <Link href={`/clubs/${tournament.club.id}`} className="hover:text-emerald-400">
-              {localizedGeoName(tournament.club.name, locale)}
+              {localizedClubName(locale, tournament.club.name, tournament.club.nameLatin)}
             </Link>
             {" · "}
             {localizedGeoName(tournament.club.city.nameRu, locale, tournament.club.city.nameEn)}
@@ -333,7 +332,7 @@ export default async function TournamentPage({
                 {pair && "player1" in myParticipation ? (
                   <>
                     {t("detail.tournament.pairParticipating", {
-                      team: teamLabel(myParticipation),
+                      team: localizedTeamLabel(locale, myParticipation),
                     })}
                     {" · "}
                     <StatusBadge

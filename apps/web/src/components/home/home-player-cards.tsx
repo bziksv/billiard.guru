@@ -1,16 +1,21 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { localizedGeoName } from "@/lib/geo-display";
+import { localizedPlayerName } from "@/lib/latin-names";
+import type { AppLocale } from "@/i18n/routing";
 import { formatRating } from "@/lib/rating";
-import { playerName } from "@/lib/public-display";
 
 type PlayerItem = {
   id: string;
   firstName: string;
   lastName: string;
   middleName: string | null;
+  firstNameLatin?: string | null;
+  lastNameLatin?: string | null;
+  middleNameLatin?: string | null;
   rating: number;
   photoUrl: string | null;
-  city: { nameRu: string };
+  city: { nameRu: string; nameEn?: string | null };
 };
 
 const RANK_CARD_CLASS = [
@@ -33,6 +38,7 @@ const RANK_BADGE_CLASS = [
 
 export async function HomePlayerCards({ players }: { players: PlayerItem[] }) {
   const t = await getTranslations();
+  const locale = (await getLocale()) as AppLocale;
 
   if (players.length === 0) {
     return (
@@ -80,9 +86,11 @@ export async function HomePlayerCards({ players }: { players: PlayerItem[] }) {
           </div>
           <div className="p-4">
             <p className="home-card-title truncate font-semibold group-hover:text-emerald-600">
-              {playerName(player)}
+              {localizedPlayerName(locale, player)}
             </p>
-            <p className="home-card-muted mt-1 truncate text-xs">{player.city.nameRu}</p>
+            <p className="home-card-muted mt-1 truncate text-xs">
+              {localizedGeoName(player.city.nameRu, locale, player.city.nameEn)}
+            </p>
             <p className="mt-3 font-mono text-lg text-emerald-600">
               {formatRating(player.rating)}
             </p>

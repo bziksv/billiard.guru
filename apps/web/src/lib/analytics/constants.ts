@@ -19,8 +19,11 @@ export const ANALYTICS_SURFACE_SHORT_LABELS: Record<AnalyticsSurfaceId, string> 
   MANAGE: "Клуб",
 };
 
+export const ANALYTICS_PERIOD_YESTERDAY = -1;
+
 export const ANALYTICS_PERIOD_OPTIONS = [
   { value: 1, label: "Сегодня" },
+  { value: ANALYTICS_PERIOD_YESTERDAY, label: "Вчера" },
   { value: 7, label: "7 дней" },
   { value: 30, label: "30 дней" },
   { value: 90, label: "90 дней" },
@@ -29,6 +32,15 @@ export const ANALYTICS_PERIOD_OPTIONS = [
 export const ANALYTICS_ALLOWED_PERIODS = new Set<number>(
   ANALYTICS_PERIOD_OPTIONS.map((option) => option.value),
 );
+
+/** Почасовой график: сегодня (до текущего часа) или вчера (полные сутки). */
+export function isAnalyticsHourlyPeriod(days: number): boolean {
+  return days === 1 || days === ANALYTICS_PERIOD_YESTERDAY;
+}
+
+export function isAnalyticsYesterdayPeriod(days: number): boolean {
+  return days === ANALYTICS_PERIOD_YESTERDAY;
+}
 
 /** Значение фильтра «страна не определена» в API последних визитов. */
 export const ANALYTICS_COUNTRY_UNKNOWN = "__none__";

@@ -9,6 +9,7 @@ import { SiteCard } from "@/components/site/site-card";
 import { Link } from "@/i18n/navigation";
 import { redirect as nextRedirect } from "next/navigation";
 import { getCurrentPlayer, isSuperAdmin } from "@/lib/auth";
+import { localizedClubName } from "@/lib/latin-names";
 import { localizedGeoName } from "@/lib/geo-display";
 import { resolveLocalizedField } from "@/lib/localized-db-text";
 import { formatRating } from "@/lib/rating";
@@ -49,7 +50,7 @@ export default async function CabinetPage() {
       status: { notIn: ["CANCELLED", "REJECTED"] },
       endsAt: { gte: new Date() },
     },
-    include: { club: { select: { id: true, name: true } } },
+    include: { club: { select: { id: true, name: true, nameLatin: true } } },
     orderBy: { startsAt: "asc" },
   });
 
@@ -144,7 +145,7 @@ export default async function CabinetPage() {
                 <li key={b.id} className="site-card px-4 py-3 text-sm">
                   <div className="flex flex-wrap items-center gap-2">
                     <Link href={`/clubs/${b.club.id}`} className="font-medium hover:text-emerald-400">
-                      {b.club.name}
+                      {localizedClubName(locale, b.club.name, b.club.nameLatin)}
                     </Link>
                     <StatusBadge
                       status={b.status}
@@ -194,7 +195,7 @@ export default async function CabinetPage() {
                   </div>
                   <p className="mt-1 text-zinc-400">
                     {TOURNAMENT_FORMAT_LABELS[r.tournament.format]} ·{" "}
-                    {r.tournament.club.name} ·{" "}
+                    {localizedClubName(locale, r.tournament.club.name, r.tournament.club.nameLatin)} ·{" "}
                     {t(`tournamentStatus.${r.tournament.status}` as "tournamentStatus.OPEN")}
                   </p>
                   <RegistrationCancelButton
@@ -231,7 +232,7 @@ export default async function CabinetPage() {
                         ? `${partner.lastName} ${partner.firstName}`
                         : "—"}
                       {" · "}
-                      {team.tournament.club.name}
+                      {localizedClubName(locale, team.tournament.club.name, team.tournament.club.nameLatin)}
                     </p>
                     <StatusBadge
                       status={team.status}

@@ -189,6 +189,7 @@ model City {
 model Club {
   id               String   @id @default(cuid())
   name             String
+  nameLatin        String?  @map("name_latin")
   cityId           String   @map("city_id")
   city             City     @relation(fields: [cityId], references: [id])
   phone            String
@@ -328,6 +329,9 @@ model Player {
   firstName        String   @map("first_name")
   lastName         String   @map("last_name")
   middleName       String?  @map("middle_name")
+  firstNameLatin   String?  @map("first_name_latin")
+  lastNameLatin    String?  @map("last_name_latin")
+  middleNameLatin  String?  @map("middle_name_latin")
   cityId           String   @map("city_id")
   city             City     @relation(fields: [cityId], references: [id])
   phone            String   @unique

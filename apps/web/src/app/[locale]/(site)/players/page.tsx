@@ -5,8 +5,8 @@ import { EmptyState } from "@/components/site/site-card";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { formatGeoLocation } from "@/lib/geo-display";
+import { localizedPlayerName } from "@/lib/latin-names";
 import { formatRating } from "@/lib/rating";
-import { playerName } from "@/lib/public-display";
 import { playerGeoWhere } from "@/lib/public-queries";
 import { prisma } from "@/lib/prisma";
 import type { GeoSearchParams } from "@/lib/site";
@@ -77,7 +77,7 @@ export default async function PlayersPage({
                             {player.firstName[0]}
                           </div>
                         )}
-                        <span className="font-medium">{playerName(player)}</span>
+                        <span className="font-medium">{localizedPlayerName(locale, player)}</span>
                       </Link>
                     </td>
                     <td className="home-card-body">

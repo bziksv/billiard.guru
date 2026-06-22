@@ -5,6 +5,7 @@ import { normalizePhoneForCity } from "@/lib/phone-server";
 import { createLoginChallenge, createCallLoginChallenge } from "@/lib/login-challenge";
 import { buildConfirmLink } from "@/lib/telegram";
 import { writeAuditLog } from "@/lib/audit";
+import { buildPlayerLatinFields } from "@/lib/latin-names";
 import { playerRegisterSchema } from "@/lib/validators";
 import {
   getNovofonVerifyNumberDisplay,
@@ -193,6 +194,7 @@ export async function registerPlayerByPhone(input: {
         firstName: data.firstName,
         lastName: data.lastName,
         middleName: data.middleName || null,
+        ...buildPlayerLatinFields(data),
         cityId: data.cityId,
         email: data.email || null,
         birthDate: data.birthDate ? new Date(data.birthDate) : null,
@@ -225,6 +227,7 @@ export async function registerPlayerByPhone(input: {
       firstName: data.firstName,
       lastName: data.lastName,
       middleName: data.middleName || null,
+      ...buildPlayerLatinFields(data),
       cityId: data.cityId,
       phone: data.phone,
       email: data.email || null,

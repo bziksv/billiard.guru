@@ -43,6 +43,9 @@ export type PlayerMinAggregateOutputType = {
   firstName: string | null
   lastName: string | null
   middleName: string | null
+  firstNameLatin: string | null
+  lastNameLatin: string | null
+  middleNameLatin: string | null
   cityId: string | null
   phone: string | null
   email: string | null
@@ -70,6 +73,9 @@ export type PlayerMaxAggregateOutputType = {
   firstName: string | null
   lastName: string | null
   middleName: string | null
+  firstNameLatin: string | null
+  lastNameLatin: string | null
+  middleNameLatin: string | null
   cityId: string | null
   phone: string | null
   email: string | null
@@ -97,6 +103,9 @@ export type PlayerCountAggregateOutputType = {
   firstName: number
   lastName: number
   middleName: number
+  firstNameLatin: number
+  lastNameLatin: number
+  middleNameLatin: number
   cityId: number
   phone: number
   email: number
@@ -139,6 +148,9 @@ export type PlayerMinAggregateInputType = {
   firstName?: true
   lastName?: true
   middleName?: true
+  firstNameLatin?: true
+  lastNameLatin?: true
+  middleNameLatin?: true
   cityId?: true
   phone?: true
   email?: true
@@ -166,6 +178,9 @@ export type PlayerMaxAggregateInputType = {
   firstName?: true
   lastName?: true
   middleName?: true
+  firstNameLatin?: true
+  lastNameLatin?: true
+  middleNameLatin?: true
   cityId?: true
   phone?: true
   email?: true
@@ -193,6 +208,9 @@ export type PlayerCountAggregateInputType = {
   firstName?: true
   lastName?: true
   middleName?: true
+  firstNameLatin?: true
+  lastNameLatin?: true
+  middleNameLatin?: true
   cityId?: true
   phone?: true
   email?: true
@@ -308,6 +326,9 @@ export type PlayerGroupByOutputType = {
   firstName: string
   lastName: string
   middleName: string | null
+  firstNameLatin: string | null
+  lastNameLatin: string | null
+  middleNameLatin: string | null
   cityId: string
   phone: string
   email: string | null
@@ -359,6 +380,9 @@ export type PlayerWhereInput = {
   firstName?: Prisma.StringFilter<"Player"> | string
   lastName?: Prisma.StringFilter<"Player"> | string
   middleName?: Prisma.StringNullableFilter<"Player"> | string | null
+  firstNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
+  lastNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
+  middleNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
   cityId?: Prisma.StringFilter<"Player"> | string
   phone?: Prisma.StringFilter<"Player"> | string
   email?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -406,6 +430,9 @@ export type PlayerOrderByWithRelationInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   middleName?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstNameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastNameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
+  middleNameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -460,6 +487,9 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   firstName?: Prisma.StringFilter<"Player"> | string
   lastName?: Prisma.StringFilter<"Player"> | string
   middleName?: Prisma.StringNullableFilter<"Player"> | string | null
+  firstNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
+  lastNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
+  middleNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
   cityId?: Prisma.StringFilter<"Player"> | string
   email?: Prisma.StringNullableFilter<"Player"> | string | null
   birthDate?: Prisma.DateTimeNullableFilter<"Player"> | Date | string | null
@@ -504,6 +534,9 @@ export type PlayerOrderByWithAggregationInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   middleName?: Prisma.SortOrderInput | Prisma.SortOrder
+  firstNameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastNameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
+  middleNameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -540,6 +573,9 @@ export type PlayerScalarWhereWithAggregatesInput = {
   firstName?: Prisma.StringWithAggregatesFilter<"Player"> | string
   lastName?: Prisma.StringWithAggregatesFilter<"Player"> | string
   middleName?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
+  firstNameLatin?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
+  lastNameLatin?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
+  middleNameLatin?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   cityId?: Prisma.StringWithAggregatesFilter<"Player"> | string
   phone?: Prisma.StringWithAggregatesFilter<"Player"> | string
   email?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
@@ -568,6 +604,9 @@ export type PlayerCreateInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -614,6 +653,9 @@ export type PlayerUncheckedCreateInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -660,6 +702,9 @@ export type PlayerUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -706,6 +751,9 @@ export type PlayerUncheckedUpdateInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -752,6 +800,9 @@ export type PlayerCreateManyInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -780,6 +831,9 @@ export type PlayerUpdateManyMutationInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -807,6 +861,9 @@ export type PlayerUncheckedUpdateManyInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -861,6 +918,9 @@ export type PlayerCountOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   middleName?: Prisma.SortOrder
+  firstNameLatin?: Prisma.SortOrder
+  lastNameLatin?: Prisma.SortOrder
+  middleNameLatin?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -895,6 +955,9 @@ export type PlayerMaxOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   middleName?: Prisma.SortOrder
+  firstNameLatin?: Prisma.SortOrder
+  lastNameLatin?: Prisma.SortOrder
+  middleNameLatin?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -922,6 +985,9 @@ export type PlayerMinOrderByAggregateInput = {
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
   middleName?: Prisma.SortOrder
+  firstNameLatin?: Prisma.SortOrder
+  lastNameLatin?: Prisma.SortOrder
+  middleNameLatin?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   email?: Prisma.SortOrder
@@ -1271,6 +1337,9 @@ export type PlayerCreateWithoutCityInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -1316,6 +1385,9 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -1390,6 +1462,9 @@ export type PlayerScalarWhereInput = {
   firstName?: Prisma.StringFilter<"Player"> | string
   lastName?: Prisma.StringFilter<"Player"> | string
   middleName?: Prisma.StringNullableFilter<"Player"> | string | null
+  firstNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
+  lastNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
+  middleNameLatin?: Prisma.StringNullableFilter<"Player"> | string | null
   cityId?: Prisma.StringFilter<"Player"> | string
   phone?: Prisma.StringFilter<"Player"> | string
   email?: Prisma.StringNullableFilter<"Player"> | string | null
@@ -1418,6 +1493,9 @@ export type PlayerCreateWithoutClubStaffInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -1463,6 +1541,9 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -1524,6 +1605,9 @@ export type PlayerUpdateWithoutClubStaffInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1569,6 +1653,9 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1614,6 +1701,9 @@ export type PlayerCreateWithoutTableBookingsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -1659,6 +1749,9 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -1720,6 +1813,9 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1765,6 +1861,9 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1810,6 +1909,9 @@ export type PlayerCreateWithoutClubNewsAuthoredInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -1855,6 +1957,9 @@ export type PlayerUncheckedCreateWithoutClubNewsAuthoredInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -1916,6 +2021,9 @@ export type PlayerUpdateWithoutClubNewsAuthoredInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1961,6 +2069,9 @@ export type PlayerUncheckedUpdateWithoutClubNewsAuthoredInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2006,6 +2117,9 @@ export type PlayerCreateWithoutSiteNewsAuthoredInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -2051,6 +2165,9 @@ export type PlayerUncheckedCreateWithoutSiteNewsAuthoredInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -2112,6 +2229,9 @@ export type PlayerUpdateWithoutSiteNewsAuthoredInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2157,6 +2277,9 @@ export type PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2202,6 +2325,9 @@ export type PlayerCreateWithoutPageViewsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -2247,6 +2373,9 @@ export type PlayerUncheckedCreateWithoutPageViewsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -2308,6 +2437,9 @@ export type PlayerUpdateWithoutPageViewsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2353,6 +2485,9 @@ export type PlayerUncheckedUpdateWithoutPageViewsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2398,6 +2533,9 @@ export type PlayerCreateWithoutNotificationPreferencesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -2443,6 +2581,9 @@ export type PlayerUncheckedCreateWithoutNotificationPreferencesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -2504,6 +2645,9 @@ export type PlayerUpdateWithoutNotificationPreferencesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2549,6 +2693,9 @@ export type PlayerUncheckedUpdateWithoutNotificationPreferencesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2594,6 +2741,9 @@ export type PlayerCreateWithoutCoachReviewsReceivedInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -2639,6 +2789,9 @@ export type PlayerUncheckedCreateWithoutCoachReviewsReceivedInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -2689,6 +2842,9 @@ export type PlayerCreateWithoutCoachReviewsGivenInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -2734,6 +2890,9 @@ export type PlayerUncheckedCreateWithoutCoachReviewsGivenInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -2795,6 +2954,9 @@ export type PlayerUpdateWithoutCoachReviewsReceivedInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2840,6 +3002,9 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2896,6 +3061,9 @@ export type PlayerUpdateWithoutCoachReviewsGivenInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -2941,6 +3109,9 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsGivenInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2986,6 +3157,9 @@ export type PlayerCreateWithoutClubRatingsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -3031,6 +3205,9 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -3092,6 +3269,9 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3137,6 +3317,9 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3182,6 +3365,9 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -3227,6 +3413,9 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -3288,6 +3477,9 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3333,6 +3525,9 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3378,6 +3573,9 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -3423,6 +3621,9 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -3473,6 +3674,9 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -3518,6 +3722,9 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -3579,6 +3786,9 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3624,6 +3834,9 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3680,6 +3893,9 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3725,6 +3941,9 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3770,6 +3989,9 @@ export type PlayerCreateWithoutRegistrationsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -3815,6 +4037,9 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -3876,6 +4101,9 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3921,6 +4149,9 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3966,6 +4197,9 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -4011,6 +4245,9 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -4072,6 +4309,9 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4117,6 +4357,9 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4162,6 +4405,9 @@ export type PlayerCreateWithoutIdeasInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -4207,6 +4453,9 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -4268,6 +4517,9 @@ export type PlayerUpdateWithoutIdeasInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4313,6 +4565,9 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4358,6 +4613,9 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -4403,6 +4661,9 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -4464,6 +4725,9 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4509,6 +4773,9 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4554,6 +4821,9 @@ export type PlayerCreateWithoutPlayListingsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -4599,6 +4869,9 @@ export type PlayerUncheckedCreateWithoutPlayListingsInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -4660,6 +4933,9 @@ export type PlayerUpdateWithoutPlayListingsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4705,6 +4981,9 @@ export type PlayerUncheckedUpdateWithoutPlayListingsInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4750,6 +5029,9 @@ export type PlayerCreateWithoutPlayListingResponsesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -4795,6 +5077,9 @@ export type PlayerUncheckedCreateWithoutPlayListingResponsesInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   cityId: string
   phone: string
   email?: string | null
@@ -4856,6 +5141,9 @@ export type PlayerUpdateWithoutPlayListingResponsesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4901,6 +5189,9 @@ export type PlayerUncheckedUpdateWithoutPlayListingResponsesInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -4946,6 +5237,9 @@ export type PlayerCreateManyCityInput = {
   firstName: string
   lastName: string
   middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
   phone: string
   email?: string | null
   birthDate?: Date | string | null
@@ -4973,6 +5267,9 @@ export type PlayerUpdateWithoutCityInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5018,6 +5315,9 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5063,6 +5363,9 @@ export type PlayerUncheckedUpdateManyWithoutCityInput = {
   firstName?: Prisma.StringFieldUpdateOperationsInput | string
   lastName?: Prisma.StringFieldUpdateOperationsInput | string
   middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -5274,6 +5577,9 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   firstName?: boolean
   lastName?: boolean
   middleName?: boolean
+  firstNameLatin?: boolean
+  lastNameLatin?: boolean
+  middleNameLatin?: boolean
   cityId?: boolean
   phone?: boolean
   email?: boolean
@@ -5324,6 +5630,9 @@ export type PlayerSelectScalar = {
   firstName?: boolean
   lastName?: boolean
   middleName?: boolean
+  firstNameLatin?: boolean
+  lastNameLatin?: boolean
+  middleNameLatin?: boolean
   cityId?: boolean
   phone?: boolean
   email?: boolean
@@ -5347,7 +5656,7 @@ export type PlayerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "aboutEn" | "isCoach" | "coachBio" | "coachBioEn" | "coachGalleryUrls" | "coachReviewAvg" | "coachReviewCount" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "firstNameLatin" | "lastNameLatin" | "middleNameLatin" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "aboutEn" | "isCoach" | "coachBio" | "coachBioEn" | "coachGalleryUrls" | "coachReviewAvg" | "coachReviewCount" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Player$registrationsArgs<ExtArgs>
@@ -5399,6 +5708,9 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     firstName: string
     lastName: string
     middleName: string | null
+    firstNameLatin: string | null
+    lastNameLatin: string | null
+    middleNameLatin: string | null
     cityId: string
     phone: string
     email: string | null
@@ -5812,6 +6124,9 @@ export interface PlayerFieldRefs {
   readonly firstName: Prisma.FieldRef<"Player", 'String'>
   readonly lastName: Prisma.FieldRef<"Player", 'String'>
   readonly middleName: Prisma.FieldRef<"Player", 'String'>
+  readonly firstNameLatin: Prisma.FieldRef<"Player", 'String'>
+  readonly lastNameLatin: Prisma.FieldRef<"Player", 'String'>
+  readonly middleNameLatin: Prisma.FieldRef<"Player", 'String'>
   readonly cityId: Prisma.FieldRef<"Player", 'String'>
   readonly phone: Prisma.FieldRef<"Player", 'String'>
   readonly email: Prisma.FieldRef<"Player", 'String'>

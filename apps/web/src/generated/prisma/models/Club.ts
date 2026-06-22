@@ -45,6 +45,7 @@ export type ClubSumAggregateOutputType = {
 export type ClubMinAggregateOutputType = {
   id: string | null
   name: string | null
+  nameLatin: string | null
   cityId: string | null
   phone: string | null
   displayPhone: string | null
@@ -75,6 +76,7 @@ export type ClubMinAggregateOutputType = {
 export type ClubMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  nameLatin: string | null
   cityId: string | null
   phone: string | null
   displayPhone: string | null
@@ -105,6 +107,7 @@ export type ClubMaxAggregateOutputType = {
 export type ClubCountAggregateOutputType = {
   id: number
   name: number
+  nameLatin: number
   cityId: number
   phone: number
   displayPhone: number
@@ -159,6 +162,7 @@ export type ClubSumAggregateInputType = {
 export type ClubMinAggregateInputType = {
   id?: true
   name?: true
+  nameLatin?: true
   cityId?: true
   phone?: true
   displayPhone?: true
@@ -189,6 +193,7 @@ export type ClubMinAggregateInputType = {
 export type ClubMaxAggregateInputType = {
   id?: true
   name?: true
+  nameLatin?: true
   cityId?: true
   phone?: true
   displayPhone?: true
@@ -219,6 +224,7 @@ export type ClubMaxAggregateInputType = {
 export type ClubCountAggregateInputType = {
   id?: true
   name?: true
+  nameLatin?: true
   cityId?: true
   phone?: true
   displayPhone?: true
@@ -342,6 +348,7 @@ export type ClubGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type ClubGroupByOutputType = {
   id: string
   name: string
+  nameLatin: string | null
   cityId: string
   phone: string
   displayPhone: string | null
@@ -401,6 +408,7 @@ export type ClubWhereInput = {
   NOT?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   id?: Prisma.StringFilter<"Club"> | string
   name?: Prisma.StringFilter<"Club"> | string
+  nameLatin?: Prisma.StringNullableFilter<"Club"> | string | null
   cityId?: Prisma.StringFilter<"Club"> | string
   phone?: Prisma.StringFilter<"Club"> | string
   displayPhone?: Prisma.StringNullableFilter<"Club"> | string | null
@@ -447,6 +455,7 @@ export type ClubWhereInput = {
 export type ClubOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   displayPhone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -498,6 +507,7 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.ClubWhereInput[]
   NOT?: Prisma.ClubWhereInput | Prisma.ClubWhereInput[]
   name?: Prisma.StringFilter<"Club"> | string
+  nameLatin?: Prisma.StringNullableFilter<"Club"> | string | null
   cityId?: Prisma.StringFilter<"Club"> | string
   phone?: Prisma.StringFilter<"Club"> | string
   displayPhone?: Prisma.StringNullableFilter<"Club"> | string | null
@@ -543,6 +553,7 @@ export type ClubWhereUniqueInput = Prisma.AtLeast<{
 export type ClubOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameLatin?: Prisma.SortOrderInput | Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   displayPhone?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -587,6 +598,7 @@ export type ClubScalarWhereWithAggregatesInput = {
   NOT?: Prisma.ClubScalarWhereWithAggregatesInput | Prisma.ClubScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Club"> | string
   name?: Prisma.StringWithAggregatesFilter<"Club"> | string
+  nameLatin?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
   cityId?: Prisma.StringWithAggregatesFilter<"Club"> | string
   phone?: Prisma.StringWithAggregatesFilter<"Club"> | string
   displayPhone?: Prisma.StringNullableWithAggregatesFilter<"Club"> | string | null
@@ -623,6 +635,7 @@ export type ClubScalarWhereWithAggregatesInput = {
 export type ClubCreateInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -668,6 +681,7 @@ export type ClubCreateInput = {
 export type ClubUncheckedCreateInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -713,6 +727,7 @@ export type ClubUncheckedCreateInput = {
 export type ClubUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -758,6 +773,7 @@ export type ClubUpdateInput = {
 export type ClubUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -803,6 +819,7 @@ export type ClubUncheckedUpdateInput = {
 export type ClubCreateManyInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -839,6 +856,7 @@ export type ClubCreateManyInput = {
 export type ClubUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -874,6 +892,7 @@ export type ClubUpdateManyMutationInput = {
 export type ClubUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -926,6 +945,7 @@ export type ClubOrderByRelevanceInput = {
 export type ClubCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameLatin?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   displayPhone?: Prisma.SortOrder
@@ -970,6 +990,7 @@ export type ClubAvgOrderByAggregateInput = {
 export type ClubMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameLatin?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   displayPhone?: Prisma.SortOrder
@@ -1000,6 +1021,7 @@ export type ClubMaxOrderByAggregateInput = {
 export type ClubMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  nameLatin?: Prisma.SortOrder
   cityId?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   displayPhone?: Prisma.SortOrder
@@ -1248,6 +1270,7 @@ export type ClubUpdateOneWithoutPlayListingsNestedInput = {
 export type ClubCreateWithoutCityInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -1292,6 +1315,7 @@ export type ClubCreateWithoutCityInput = {
 export type ClubUncheckedCreateWithoutCityInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -1365,6 +1389,7 @@ export type ClubScalarWhereInput = {
   NOT?: Prisma.ClubScalarWhereInput | Prisma.ClubScalarWhereInput[]
   id?: Prisma.StringFilter<"Club"> | string
   name?: Prisma.StringFilter<"Club"> | string
+  nameLatin?: Prisma.StringNullableFilter<"Club"> | string | null
   cityId?: Prisma.StringFilter<"Club"> | string
   phone?: Prisma.StringFilter<"Club"> | string
   displayPhone?: Prisma.StringNullableFilter<"Club"> | string | null
@@ -1401,6 +1426,7 @@ export type ClubScalarWhereInput = {
 export type ClubCreateWithoutStaffInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -1445,6 +1471,7 @@ export type ClubCreateWithoutStaffInput = {
 export type ClubUncheckedCreateWithoutStaffInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -1505,6 +1532,7 @@ export type ClubUpdateToOneWithWhereWithoutStaffInput = {
 export type ClubUpdateWithoutStaffInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1549,6 +1577,7 @@ export type ClubUpdateWithoutStaffInput = {
 export type ClubUncheckedUpdateWithoutStaffInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1593,6 +1622,7 @@ export type ClubUncheckedUpdateWithoutStaffInput = {
 export type ClubCreateWithoutTableBookingsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -1637,6 +1667,7 @@ export type ClubCreateWithoutTableBookingsInput = {
 export type ClubUncheckedCreateWithoutTableBookingsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -1697,6 +1728,7 @@ export type ClubUpdateToOneWithWhereWithoutTableBookingsInput = {
 export type ClubUpdateWithoutTableBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1741,6 +1773,7 @@ export type ClubUpdateWithoutTableBookingsInput = {
 export type ClubUncheckedUpdateWithoutTableBookingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1785,6 +1818,7 @@ export type ClubUncheckedUpdateWithoutTableBookingsInput = {
 export type ClubCreateWithoutNewsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -1829,6 +1863,7 @@ export type ClubCreateWithoutNewsInput = {
 export type ClubUncheckedCreateWithoutNewsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -1889,6 +1924,7 @@ export type ClubUpdateToOneWithWhereWithoutNewsInput = {
 export type ClubUpdateWithoutNewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1933,6 +1969,7 @@ export type ClubUpdateWithoutNewsInput = {
 export type ClubUncheckedUpdateWithoutNewsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1977,6 +2014,7 @@ export type ClubUncheckedUpdateWithoutNewsInput = {
 export type ClubCreateWithoutPlayerRatingsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -2021,6 +2059,7 @@ export type ClubCreateWithoutPlayerRatingsInput = {
 export type ClubUncheckedCreateWithoutPlayerRatingsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -2081,6 +2120,7 @@ export type ClubUpdateToOneWithWhereWithoutPlayerRatingsInput = {
 export type ClubUpdateWithoutPlayerRatingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2125,6 +2165,7 @@ export type ClubUpdateWithoutPlayerRatingsInput = {
 export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2169,6 +2210,7 @@ export type ClubUncheckedUpdateWithoutPlayerRatingsInput = {
 export type ClubCreateWithoutTournamentsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -2213,6 +2255,7 @@ export type ClubCreateWithoutTournamentsInput = {
 export type ClubUncheckedCreateWithoutTournamentsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -2273,6 +2316,7 @@ export type ClubUpdateToOneWithWhereWithoutTournamentsInput = {
 export type ClubUpdateWithoutTournamentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2317,6 +2361,7 @@ export type ClubUpdateWithoutTournamentsInput = {
 export type ClubUncheckedUpdateWithoutTournamentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2361,6 +2406,7 @@ export type ClubUncheckedUpdateWithoutTournamentsInput = {
 export type ClubCreateWithoutTeamsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -2405,6 +2451,7 @@ export type ClubCreateWithoutTeamsInput = {
 export type ClubUncheckedCreateWithoutTeamsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -2465,6 +2512,7 @@ export type ClubUpdateToOneWithWhereWithoutTeamsInput = {
 export type ClubUpdateWithoutTeamsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2509,6 +2557,7 @@ export type ClubUpdateWithoutTeamsInput = {
 export type ClubUncheckedUpdateWithoutTeamsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2553,6 +2602,7 @@ export type ClubUncheckedUpdateWithoutTeamsInput = {
 export type ClubCreateWithoutRegistrationsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -2597,6 +2647,7 @@ export type ClubCreateWithoutRegistrationsInput = {
 export type ClubUncheckedCreateWithoutRegistrationsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -2657,6 +2708,7 @@ export type ClubUpdateToOneWithWhereWithoutRegistrationsInput = {
 export type ClubUpdateWithoutRegistrationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2701,6 +2753,7 @@ export type ClubUpdateWithoutRegistrationsInput = {
 export type ClubUncheckedUpdateWithoutRegistrationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2745,6 +2798,7 @@ export type ClubUncheckedUpdateWithoutRegistrationsInput = {
 export type ClubCreateWithoutIdeasInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -2789,6 +2843,7 @@ export type ClubCreateWithoutIdeasInput = {
 export type ClubUncheckedCreateWithoutIdeasInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -2849,6 +2904,7 @@ export type ClubUpdateToOneWithWhereWithoutIdeasInput = {
 export type ClubUpdateWithoutIdeasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2893,6 +2949,7 @@ export type ClubUpdateWithoutIdeasInput = {
 export type ClubUncheckedUpdateWithoutIdeasInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2937,6 +2994,7 @@ export type ClubUncheckedUpdateWithoutIdeasInput = {
 export type ClubCreateWithoutPlayListingsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -2981,6 +3039,7 @@ export type ClubCreateWithoutPlayListingsInput = {
 export type ClubUncheckedCreateWithoutPlayListingsInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   cityId: string
   phone: string
   displayPhone?: string | null
@@ -3041,6 +3100,7 @@ export type ClubUpdateToOneWithWhereWithoutPlayListingsInput = {
 export type ClubUpdateWithoutPlayListingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3085,6 +3145,7 @@ export type ClubUpdateWithoutPlayListingsInput = {
 export type ClubUncheckedUpdateWithoutPlayListingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   cityId?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3129,6 +3190,7 @@ export type ClubUncheckedUpdateWithoutPlayListingsInput = {
 export type ClubCreateManyCityInput = {
   id?: string
   name: string
+  nameLatin?: string | null
   phone: string
   displayPhone?: string | null
   email?: string | null
@@ -3164,6 +3226,7 @@ export type ClubCreateManyCityInput = {
 export type ClubUpdateWithoutCityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3208,6 +3271,7 @@ export type ClubUpdateWithoutCityInput = {
 export type ClubUncheckedUpdateWithoutCityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3252,6 +3316,7 @@ export type ClubUncheckedUpdateWithoutCityInput = {
 export type ClubUncheckedUpdateManyWithoutCityInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   displayPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -3390,6 +3455,7 @@ export type ClubCountOutputTypeCountStaffArgs<ExtArgs extends runtime.Types.Exte
 export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  nameLatin?: boolean
   cityId?: boolean
   phone?: boolean
   displayPhone?: boolean
@@ -3439,6 +3505,7 @@ export type ClubSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type ClubSelectScalar = {
   id?: boolean
   name?: boolean
+  nameLatin?: boolean
   cityId?: boolean
   phone?: boolean
   displayPhone?: boolean
@@ -3472,7 +3539,7 @@ export type ClubSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "cityId" | "phone" | "displayPhone" | "email" | "photoUrl" | "galleryUrls" | "description" | "descriptionEn" | "address" | "addressEn" | "latitude" | "longitude" | "workingHours" | "workingHoursEn" | "weeklyHours" | "tableCount" | "tableCounts" | "floorPlan" | "gamePrice" | "gamePriceEn" | "priceTiers" | "priceTiersEn" | "bookingEnabled" | "bookingSlotMinutes" | "bookingAdvanceDays" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
+export type ClubOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "nameLatin" | "cityId" | "phone" | "displayPhone" | "email" | "photoUrl" | "galleryUrls" | "description" | "descriptionEn" | "address" | "addressEn" | "latitude" | "longitude" | "workingHours" | "workingHoursEn" | "weeklyHours" | "tableCount" | "tableCounts" | "floorPlan" | "gamePrice" | "gamePriceEn" | "priceTiers" | "priceTiersEn" | "bookingEnabled" | "bookingSlotMinutes" | "bookingAdvanceDays" | "telegramId" | "telegramUsername" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["club"]>
 export type ClubInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   tournaments?: boolean | Prisma.Club$tournamentsArgs<ExtArgs>
@@ -3504,6 +3571,7 @@ export type $ClubPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    nameLatin: string | null
     cityId: string
     phone: string
     displayPhone: string | null
@@ -3916,6 +3984,7 @@ export interface Prisma__ClubClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface ClubFieldRefs {
   readonly id: Prisma.FieldRef<"Club", 'String'>
   readonly name: Prisma.FieldRef<"Club", 'String'>
+  readonly nameLatin: Prisma.FieldRef<"Club", 'String'>
   readonly cityId: Prisma.FieldRef<"Club", 'String'>
   readonly phone: Prisma.FieldRef<"Club", 'String'>
   readonly displayPhone: Prisma.FieldRef<"Club", 'String'>

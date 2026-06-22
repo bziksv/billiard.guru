@@ -10,6 +10,7 @@ import { normalizePhoneForCity } from "@/lib/phone-server";
 import { tryAutoSendClubConfirmTelegram } from "@/lib/club-confirm-server";
 import { buildConfirmLink } from "@/lib/telegram";
 import { clubOwnerCreateSchema } from "@/lib/validators";
+import { buildClubLatinFields } from "@/lib/latin-names";
 
 export async function POST(request: NextRequest) {
   const requestId = randomUUID();
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
     const club = await prisma.club.create({
       data: {
         name: data.name,
+        ...buildClubLatinFields(data.name),
         cityId: data.cityId,
         phone: player.phone,
         displayPhone,

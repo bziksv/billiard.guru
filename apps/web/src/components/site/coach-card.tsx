@@ -6,13 +6,16 @@ import { formatCoachReviewAvg } from "@/lib/coach-review-display";
 import { CoachReviewStars } from "@/components/site/coach-review-stars";
 import type { AppLocale } from "@/i18n/routing";
 import { formatGeoLocation } from "@/lib/geo-display";
-import { playerName } from "@/lib/public-display";
+import { localizedPlayerName } from "@/lib/latin-names";
 
 export type CoachListItem = {
   id: string;
   firstName: string;
   lastName: string;
   middleName: string | null;
+  firstNameLatin?: string | null;
+  lastNameLatin?: string | null;
+  middleNameLatin?: string | null;
   coachReviewAvg: number | null;
   coachReviewCount: number;
   photoUrl: string | null;
@@ -52,7 +55,7 @@ export async function CoachCard({ coach, href }: { coach: CoachListItem; href: s
         )}
       </div>
       <div className="p-4">
-        <h3 className="home-card-title font-semibold">{playerName(coach)}</h3>
+        <h3 className="home-card-title font-semibold">{localizedPlayerName(locale, coach)}</h3>
         <p className="home-card-muted mt-1 text-xs">
           {formatGeoLocation(
             coach.city.nameRu,

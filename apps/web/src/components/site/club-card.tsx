@@ -3,12 +3,14 @@
 import { useLocale, useTranslations } from "next-intl";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { SiteCard } from "@/components/site/site-card";
+import { localizedClubName } from "@/lib/latin-names";
 import { localizedGeoName } from "@/lib/geo-display";
 import type { AppLocale } from "@/i18n/routing";
 
 type ClubListItem = {
   id: string;
   name: string;
+  nameLatin?: string | null;
   email?: string | null;
   photoUrl?: string | null;
   tableCount?: number | null;
@@ -44,7 +46,9 @@ export function ClubCard({
       )}
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 className="home-card-title font-semibold">{club.name}</h3>
+          <h3 className="home-card-title font-semibold">
+            {localizedClubName(locale, club.name, club.nameLatin)}
+          </h3>
           <StatusBadge
             status={club.isVerified ? "CONFIRMED" : "PENDING"}
             label={club.isVerified ? t("verified") : t("pendingTelegram")}

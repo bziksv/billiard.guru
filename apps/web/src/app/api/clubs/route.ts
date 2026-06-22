@@ -22,6 +22,7 @@ import {
 } from "@/lib/club-schedule";
 import { clubRegisterSchema } from "@/lib/validators";
 import { buildClubLocalizedUpdate } from "@/lib/translation";
+import { buildClubLatinFields } from "@/lib/latin-names";
 
 export async function GET() {
   const clubs = await prisma.club.findMany({
@@ -82,6 +83,7 @@ export async function POST(request: NextRequest) {
     const club = await prisma.club.create({
       data: {
         name: data.name,
+        ...buildClubLatinFields(data.name),
         cityId: data.cityId,
         phone: data.phone,
         displayPhone,
