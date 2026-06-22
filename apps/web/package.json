@@ -16,7 +16,9 @@
     "telegram:webhook": "tsx scripts/telegram-set-webhook.ts",
     "verify:seo": "tsx scripts/verify-seo-uniqueness.ts",
     "verify:en-cyrillic": "tsx scripts/verify-en-no-cyrillic.ts",
-    "verify:hreflang": "tsx scripts/verify-hreflang-paths.ts"
+    "verify:hreflang": "tsx scripts/verify-hreflang-paths.ts",
+    "i18n:backfill": "tsx scripts/backfill-translations.ts",
+    "i18n:backfill:count": "tsx scripts/backfill-translations.ts --count"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

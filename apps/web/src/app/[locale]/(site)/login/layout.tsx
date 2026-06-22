@@ -1,6 +1,13 @@
-import { buildPageMetadata, STATIC_PAGE_SEO } from "@/lib/seo";
+import { buildLocalizedStaticMetadata } from "@/lib/seo-locale";
 
-export const metadata = buildPageMetadata(STATIC_PAGE_SEO.login);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return buildLocalizedStaticMetadata("login", locale);
+}
 
 export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return children;

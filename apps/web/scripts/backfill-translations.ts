@@ -3,6 +3,7 @@
  *
  *   cd apps/web && npx tsx scripts/backfill-translations.ts
  *   cd apps/web && npx tsx scripts/backfill-translations.ts --dry-run
+ *   cd apps/web && npx tsx scripts/backfill-translations.ts --count
  */
 import { config } from "dotenv";
 import { resolve } from "path";
@@ -22,6 +23,58 @@ import { parsePriceTiers } from "../src/lib/club-schedule";
 import { COUNTRY_NAME_EN } from "../src/lib/geo-display";
 
 const dryRun = process.argv.includes("--dry-run");
+const countOnly = process.argv.includes("--count");
+
+async function countMissingTranslations() {
+  const clubs = await prisma.club.findMany({
+    select: { priceTiers: true, priceTiersEn: true },
+  });
+  const counts = {
+    siteNews: await prisma.siteNews.count({
+      where: { OR: [{ titleEn: null }, { bodyEn: null }] },
+    }),
+    clubNews: await prisma.clubNews.count({
+      where: { status: "APPROVED", OR: [{ titleEn: null }, { bodyEn: null }] },
+    }),
+    playListing: await prisma.playListing.count({ where: { titleEn: null } }),
+    clubsDesc: await prisma.club.count({
+      where: { description: { not: null }, descriptionEn: null },
+    }),
+    clubsAddress: await prisma.club.count({
+      where: { address: { not: null }, addressEn: null },
+    }),
+    clubsGamePrice: await prisma.club.count({
+      where: { gamePrice: { not: null }, gamePriceEn: null },
+    }),
+    clubsWorkingHours: await prisma.club.count({
+      where: { workingHours: { not: null }, workingHoursEn: null },
+    }),
+    clubsPriceTiers: clubs.filter((c) => c.priceTiers != null && c.priceTiersEn == null).length,
+    tournamentName: await prisma.tournament.count({ where: { nameEn: null } }),
+    tournamentDesc: await prisma.tournament.count({
+      where: { description: { not: null }, descriptionEn: null },
+    }),
+    ideas: await prisma.idea.count({
+      where: { status: "APPROVED", OR: [{ titleEn: null }, { bodyEn: null }] },
+    }),
+    countries: await prisma.country.count({ where: { nameEn: null } }),
+    cities: await prisma.city.count({ where: { nameEn: null } }),
+    coachBio: await prisma.player.count({
+      where: { isCoach: true, coachBio: { not: null }, coachBioEn: null },
+    }),
+    about: await prisma.player.count({ where: { about: { not: null }, aboutEn: null } }),
+    coachComments: await prisma.coachRating.count({
+      where: { comment: { not: null }, commentEn: null },
+    }),
+    playResponses: await prisma.playListingResponse.count({
+      where: { message: { not: null }, messageEn: null },
+    }),
+  };
+  const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+  console.log(JSON.stringify(counts, null, 2));
+  console.log(`\nTotal rows needing backfill (approx): ${total}`);
+  return total;
+}
 
 async function backfillTitleBody(
   label: string,
@@ -42,6 +95,11 @@ async function backfillTitleBody(
 }
 
 async function main() {
+  if (countOnly) {
+    await countMissingTranslations();
+    return;
+  }
+
   if (!isTranslationEnabled()) {
     console.error("DEEPSEEK_API_KEY не задан или TRANSLATION_ENABLED=false");
     process.exit(1);
