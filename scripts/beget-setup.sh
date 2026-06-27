@@ -185,15 +185,26 @@ if [ -n "${TELEGRAM_BOT_TOKEN:-}" ]; then
 fi
 
 echo ""
+echo "→ Прогрев приложения (холодный старт Passenger может занять время)…"
+# Первый запрос после restart.txt поднимает Next standalone — даём ему спокойно
+# подняться, чтобы health-check ниже не ловил ложный 000.
+APP_BASE="${APP_URL:-https://billiard.guru}"
+APP_BASE="${APP_BASE%/}"
+sleep 5
+beget_fetch_http_code "${APP_BASE}/api/v1/health" 90 >/dev/null 2>&1 || true
+
 echo "→ Health-check после переключения релиза…"
-CHECK_URL="${APP_URL:-https://billiard.guru}"
+# Лёгкий эндпоинт вместо тяжёлой главной — быстрее и надёжнее на холодном старте.
+CHECK_URL="${APP_BASE}${BEGET_HEALTH_PATH:-/api/v1/health}"
 if http_code="$(beget_health_check_url "$CHECK_URL")"; then
   echo "  ✓ HTTP $http_code"
 else
   echo "  ✗ HTTP ${http_code:-000} после ${BEGET_HEALTH_RETRIES} попыток"
   if beget_rollback_to_previous; then
     echo "→ Повторная проверка после отката…"
-    if rollback_code="$(beget_health_check_url "$CHECK_URL" 5 3)"; then
+    sleep 5
+    beget_fetch_http_code "$CHECK_URL" 90 >/dev/null 2>&1 || true
+    if rollback_code="$(beget_health_check_url "$CHECK_URL" 10 4)"; then
       echo "  ✓ После отката: HTTP $rollback_code"
     else
       echo "  ✗ После отката всё ещё HTTP ${rollback_code:-000}"

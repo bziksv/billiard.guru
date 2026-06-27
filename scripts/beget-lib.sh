@@ -16,8 +16,12 @@ BEGET_PREVIOUS="$SITE_ROOT/previous"
 BEGET_HTACCESS="$SITE_ROOT/.htaccess"
 BEGET_PUBLIC_HTML="$SITE_ROOT/public_html"
 BEGET_KEEP_RELEASES="${BEGET_KEEP_RELEASES:-5}"
-BEGET_HEALTH_RETRIES="${BEGET_HEALTH_RETRIES:-8}"
+# Холодный старт Next standalone под Passenger может занять заметное время —
+# даём щедрое окно (15×4s ≈ 60s), иначе деплой ложно откатывается.
+BEGET_HEALTH_RETRIES="${BEGET_HEALTH_RETRIES:-15}"
 BEGET_HEALTH_INTERVAL="${BEGET_HEALTH_INTERVAL:-4}"
+# Лёгкий эндпоинт для health-check (быстрее холодной отрисовки главной).
+BEGET_HEALTH_PATH="${BEGET_HEALTH_PATH:-/api/v1/health}"
 
 beget_find_working_node() {
   local candidate
