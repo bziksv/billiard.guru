@@ -41,6 +41,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   const [tournaments, setTournaments] = useState<AdminTournament[]>([]);
   const [loading, setLoading] = useState(true);
   const [newFormat, setNewFormat] = useState("OLYMPIC");
+  const [newIsPair, setNewIsPair] = useState(false);
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -107,6 +108,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
           description: form.get("description") || undefined,
           clubId,
           format: newFormat,
+          isPair: newIsPair,
           startsAt: form.get("startsAt") || undefined,
           ratingMax: tournamentDefaults.limitByRating
             ? Number(form.get("ratingMax"))
@@ -125,6 +127,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
       }
       await reloadTournaments();
       setNewFormat("OLYMPIC");
+      setNewIsPair(false);
       setSelectedTableIds([]);
       setTableStreams({});
       formEl.reset();
@@ -207,6 +210,21 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
                 ))
               )}
             </select>
+            <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
+              <input
+                type="checkbox"
+                checked={newIsPair}
+                onChange={(e) => setNewIsPair(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-emerald-600"
+              />
+              <span>
+                <span className="font-medium text-zinc-200">Парный турнир</span>
+                <span className="mt-0.5 block text-xs text-zinc-500">
+                  Регистрация по одному игроку (лимит сетки ×2), пары собирает
+                  организатор перетаскиванием на этапе подтверждения.
+                </span>
+              </span>
+            </label>
             <textarea
               name="description"
               rows={4}
