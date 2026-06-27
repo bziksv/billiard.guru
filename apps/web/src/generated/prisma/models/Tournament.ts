@@ -42,6 +42,7 @@ export type TournamentMinAggregateOutputType = {
   descriptionEn: string | null
   clubId: string | null
   format: $Enums.TournamentFormat | null
+  isPair: boolean | null
   status: $Enums.TournamentStatus | null
   ratingMax: number | null
   ratingSource: $Enums.TournamentRatingSource | null
@@ -62,6 +63,7 @@ export type TournamentMaxAggregateOutputType = {
   descriptionEn: string | null
   clubId: string | null
   format: $Enums.TournamentFormat | null
+  isPair: boolean | null
   status: $Enums.TournamentStatus | null
   ratingMax: number | null
   ratingSource: $Enums.TournamentRatingSource | null
@@ -82,6 +84,7 @@ export type TournamentCountAggregateOutputType = {
   descriptionEn: number
   clubId: number
   format: number
+  isPair: number
   status: number
   ratingMax: number
   ratingSource: number
@@ -114,6 +117,7 @@ export type TournamentMinAggregateInputType = {
   descriptionEn?: true
   clubId?: true
   format?: true
+  isPair?: true
   status?: true
   ratingMax?: true
   ratingSource?: true
@@ -134,6 +138,7 @@ export type TournamentMaxAggregateInputType = {
   descriptionEn?: true
   clubId?: true
   format?: true
+  isPair?: true
   status?: true
   ratingMax?: true
   ratingSource?: true
@@ -154,6 +159,7 @@ export type TournamentCountAggregateInputType = {
   descriptionEn?: true
   clubId?: true
   format?: true
+  isPair?: true
   status?: true
   ratingMax?: true
   ratingSource?: true
@@ -263,6 +269,7 @@ export type TournamentGroupByOutputType = {
   descriptionEn: string | null
   clubId: string
   format: $Enums.TournamentFormat
+  isPair: boolean
   status: $Enums.TournamentStatus
   ratingMax: number | null
   ratingSource: $Enums.TournamentRatingSource
@@ -308,6 +315,7 @@ export type TournamentWhereInput = {
   descriptionEn?: Prisma.StringNullableFilter<"Tournament"> | string | null
   clubId?: Prisma.StringFilter<"Tournament"> | string
   format?: Prisma.EnumTournamentFormatFilter<"Tournament"> | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFilter<"Tournament"> | boolean
   status?: Prisma.EnumTournamentStatusFilter<"Tournament"> | $Enums.TournamentStatus
   ratingMax?: Prisma.FloatNullableFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
@@ -334,6 +342,7 @@ export type TournamentOrderByWithRelationInput = {
   descriptionEn?: Prisma.SortOrderInput | Prisma.SortOrder
   clubId?: Prisma.SortOrder
   format?: Prisma.SortOrder
+  isPair?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
@@ -365,6 +374,7 @@ export type TournamentWhereUniqueInput = Prisma.AtLeast<{
   descriptionEn?: Prisma.StringNullableFilter<"Tournament"> | string | null
   clubId?: Prisma.StringFilter<"Tournament"> | string
   format?: Prisma.EnumTournamentFormatFilter<"Tournament"> | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFilter<"Tournament"> | boolean
   status?: Prisma.EnumTournamentStatusFilter<"Tournament"> | $Enums.TournamentStatus
   ratingMax?: Prisma.FloatNullableFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
@@ -390,6 +400,7 @@ export type TournamentOrderByWithAggregationInput = {
   descriptionEn?: Prisma.SortOrderInput | Prisma.SortOrder
   clubId?: Prisma.SortOrder
   format?: Prisma.SortOrder
+  isPair?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
@@ -420,6 +431,7 @@ export type TournamentScalarWhereWithAggregatesInput = {
   descriptionEn?: Prisma.StringNullableWithAggregatesFilter<"Tournament"> | string | null
   clubId?: Prisma.StringWithAggregatesFilter<"Tournament"> | string
   format?: Prisma.EnumTournamentFormatWithAggregatesFilter<"Tournament"> | $Enums.TournamentFormat
+  isPair?: Prisma.BoolWithAggregatesFilter<"Tournament"> | boolean
   status?: Prisma.EnumTournamentStatusWithAggregatesFilter<"Tournament"> | $Enums.TournamentStatus
   ratingMax?: Prisma.FloatNullableWithAggregatesFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceWithAggregatesFilter<"Tournament"> | $Enums.TournamentRatingSource
@@ -441,6 +453,7 @@ export type TournamentCreateInput = {
   description?: string | null
   descriptionEn?: string | null
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -467,6 +480,7 @@ export type TournamentUncheckedCreateInput = {
   descriptionEn?: string | null
   clubId: string
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -491,6 +505,7 @@ export type TournamentUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -517,6 +532,7 @@ export type TournamentUncheckedUpdateInput = {
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clubId?: Prisma.StringFieldUpdateOperationsInput | string
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -542,6 +558,7 @@ export type TournamentCreateManyInput = {
   descriptionEn?: string | null
   clubId: string
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -563,6 +580,7 @@ export type TournamentUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -585,6 +603,7 @@ export type TournamentUncheckedUpdateManyInput = {
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clubId?: Prisma.StringFieldUpdateOperationsInput | string
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -623,6 +642,7 @@ export type TournamentCountOrderByAggregateInput = {
   descriptionEn?: Prisma.SortOrder
   clubId?: Prisma.SortOrder
   format?: Prisma.SortOrder
+  isPair?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
@@ -649,6 +669,7 @@ export type TournamentMaxOrderByAggregateInput = {
   descriptionEn?: Prisma.SortOrder
   clubId?: Prisma.SortOrder
   format?: Prisma.SortOrder
+  isPair?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
@@ -669,6 +690,7 @@ export type TournamentMinOrderByAggregateInput = {
   descriptionEn?: Prisma.SortOrder
   clubId?: Prisma.SortOrder
   format?: Prisma.SortOrder
+  isPair?: Prisma.SortOrder
   status?: Prisma.SortOrder
   ratingMax?: Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
@@ -793,6 +815,7 @@ export type TournamentCreateWithoutClubInput = {
   description?: string | null
   descriptionEn?: string | null
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -817,6 +840,7 @@ export type TournamentUncheckedCreateWithoutClubInput = {
   description?: string | null
   descriptionEn?: string | null
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -871,6 +895,7 @@ export type TournamentScalarWhereInput = {
   descriptionEn?: Prisma.StringNullableFilter<"Tournament"> | string | null
   clubId?: Prisma.StringFilter<"Tournament"> | string
   format?: Prisma.EnumTournamentFormatFilter<"Tournament"> | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFilter<"Tournament"> | boolean
   status?: Prisma.EnumTournamentStatusFilter<"Tournament"> | $Enums.TournamentStatus
   ratingMax?: Prisma.FloatNullableFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
@@ -892,6 +917,7 @@ export type TournamentCreateWithoutTeamsInput = {
   description?: string | null
   descriptionEn?: string | null
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -917,6 +943,7 @@ export type TournamentUncheckedCreateWithoutTeamsInput = {
   descriptionEn?: string | null
   clubId: string
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -956,6 +983,7 @@ export type TournamentUpdateWithoutTeamsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -981,6 +1009,7 @@ export type TournamentUncheckedUpdateWithoutTeamsInput = {
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clubId?: Prisma.StringFieldUpdateOperationsInput | string
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1004,6 +1033,7 @@ export type TournamentCreateWithoutMatchesInput = {
   description?: string | null
   descriptionEn?: string | null
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -1029,6 +1059,7 @@ export type TournamentUncheckedCreateWithoutMatchesInput = {
   descriptionEn?: string | null
   clubId: string
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -1068,6 +1099,7 @@ export type TournamentUpdateWithoutMatchesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1093,6 +1125,7 @@ export type TournamentUncheckedUpdateWithoutMatchesInput = {
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clubId?: Prisma.StringFieldUpdateOperationsInput | string
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1116,6 +1149,7 @@ export type TournamentCreateWithoutRegistrationsInput = {
   description?: string | null
   descriptionEn?: string | null
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -1141,6 +1175,7 @@ export type TournamentUncheckedCreateWithoutRegistrationsInput = {
   descriptionEn?: string | null
   clubId: string
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -1180,6 +1215,7 @@ export type TournamentUpdateWithoutRegistrationsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1205,6 +1241,7 @@ export type TournamentUncheckedUpdateWithoutRegistrationsInput = {
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clubId?: Prisma.StringFieldUpdateOperationsInput | string
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1228,6 +1265,7 @@ export type TournamentCreateManyClubInput = {
   description?: string | null
   descriptionEn?: string | null
   format: $Enums.TournamentFormat
+  isPair?: boolean
   status?: $Enums.TournamentStatus
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
@@ -1249,6 +1287,7 @@ export type TournamentUpdateWithoutClubInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1273,6 +1312,7 @@ export type TournamentUncheckedUpdateWithoutClubInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1297,6 +1337,7 @@ export type TournamentUncheckedUpdateManyWithoutClubInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   descriptionEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   format?: Prisma.EnumTournamentFormatFieldUpdateOperationsInput | $Enums.TournamentFormat
+  isPair?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.EnumTournamentStatusFieldUpdateOperationsInput | $Enums.TournamentStatus
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
@@ -1368,6 +1409,7 @@ export type TournamentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   descriptionEn?: boolean
   clubId?: boolean
   format?: boolean
+  isPair?: boolean
   status?: boolean
   ratingMax?: boolean
   ratingSource?: boolean
@@ -1397,6 +1439,7 @@ export type TournamentSelectScalar = {
   descriptionEn?: boolean
   clubId?: boolean
   format?: boolean
+  isPair?: boolean
   status?: boolean
   ratingMax?: boolean
   ratingSource?: boolean
@@ -1411,7 +1454,7 @@ export type TournamentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "nameEn" | "description" | "descriptionEn" | "clubId" | "format" | "status" | "ratingMax" | "ratingSource" | "handicapHalfStep" | "suppressNotifications" | "tableIds" | "tableStreams" | "startsAt" | "clubApprovalToken" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
+export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "nameEn" | "description" | "descriptionEn" | "clubId" | "format" | "isPair" | "status" | "ratingMax" | "ratingSource" | "handicapHalfStep" | "suppressNotifications" | "tableIds" | "tableStreams" | "startsAt" | "clubApprovalToken" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
 export type TournamentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Tournament$registrationsArgs<ExtArgs>
@@ -1436,6 +1479,10 @@ export type $TournamentPayload<ExtArgs extends runtime.Types.Extensions.Internal
     descriptionEn: string | null
     clubId: string
     format: $Enums.TournamentFormat
+    /**
+     * Парный режим поверх обычной сетки: регистрация по одному игроку (лимит ×2), пары собирает организатор
+     */
+    isPair: boolean
     status: $Enums.TournamentStatus
     /**
      * Макс. рейтинг для записи и рассылки (null — без лимита)
@@ -1846,6 +1893,7 @@ export interface TournamentFieldRefs {
   readonly descriptionEn: Prisma.FieldRef<"Tournament", 'String'>
   readonly clubId: Prisma.FieldRef<"Tournament", 'String'>
   readonly format: Prisma.FieldRef<"Tournament", 'TournamentFormat'>
+  readonly isPair: Prisma.FieldRef<"Tournament", 'Boolean'>
   readonly status: Prisma.FieldRef<"Tournament", 'TournamentStatus'>
   readonly ratingMax: Prisma.FieldRef<"Tournament", 'Float'>
   readonly ratingSource: Prisma.FieldRef<"Tournament", 'TournamentRatingSource'>

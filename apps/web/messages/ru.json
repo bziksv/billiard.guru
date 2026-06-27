@@ -86,7 +86,8 @@
     "region": "Регион",
     "searchCountry": "Поиск страны…",
     "searchCity": "Поиск города…",
-    "noResults": "Ничего не найдено"
+    "noResults": "Ничего не найдено",
+    "loading": "Загрузка…"
   },
   "home": {
     "hero": {
@@ -739,6 +740,35 @@
     "scheduleAndPrices": "Режим работы и цены",
     "bookTelegram": "Забронировать в Telegram"
   },
+  "clubBookingWidget": {
+    "title": "Забронировать стол",
+    "lead": "Выберите формат, дату, время и длительность — {clubName} подтвердит бронь.",
+    "leadWithFloorPlan": "Выберите формат, дату, время и длительность, затем стол на схеме — {clubName} подтвердит бронь.",
+    "format": "Формат",
+    "date": "Дата",
+    "start": "Начало",
+    "loading": "Загрузка…",
+    "noSlots": "На эту дату нет свободных слотов.",
+    "duration": "Длительность",
+    "interval": "Интервал: {range}",
+    "pickTable": "Выберите стол",
+    "checkingFloorPlan": "Проверка схемы…",
+    "legendFree": "Свободен",
+    "legendPending": "Занят (ожидает)",
+    "legendOccupied": "Занят",
+    "selectedTable": "Выбран: {label}",
+    "freeOnPlan": "Свободно {free} из {total} {word} на схеме",
+    "noteLabel": "Комментарий (необязательно)",
+    "notePlaceholder": "Например: нужен стол у окна",
+    "signIn": "Войдите",
+    "signInSuffix": ", чтобы отправить заявку.",
+    "submit": "Забронировать",
+    "submitting": "Отправка…",
+    "errorLoadSlots": "Не удалось загрузить слоты",
+    "errorPickTable": "Выберите стол на схеме зала",
+    "errorSubmit": "Не удалось забронировать",
+    "success": "Заявка отправлена — клуб подтвердит бронь"
+  },
   "clubSchedule": {
     "contactClub": "График уточняйте у клуба.",
     "todayPrefix": "Сегодня · {day}",
@@ -857,6 +887,9 @@
     "toc": "Содержание"
   },
   "legal": {
+    "consentCheckbox": {
+      "text": "Нажимая на эту кнопку, я даю своё согласие на <personalData>обработку персональных данных</personalData> и соглашаюсь с условиями <privacy>политики конфиденциальности</privacy>."
+    },
     "page": {
       "notFound": "Документ не найден",
       "updated": "Обновлено: {date}",
@@ -894,8 +927,10 @@
     "lead": "Введите номер телефона — мы проверим, есть ли вы в базе.",
     "newUserLabel": "Новый пользователь:",
     "newUserText": "заполните профиль, подтвердите номер коротким звонком, затем подключите <link></link> для уведомлений о турнирах, проведения турниров, управления клубом, своей анкеты и поиска партнёров для игры.",
+    "newUserTextPhoneOnly": "заполните профиль и подтвердите номер коротким звонком.",
     "existingUserLabel": "Уже регистрировались:",
     "existingUserText": "вход через Telegram или тем же коротким звонком.",
+    "existingUserTextPhoneOnly": "вход коротким звонком с вашего номера.",
     "continue": "Продолжить",
     "checking": "Проверка…",
     "lastName": "Фамилия",
@@ -913,8 +948,10 @@
     "callFromPhone": "Звоните с номера {phone} — он должен совпасть с тем, что вы вводили.",
     "dialShort": "Наберите короткий номер:",
     "callNotActive": "Номер для звонка пока не активирован. Используйте Telegram.",
+    "callNotActivePhoneOnly": "Номер для звонка пока не активирован. Попробуйте позже.",
     "callStep1": "Дождитесь сброса — разговаривать не нужно",
     "callStep2Register": "После звонка предложим подключить Telegram для уведомлений",
+    "callStep2RegisterPhoneOnly": "После звонка можно сразу перейти в кабинет",
     "callStep2Login": "Страница войдёт автоматически",
     "cancel": "Отменить",
     "openTelegramConfirm": "Откройте Telegram и нажмите «Подтвердить вход»…",
@@ -931,7 +968,34 @@
     "laterToCabinet": "Позже — в кабинет",
     "home": "На главную",
     "loading": "Загрузка…",
-    "defaultCountry": "Россия"
+    "country": "Страна",
+    "selectCountry": "Выберите страну",
+    "phoneLabel": "Телефон",
+    "pickCountryFirst": "Сначала выберите страну",
+    "phoneHint": "Введите номер без кода страны — код подставим автоматически",
+    "phoneAccepted": "Номер принят",
+    "errors": {
+      "invalidPhone": "Введите корректный телефон",
+      "consentRequired": "Подтвердите согласие на обработку персональных данных",
+      "generic": "Ошибка",
+      "registerFields": "Заполните фамилию, имя, город и телефон",
+      "registerFailed": "Ошибка регистрации",
+      "callStartFailed": "Не удалось начать вход звонком",
+      "serverTimeout": "Сервер не ответил. Попробуйте позже.",
+      "loginFailed": "Ошибка входа",
+      "loginCancelled": "Вход отменён",
+      "loginExpired": "Время ожидания истекло"
+    }
+  },
+  "phone": {
+    "validation": {
+      "empty": "Введите номер телефона",
+      "tooManyDigits": "Слишком много цифр для {countryName}",
+      "digitsAfterDial": "Введите {localLength} цифр после +{dial}",
+      "needLocalDigits": "Нужно {localLength} цифр (пример: {example})",
+      "countryMismatch": "Номер (+{phoneDial}) не соответствует стране города ({cityCountry}, +{cityDial})",
+      "invalid": "Некорректный телефон"
+    }
   },
   "empty": {
     "tournaments": "В этом регионе пока нет опубликованных турниров.",

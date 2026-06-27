@@ -86,7 +86,8 @@
     "region": "Region",
     "searchCountry": "Search country…",
     "searchCity": "Search city…",
-    "noResults": "Nothing found"
+    "noResults": "Nothing found",
+    "loading": "Loading…"
   },
   "home": {
     "hero": {
@@ -739,6 +740,35 @@
     "scheduleAndPrices": "Hours & prices",
     "bookTelegram": "Book in Telegram"
   },
+  "clubBookingWidget": {
+    "title": "Book a table",
+    "lead": "Choose format, date, time and duration — {clubName} will confirm your booking.",
+    "leadWithFloorPlan": "Choose format, date, time and duration, then pick a table on the floor plan — {clubName} will confirm your booking.",
+    "format": "Format",
+    "date": "Date",
+    "start": "Start",
+    "loading": "Loading…",
+    "noSlots": "No available slots for this date.",
+    "duration": "Duration",
+    "interval": "Time slot: {range}",
+    "pickTable": "Pick a table",
+    "checkingFloorPlan": "Checking floor plan…",
+    "legendFree": "Available",
+    "legendPending": "Taken (pending)",
+    "legendOccupied": "Taken",
+    "selectedTable": "Selected: {label}",
+    "freeOnPlan": "{free} of {total} {word} available on the plan",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "e.g. table near the window",
+    "signIn": "Sign in",
+    "signInSuffix": " to submit a request.",
+    "submit": "Book",
+    "submitting": "Submitting…",
+    "errorLoadSlots": "Could not load time slots",
+    "errorPickTable": "Pick a table on the floor plan",
+    "errorSubmit": "Could not submit booking",
+    "success": "Request sent — the club will confirm your booking"
+  },
   "clubSchedule": {
     "contactClub": "Contact the club for hours.",
     "todayPrefix": "Today · {day}",
@@ -857,6 +887,9 @@
     "toc": "Contents"
   },
   "legal": {
+    "consentCheckbox": {
+      "text": "By clicking this button, I consent to <personalData>personal data processing</personalData> and agree to the terms of the <privacy>privacy policy</privacy>."
+    },
     "page": {
       "notFound": "Document not found",
       "updated": "Last updated: {date}",
@@ -894,8 +927,10 @@
     "lead": "Enter your phone number — we will check if you are already in the database.",
     "newUserLabel": "New user:",
     "newUserText": "fill in your profile, confirm your number with a short call, then connect <link></link> for tournament notifications, running events, club management, your profile, and finding sparring partners.",
+    "newUserTextPhoneOnly": "fill in your profile and confirm your number with a short call.",
     "existingUserLabel": "Already registered:",
     "existingUserText": "sign in via Telegram or the same short call.",
+    "existingUserTextPhoneOnly": "sign in with a short call from your phone number.",
     "continue": "Continue",
     "checking": "Checking…",
     "lastName": "Last name",
@@ -913,8 +948,10 @@
     "callFromPhone": "Call from {phone} — it must match the number you entered.",
     "dialShort": "Dial the short number:",
     "callNotActive": "The call-in number is not active yet. Use Telegram.",
+    "callNotActivePhoneOnly": "The call-in number is not active yet. Try again later.",
     "callStep1": "Wait for the hang-up — no need to talk",
     "callStep2Register": "After the call we will suggest connecting Telegram for notifications",
+    "callStep2RegisterPhoneOnly": "After the call you can go straight to your account",
     "callStep2Login": "This page will sign you in automatically",
     "cancel": "Cancel",
     "openTelegramConfirm": "Open Telegram and tap «Confirm sign-in»…",
@@ -931,7 +968,34 @@
     "laterToCabinet": "Later — go to account",
     "home": "Home",
     "loading": "Loading…",
-    "defaultCountry": "Russia"
+    "country": "Country",
+    "selectCountry": "Select country",
+    "phoneLabel": "Phone",
+    "pickCountryFirst": "Select your country first",
+    "phoneHint": "Enter the number without country code — we add it automatically",
+    "phoneAccepted": "Number accepted",
+    "errors": {
+      "invalidPhone": "Enter a valid phone number",
+      "consentRequired": "Please confirm consent to personal data processing",
+      "generic": "Something went wrong",
+      "registerFields": "Enter last name, first name, city, and phone",
+      "registerFailed": "Registration failed",
+      "callStartFailed": "Could not start sign-in by call",
+      "serverTimeout": "Server did not respond. Try again later.",
+      "loginFailed": "Sign-in failed",
+      "loginCancelled": "Sign-in cancelled",
+      "loginExpired": "Waiting time expired"
+    }
+  },
+  "phone": {
+    "validation": {
+      "empty": "Enter a phone number",
+      "tooManyDigits": "Too many digits for {countryName}",
+      "digitsAfterDial": "Enter {localLength} digits after +{dial}",
+      "needLocalDigits": "Enter {localLength} digits (e.g. {example})",
+      "countryMismatch": "Number (+{phoneDial}) does not match the city's country ({cityCountry}, +{cityDial})",
+      "invalid": "Invalid phone number"
+    }
   },
   "empty": {
     "tournaments": "No published tournaments in this region yet.",

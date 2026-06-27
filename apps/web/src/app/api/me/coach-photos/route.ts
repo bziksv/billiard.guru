@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { parseCoachGalleryUrls } from "@/lib/coach-profile";
 import { saveCoachPhotoFile } from "@/lib/coach-photo-upload";
+import { ImageProcessingError } from "@/lib/image-processing";
 import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
 
@@ -37,6 +38,9 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
+    if (error instanceof ImageProcessingError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json({ error: "Не удалось загрузить фото" }, { status: 500 });
   }
 }

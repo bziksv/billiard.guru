@@ -117,6 +117,7 @@ export async function POST(request: NextRequest) {
         descriptionEn: descriptionFields.descriptionEn,
         clubId: data.clubId,
         format: data.format,
+        isPair: data.isPair === true,
         status: suppressNotifications ? "OPEN" : "DRAFT",
         startsAt: data.startsAt ? new Date(data.startsAt) : null,
         ratingMax: data.ratingMax,

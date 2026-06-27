@@ -69,6 +69,7 @@ import {
   TournamentParticipantRegistrationPanel,
   type TournamentRegistrationPlayer,
 } from "@/components/tournament/tournament-participant-registration-panel";
+import { TournamentPairBuilder } from "@/components/admin/tournament-pair-builder";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import {
   REGISTRATION_STATUS_LABELS,
@@ -537,9 +538,12 @@ export function TournamentManageView({
   const fixedSwiss = isFixedSwissFormat(t.format);
   const olympic = isOlympicFormat(t.format);
   const confirmedTeams = t.teams.filter((team) => team.status === "CONFIRMED");
+  // Для генерации сетки считаем «единицы сетки»: пары (PAIR_* или isPair) либо игроков.
   const confirmedCount = pair
     ? confirmedTeams.length
-    : confirmedRegistrations.length;
+    : t.isPair
+      ? confirmedTeams.filter((team) => team.player2).length
+      : confirmedRegistrations.length;
   const maxRound = t.matches.reduce((max, m) => Math.max(max, m.round), 0);
   const currentRoundOpen = t.matches.some(
     (m) => m.round === maxRound && !m.winnerTeam && m.status !== "FINISHED",
@@ -1347,6 +1351,14 @@ function ParticipantsTab({
 
   return (
     <div className="space-y-4">
+      {t.isPair && (
+        <TournamentPairBuilder
+          tournament={t}
+          bracketLocked={bracketLocked}
+          onUpdated={onUpdated}
+        />
+      )}
+
       {pair && activeTeams.length > 0 && (
         <div>
           {pendingTeamsWithoutFee.length > 0 && (
@@ -1673,6 +1685,7 @@ function BracketGenerateButton({
     format,
     confirmedCount,
     participantRules,
+    isPairFormat(format) || t.isPair === true,
   );
 
   const generateDisabled =
@@ -1697,7 +1710,10 @@ function BracketGenerateButton({
         {bracketLoading ? "Формирование…" : generateLabel}
       </button>
       <p className="text-xs text-zinc-500">
-        Подтверждённых: {confirmedCount}
+        {isPairFormat(format) || t.isPair === true
+          ? "Собрано пар: "
+          : "Подтверждённых: "}
+        {confirmedCount}
         {confirmedCount < 2 && " (минимум 2)"}
         {participantCheck.ok &&
           participantRules.exact != null &&
@@ -1768,6 +1784,7 @@ function TournamentBracketSettings({
     format,
     confirmedCount,
     participantRules,
+    isPairFormat(format) || t.isPair === true,
   );
 
   const generateDisabled =
@@ -1908,7 +1925,10 @@ function TournamentBracketSettings({
         )}
       </div>
       <p className="text-xs text-zinc-500">
-        Подтверждённых: {confirmedCount}
+        {isPairFormat(format) || t.isPair === true
+          ? "Собрано пар: "
+          : "Подтверждённых: "}
+        {confirmedCount}
         {confirmedCount < 2 && " (минимум 2)"}
         {participantCheck.ok &&
           participantRules.exact != null &&

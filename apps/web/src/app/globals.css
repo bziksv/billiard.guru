@@ -3111,6 +3111,7 @@ html.light .home-player-card:hover {
 .geo-searchable-dropdown {
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-panel);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 0.18);
 }
 
 .geo-searchable-dropdown button {

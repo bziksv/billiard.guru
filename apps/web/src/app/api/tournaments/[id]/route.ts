@@ -106,7 +106,9 @@ export async function PATCH(
       }
       const count = isPairFormat(current.format)
         ? current.teams.length
-        : current.registrations.length;
+        : current.isPair
+          ? current.teams.length
+          : current.registrations.length;
       if (count < 2) {
         return NextResponse.json(
           { error: "Нужно минимум 2 подтверждённых участника" },
@@ -200,6 +202,7 @@ export async function PATCH(
         }),
         ...(data.clubId !== undefined && { clubId: data.clubId }),
         ...(data.format !== undefined && { format: data.format }),
+        ...(data.isPair !== undefined && { isPair: data.isPair }),
         ...(data.status !== undefined && { status: data.status }),
         ...(data.startsAt !== undefined && {
           startsAt: data.startsAt ? new Date(data.startsAt) : null,

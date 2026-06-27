@@ -8,6 +8,8 @@ export interface TeamPlayer {
 export interface TeamWithPlayers {
   id: string;
   name?: string | null;
+  /** Переопределённый рейтинг пары (для сыгранных пар); null — берётся сумма рейтингов игроков. */
+  ratingOverride?: number | null;
   player1: TeamPlayer;
   player2?: TeamPlayer | null;
 }
@@ -200,6 +202,7 @@ export function normalizePlayerPair(id1: string, id2: string): [string, string] 
 }
 
 export function teamRating(team: TeamWithPlayers): number {
+  if (team.ratingOverride != null) return team.ratingOverride;
   if (!team.player2) return team.player1.rating;
   return team.player1.rating + team.player2.rating;
 }

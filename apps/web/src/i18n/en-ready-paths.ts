@@ -11,6 +11,7 @@ export const EN_READY_EXACT = new Set<string>([
   "/pokatat",
   "/ideas",
   "/cabinet",
+  "/login",
 ]);
 
 /** Префиксы detail-страниц в scope Phase 2–3. */

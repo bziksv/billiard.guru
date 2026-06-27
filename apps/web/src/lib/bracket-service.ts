@@ -1238,9 +1238,11 @@ async function seedTeamsForFixedSwiss(
   db: Db,
   tournamentId: string,
   format: string,
+  isPair = false,
 ) {
   if (
-    format === "FIXED_SWISS" ||
+    !isPair &&
+    (format === "FIXED_SWISS" ||
     format === "FIXED_SWISS_8R4_1_3_mesto" ||
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_16R4_2_3_mesta" ||
@@ -1261,7 +1263,7 @@ async function seedTeamsForFixedSwiss(
     format === "FIXED_SWISS_256R8_1_3_mesto" ||
     format === "FIXED_SWISS_64" ||
     format === "FIXED_SWISS_64_BRONZE" ||
-    format === "EXCEL_REF_64"
+    format === "EXCEL_REF_64")
   ) {
     await ensureSoloTeams(db, tournamentId);
   }
@@ -1273,7 +1275,11 @@ async function seedTeamsForFixedSwiss(
   });
 
   if (teams.length < 2) {
-    throw new Error("Нужно минимум 2 подтверждённые команды");
+    throw new Error(
+      isPair
+        ? "Нужно минимум 2 собранные пары"
+        : "Нужно минимум 2 подтверждённые команды",
+    );
   }
 
   const seeded = [...teams].sort((a, b) => teamRating(b) - teamRating(a));
@@ -1297,7 +1303,12 @@ export async function generateFixedSwissGrid(db: Db, tournamentId: string) {
     throw new Error("Сетка уже сформирована");
   }
 
-  const seeded = await seedTeamsForFixedSwiss(db, tournamentId, tournament.format);
+  const seeded = await seedTeamsForFixedSwiss(
+    db,
+    tournamentId,
+    tournament.format,
+    tournament.isPair,
+  );
   await assertParticipantCountForFormat(tournament.format, seeded.length);
   const gridSize = fixedSwissNominalGridSize(tournament.format, seeded.length);
   const template = buildFixedSwissTemplate(seeded.length, tournament.format);

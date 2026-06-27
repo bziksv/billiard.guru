@@ -5,7 +5,10 @@ import { CitySelect } from "@/components/admin/city-select";
 import { TournamentParticipantLimitNotice } from "@/components/tournament/tournament-participant-limit-notice";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { SearchableMultiSelect, SearchableSelect } from "@/components/ui/searchable-select";
-import { getDefaultBracketParticipantRules } from "@/lib/bracket-participant-rules";
+import {
+  doubleParticipantRulesForPair,
+  getDefaultBracketParticipantRules,
+} from "@/lib/bracket-participant-rules";
 import {
   countActiveTournamentSlots,
   slotsRemaining,
@@ -76,8 +79,11 @@ export function TournamentParticipantRegistrationPanel({
     if (defaultCityId) setNewCityId(defaultCityId);
   }, [defaultCityId]);
 
-  const participantRules =
+  const baseParticipantRules =
     tournament.participantRules ?? getDefaultBracketParticipantRules(tournament.format);
+  const participantRules = tournament.isPair
+    ? doubleParticipantRulesForPair(baseParticipantRules)
+    : baseParticipantRules;
   const activeParticipantCount = countActiveTournamentSlots(tournament);
   const slotsLeft = slotsRemaining(participantRules, activeParticipantCount);
 

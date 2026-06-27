@@ -3,14 +3,17 @@
 import { Link } from "@/i18n/navigation";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { CitySelect } from "@/components/admin/city-select";
 import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { SiteContainer } from "@/components/site/site-container";
+import { PhoneCountrySelect } from "@/components/ui/phone-country-select";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
 import { TelegramLink } from "@/lib/contact-links";
-import { formatPhoneDisplay } from "@/lib/phone";
+import { DEFAULT_PHONE_COUNTRY, formatPhoneDisplay, isPhoneOnlyAuthCountry } from "@/lib/phone";
+import { resolvePhoneApiError } from "@/lib/phone-api-error";
+import type { AppLocale } from "@/i18n/routing";
 
 type Step = "phone" | "register" | "confirm" | "login" | "telegram_nudge";
 type AuthMethod = "telegram" | "call";
@@ -30,6 +33,7 @@ type CallLoginPayload = {
 
 function LoginForm() {
   const t = useTranslations("auth");
+  const locale = useLocale() as AppLocale;
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/cabinet";
@@ -38,7 +42,9 @@ function LoginForm() {
   const [phone, setPhone] = useState("");
   const [phoneValid, setPhoneValid] = useState(false);
   const [cityId, setCityId] = useState("");
-  const [countryName, setCountryName] = useState(t("defaultCountry"));
+  const [countryName, setCountryName] = useState(() =>
+    locale === "ru" ? DEFAULT_PHONE_COUNTRY : "",
+  );
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -55,7 +61,8 @@ function LoginForm() {
 
   const finishSession = useCallback(
     (result: { role?: string; needsTelegram?: boolean }) => {
-      if (result.needsTelegram) {
+      const phoneOnlyAuth = isPhoneOnlyAuthCountry(countryName);
+      if (result.needsTelegram && !phoneOnlyAuth) {
         setStep("telegram_nudge");
         setChallengeToken(null);
         setPolling(false);
@@ -70,7 +77,7 @@ function LoginForm() {
       );
       router.refresh();
     },
-    [next, router],
+    [next, router, countryName],
   );
 
   const applyCallLogin = useCallback((data: CallLoginPayload) => {
@@ -103,7 +110,7 @@ function LoginForm() {
         const result = await complete.json();
         setPolling(false);
         if (!complete.ok) {
-          setError(result.error ?? "Ошибка входа");
+          setError(result.error ?? t("errors.loginFailed"));
           setChallengeToken(null);
           setStep("phone");
           return;
@@ -117,7 +124,9 @@ function LoginForm() {
         setChallengeToken(null);
         setStep("phone");
         setError(
-          data.status === "CANCELLED" ? "Вход отменён" : "Время ожидания истекло",
+          data.status === "CANCELLED"
+            ? t("errors.loginCancelled")
+            : t("errors.loginExpired"),
         );
       }
     }, 2000);
@@ -128,11 +137,11 @@ function LoginForm() {
   async function startAuth(e?: FormEvent) {
     e?.preventDefault();
     if (!phoneValid) {
-      setError("Введите корректный телефон");
+      setError(t("errors.invalidPhone"));
       return;
     }
     if (!consentAccepted) {
-      setError("Подтвердите согласие на обработку персональных данных");
+      setError(t("errors.consentRequired"));
       return;
     }
     setLoading(true);
@@ -143,19 +152,24 @@ function LoginForm() {
       const res = await fetch("/api/auth/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ phone, countryName, locale }),
         signal: AbortSignal.timeout(20_000),
       });
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Ошибка");
+        setError(resolvePhoneApiError(data, locale, t("errors.generic")));
         return;
       }
 
       if (data.mode === "login") {
         setAuthFlow(data.flow === "register" ? "register" : "login");
-        if (data.authMethod === "call") {
+        const phoneOnlyAuth = isPhoneOnlyAuthCountry(countryName);
+        if (data.authMethod === "call" || phoneOnlyAuth) {
+          if (phoneOnlyAuth && data.authMethod === "telegram") {
+            await switchToCallAuth();
+            return;
+          }
           applyCallLogin({
             challengeToken: data.challengeToken,
             callNumber: data.callAuth?.callNumber ?? null,
@@ -177,6 +191,10 @@ function LoginForm() {
       }
 
       if (data.mode === "confirm") {
+        if (isPhoneOnlyAuthCountry(countryName)) {
+          setError(t("errors.callStartFailed"));
+          return;
+        }
         setStep("confirm");
         setAuthFlow("register");
         setConfirmLink(data.confirmLink);
@@ -188,7 +206,7 @@ function LoginForm() {
       setAuthFlow("register");
       setInfo(data.message);
     } catch {
-      setError("Сервер не ответил. Попробуйте позже.");
+      setError(t("errors.serverTimeout"));
     } finally {
       setLoading(false);
     }
@@ -197,11 +215,11 @@ function LoginForm() {
   async function submitRegister(e: FormEvent) {
     e.preventDefault();
     if (!phoneValid || !cityId || firstName.trim().length < 2 || lastName.trim().length < 2) {
-      setError("Заполните фамилию, имя, город и телефон");
+      setError(t("errors.registerFields"));
       return;
     }
     if (!consentAccepted) {
-      setError("Подтвердите согласие на обработку персональных данных");
+      setError(t("errors.consentRequired"));
       return;
     }
     setLoading(true);
@@ -216,12 +234,13 @@ function LoginForm() {
           cityId,
           firstName: firstName.trim(),
           lastName: lastName.trim(),
+          locale,
         }),
         signal: AbortSignal.timeout(20_000),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Ошибка регистрации");
+        setError(resolvePhoneApiError(data, locale, t("errors.registerFailed")));
         return;
       }
 
@@ -243,7 +262,7 @@ function LoginForm() {
       setConfirmLink(data.confirmLink);
       setInfo(data.message);
     } catch {
-      setError("Сервер не ответил. Попробуйте позже.");
+      setError(t("errors.serverTimeout"));
     } finally {
       setLoading(false);
     }
@@ -258,12 +277,12 @@ function LoginForm() {
       const res = await fetch("/api/auth/start-call", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ phone, countryName, locale }),
         signal: AbortSignal.timeout(20_000),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Не удалось начать вход звонком");
+        setError(resolvePhoneApiError(data, locale, t("errors.callStartFailed")));
         return;
       }
       applyCallLogin({
@@ -273,7 +292,7 @@ function LoginForm() {
         flow: authFlow,
       });
     } catch {
-      setError("Сервер не ответил. Попробуйте позже.");
+      setError(t("errors.serverTimeout"));
     } finally {
       setLoading(false);
     }
@@ -299,6 +318,7 @@ function LoginForm() {
 
   const botLink = confirmLink ?? `https://t.me/${TELEGRAM_BOT_USERNAME}`;
   const phoneDisplay = phone ? formatPhoneDisplay(phone, countryName) : null;
+  const phoneOnlyAuth = isPhoneOnlyAuthCountry(countryName);
 
   return (
     <div className="site-card mx-auto w-full max-w-md p-8">
@@ -307,30 +327,48 @@ function LoginForm() {
       <ul className="mt-2 space-y-1 text-sm text-[var(--text-secondary)]">
         <li>
           <span className="font-medium text-[var(--text-primary)]">{t("newUserLabel")}</span>{" "}
-          {t.rich("newUserText", {
-            bot: TELEGRAM_BOT_USERNAME,
-            link: () => (
-              <TelegramLink
-                username={TELEGRAM_BOT_USERNAME}
-                className="font-medium text-emerald-700 underline dark:text-emerald-400"
-              />
-            ),
-          })}
+          {phoneOnlyAuth ? (
+            t("newUserTextPhoneOnly")
+          ) : (
+            t.rich("newUserText", {
+              bot: TELEGRAM_BOT_USERNAME,
+              link: () => (
+                <TelegramLink
+                  username={TELEGRAM_BOT_USERNAME}
+                  className="font-medium text-emerald-700 underline dark:text-emerald-400"
+                />
+              ),
+            })
+          )}
         </li>
         <li>
           <span className="font-medium text-[var(--text-primary)]">{t("existingUserLabel")}</span>{" "}
-          {t("existingUserText")}
+          {phoneOnlyAuth ? t("existingUserTextPhoneOnly") : t("existingUserText")}
         </li>
       </ul>
 
       {step === "phone" && (
         <form onSubmit={startAuth} className="mt-6 space-y-4">
+          <PhoneCountrySelect
+            value={countryName}
+            onChange={setCountryName}
+            label={t("country")}
+            placeholder={locale === "en" ? t("selectCountry") : undefined}
+            required
+          />
           <PhoneInput
             countryName={countryName}
+            locale={locale}
             value={phone}
             onChange={(e164, valid) => {
               setPhone(e164);
               setPhoneValid(valid);
+            }}
+            labels={{
+              phone: t("phoneLabel"),
+              pickCountryFirst: t("pickCountryFirst"),
+              hint: t("phoneHint"),
+              accepted: t("phoneAccepted"),
             }}
             required
           />
@@ -342,7 +380,7 @@ function LoginForm() {
           />
           <button
             type="submit"
-            disabled={loading || !phoneValid || !consentAccepted}
+            disabled={loading || !countryName || !phoneValid || !consentAccepted}
             className="site-btn-primary w-full disabled:opacity-50"
           >
             {loading ? t("checking") : t("continue")}
@@ -378,7 +416,7 @@ function LoginForm() {
           <CitySelect
             value={cityId}
             onChange={setCityId}
-            onCountryChange={(c) => setCountryName(c?.nameRu ?? t("defaultCountry"))}
+            onCountryChange={(c) => setCountryName(c?.nameRu ?? DEFAULT_PHONE_COUNTRY)}
             required
           />
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
@@ -400,7 +438,7 @@ function LoginForm() {
         </form>
       )}
 
-      {step === "confirm" && (
+      {step === "confirm" && !phoneOnlyAuth && (
         <div className={`mt-6 ${authPanelClass} space-y-4`}>
           {info && <p className="text-sm text-emerald-800 dark:text-emerald-300">{info}</p>}
           <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-600 dark:text-zinc-300">
@@ -463,13 +501,17 @@ function LoginForm() {
             </>
           ) : (
             <p className="text-sm text-amber-800 dark:text-amber-300">
-              {t("callNotActive")}
+              {phoneOnlyAuth ? t("callNotActivePhoneOnly") : t("callNotActive")}
             </p>
           )}
           <ol className="list-decimal space-y-1 pl-4 text-xs text-zinc-600 dark:text-zinc-300">
             <li>{t("callStep1")}</li>
             <li>
-              {authFlow === "register" ? t("callStep2Register") : t("callStep2Login")}
+              {authFlow === "register"
+                ? phoneOnlyAuth
+                  ? t("callStep2RegisterPhoneOnly")
+                  : t("callStep2Register")
+                : t("callStep2Login")}
             </li>
           </ol>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
@@ -483,7 +525,7 @@ function LoginForm() {
         </div>
       )}
 
-      {step === "login" && authMethod === "telegram" && (
+      {step === "login" && authMethod === "telegram" && !phoneOnlyAuth && (
         <div className={`mt-6 ${authPanelClass} space-y-3`}>
           <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
             {polling ? t("openTelegramConfirm") : t("processing")}

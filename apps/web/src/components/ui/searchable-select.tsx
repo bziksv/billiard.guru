@@ -1,12 +1,51 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 export interface SearchableSelectOption {
   value: string;
   label: string;
+  /** Доп. строка для поиска (не показывается в UI) */
+  searchText?: string;
   /** Показать в списке, но нельзя выбрать */
   disabled?: boolean;
+}
+
+const MENU_GAP = 4;
+const MENU_MAX_HEIGHT = 224;
+const MENU_Z_INDEX = 10_000;
+
+type FloatingMenuPosition = {
+  left: number;
+  width: number;
+  maxHeight: number;
+  top?: number;
+  bottom?: number;
+};
+
+function measureFloatingMenu(input: HTMLElement | null): FloatingMenuPosition | null {
+  if (!input) return null;
+  const rect = input.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom - MENU_GAP;
+  const spaceAbove = rect.top - MENU_GAP;
+  const openAbove = spaceBelow < 160 && spaceAbove > spaceBelow;
+
+  if (!openAbove) {
+    return {
+      top: rect.bottom + MENU_GAP,
+      left: rect.left,
+      width: rect.width,
+      maxHeight: Math.min(MENU_MAX_HEIGHT, Math.max(96, spaceBelow - 8)),
+    };
+  }
+
+  return {
+    bottom: window.innerHeight - rect.top + MENU_GAP,
+    left: rect.left,
+    width: rect.width,
+    maxHeight: Math.min(MENU_MAX_HEIGHT, Math.max(96, spaceAbove - 8)),
+  };
 }
 
 interface SearchableSelectProps {
@@ -50,7 +89,9 @@ export function SearchableSelect({
 }: SearchableSelectProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [menuPos, setMenuPos] = useState<FloatingMenuPosition | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
 
@@ -59,15 +100,38 @@ export function SearchableSelect({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return options;
-    return options.filter((o) => o.label.toLowerCase().includes(q));
+    return options.filter((o) => {
+      const hay = `${o.label} ${o.searchText ?? ""}`.toLowerCase();
+      return hay.includes(q);
+    });
   }, [options, query]);
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setMenuPos(null);
+      return;
+    }
+
+    function update() {
+      setMenuPos(measureFloatingMenu(inputRef.current));
+    }
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open, filtered.length]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (!containerRef.current?.contains(e.target as Node)) {
-        setOpen(false);
-        setQuery("");
-      }
+      const target = e.target as Node;
+      if (containerRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
+      setOpen(false);
+      setQuery("");
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -136,56 +200,71 @@ export function SearchableSelect({
             "w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           }
         />
-        {open && !disabled && (
-          <ul
-            id={listId}
-            role="listbox"
-            className={
-              dropdownClassName ??
-              "absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
-            }
-          >
-            {filtered.length === 0 ? (
-              <li
-                className={
-                  emptyClassName ?? "px-3 py-2 text-sm text-zinc-500"
-                }
-              >
-                {emptyMessage}
-              </li>
-            ) : (
-              filtered.map((option) => (
-                <li key={option.value}>
-                  <button
-                    type="button"
-                    role="option"
-                    aria-selected={option.value === value}
-                    aria-disabled={option.disabled || undefined}
-                    disabled={option.disabled}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      select(option);
-                    }}
-                    className={
-                      option.disabled
-                        ? optionClassName
-                          ? `${optionClassName} cursor-not-allowed opacity-60`
-                          : "w-full cursor-not-allowed px-3 py-2 text-left text-sm text-zinc-500 opacity-60"
-                        : option.value === value
-                          ? (selectedOptionClassName ??
-                            "w-full bg-zinc-800 px-3 py-2 text-left text-sm text-emerald-400")
-                          : (optionClassName ??
-                            "w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-zinc-800")
-                    }
-                  >
-                    {option.label}
-                  </button>
+        {open &&
+          !disabled &&
+          menuPos &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <ul
+              ref={menuRef}
+              id={listId}
+              role="listbox"
+              style={{
+                position: "fixed",
+                top: menuPos.top,
+                bottom: menuPos.bottom,
+                left: menuPos.left,
+                width: menuPos.width,
+                maxHeight: menuPos.maxHeight,
+                zIndex: MENU_Z_INDEX,
+              }}
+              className={
+                dropdownClassName ??
+                "max-h-48 overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
+              }
+            >
+              {filtered.length === 0 ? (
+                <li
+                  className={
+                    emptyClassName ?? "px-3 py-2 text-sm text-zinc-500"
+                  }
+                >
+                  {emptyMessage}
                 </li>
-              ))
-            )}
-          </ul>
-        )}
+              ) : (
+                filtered.map((option) => (
+                  <li key={option.value}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={option.value === value}
+                      aria-disabled={option.disabled || undefined}
+                      disabled={option.disabled}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        select(option);
+                      }}
+                      className={
+                        option.disabled
+                          ? optionClassName
+                            ? `${optionClassName} cursor-not-allowed opacity-60`
+                            : "w-full cursor-not-allowed px-3 py-2 text-left text-sm text-zinc-500 opacity-60"
+                          : option.value === value
+                            ? (selectedOptionClassName ??
+                              "w-full bg-zinc-800 px-3 py-2 text-left text-sm text-emerald-400")
+                            : (optionClassName ??
+                              "w-full px-3 py-2 text-left text-sm text-zinc-200 hover:bg-zinc-800")
+                      }
+                    >
+                      {option.label}
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>,
+            document.body,
+          )}
       </div>
     </div>
   );
@@ -229,7 +308,10 @@ export function SearchableMultiSelect({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return options;
-    return options.filter((o) => o.label.toLowerCase().includes(q));
+    return options.filter((o) => {
+      const hay = `${o.label} ${o.searchText ?? ""}`.toLowerCase();
+      return hay.includes(q);
+    });
   }, [options, query]);
 
   useEffect(() => {

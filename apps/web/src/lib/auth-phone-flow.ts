@@ -1,7 +1,13 @@
 import { randomUUID } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { normalizePhone } from "@/lib/phone";
-import { normalizePhoneForCity } from "@/lib/phone-server";
+import { normalizePhoneAuto, isPhoneOnlyAuthCountry } from "@/lib/phone";
+import { normalizePhoneForCity, resolveCountryName } from "@/lib/phone-server";
+import {
+  formatPhoneValidationError,
+  type PhoneValidationErrorCode,
+  type PhoneValidationErrorParams,
+} from "@/lib/phone-validation-errors";
+import type { AppLocale } from "@/i18n/routing";
 import { createLoginChallenge, createCallLoginChallenge } from "@/lib/login-challenge";
 import { buildConfirmLink } from "@/lib/telegram";
 import { writeAuditLog } from "@/lib/audit";
@@ -50,20 +56,21 @@ async function ensureConfirmToken(playerId: string, existing: string | null) {
   return confirmToken;
 }
 
-async function buildCallVerifyResult(
+async function buildCallLoginResult(
   playerId: string,
-  confirmToken: string,
   message: string,
+  flow: "register" | "login" = "login",
+  confirmToken?: string,
 ): Promise<Extract<AuthStartResult, { mode: "login" }>> {
   const { token, expiresAt } = await createCallLoginChallenge(playerId);
   return {
     mode: "login",
     authMethod: "call",
-    flow: "register",
+    flow,
     challengeToken: token,
     expiresAt: expiresAt.toISOString(),
     message,
-    confirmLink: buildConfirmLink(confirmToken),
+    ...(confirmToken ? { confirmLink: buildConfirmLink(confirmToken) } : {}),
     callAuth: {
       available: true,
       enabled: true,
@@ -72,14 +79,42 @@ async function buildCallVerifyResult(
   };
 }
 
+async function buildCallVerifyResult(
+  playerId: string,
+  confirmToken: string,
+  message: string,
+): Promise<Extract<AuthStartResult, { mode: "login" }>> {
+  return buildCallLoginResult(playerId, message, "register", confirmToken);
+}
+
+function callAuthUnavailableError(phoneOnlyAuth: boolean): string {
+  return phoneOnlyAuth
+    ? "Вход по телефону временно недоступен. Попробуйте позже."
+    : "Подтверждение временно недоступно. Попробуйте позже или используйте Telegram.";
+}
+
 export async function resolveAuthByPhone(
   phoneRaw: string,
-  countryName = "Россия",
-): Promise<{ error?: string; result?: AuthStartResult }> {
-  const normalized = normalizePhone(String(phoneRaw), countryName);
+  countryName?: string,
+  locale: AppLocale = "ru",
+): Promise<{
+  error?: string;
+  errorCode?: PhoneValidationErrorCode;
+  errorParams?: PhoneValidationErrorParams;
+  result?: AuthStartResult;
+}> {
+  const normalized = normalizePhoneAuto(String(phoneRaw), countryName);
   if (!normalized.valid || !normalized.e164) {
-    return { error: normalized.error ?? "Некорректный телефон" };
+    const code = normalized.errorCode ?? "invalid";
+    return {
+      error: formatPhoneValidationError(code, normalized.errorParams ?? {}, locale),
+      errorCode: code,
+      errorParams: normalized.errorParams,
+    };
   }
+
+  const authCountry = countryName ?? normalized.countryName;
+  const phoneOnlyAuth = isPhoneOnlyAuthCountry(authCountry);
 
   const player = await prisma.player.findUnique({
     where: { phone: normalized.e164 },
@@ -90,47 +125,60 @@ export async function resolveAuthByPhone(
       result: {
         mode: "register",
         phone: normalized.e164,
-        message: "Заполните имя и город — дальше подтвердите номер коротким звонком.",
+        message: phoneOnlyAuth
+          ? "Заполните имя и город — дальше подтвердите номер коротким звонком."
+          : "Заполните имя и город — дальше подтвердите номер коротким звонком или в Telegram.",
       },
     };
   }
 
-  if (player.isVerified && player.telegramId) {
-    const { token, expiresAt } = await createLoginChallenge(player.id, player.telegramId);
-    return {
-      result: {
-        mode: "login",
-        authMethod: "telegram",
-        flow: "login",
-        challengeToken: token,
-        expiresAt: expiresAt.toISOString(),
-        message: "Подтвердите вход в Telegram",
-        callAuth: {
-          available: isNovofonCallAuthConfigured(),
-          enabled: isNovofonCallAuthEnabled(),
-          callNumber: getNovofonVerifyNumberDisplay(),
-        },
-      },
-    };
-  }
+  if (player.isVerified) {
+    if (phoneOnlyAuth) {
+      if (!isNovofonCallAuthEnabled()) {
+        return { error: callAuthUnavailableError(true) };
+      }
+      return {
+        result: await buildCallLoginResult(
+          player.id,
+          "Позвоните на указанный номер — звонок сбросится автоматически",
+          "login",
+        ),
+      };
+    }
 
-  if (player.isVerified && isNovofonCallAuthEnabled()) {
-    const { token, expiresAt } = await createCallLoginChallenge(player.id);
-    return {
-      result: {
-        mode: "login",
-        authMethod: "call",
-        flow: "login",
-        challengeToken: token,
-        expiresAt: expiresAt.toISOString(),
-        message: "Позвоните на указанный номер — звонок сбросится автоматически",
-        callAuth: {
-          available: true,
-          enabled: true,
-          callNumber: getNovofonVerifyNumberDisplay(),
+    if (player.telegramId) {
+      const { token, expiresAt } = await createLoginChallenge(
+        player.id,
+        player.telegramId,
+      );
+      return {
+        result: {
+          mode: "login",
+          authMethod: "telegram",
+          flow: "login",
+          challengeToken: token,
+          expiresAt: expiresAt.toISOString(),
+          message: "Подтвердите вход в Telegram",
+          callAuth: {
+            available: isNovofonCallAuthConfigured(),
+            enabled: isNovofonCallAuthEnabled(),
+            callNumber: getNovofonVerifyNumberDisplay(),
+          },
         },
-      },
-    };
+      };
+    }
+
+    if (isNovofonCallAuthEnabled()) {
+      return {
+        result: await buildCallLoginResult(
+          player.id,
+          "Позвоните на указанный номер — звонок сбросится автоматически",
+          "login",
+        ),
+      };
+    }
+
+    return { error: callAuthUnavailableError(false) };
   }
 
   const confirmToken = await ensureConfirmToken(player.id, player.confirmToken);
@@ -143,6 +191,10 @@ export async function resolveAuthByPhone(
         "Позвоните на указанный номер с телефона, который вводили — так мы подтвердим регистрацию.",
       ),
     };
+  }
+
+  if (phoneOnlyAuth) {
+    return { error: callAuthUnavailableError(true) };
   }
 
   return {
@@ -164,10 +216,18 @@ export async function registerPlayerByPhone(input: {
   phone: string;
   email?: string;
   birthDate?: string;
+  locale?: AppLocale;
 }) {
   const phoneResult = await normalizePhoneForCity(input.phone, input.cityId);
   if (phoneResult.error || !phoneResult.e164) {
-    return { error: phoneResult.error ?? "Некорректный телефон" };
+    const code = phoneResult.errorCode ?? "invalid";
+    const params = phoneResult.errorParams ?? {};
+    const locale = input.locale ?? "ru";
+    return {
+      error: formatPhoneValidationError(code, params, locale),
+      errorCode: code,
+      errorParams: params,
+    };
   }
 
   const data = playerRegisterSchema.parse({
@@ -175,6 +235,9 @@ export async function registerPlayerByPhone(input: {
     phone: phoneResult.e164,
     rating: 0,
   });
+
+  const cityCountry = (await resolveCountryName(input.cityId)) ?? "Россия";
+  const phoneOnlyAuth = isPhoneOnlyAuthCountry(cityCountry);
 
   const existing = await prisma.player.findUnique({
     where: { phone: data.phone },
@@ -210,6 +273,10 @@ export async function registerPlayerByPhone(input: {
           "Позвоните на указанный номер — так мы подтвердим ваш номер.",
         ),
       };
+    }
+
+    if (phoneOnlyAuth) {
+      return { error: callAuthUnavailableError(true) };
     }
 
     return {
@@ -254,6 +321,10 @@ export async function registerPlayerByPhone(input: {
         "Позвоните на указанный номер — так мы подтвердим ваш номер.",
       ),
     };
+  }
+
+  if (phoneOnlyAuth) {
+    return { error: callAuthUnavailableError(true) };
   }
 
   return {

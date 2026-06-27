@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
 import { ClubFloorPlanCanvas } from "@/components/club/club-floor-plan-canvas";
 import {
@@ -31,6 +31,18 @@ type ClubBookingWidgetProps = {
   isLoggedIn: boolean;
 };
 
+function tableWord(
+  n: number,
+  t: ReturnType<typeof useTranslations<"clubPanel">>,
+): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 14) return t("tableMany");
+  if (mod10 === 1) return t("tableOne");
+  if (mod10 >= 2 && mod10 <= 4) return t("tableFew");
+  return t("tableMany");
+}
+
 export function ClubBookingWidget({
   clubId,
   clubName,
@@ -43,6 +55,8 @@ export function ClubBookingWidget({
 }: ClubBookingWidgetProps) {
   const locale = useLocale() as AppLocale;
   const scheduleLocale = locale === "en" ? "en" : "ru";
+  const t = useTranslations("clubBookingWidget");
+  const tTables = useTranslations("clubPanel");
   const router = useRouter();
   const plan = useMemo(() => parseFloorPlan(floorPlan), [floorPlan]);
   const priceTiers = useMemo(() => parsePriceTiers(priceTiersRaw), [priceTiersRaw]);
@@ -53,6 +67,16 @@ export function ClubBookingWidget({
   const dates = useMemo(
     () => bookingDateOptions(bookingAdvanceDays, scheduleLocale),
     [bookingAdvanceDays, scheduleLocale],
+  );
+
+  const formatTableCount = useCallback(
+    (count: number, opts?: { of?: number }) => {
+      if (opts?.of != null) {
+        return `${count} ${scheduleLocale === "en" ? "of" : "из"} ${opts.of} ${tableWord(opts.of, tTables)}`;
+      }
+      return `${count} ${tableWord(count, tTables)}`;
+    },
+    [scheduleLocale, tTables],
   );
 
   const [format, setFormat] = useState<ClubTableFormatId | "">("");
@@ -98,13 +122,13 @@ export function ClubBookingWidget({
     setLoadingSlots(false);
     if (!res.ok) {
       setSlots([]);
-      setError(data.error ?? "Не удалось загрузить слоты");
+      setError(data.error ?? t("errorLoadSlots"));
       return;
     }
     setSlots(Array.isArray(data.slots) ? data.slots : []);
     setHasFloorPlan(Boolean(data.hasFloorPlan));
     if (typeof data.slotMinutes === "number") setSlotMinutes(data.slotMinutes);
-  }, [clubId, date, format]);
+  }, [clubId, date, format, t]);
 
   const loadSlotDetails = useCallback(async () => {
     if (!format || !date || !selectedSlot) {
@@ -197,18 +221,19 @@ export function ClubBookingWidget({
 
   const bookingRangeLabel = useMemo(() => {
     if (!selectedSlot || !endsAtIso) return null;
-    const fmt = new Intl.DateTimeFormat("ru-RU", {
+    const intlLocale = scheduleLocale === "en" ? "en-US" : "ru-RU";
+    const fmt = new Intl.DateTimeFormat(intlLocale, {
       hour: "2-digit",
       minute: "2-digit",
       timeZone: "Europe/Moscow",
     });
     return `${fmt.format(new Date(selectedSlot))} – ${fmt.format(new Date(endsAtIso))}`;
-  }, [selectedSlot, endsAtIso]);
+  }, [selectedSlot, endsAtIso, scheduleLocale]);
 
   async function submitBooking() {
     if (!selectedSlot || !format || !endsAtIso) return;
     if (hasFloorPlan && !selectedTableId) {
-      setError("Выберите стол на схеме зала");
+      setError(t("errorPickTable"));
       return;
     }
     if (!isLoggedIn) {
@@ -232,10 +257,10 @@ export function ClubBookingWidget({
     const data = await res.json();
     setSubmitting(false);
     if (!res.ok) {
-      setError(data.error ?? "Не удалось забронировать");
+      setError(data.error ?? t("errorSubmit"));
       return;
     }
-    setSuccess("Заявка отправлена — клуб подтвердит бронь");
+    setSuccess(t("success"));
     setSelectedSlot(null);
     setSelectedTableId(null);
     setDurationMinutes(null);
@@ -248,15 +273,16 @@ export function ClubBookingWidget({
 
   return (
     <div className="club-booking">
-      <h3 className="site-section-title mb-1">Забронировать стол</h3>
+      <h3 className="site-section-title mb-1">{t("title")}</h3>
       <p className="home-card-muted mb-4 text-sm">
-        Выберите формат, дату, время и длительность
-        {hasFloorPlan ? ", затем стол на схеме" : ""} — {clubName} подтвердит бронь.
+        {hasFloorPlan
+          ? t("leadWithFloorPlan", { clubName })
+          : t("lead", { clubName })}
       </p>
 
       <div className="club-booking-filters">
         <label className="club-booking-field">
-          <span className="club-booking-label">Формат</span>
+          <span className="club-booking-label">{t("format")}</span>
           <select
             value={format}
             onChange={(e) => setFormat(e.target.value as ClubTableFormatId)}
@@ -270,7 +296,7 @@ export function ClubBookingWidget({
           </select>
         </label>
         <label className="club-booking-field">
-          <span className="club-booking-label">Дата</span>
+          <span className="club-booking-label">{t("date")}</span>
           <select
             value={date}
             onChange={(e) => setDate(e.target.value)}
@@ -286,11 +312,11 @@ export function ClubBookingWidget({
       </div>
 
       <div className="mt-4">
-        <p className="club-booking-label mb-2">Начало</p>
+        <p className="club-booking-label mb-2">{t("start")}</p>
         {loadingSlots ? (
-          <p className="text-sm text-zinc-500">Загрузка…</p>
+          <p className="text-sm text-zinc-500">{t("loading")}</p>
         ) : slots.length === 0 ? (
-          <p className="text-sm text-zinc-500">На эту дату нет свободных слотов.</p>
+          <p className="text-sm text-zinc-500">{t("noSlots")}</p>
         ) : (
           <div className="club-booking-slots">
             {slots.map((slot) => (
@@ -317,7 +343,7 @@ export function ClubBookingWidget({
       {selectedSlot && durationOptions.length > 0 && (
         <div className="mt-4">
           <label className="club-booking-field block">
-            <span className="club-booking-label">Длительность</span>
+            <span className="club-booking-label">{t("duration")}</span>
             <select
               value={durationMinutes ?? durationOptions[0]}
               onChange={(e) => setDurationMinutes(Number(e.target.value))}
@@ -325,22 +351,24 @@ export function ClubBookingWidget({
             >
               {durationOptions.map((minutes) => (
                 <option key={minutes} value={minutes}>
-                  {formatBookingDuration(minutes)}
+                  {formatBookingDuration(minutes, scheduleLocale)}
                 </option>
               ))}
             </select>
           </label>
           {bookingRangeLabel && (
-            <p className="mt-2 text-sm text-zinc-400">Интервал: {bookingRangeLabel}</p>
+            <p className="mt-2 text-sm text-zinc-400">
+              {t("interval", { range: bookingRangeLabel })}
+            </p>
           )}
         </div>
       )}
 
       {selectedSlot && hasFloorPlan && (
         <div className="mt-4 space-y-2">
-          <p className="club-booking-label">Выберите стол</p>
+          <p className="club-booking-label">{t("pickTable")}</p>
           {loadingSlotDetails ? (
-            <p className="text-sm text-zinc-500">Проверка схемы…</p>
+            <p className="text-sm text-zinc-500">{t("checkingFloorPlan")}</p>
           ) : (
             <>
               <ClubFloorPlanCanvas
@@ -355,26 +383,31 @@ export function ClubBookingWidget({
               <ul className="club-floor-plan-legend">
                 <li className="club-floor-plan-legend-item">
                   <span className="club-floor-plan-legend-dot club-floor-plan-legend-dot--free" />
-                  <span>Свободен</span>
+                  <span>{t("legendFree")}</span>
                 </li>
                 <li className="club-floor-plan-legend-item">
                   <span className="club-floor-plan-legend-dot club-floor-plan-legend-dot--pending" />
-                  <span>Занят (ожидает)</span>
+                  <span>{t("legendPending")}</span>
                 </li>
                 <li className="club-floor-plan-legend-item">
                   <span className="club-floor-plan-legend-dot club-floor-plan-legend-dot--occupied" />
-                  <span>Занят</span>
+                  <span>{t("legendOccupied")}</span>
                 </li>
               </ul>
               {selectedTableId && (
                 <p className="text-sm text-emerald-400">
-                  Выбран: {floorTables.find((t) => t.id === selectedTableId)?.label}
+                  {t("selectedTable", {
+                    label: floorTables.find((tbl) => tbl.id === selectedTableId)?.label ?? "",
+                  })}
                 </p>
               )}
               {floorTables.length > 0 && (
                 <p className="text-xs text-zinc-500">
-                  Свободно {floorTables.filter((t) => t.status === "free").length} из{" "}
-                  {floorTables.length} столов на схеме
+                  {t("freeOnPlan", {
+                    free: floorTables.filter((tbl) => tbl.status === "free").length,
+                    total: floorTables.length,
+                    word: tableWord(floorTables.length, tTables),
+                  })}
                 </p>
               )}
             </>
@@ -385,20 +418,20 @@ export function ClubBookingWidget({
       {selectedSlot && (
         <div className="mt-4 space-y-3">
           <label className="block text-sm">
-            <span className="club-booking-label">Комментарий (необязательно)</span>
+            <span className="club-booking-label">{t("noteLabel")}</span>
             <input
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Например: нужен стол у окна"
+              placeholder={t("notePlaceholder")}
               className="site-input mt-1 w-full"
             />
           </label>
           {!isLoggedIn ? (
             <p className="text-sm text-zinc-400">
               <Link href={`/login?next=/clubs/${clubId}`} className="text-emerald-400 hover:underline">
-                Войдите
+                {t("signIn")}
               </Link>
-              , чтобы отправить заявку.
+              {t("signInSuffix")}
             </p>
           ) : (
             <button
@@ -412,7 +445,7 @@ export function ClubBookingWidget({
               }
               className="site-btn-primary disabled:opacity-50"
             >
-              {submitting ? "Отправка…" : "Забронировать"}
+              {submitting ? t("submitting") : t("submit")}
             </button>
           )}
         </div>
@@ -422,20 +455,4 @@ export function ClubBookingWidget({
       {success && <p className="mt-3 text-sm text-emerald-400">{success}</p>}
     </div>
   );
-}
-
-function tableWord(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod100 >= 11 && mod100 <= 14) return "столов";
-  if (mod10 === 1) return "стол";
-  if (mod10 >= 2 && mod10 <= 4) return "стола";
-  return "столов";
-}
-
-function formatTableCount(count: number, opts?: { of?: number }): string {
-  if (opts?.of != null) {
-    return `${count} из ${opts.of} ${tableWord(opts.of)}`;
-  }
-  return `${count} ${tableWord(count)}`;
 }

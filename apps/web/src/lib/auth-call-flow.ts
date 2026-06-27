@@ -1,5 +1,11 @@
 import { createCallLoginChallenge } from "@/lib/login-challenge";
-import { normalizePhone } from "@/lib/phone";
+import { normalizePhoneAuto, isPhoneOnlyAuthCountry } from "@/lib/phone";
+import {
+  formatPhoneValidationError,
+  type PhoneValidationErrorCode,
+  type PhoneValidationErrorParams,
+} from "@/lib/phone-validation-errors";
+import type { AppLocale } from "@/i18n/routing";
 import { prisma } from "@/lib/prisma";
 import {
   getNovofonVerifyNumberDisplay,
@@ -8,9 +14,15 @@ import {
 
 export async function startCallAuthByPhone(
   phoneRaw: string,
-  countryName = "Россия",
+  countryName?: string,
+  locale: AppLocale = "ru",
 ): Promise<
-  | { error: string; status?: number }
+  | {
+      error: string;
+      errorCode?: PhoneValidationErrorCode;
+      errorParams?: PhoneValidationErrorParams;
+      status?: number;
+    }
   | {
       authMethod: "call";
       challengeToken: string;
@@ -20,15 +32,24 @@ export async function startCallAuthByPhone(
     }
 > {
   if (!isNovofonCallAuthEnabled()) {
+    const phoneOnlyAuth = isPhoneOnlyAuthCountry(countryName);
     return {
-      error: "Вход звонком временно недоступен. Используйте Telegram или попробуйте позже.",
+      error: phoneOnlyAuth
+        ? "Вход по телефону временно недоступен. Попробуйте позже."
+        : "Вход звонком временно недоступен. Используйте Telegram или попробуйте позже.",
       status: 503,
     };
   }
 
-  const normalized = normalizePhone(String(phoneRaw), countryName);
+  const normalized = normalizePhoneAuto(String(phoneRaw), countryName);
   if (!normalized.valid || !normalized.e164) {
-    return { error: normalized.error ?? "Некорректный телефон", status: 400 };
+    const code = normalized.errorCode ?? "invalid";
+    return {
+      error: formatPhoneValidationError(code, normalized.errorParams ?? {}, locale),
+      errorCode: code,
+      errorParams: normalized.errorParams,
+      status: 400,
+    };
   }
 
   const player = await prisma.player.findUnique({

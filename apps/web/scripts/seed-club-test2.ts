@@ -119,8 +119,8 @@ async function main() {
     phone: ref.phone,
     displayPhone: "+7 (473) 987-65-43",
     email: "test2@billiard.guru",
-    photoUrl: "/demo/club-test.jpg",
-    galleryUrls: ["/demo/club-test.jpg", "/demo/club-test-2.jpg", "/demo/club-test-3.jpg"],
+    photoUrl: "/demo/club-test.webp",
+    galleryUrls: ["/demo/club-test.webp", "/demo/club-test-2.webp", "/demo/club-test-3.webp"],
     description: `Бильярдный клуб «${CLUB_NAME}» — вторая демо-площадка billiard.guru с полным набором форматов.
 
 10 профессиональных столов:

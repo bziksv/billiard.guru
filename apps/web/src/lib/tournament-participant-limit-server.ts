@@ -3,7 +3,10 @@ import {
   countActiveTournamentSlots,
   validateCanAddParticipants,
 } from "@/lib/tournament-participant-limit";
-import { validateFormatChangeParticipantCount } from "@/lib/bracket-participant-rules";
+import {
+  doubleParticipantRulesForPair,
+  validateFormatChangeParticipantCount,
+} from "@/lib/bracket-participant-rules";
 import { prisma } from "@/lib/prisma";
 
 export async function getTournamentParticipantContext(tournamentId: string) {
@@ -17,7 +20,10 @@ export async function getTournamentParticipantContext(tournamentId: string) {
   if (!tournament) {
     throw new Error("Турнир не найден");
   }
-  const rules = await getResolvedParticipantRules(tournament.format);
+  const baseRules = await getResolvedParticipantRules(tournament.format);
+  const rules = tournament.isPair
+    ? doubleParticipantRulesForPair(baseRules)
+    : baseRules;
   const count = countActiveTournamentSlots(tournament);
   return { tournament, rules, count };
 }
@@ -44,7 +50,10 @@ export async function assertTournamentFitsFormat(
   });
   if (!tournament) throw new Error("Турнир не найден");
 
-  const rules = await getResolvedParticipantRules(format);
+  const baseRules = await getResolvedParticipantRules(format);
+  const rules = tournament.isPair
+    ? doubleParticipantRulesForPair(baseRules)
+    : baseRules;
   const count = countActiveTournamentSlots({ ...tournament, format });
   const check = validateFormatChangeParticipantCount(format, count, rules);
   if (!check.ok) {

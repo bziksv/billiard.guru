@@ -114,7 +114,23 @@ export function maxBookingDurationMinutes(club: ClubBookingContext) {
   return Math.min(240, bookingStepMinutes(club) * 8);
 }
 
-export function formatBookingDuration(minutes: number): string {
+export function formatBookingDuration(
+  minutes: number,
+  locale: "ru" | "en" = "ru",
+): string {
+  if (locale === "en") {
+    if (minutes >= 60 && minutes % 60 === 0) {
+      const hours = minutes / 60;
+      return hours === 1 ? "1 hour" : `${hours} hours`;
+    }
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      const rest = minutes % 60;
+      return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
+    }
+    return `${minutes} min`;
+  }
+
   if (minutes >= 60 && minutes % 60 === 0) {
     const hours = minutes / 60;
     if (hours === 1) return "1 час";

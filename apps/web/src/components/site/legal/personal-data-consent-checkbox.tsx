@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { LEGAL_URLS } from "@/lib/legal";
 
 type PersonalDataConsentCheckboxProps = {
@@ -10,12 +11,17 @@ type PersonalDataConsentCheckboxProps = {
   className?: string;
 };
 
+const linkClassName =
+  "text-emerald-700 underline underline-offset-2 hover:text-emerald-600 dark:text-emerald-400";
+
 export function PersonalDataConsentCheckbox({
   checked,
   onChange,
   id = "personal-data-consent",
   className = "",
 }: PersonalDataConsentCheckboxProps) {
+  const t = useTranslations("legal.consentCheckbox");
+
   return (
     <label
       htmlFor={id}
@@ -30,25 +36,28 @@ export function PersonalDataConsentCheckbox({
         required
       />
       <span>
-        Нажимая на эту кнопку, я даю своё согласие на{" "}
-        <Link
-          href={LEGAL_URLS.personalDataConsent}
-          className="text-emerald-700 underline underline-offset-2 hover:text-emerald-600 dark:text-emerald-400"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          обработку персональных данных
-        </Link>{" "}
-        и соглашаюсь с условиями{" "}
-        <Link
-          href={LEGAL_URLS.privacy}
-          className="text-emerald-700 underline underline-offset-2 hover:text-emerald-600 dark:text-emerald-400"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          политики конфиденциальности
-        </Link>
-        .
+        {t.rich("text", {
+          personalData: (chunks) => (
+            <Link
+              href={LEGAL_URLS.personalDataConsent}
+              className={linkClassName}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link
+              href={LEGAL_URLS.privacy}
+              className={linkClassName}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {chunks}
+            </Link>
+          ),
+        })}
       </span>
     </label>
   );

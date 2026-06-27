@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { registerPlayerByPhone } from "@/lib/auth-phone-flow";
+import { parseApiLocale } from "@/lib/phone-api-error";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { firstName, lastName, middleName, cityId, phone, email, birthDate } = body;
+    const {
+      firstName,
+      lastName,
+      middleName,
+      cityId,
+      phone,
+      email,
+      birthDate,
+      locale: localeRaw,
+    } = body;
+    const locale = parseApiLocale(localeRaw);
 
     if (!firstName || !lastName || !cityId || !phone) {
       return NextResponse.json(
@@ -13,7 +24,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { error, result } = await registerPlayerByPhone({
+    const { error, errorCode, errorParams, result } = await registerPlayerByPhone({
       firstName: String(firstName),
       lastName: String(lastName),
       middleName: middleName ? String(middleName) : undefined,
@@ -21,10 +32,11 @@ export async function POST(request: NextRequest) {
       phone: String(phone),
       email: email ? String(email) : undefined,
       birthDate: birthDate ? String(birthDate) : undefined,
+      locale,
     });
 
     if (error) {
-      return NextResponse.json({ error }, { status: 400 });
+      return NextResponse.json({ error, errorCode, errorParams }, { status: 400 });
     }
 
     return NextResponse.json(result, { status: 201 });

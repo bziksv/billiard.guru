@@ -109,6 +109,7 @@ export default function TournamentsPage() {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [newClubId, setNewClubId] = useState("");
   const [newFormat, setNewFormat] = useState("OLYMPIC");
+  const [newIsPair, setNewIsPair] = useState(false);
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
@@ -297,6 +298,7 @@ export default function TournamentsPage() {
         description: form.get("description") || undefined,
         clubId: newClubId,
         format: newFormat,
+        isPair: newIsPair,
         startsAt: form.get("startsAt") || undefined,
         ratingMax: tournamentDefaults.limitByRating
           ? Number(form.get("ratingMax"))
@@ -316,6 +318,7 @@ export default function TournamentsPage() {
     await reloadTournaments();
     setNewClubId("");
     setNewFormat("OLYMPIC");
+    setNewIsPair(false);
     setSelectedTableIds([]);
     setTableStreams({});
     formEl.reset();
@@ -429,6 +432,21 @@ export default function TournamentsPage() {
             required
             disabled={formatOptionsLoading || formatOptions.length === 0}
           />
+          <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={newIsPair}
+              onChange={(e) => setNewIsPair(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+            />
+            <span>
+              <span className="font-medium text-zinc-200">Парный турнир</span>
+              <span className="mt-0.5 block text-xs text-zinc-500">
+                Регистрация по одному игроку (лимит сетки ×2), пары собирает
+                организатор перетаскиванием на этапе подтверждения.
+              </span>
+            </span>
+          </label>
           <textarea
             name="description"
             rows={4}

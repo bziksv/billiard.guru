@@ -1,9 +1,12 @@
 import { config } from "dotenv";
 import { resolve } from "path";
+import { fileURLToPath } from "url";
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
-config({ path: resolve(__dirname, ".env") });
+const rootDir = fileURLToPath(new URL(".", import.meta.url));
+
+config({ path: resolve(rootDir, ".env") });
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -16,8 +19,10 @@ const buildCpus =
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // sharp использует нативные бинарники — не бандлим, грузим из node_modules (важно для standalone/Beget).
+  serverExternalPackages: ["sharp"],
   turbopack: {
-    root: __dirname,
+    root: rootDir,
   },
   ...(buildCpus
     ? {

@@ -40,6 +40,8 @@ export interface AdminTournamentTeam {
   feePaid?: boolean;
   seed?: number | null;
   swissPoints?: number;
+  /** Переопределённый рейтинг пары (сыгранные пары); null — сумма рейтингов игроков. */
+  ratingOverride?: number | null;
   player1: {
     id: string;
     firstName: string;
@@ -84,6 +86,8 @@ export interface AdminTournament {
   name: string;
   description?: string | null;
   format: string;
+  /** Парный режим поверх обычной сетки (регистрация по одному, пары собирает организатор). */
+  isPair?: boolean;
   /** Подпись из /admin/brackets (если загружена с сервера) */
   formatLabel?: string;
   status: string;
@@ -230,6 +234,9 @@ function appendSoloRegistrationsWithoutTeams(
   standings: TournamentStandingRow[],
 ): TournamentStandingRow[] {
   if (!isSoloFormat(t.format)) return standings;
+  // В парном режиме участники турнира — пары (TournamentTeam), а регистрации —
+  // отдельные игроки внутри пар. Не добавляем их в зачёт как «вне сетки».
+  if (t.isPair) return standings;
 
   const inBracket = new Set(
     t.teams

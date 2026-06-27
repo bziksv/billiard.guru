@@ -1,14 +1,20 @@
 import { randomUUID } from "crypto";
 import { mkdir, writeFile } from "fs/promises";
 import path from "path";
+import {
+  assertUploadSize,
+  processImageToWebp,
+} from "@/lib/image-processing";
 import { resolveUploadsSubdir } from "@/lib/uploads-dir";
 
+/** Сохраняет фото клуба: ресайз + конвертация в WebP, отдаёт публичный URL. */
 export async function saveClubPhotoFile(file: File): Promise<string> {
+  assertUploadSize(file.size);
   const uploadsDir = resolveUploadsSubdir("clubs");
   await mkdir(uploadsDir, { recursive: true });
-  const ext = path.extname(file.name) || ".jpg";
-  const filename = `${randomUUID()}${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await writeFile(path.join(uploadsDir, filename), buffer);
+  const input = Buffer.from(await file.arrayBuffer());
+  const webp = await processImageToWebp(input);
+  const filename = `${randomUUID()}.webp`;
+  await writeFile(path.join(uploadsDir, filename), webp);
   return `/uploads/clubs/${filename}`;
 }

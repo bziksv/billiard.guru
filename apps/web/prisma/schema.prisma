@@ -473,6 +473,8 @@ model Tournament {
   clubId      String           @map("club_id")
   club        Club             @relation(fields: [clubId], references: [id])
   format              TournamentFormat
+  /// Парный режим поверх обычной сетки: регистрация по одному игроку (лимит ×2), пары собирает организатор
+  isPair              Boolean          @default(false) @map("is_pair")
   status              TournamentStatus @default(DRAFT)
   /// Макс. рейтинг для записи и рассылки (null — без лимита)
   ratingMax           Float?                   @map("rating_max")
@@ -513,6 +515,8 @@ model TournamentTeam {
   source       RegistrationSource
   status       RegistrationStatus @default(PENDING)
   feePaid      Boolean            @default(false) @map("fee_paid")
+  /// Переопределённый рейтинг пары для посева (если null — берётся сумма рейтингов игроков). Для сыгранных пар.
+  ratingOverride Float?           @map("rating_override")
   seed         Int?
   swissPoints  Int                @default(0) @map("swiss_points")
   createdAt    DateTime           @default(now()) @map("created_at")

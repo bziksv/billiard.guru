@@ -1,9 +1,41 @@
+import {
+  formatPhoneValidationError,
+  type PhoneValidationErrorCode,
+  type PhoneValidationErrorParams,
+} from "@/lib/phone-validation-errors";
+
 export interface CountryPhoneRule {
   dial: string;
   localLength: number;
   /** Локальный префикс, который пользователь может ввести вместо кода страны (8 для РФ) */
   trunkPrefix?: string;
   example: string;
+}
+
+export type PhoneNormalizeResult = {
+  e164: string;
+  valid: boolean;
+  display: string;
+  errorCode?: PhoneValidationErrorCode;
+  errorParams?: PhoneValidationErrorParams;
+  /** RU fallback для admin/API без locale */
+  error?: string;
+};
+
+function invalidPhone(
+  code: PhoneValidationErrorCode,
+  params: PhoneValidationErrorParams | undefined,
+  display: string,
+  e164 = "",
+): PhoneNormalizeResult {
+  return {
+    e164,
+    valid: false,
+    display,
+    errorCode: code,
+    errorParams: params,
+    error: formatPhoneValidationError(code, params ?? {}, "ru"),
+  };
 }
 
 export const COUNTRY_PHONE_RULES: Record<string, CountryPhoneRule> = {
@@ -31,8 +63,30 @@ export const COUNTRY_PHONE_RULES: Record<string, CountryPhoneRule> = {
 
 const DEFAULT_COUNTRY = "Россия";
 
+export const DEFAULT_PHONE_COUNTRY = DEFAULT_COUNTRY;
+
+/** РФ: вход и подтверждение номера только звонком (без Telegram-авторизации). */
+export const PHONE_ONLY_AUTH_COUNTRY = DEFAULT_COUNTRY;
+
+export function isPhoneOnlyAuthCountry(countryName?: string | null): boolean {
+  return (
+    countryName === PHONE_ONLY_AUTH_COUNTRY || countryName === "Russia"
+  );
+}
+
+export const PHONE_COUNTRY_NAMES = Object.keys(
+  COUNTRY_PHONE_RULES,
+) as (keyof typeof COUNTRY_PHONE_RULES)[];
+
+export function isPhoneCountrySupported(countryName: string): boolean {
+  return countryName in COUNTRY_PHONE_RULES;
+}
+
 export function getPhoneRule(countryName: string): CountryPhoneRule {
-  return COUNTRY_PHONE_RULES[countryName] ?? COUNTRY_PHONE_RULES[DEFAULT_COUNTRY];
+  if (!countryName || !isPhoneCountrySupported(countryName)) {
+    return COUNTRY_PHONE_RULES[DEFAULT_COUNTRY];
+  }
+  return COUNTRY_PHONE_RULES[countryName];
 }
 
 function digitsOnly(value: string): string {
@@ -43,12 +97,12 @@ function digitsOnly(value: string): string {
 export function normalizePhone(
   input: string,
   countryName: string,
-): { e164: string; valid: boolean; error?: string; display: string } {
+): PhoneNormalizeResult {
   const rule = getPhoneRule(countryName);
   let digits = digitsOnly(input);
 
   if (!digits) {
-    return { e164: "", valid: false, error: "Введите номер телефона", display: "" };
+    return invalidPhone("empty", undefined, "");
   }
 
   // Убрать международный префикс 00
@@ -66,6 +120,13 @@ export function normalizePhone(
         valid: true,
         display: formatNationalDigits(local, rule),
       };
+    }
+    if (local.length > rule.localLength) {
+      return invalidPhone(
+        "tooManyDigits",
+        { countryName },
+        formatNationalDigits(local.slice(0, rule.localLength), rule),
+      );
     }
   }
 
@@ -96,29 +157,28 @@ export function normalizePhone(
 
   // Начали с кода страны, но неполный номер
   if (digits.startsWith(rule.dial) && digits.length < rule.dial.length + rule.localLength) {
-    return {
-      e164: `+${digits}`,
-      valid: false,
-      error: `Введите ${rule.localLength} цифр после +${rule.dial}`,
-      display: formatNationalDigits(digits.slice(rule.dial.length), rule),
-    };
+    return invalidPhone(
+      "digitsAfterDial",
+      { localLength: rule.localLength, dial: rule.dial },
+      formatNationalDigits(digits.slice(rule.dial.length), rule),
+      `+${digits}`,
+    );
   }
 
   if (digits.length > rule.localLength && !digits.startsWith(rule.dial)) {
-    return {
-      e164: "",
-      valid: false,
-      error: `Слишком много цифр для ${countryName}`,
-      display: formatNationalDigits(digits.slice(0, rule.localLength), rule),
-    };
+    return invalidPhone(
+      "tooManyDigits",
+      { countryName },
+      formatNationalDigits(digits.slice(0, rule.localLength), rule),
+    );
   }
 
-  return {
-    e164: digits.length > 0 ? `+${rule.dial}${digits}` : "",
-    valid: false,
-    error: `Нужно ${rule.localLength} цифр (пример: ${rule.example})`,
-    display: formatNationalDigits(digits, rule),
-  };
+  return invalidPhone(
+    "needLocalDigits",
+    { localLength: rule.localLength, example: rule.example },
+    formatNationalDigits(digits, rule),
+    digits.length > 0 ? `+${rule.dial}${digits}` : "",
+  );
 }
 
 function formatPartial(
@@ -183,17 +243,73 @@ export function formatPhoneDisplay(e164: string, countryName: string): string {
   return `+${rule.dial} ${formatNationalDigits(local, rule)}`;
 }
 
-function resolveCountryFromE164(e164: string): string {
+/** Определяет страну по E.164; для +7 нужен hint (Россия / Казахстан). */
+export function resolveCountryFromE164(e164: string, hint?: string): string {
   const digits = digitsOnly(e164);
+  if (!digits) {
+    return hint && isPhoneCountrySupported(hint) ? hint : DEFAULT_COUNTRY;
+  }
+
   const entries = Object.entries(COUNTRY_PHONE_RULES).sort(
     (a, b) => b[1].dial.length - a[1].dial.length,
   );
   for (const [country, rule] of entries) {
     if (digits.startsWith(rule.dial)) {
+      if (rule.dial === "7" && hint && isPhoneCountrySupported(hint)) {
+        const hintRule = getPhoneRule(hint);
+        if (hintRule.dial === "7") return hint;
+      }
       return country;
     }
   }
-  return DEFAULT_COUNTRY;
+  return hint && isPhoneCountrySupported(hint) ? hint : DEFAULT_COUNTRY;
+}
+
+function looksLikeInternationalPhone(input: string): boolean {
+  const trimmed = input.trim();
+  if (trimmed.startsWith("+")) return true;
+
+  const digits = digitsOnly(trimmed);
+  if (digits.startsWith("00") && digits.length > 4) return true;
+
+  const entries = Object.entries(COUNTRY_PHONE_RULES).sort(
+    (a, b) => b[1].dial.length - a[1].dial.length,
+  );
+  for (const [, rule] of entries) {
+    if (
+      digits.startsWith(rule.dial) &&
+      digits.length >= rule.dial.length + rule.localLength
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/** Нормализация с автоопределением страны по E.164 или подсказке из UI */
+export function normalizePhoneAuto(
+  input: string,
+  countryHint?: string,
+): PhoneNormalizeResult & { countryName: string } {
+  const hint =
+    countryHint && isPhoneCountrySupported(countryHint) ? countryHint : undefined;
+
+  let country: string;
+  if (looksLikeInternationalPhone(input)) {
+    const trimmed = input.trim();
+    const digits = digitsOnly(trimmed);
+    const intl = trimmed.startsWith("+")
+      ? trimmed
+      : digits.startsWith("00")
+        ? `+${digits.slice(2)}`
+        : `+${digits}`;
+    country = resolveCountryFromE164(intl, hint);
+  } else {
+    country = hint ?? DEFAULT_COUNTRY;
+  }
+
+  const result = normalizePhone(input, country);
+  return { ...result, countryName: country };
 }
 
 /** E.164 (+7473…) → «+7 (473) 123-45-67» для отображения на сайте */
@@ -222,7 +338,7 @@ export function formatE164Display(e164: string, countryName?: string): string {
 export function formatPhoneInput(
   raw: string,
   countryName: string,
-): { display: string; e164: string; valid: boolean; error?: string } {
+): PhoneNormalizeResult {
   return normalizePhone(raw, countryName);
 }
 

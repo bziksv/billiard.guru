@@ -6,6 +6,7 @@ import type { AuditSectionId } from "@/lib/audit-sections";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import { clubCoordsIfAddressChanged } from "@/lib/club-geocode";
 import { saveClubPhotoFile } from "@/lib/club-photo-upload";
+import { ImageProcessingError } from "@/lib/image-processing";
 import { parseClubGalleryUrls, syncClubPhotoFields } from "@/lib/club-photos";
 import { floorPlanToJson, parseFloorPlan } from "@/lib/club-floor-plan";
 import {
@@ -383,6 +384,9 @@ export async function PATCH(
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
+    if (error instanceof ImageProcessingError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Ошибка валидации" }, { status: 400 });
     }

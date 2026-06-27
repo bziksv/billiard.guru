@@ -277,6 +277,25 @@ export function getDefaultBracketParticipantRules(
   };
 }
 
+/**
+ * Удваивает лимиты участников для парного режима (isPair): на сетку из N команд
+ * регистрируется 2×N игроков, из которых организатор собирает пары.
+ */
+export function doubleParticipantRulesForPair(
+  rules: BracketParticipantRules,
+): BracketParticipantRules {
+  const doubled: BracketParticipantRules = {
+    ...rules,
+    min: rules.min * 2,
+    max: rules.max * 2,
+    ...(rules.exact !== undefined ? { exact: rules.exact * 2 } : {}),
+  };
+  return {
+    ...doubled,
+    label: formatParticipantRulesLabel(doubled),
+  };
+}
+
 export function formatParticipantRulesLabel(rules: BracketParticipantRules): string {
   if (rules.exact !== undefined) return `ровно ${rules.exact}`;
   if (rules.min === rules.max) return `${rules.min}`;
@@ -353,8 +372,34 @@ export function validateBracketParticipantCount(
   format: string,
   count: number,
   rules?: BracketParticipantRules,
+  pairMode = false,
 ): { ok: true } | { ok: false; error: string } {
   const r = rules ?? getDefaultBracketParticipantRules(format);
+  if (pairMode) {
+    const pairHint = "Соберите пары перетаскиванием в блоке «Сборка пар».";
+    if (r.exact !== undefined) {
+      if (count !== r.exact) {
+        return {
+          ok: false,
+          error: `Для этой сетки нужно ровно ${r.exact} собранных пар (сейчас ${count}). ${pairHint}`,
+        };
+      }
+      return { ok: true };
+    }
+    if (count < r.min) {
+      return {
+        ok: false,
+        error: `Нужно минимум ${r.min} собранных пар (сейчас ${count}). ${pairHint}`,
+      };
+    }
+    if (count > r.max) {
+      return {
+        ok: false,
+        error: `Не более ${r.max} пар для этой сетки (сейчас ${count}).`,
+      };
+    }
+    return { ok: true };
+  }
   if (r.exact !== undefined) {
     if (count !== r.exact) {
       return {

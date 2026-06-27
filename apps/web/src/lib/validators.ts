@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { normalizePhone } from "@/lib/phone";
+import { getPhoneRule, normalizePhoneAuto } from "@/lib/phone";
 import { MAX_PLAYER_RATING } from "@/lib/rating";
 import { CLUB_TABLE_FORMATS, type ClubTableFormatId } from "@/lib/club-table-formats";
 
@@ -37,10 +37,18 @@ export async function validatePhoneForCity(
   cityId: string,
   getCountryName: (cityId: string) => Promise<string | null>,
 ): Promise<{ phone: string; error?: string }> {
-  const countryName = (await getCountryName(cityId)) ?? "Россия";
-  const result = normalizePhone(phone, countryName);
+  const cityCountry = (await getCountryName(cityId)) ?? "Россия";
+  const result = normalizePhoneAuto(phone, cityCountry);
   if (!result.valid) {
     return { phone: "", error: result.error ?? "Некорректный телефон" };
+  }
+  const phoneDial = getPhoneRule(result.countryName).dial;
+  const cityDial = getPhoneRule(cityCountry).dial;
+  if (phoneDial !== cityDial) {
+    return {
+      phone: "",
+      error: `Номер (+${phoneDial}) не соответствует стране города (${cityCountry}, +${cityDial})`,
+    };
   }
   return { phone: result.e164 };
 }
@@ -250,6 +258,8 @@ export const tournamentSchema = z.object({
     "FIXED_PAIR_SWISS_64_BRONZE",
     "EXCEL_REF_64",
   ]),
+  /** Парный режим поверх обычной сетки (лимит участников ×2, пары собирает организатор) */
+  isPair: z.boolean().optional().default(false),
   startsAt: z.string().optional(),
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional().default("CLUB"),
@@ -310,6 +320,7 @@ export const tournamentUpdateSchema = z.object({
   status: z
     .enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"])
     .optional(),
+  isPair: z.boolean().optional(),
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional(),
   handicapHalfStep: z.boolean().optional(),

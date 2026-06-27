@@ -1,27 +1,53 @@
 ---
-description: Телефон — PhoneInput с кодом страны и автоформатом
+description: Телефон — PhoneInput, E.164, normalizePhoneAuto на сервере
 globs: apps/web/**/*.{tsx,ts}
 alwaysApply: false
 ---
 
 # Валидация телефона
 
-Для полей телефона использовать `PhoneInput` из `@/components/ui/phone-input`.
-
-## Обязательно
-
-- Код страны подставляется **автоматически** по выбранной стране в `CitySelect`
-- Пользователь может ввести `9172345678`, `79172345678`, `89172345678` — нормализуется в E.164
-- Хранить в БД формат `+79172345678`
-- На сервере — `normalizePhoneForCity()` из `@/lib/phone-server`
-
 ## UI
 
-- Префикс `+7` / `+375` слева (не редактируется)
-- Живая маска и ✓ при валидном номере
-- Красная рамка + текст ошибки при невалидном
+- Поля телефона — `PhoneInput` из `@/components/ui/phone-input`
+- Выбор страны — `PhoneCountrySelect` (логин) или `CitySelect` + `onCountryChange` (регистрация, игроки)
+- Клиент отправляет **E.164** (`+375323123232`), страну UI передаёт как `countryName` / город через `cityId`
+
+## Сервер
+
+**Не вызывать** `normalizePhone(raw, "Россия")` для уже нормализованного E.164 — сломается для +375 и др.
+
+| Сценарий | Функция |
+|----------|---------|
+| E.164 без города (вход, звонок) | `normalizePhoneAuto(phone, countryName?)` |
+| Регистрация, игроки, клубы, staff | `normalizePhoneForCity(phone, cityId)` |
+
+`normalizePhoneAuto` определяет страну по префиксу E.164. Для **+7** (Россия/Казахстан) нужен `countryHint` из UI.
+
+## Авторизация по стране
+
+- **Россия** (`isPhoneOnlyAuthCountry`): вход и подтверждение номера **только звонком** — без Telegram-авторизации (сервер: `auth-phone-flow.ts`, UI: `/login`).
+- **Остальные страны**: Telegram или звонок, как раньше.
+
+При добавлении нового API с телефоном:
+1. Клиент — `PhoneInput` + страна
+2. Сервер — `normalizePhoneAuto` или `normalizePhoneForCity`
+3. Прогнать `npm run verify:phones`
+
+## i18n
+
+- Коды ошибок: `phone-validation-errors.ts` (`empty`, `tooManyDigits`, …)
+- UI и API с `locale`: `formatPhoneValidationError(code, params, locale)`
+- Словари: `messages/{locale}.json` → `phone.validation.*` (держать в sync с `MESSAGES` в TS)
+- `/en/login`: клиент передаёт `locale` в `/api/auth/start`
+
+```bash
+cd apps/web && npm run verify:phones
+```
+
+Тест-кейсы: `apps/web/scripts/verify-phone-countries.ts`
 
 ## Не использовать
 
-- Простой `<input type="tel">` без `PhoneInput`
-- Сохранение «сырых» цифр без нормализации
+- `<input type="tel">` без `PhoneInput`
+- Сохранение сырых цифр без нормализации
+- Повторная нормализация E.164 с дефолтом «Россия»

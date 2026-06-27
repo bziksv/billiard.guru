@@ -30,11 +30,11 @@ async function main() {
       email: "demo@billiard.guru",
       phone: "+79507775325",
       displayPhone: "+74731234567",
-      photoUrl: "/demo/club-test.jpg",
+      photoUrl: "/demo/club-test.webp",
       galleryUrls: [
-        "/demo/club-test.jpg",
-        "/demo/club-test-2.jpg",
-        "/demo/club-test-3.jpg",
+        "/demo/club-test.webp",
+        "/demo/club-test-2.webp",
+        "/demo/club-test-3.webp",
       ],
       description: `Бильярдный клуб «${clubName}» — демонстрационная страница платформы billiard.guru для любителей русского бильярда и пула.
 

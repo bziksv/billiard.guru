@@ -22,7 +22,7 @@ type GeoFilterProps = {
 const SITE_GEO_INPUT =
   "site-input w-full disabled:cursor-not-allowed disabled:opacity-50";
 const SITE_GEO_DROPDOWN =
-  "geo-searchable-dropdown absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-xl py-1 shadow-lg";
+  "geo-searchable-dropdown overflow-auto rounded-xl py-1 shadow-lg";
 const SITE_GEO_OPTION =
   "geo-searchable-option w-full px-3 py-2 text-left text-sm hover:bg-[var(--bg-muted)]";
 const SITE_GEO_OPTION_SELECTED =

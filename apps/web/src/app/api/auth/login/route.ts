@@ -4,12 +4,15 @@ import { resolveAuthByPhone } from "@/lib/auth-phone-flow";
 /** @deprecated Prefer POST /api/auth/start — kept for compatibility. */
 export async function POST(request: NextRequest) {
   try {
-    const { phone } = await request.json();
+    const { phone, countryName } = await request.json();
     if (!phone) {
       return NextResponse.json({ error: "Укажите телефон" }, { status: 400 });
     }
 
-    const { error, result } = await resolveAuthByPhone(String(phone));
+    const { error, result } = await resolveAuthByPhone(
+      String(phone),
+      countryName ? String(countryName) : undefined,
+    );
     if (error) {
       return NextResponse.json({ error }, { status: 400 });
     }
