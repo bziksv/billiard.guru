@@ -22,6 +22,10 @@ BEGET_HEALTH_RETRIES="${BEGET_HEALTH_RETRIES:-15}"
 BEGET_HEALTH_INTERVAL="${BEGET_HEALTH_INTERVAL:-4}"
 # Лёгкий эндпоинт для health-check (быстрее холодной отрисовки главной).
 BEGET_HEALTH_PATH="${BEGET_HEALTH_PATH:-/api/v1/health}"
+# Публичный хост сайта. Используется как Host-заголовок при проверке через
+# localhost (APP_URL в проде может быть http://localhost:3010 — тогда Apache
+# не попадает в нужный vhost и отдаёт 404).
+BEGET_PUBLIC_HOST="${BEGET_PUBLIC_HOST:-billiard.guru}"
 
 beget_find_working_node() {
   local candidate
@@ -356,6 +360,8 @@ beget_fetch_http_code() {
   if [[ "$url" =~ ^https?://([^/]+)(/.*)?$ ]]; then
     host="${BASH_REMATCH[1]}"
     path="${BASH_REMATCH[2]:-/}"
+    # Host для vhost должен быть публичным доменом, а не localhost:PORT из APP_URL.
+    [ -n "${BEGET_PUBLIC_HOST:-}" ] && host="$BEGET_PUBLIC_HOST"
     lcode="$(curl -sS -o /dev/null -w "%{http_code}" -L -H "Host: $host" "http://127.0.0.1${path}" --max-time "$max_time" 2>/dev/null)"
     [ -n "$lcode" ] || lcode="000"
     if [ "$lcode" != "000" ]; then

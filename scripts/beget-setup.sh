@@ -188,8 +188,8 @@ echo ""
 echo "→ Прогрев приложения (холодный старт Passenger может занять время)…"
 # Первый запрос после restart.txt поднимает Next standalone — даём ему спокойно
 # подняться, чтобы health-check ниже не ловил ложный 000.
-APP_BASE="${APP_URL:-https://billiard.guru}"
-APP_BASE="${APP_BASE%/}"
+# Публичный хост, а не APP_URL (в проде это http://localhost:3010 → 404 на vhost).
+APP_BASE="https://${BEGET_PUBLIC_HOST:-billiard.guru}"
 sleep 5
 beget_fetch_http_code "${APP_BASE}/api/v1/health" 90 >/dev/null 2>&1 || true
 

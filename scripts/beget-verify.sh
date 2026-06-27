@@ -27,11 +27,15 @@ APP_URL_OVERRIDE="${APP_URL:-}"
 if [ -f "$ENV_FILE" ]; then
   beget_load_env "$ENV_FILE"
 fi
-if [ -n "$APP_URL_OVERRIDE" ]; then
-  APP_URL="$APP_URL_OVERRIDE"
-fi
 
-CHECK_URL="${APP_URL:-https://billiard.guru}"
+# Явный APP_URL из окружения (для ручных проверок) важнее .env.
+# Иначе берём публичный хост — APP_URL в .env прода это http://localhost:3010,
+# по нему Apache не попадает в нужный vhost (404).
+if [ -n "$APP_URL_OVERRIDE" ]; then
+  CHECK_URL="$APP_URL_OVERRIDE"
+else
+  CHECK_URL="https://${BEGET_PUBLIC_HOST:-billiard.guru}"
+fi
 CHECK_URL="${CHECK_URL%/}"
 
 echo "=== billiard.guru — проверка после деплоя ==="
