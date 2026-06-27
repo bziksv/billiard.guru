@@ -5,11 +5,10 @@ import {
   PLAY_LISTING_STATUS_LABELS,
 } from "@/lib/play-listing-display";
 import { sendTelegramMessage } from "@/lib/telegram";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 
 function appUrlBase() {
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
-  return base.replace(/\/$/, "");
+  return getNotificationLinkBase();
 }
 
 function escapeHtml(text: string): string {

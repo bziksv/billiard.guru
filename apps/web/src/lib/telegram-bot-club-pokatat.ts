@@ -1,4 +1,5 @@
 import { clubOwnedByPlayer } from "@/lib/club-access";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import { listClubsManagedByPlayer, playerCanManageClub } from "@/lib/club-staff";
 import {
   countClubPendingPlayResponses,
@@ -18,9 +19,7 @@ import {
 } from "@/lib/telegram";
 
 function appUrlBase() {
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
-  return base.replace(/\/$/, "");
+  return getNotificationLinkBase();
 }
 
 function escapeHtml(text: string): string {

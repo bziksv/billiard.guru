@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { writeAuditLog } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import { syncLocalizedTitleBody } from "@/lib/translation";
 import {
   answerCallbackQuery,
@@ -11,7 +12,7 @@ import {
 } from "@/lib/telegram";
 
 function appUrl(path = "") {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
+  const base = getNotificationLinkBase();
   return `${base.replace(/\/$/, "")}${path}`;
 }
 

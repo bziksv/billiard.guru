@@ -8,10 +8,11 @@ import {
   sendTelegramMessage,
 } from "@/lib/telegram";
 import { getSuperadminTelegramIds } from "@/lib/telegram-admin-ids";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import { syncLocalizedTitleBody, type PublishLocale } from "@/lib/translation";
 
 function appUrl(path = "") {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
+  const base = getNotificationLinkBase();
   return `${base.replace(/\/$/, "")}${path}`;
 }
 

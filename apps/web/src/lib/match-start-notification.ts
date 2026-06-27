@@ -6,6 +6,7 @@ import { formatRating } from "@/lib/rating";
 import { teamLabel } from "@/lib/pair-tournament";
 import { formatStartsAt } from "@/lib/public-display";
 import { buildBracketMatchNumbers } from "@/lib/tournament-match-schedule";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import { dispatchNotification } from "@/lib/notifications";
 import { getNotificationDefaultTemplate } from "@/lib/notifications/default-templates";
 import {
@@ -14,7 +15,7 @@ import {
 } from "@/lib/notifications/settings-server";
 
 function appUrl(path: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
+  const base = getNotificationLinkBase();
   return `${base.replace(/\/$/, "")}${path}`;
 }
 

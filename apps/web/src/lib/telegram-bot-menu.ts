@@ -14,6 +14,7 @@ import { playerName } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
 import { formatRating } from "@/lib/rating";
 import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import {
   answerCallbackQuery,
   contactRequestKeyboard,
@@ -55,9 +56,7 @@ type PlayerWithCity = Player & {
 };
 
 function appUrlBase() {
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
-  return base.replace(/\/$/, "");
+  return getNotificationLinkBase();
 }
 
 function escapeHtml(text: string): string {

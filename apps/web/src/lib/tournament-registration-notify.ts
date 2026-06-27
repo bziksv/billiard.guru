@@ -1,6 +1,7 @@
 import { writeAuditLog } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import { dispatchNotification } from "@/lib/notifications";
 import type { NotificationId } from "@/lib/notifications/catalog";
 import { getNotificationDefaultTemplate } from "@/lib/notifications/default-templates";
@@ -13,7 +14,7 @@ import { tournamentNotificationsSuppressed } from "@/lib/tournament-notification
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 
 function appUrl(path: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
+  const base = getNotificationLinkBase();
   return `${base.replace(/\/$/, "")}${path}`;
 }
 

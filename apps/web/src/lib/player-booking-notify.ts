@@ -2,6 +2,7 @@ import { writeAuditLog } from "@/lib/audit";
 import { parseFloorPlan } from "@/lib/club-floor-plan";
 import { floorTableLabel } from "@/lib/floor-plan-booking";
 import { logger } from "@/lib/logger";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import { dispatchNotification } from "@/lib/notifications";
 import type { NotificationId } from "@/lib/notifications/catalog";
 import { getNotificationDefaultTemplate } from "@/lib/notifications/default-templates";
@@ -16,7 +17,7 @@ import {
 } from "@/lib/table-booking";
 
 function appUrl(path: string) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
+  const base = getNotificationLinkBase();
   return `${base.replace(/\/$/, "")}${path}`;
 }
 

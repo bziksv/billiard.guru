@@ -33,3 +33,26 @@ export function isLocalDevHost(host: string): boolean {
     h.includes(":")
   );
 }
+
+/**
+ * База для публичных ссылок в Telegram-уведомлениях/боте.
+ * Берём NEXT_PUBLIC_APP_URL → APP_URL, но в production НЕ отдаём localhost
+ * (в проде APP_URL=http://localhost:3010 — иначе ссылки некликабельны).
+ */
+export function getNotificationLinkBase(): string {
+  const raw = (process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL)?.trim();
+  if (raw) {
+    const trimmed = raw.replace(/\/$/, "");
+    if (process.env.NODE_ENV === "production") {
+      try {
+        if (isLocalDevHost(new URL(trimmed).host)) {
+          return getCanonicalSiteOrigin();
+        }
+      } catch {
+        return getCanonicalSiteOrigin();
+      }
+    }
+    return trimmed;
+  }
+  return getCanonicalSiteOrigin();
+}

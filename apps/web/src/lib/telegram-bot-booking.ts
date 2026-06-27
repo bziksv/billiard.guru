@@ -3,6 +3,7 @@ import { renderFloorPlanPngForBooking } from "@/lib/floor-plan-image";
 import { parseFloorPlan } from "@/lib/club-floor-plan";
 import { clubTableFormatLabel, type ClubTableFormatId } from "@/lib/club-table-formats";
 import { notifyClubNewBooking } from "@/lib/club-booking-notify";
+import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import {
   floorTableAvailability,
   floorTableLabel,
@@ -57,9 +58,7 @@ function escapeHtml(text: string): string {
 }
 
 function appUrl() {
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? "http://localhost:3010";
-  return base.replace(/\/$/, "");
+  return getNotificationLinkBase();
 }
 
 function clubBookingContext(club: {
