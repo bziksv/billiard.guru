@@ -1,4 +1,4 @@
-import sharp, { type Sharp } from "sharp";
+import type { Sharp } from "sharp";
 
 /** Максимальная сторона изображения после ресайза (px). Фото клубов/тренеров/игроков. */
 export const IMAGE_MAX_DIMENSION = 1600;
@@ -32,6 +32,10 @@ export async function processImageToWebp(
 ): Promise<Buffer> {
   const maxDimension = options.maxDimension ?? IMAGE_MAX_DIMENSION;
   const quality = options.quality ?? IMAGE_WEBP_QUALITY;
+
+  // Ленивый импорт: нативный бинарник libvips не должен грузиться во время
+  // сборки/«collecting page data» (под cgroup-лимитами Beget это даёт SIGSEGV).
+  const { default: sharp } = await import("sharp");
 
   let pipeline: Sharp;
   try {
