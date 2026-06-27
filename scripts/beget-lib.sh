@@ -333,30 +333,37 @@ beget_prune_old_releases() {
     | sort -rn | awk '{print $2}')
 }
 
-# HTTP-код ответа: сначала публичный URL, при 000 — localhost+Host (из Docker Beget внешний curl часто недоступен).
+# HTTP-код ответа: сначала публичный URL, при неуспехе — localhost+Host
+# (из Docker Beget внешний curl часто недоступен).
+# ВАЖНО: curl -w "%{http_code}" сам печатает "000" при обрыве соединения,
+# поэтому НЕ добавляем "|| echo 000" — иначе код склеивается в "000000".
 beget_fetch_http_code() {
   local url="$1"
   local max_time="${2:-45}"
-  local code host path
+  local code lcode host path
 
   url="${url%/}"
-  code="$(curl -sS -o /dev/null -w "%{http_code}" -L "$url" --max-time "$max_time" 2>/dev/null || echo "000")"
+  code="$(curl -sS -o /dev/null -w "%{http_code}" -L "$url" --max-time "$max_time" 2>/dev/null)"
+  [ -n "$code" ] || code="000"
   case "$code" in
     200|301|302|307|308)
       echo "$code"
       return 0
       ;;
-    000)
-      if [[ "$url" =~ ^https?://([^/]+)(/.*)?$ ]]; then
-        host="${BASH_REMATCH[1]}"
-        path="${BASH_REMATCH[2]:-/}"
-        code="$(curl -sS -o /dev/null -w "%{http_code}" -L -H "Host: $host" "http://127.0.0.1${path}" --max-time "$max_time" 2>/dev/null || echo "000")"
-        if [ "$code" != "000" ]; then
-          echo "  (health-check: localhost+Host $host → HTTP $code)" >&2
-        fi
-      fi
-      ;;
   esac
+
+  # Публичный URL не ответил успехом — пробуем напрямую localhost+Host.
+  if [[ "$url" =~ ^https?://([^/]+)(/.*)?$ ]]; then
+    host="${BASH_REMATCH[1]}"
+    path="${BASH_REMATCH[2]:-/}"
+    lcode="$(curl -sS -o /dev/null -w "%{http_code}" -L -H "Host: $host" "http://127.0.0.1${path}" --max-time "$max_time" 2>/dev/null)"
+    [ -n "$lcode" ] || lcode="000"
+    if [ "$lcode" != "000" ]; then
+      echo "  (health-check: localhost+Host $host → HTTP $lcode)" >&2
+      code="$lcode"
+    fi
+  fi
+
   echo "$code"
   case "$code" in
     200|301|302|307|308) return 0 ;;
@@ -379,7 +386,10 @@ beget_health_check_url() {
   url="${url%/}"
 
   for attempt in $(seq 1 "$retries"); do
-    code="$(beget_fetch_http_code "$url" 45 || echo "000")"
+    # beget_fetch_http_code всегда печатает код сам — без "|| echo 000",
+    # иначе коды склеиваются ("000000").
+    code="$(beget_fetch_http_code "$url" 45)"
+    [ -n "$code" ] || code="000"
     case "$code" in
       200|301|302|307|308)
         echo "$code"

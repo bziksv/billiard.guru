@@ -84,7 +84,9 @@ fi
 
 echo ""
 echo "→ HTTP $CHECK_URL …"
-http_code="$(beget_fetch_http_code "$CHECK_URL" 45 || echo "000")"
+# Без "|| echo 000": beget_fetch_http_code сам печатает код (иначе склейка "000000").
+http_code="$(beget_fetch_http_code "$CHECK_URL" 45)"
+[ -n "$http_code" ] || http_code="000"
 echo "   код ответа: $http_code"
 
 case "$http_code" in
