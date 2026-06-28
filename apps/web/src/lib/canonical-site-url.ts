@@ -36,23 +36,26 @@ export function isLocalDevHost(host: string): boolean {
 
 /**
  * База для публичных ссылок в Telegram-уведомлениях/боте.
- * Берём NEXT_PUBLIC_APP_URL → APP_URL, но в production НЕ отдаём localhost
- * (в проде APP_URL=http://localhost:3010 — иначе ссылки некликабельны).
+ * Берём NEXT_PUBLIC_APP_URL → APP_URL, но НИКОГДА не отдаём localhost:
+ * в проде APP_URL=http://localhost:3010, а Telegram отклоняет inline-кнопки
+ * с localhost-URL («Wrong HTTP URL») — и сообщение целиком не отправляется.
+ * Не зависим от NODE_ENV (на Passenger он может быть не задан).
  */
 export function getNotificationLinkBase(): string {
   const raw = (process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL)?.trim();
   if (raw) {
     const trimmed = raw.replace(/\/$/, "");
-    if (process.env.NODE_ENV === "production") {
-      try {
-        if (isLocalDevHost(new URL(trimmed).host)) {
-          return getCanonicalSiteOrigin();
-        }
-      } catch {
-        return getCanonicalSiteOrigin();
-      }
+    try {
+      const host = new URL(trimmed).hostname.toLowerCase();
+      const isLocal =
+        host === "localhost" ||
+        host === "127.0.0.1" ||
+        host === "0.0.0.0" ||
+        host.endsWith(".local");
+      if (!isLocal) return trimmed;
+    } catch {
+      // невалидный URL — отдаём канонический origin
     }
-    return trimmed;
   }
   return getCanonicalSiteOrigin();
 }
