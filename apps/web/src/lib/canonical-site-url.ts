@@ -1,10 +1,27 @@
 const DEFAULT_ORIGIN = "https://billiard.guru";
 
+/** localhost / loopback / *.local — никогда не годятся как публичный origin. */
+function isLocalHostname(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+  return (
+    h === "localhost" ||
+    h === "127.0.0.1" ||
+    h === "0.0.0.0" ||
+    h === "::1" ||
+    h.endsWith(".local")
+  );
+}
+
 /** Канонический origin без www — для metadataBase, sitemap, canonical. */
 export function getCanonicalSiteOrigin(raw = process.env.NEXT_PUBLIC_APP_URL): string {
   const value = raw?.trim() || DEFAULT_ORIGIN;
   try {
     const url = new URL(value);
+    // На проде APP_URL/NEXT_PUBLIC_APP_URL может быть localhost — для публичных
+    // ссылок (SEO, sitemap, canonical) это всегда ошибка.
+    if (isLocalHostname(url.hostname)) {
+      return DEFAULT_ORIGIN;
+    }
     if (url.hostname.startsWith("www.")) {
       url.hostname = url.hostname.slice(4);
     }
@@ -42,20 +59,16 @@ export function isLocalDevHost(host: string): boolean {
  * Не зависим от NODE_ENV (на Passenger он может быть не задан).
  */
 export function getNotificationLinkBase(): string {
-  const raw = (process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL)?.trim();
-  if (raw) {
-    const trimmed = raw.replace(/\/$/, "");
+  for (const raw of [process.env.NEXT_PUBLIC_APP_URL, process.env.APP_URL]) {
+    const trimmed = raw?.trim().replace(/\/$/, "");
+    if (!trimmed) continue;
     try {
-      const host = new URL(trimmed).hostname.toLowerCase();
-      const isLocal =
-        host === "localhost" ||
-        host === "127.0.0.1" ||
-        host === "0.0.0.0" ||
-        host.endsWith(".local");
-      if (!isLocal) return trimmed;
+      if (!isLocalHostname(new URL(trimmed).hostname)) return trimmed;
     } catch {
-      // невалидный URL — отдаём канонический origin
+      // невалидный URL — пробуем следующий, иначе DEFAULT_ORIGIN
     }
   }
-  return getCanonicalSiteOrigin();
+  // Жёсткий fallback: НЕ через getCanonicalSiteOrigin (она читает тот же
+  // NEXT_PUBLIC_APP_URL=localhost) — иначе вернулся бы localhost.
+  return DEFAULT_ORIGIN;
 }
