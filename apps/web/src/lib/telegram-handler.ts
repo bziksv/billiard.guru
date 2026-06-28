@@ -68,11 +68,13 @@ function phoneDigits(raw: string): string[] {
   return [...set];
 }
 
+// Привязываем по контакту всех, у кого Telegram ещё не привязан —
+// включая игроков/клубы, которых организатор добавил по телефону (isVerified: true).
 async function findUnverifiedPlayerByPhone(contactPhone: string) {
   const variants = phoneDigits(contactPhone);
   return prisma.player.findFirst({
     where: {
-      isVerified: false,
+      telegramId: null,
       OR: variants.flatMap((v) => [
         { phone: { contains: v } },
         { phone: { endsWith: v } },
@@ -86,7 +88,7 @@ async function findUnverifiedClubByPhone(contactPhone: string) {
   const variants = phoneDigits(contactPhone);
   return prisma.club.findFirst({
     where: {
-      isVerified: false,
+      telegramId: null,
       OR: variants.flatMap((v) => [
         { phone: { contains: v } },
         { phone: { endsWith: v } },
