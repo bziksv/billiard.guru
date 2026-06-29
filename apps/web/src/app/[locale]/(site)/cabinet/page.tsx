@@ -14,6 +14,8 @@ import { localizedGeoName } from "@/lib/geo-display";
 import { resolveLocalizedField } from "@/lib/localized-db-text";
 import { formatRating } from "@/lib/rating";
 import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
+import { PlayerStatsCard } from "@/components/site/player-stats-card";
+import { computePlayerMatchStats } from "@/lib/player-stats";
 import { prisma } from "@/lib/prisma";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
 import type { AppLocale } from "@/i18n/routing";
@@ -67,6 +69,7 @@ export default async function CabinetPage() {
   });
 
   const pairTeams = teams.filter((team) => team.player2);
+  const stats = await computePlayerMatchStats(player.id);
   const cityLabel = localizedGeoName(player.city.nameRu, locale, player.city.nameEn);
   const countryLabel = localizedGeoName(
     player.city.country.nameRu,
@@ -123,6 +126,8 @@ export default async function CabinetPage() {
             )}
           </div>
         </SiteCard>
+
+        <PlayerStatsCard stats={stats} />
 
         <NotificationPreferencesEditor />
 

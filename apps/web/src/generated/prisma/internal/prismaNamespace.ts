@@ -2620,6 +2620,8 @@ export const TournamentScalarFieldEnum = {
   descriptionEn: 'descriptionEn',
   clubId: 'clubId',
   format: 'format',
+  discipline: 'discipline',
+  gameType: 'gameType',
   isPair: 'isPair',
   status: 'status',
   ratingMax: 'ratingMax',
@@ -3107,6 +3109,8 @@ export const TournamentOrderByRelevanceFieldEnum = {
   description: 'description',
   descriptionEn: 'descriptionEn',
   clubId: 'clubId',
+  discipline: 'discipline',
+  gameType: 'gameType',
   clubApprovalToken: 'clubApprovalToken'
 } as const
 

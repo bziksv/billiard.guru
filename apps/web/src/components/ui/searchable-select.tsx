@@ -16,6 +16,35 @@ const MENU_GAP = 4;
 const MENU_MAX_HEIGHT = 224;
 const MENU_Z_INDEX = 10_000;
 
+/** Нормализация для поиска: нижний регистр + ё→е. */
+function normalizeForSearch(text: string): string {
+  return text.toLowerCase().replace(/ё/g, "е");
+}
+
+/**
+ * Умный поиск: запрос делится на слова, и совпадение засчитывается,
+ * только если КАЖДОЕ слово встречается в строке (в любом порядке).
+ * Пример: «вил ста» находит «Виленский Станислав».
+ */
+function matchesSearchQuery(
+  option: SearchableSelectOption,
+  query: string,
+): boolean {
+  const tokens = normalizeForSearch(query).split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return true;
+  const hay = normalizeForSearch(`${option.label} ${option.searchText ?? ""}`);
+  return tokens.every((token) => hay.includes(token));
+}
+
+function filterOptions(
+  options: SearchableSelectOption[],
+  query: string,
+): SearchableSelectOption[] {
+  const q = query.trim();
+  if (!q) return options;
+  return options.filter((o) => matchesSearchQuery(o, q));
+}
+
 type FloatingMenuPosition = {
   left: number;
   width: number;
@@ -97,14 +126,7 @@ export function SearchableSelect({
 
   const selected = options.find((o) => o.value === value);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return options;
-    return options.filter((o) => {
-      const hay = `${o.label} ${o.searchText ?? ""}`.toLowerCase();
-      return hay.includes(q);
-    });
-  }, [options, query]);
+  const filtered = useMemo(() => filterOptions(options, query), [options, query]);
 
   useLayoutEffect(() => {
     if (!open) {
@@ -305,14 +327,7 @@ export function SearchableMultiSelect({
 
   const selectedSet = useMemo(() => new Set(values), [values]);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return options;
-    return options.filter((o) => {
-      const hay = `${o.label} ${o.searchText ?? ""}`.toLowerCase();
-      return hay.includes(q);
-    });
-  }, [options, query]);
+  const filtered = useMemo(() => filterOptions(options, query), [options, query]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {

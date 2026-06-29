@@ -11,6 +11,8 @@ import { formatRating } from "@/lib/rating";
 import { localizedClubName, localizedPlayerName } from "@/lib/latin-names";
 import { prisma } from "@/lib/prisma";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { PlayerStatsCard } from "@/components/site/player-stats-card";
+import { computePlayerMatchStats } from "@/lib/player-stats";
 import { buildLocalizedPlayerDetailMetadata } from "@/lib/seo-locale";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -25,7 +27,7 @@ export async function generateMetadata({
   const { locale, id } = await params;
   const t = await getTranslations("detail.notFound");
   const player = await prisma.player.findUnique({
-    where: { id, isVerified: true },
+    where: { id },
     include: { city: { include: { country: true } } },
   });
   if (!player) return { title: t("player") };
@@ -39,12 +41,18 @@ export async function generateMetadata({
         player.city.country.nameEn,
       )
     : null;
-  return buildLocalizedPlayerDetailMetadata(
+  const metadata = buildLocalizedPlayerDetailMetadata(
     localizedPlayerName(appLocale, player),
     cityLabel,
     id,
     locale,
   );
+  // Неподтверждённые игроки (добавлены клубом, без привязки Telegram) видны
+  // в протоколах турниров, но в каталог не попадают — не индексируем.
+  if (!player.isVerified) {
+    metadata.robots = { index: false, follow: true };
+  }
+  return metadata;
 }
 
 export default async function PlayerPage({
@@ -57,7 +65,7 @@ export default async function PlayerPage({
   const locale = (await getLocale()) as AppLocale;
 
   const player = await prisma.player.findUnique({
-    where: { id, isVerified: true },
+    where: { id },
     include: {
       city: { include: { country: true } },
       registrations: {
@@ -69,6 +77,8 @@ export default async function PlayerPage({
   });
 
   if (!player) notFound();
+
+  const stats = await computePlayerMatchStats(player.id);
 
   function tournamentStatusLabel(status: string) {
     const key = PUBLIC_STATUSES.find((s) => s === status);
@@ -123,6 +133,8 @@ export default async function PlayerPage({
             </div>
           )}
         </SiteCard>
+
+        <PlayerStatsCard stats={stats} />
 
         {player.about?.trim() && (
           <section>

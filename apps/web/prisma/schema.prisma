@@ -473,6 +473,10 @@ model Tournament {
   clubId      String           @map("club_id")
   club        Club             @relation(fields: [clubId], references: [id])
   format              TournamentFormat
+  /// Дисциплина (тип стола): PYRAMID/POOL/SNOOKER/CHINESE_POOL/CAROM
+  discipline          String?          @map("discipline")
+  /// Подвид дисциплины (тип игры), напр. MOSCOW/P8/THREE_CUSHION
+  gameType            String?          @map("game_type")
   /// Парный режим поверх обычной сетки: регистрация по одному игроку (лимит ×2), пары собирает организатор
   isPair              Boolean          @default(false) @map("is_pair")
   status              TournamentStatus @default(DRAFT)

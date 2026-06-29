@@ -202,6 +202,8 @@ export async function PATCH(
         }),
         ...(data.clubId !== undefined && { clubId: data.clubId }),
         ...(data.format !== undefined && { format: data.format }),
+        ...(data.discipline !== undefined && { discipline: data.discipline || null }),
+        ...(data.gameType !== undefined && { gameType: data.gameType || null }),
         ...(data.isPair !== undefined && { isPair: data.isPair }),
         ...(data.status !== undefined && { status: data.status }),
         ...(data.startsAt !== undefined && {

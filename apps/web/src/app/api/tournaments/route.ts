@@ -117,6 +117,8 @@ export async function POST(request: NextRequest) {
         descriptionEn: descriptionFields.descriptionEn,
         clubId: data.clubId,
         format: data.format,
+        discipline: data.discipline || null,
+        gameType: data.gameType || null,
         isPair: data.isPair === true,
         status: suppressNotifications ? "OPEN" : "DRAFT",
         startsAt: data.startsAt ? new Date(data.startsAt) : null,

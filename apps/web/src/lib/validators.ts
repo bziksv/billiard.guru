@@ -2,6 +2,32 @@ import { z } from "zod";
 import { getPhoneRule, normalizePhoneAuto } from "@/lib/phone";
 import { MAX_PLAYER_RATING } from "@/lib/rating";
 import { CLUB_TABLE_FORMATS, type ClubTableFormatId } from "@/lib/club-table-formats";
+import { isDisciplineId, isGameTypeId } from "@/lib/tournament-discipline";
+
+/** Валидация дисциплины и подвида (тип игры) для турнира. */
+function refineDiscipline(
+  data: { discipline?: string | null; gameType?: string | null },
+  ctx: z.RefinementCtx,
+) {
+  if (data.discipline != null && data.discipline !== "" && !isDisciplineId(data.discipline)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["discipline"],
+      message: "Неизвестная дисциплина",
+    });
+  }
+  if (
+    data.gameType != null &&
+    data.gameType !== "" &&
+    !isGameTypeId(data.discipline, data.gameType)
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["gameType"],
+      message: "Тип игры не подходит к дисциплине",
+    });
+  }
+}
 
 const tableFormatIds = CLUB_TABLE_FORMATS.map((f) => f.id) as [
   ClubTableFormatId,
@@ -260,6 +286,9 @@ export const tournamentSchema = z.object({
   ]),
   /** Парный режим поверх обычной сетки (лимит участников ×2, пары собирает организатор) */
   isPair: z.boolean().optional().default(false),
+  /** Дисциплина (тип стола) и подвид (тип игры) — обязательны при создании */
+  discipline: z.string().min(1, "Выберите тип игры (дисциплину)"),
+  gameType: z.string().min(1, "Выберите вид игры"),
   startsAt: z.string().optional(),
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional().default("CLUB"),
@@ -268,7 +297,7 @@ export const tournamentSchema = z.object({
   tableIds: z.array(z.string().min(1)).min(1, "Выберите хотя бы один стол"),
   tableStreams: z.record(z.string().min(1), z.string().max(2000)).optional(),
   status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
-});
+}).superRefine(refineDiscipline);
 
 export const tournamentUpdateSchema = z.object({
   name: z.string().min(2).optional(),
@@ -321,6 +350,8 @@ export const tournamentUpdateSchema = z.object({
     .enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"])
     .optional(),
   isPair: z.boolean().optional(),
+  discipline: z.string().optional().nullable(),
+  gameType: z.string().optional().nullable(),
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional(),
   handicapHalfStep: z.boolean().optional(),
@@ -329,7 +360,7 @@ export const tournamentUpdateSchema = z.object({
   clearRatingLimit: z.boolean().optional(),
   tableIds: z.array(z.string().min(1)).min(1, "Выберите хотя бы один стол").optional(),
   tableStreams: z.record(z.string().min(1), z.string().max(2000)).optional(),
-});
+}).superRefine(refineDiscipline);
 
 export const tournamentPublishSchema = z.object({
   suppressNotifications: z.boolean().optional(),

@@ -294,10 +294,16 @@
     },
     "players": {
       "lead": "Рейтинг и профили игроков. Фильтр по стране и городу.",
+      "searchPlaceholder": "Поиск по имени или фамилии…",
+      "perPage": "На странице",
+      "showing": "Показано {from}–{to} из {total}",
+      "prev": "Назад",
+      "next": "Вперёд",
       "columns": {
         "player": "Игрок",
         "city": "Город",
-        "rating": "Рейтинг"
+        "rating": "Рейтинг",
+        "winRate": "% побед"
       }
     },
     "coaches": {
@@ -517,6 +523,23 @@
   "userRole": {
     "PLAYER": "Игрок",
     "SUPERADMIN": "Суперадмин"
+  },
+  "playerStats": {
+    "title": "Статистика игр",
+    "winRate": "Процент побед",
+    "games": "Сыграно встреч",
+    "tournaments": "Турниров сыграно",
+    "record": "Победы / Поражения",
+    "avgDuration": "Среднее время встречи",
+    "minutesShort": "{count} мин",
+    "hoursMinutes": "{hours} ч {minutes} мин",
+    "winsShort": "Побед: {count}",
+    "lossesShort": "Поражений: {count}",
+    "pairGames": "Из них парных встреч: {count}",
+    "byDiscipline": "По дисциплинам",
+    "rivalsBeat": "Чаще обыгрываешь",
+    "rivalsLose": "Чаще проигрываешь",
+    "gamesShort": "{count} встреч"
   },
   "playListing": {
     "kind": {

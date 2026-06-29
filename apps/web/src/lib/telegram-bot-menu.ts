@@ -10,9 +10,13 @@ import {
   getPlayerNotificationPreferencesForCabinet,
   setPlayerNotificationEnabled,
 } from "@/lib/notifications/player-preferences-server";
-import { playerName } from "@/lib/public-display";
+import { playerName, PUBLIC_PARTICIPANT_STATUSES } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
 import { formatRating } from "@/lib/rating";
+import {
+  buildPublicTournamentStandings,
+} from "@/lib/tournament-public-standings";
+import type { AdminTournament } from "@/lib/tournament-admin";
 import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
 import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import {
@@ -40,6 +44,7 @@ export const BOT_MENU_NOTIFICATIONS = "🔔 Уведомления";
 export { BOT_MENU_POKATAT, BOT_MENU_CLUB_POKATAT };
 
 export const BOT_NOTIFY_TOGGLE_PREFIX = "bot_notify_toggle_";
+export const BOT_TOURNAMENTS_MORE_PREFIX = "bmt_";
 
 export type BotMenuAction =
   | "profile"
@@ -50,6 +55,7 @@ export type BotMenuAction =
   | "notifications";
 
 const LIST_LIMIT = 8;
+const TOURNAMENTS_PAGE_SIZE = 10;
 
 type PlayerWithCity = Player & {
   city: City & { country: Country };
@@ -104,13 +110,19 @@ export function cabinetInlineKeyboard() {
   };
 }
 
-function tournamentsInlineKeyboard() {
-  return {
-    inline_keyboard: [
-      [{ text: "Все турниры", url: `${appUrlBase()}/tournaments` }],
-      [{ text: "Кабинет", url: `${appUrlBase()}/cabinet` }],
-    ],
-  };
+function tournamentsInlineKeyboard(moreOffset: number | null = null) {
+  type InlineButton =
+    | { text: string; callback_data: string }
+    | { text: string; url: string };
+  const rows: InlineButton[][] = [];
+  if (moreOffset != null) {
+    rows.push([
+      { text: "⬇️ Показать ещё", callback_data: `${BOT_TOURNAMENTS_MORE_PREFIX}${moreOffset}` },
+    ]);
+  }
+  rows.push([{ text: "Все турниры", url: `${appUrlBase()}/tournaments` }]);
+  rows.push([{ text: "Кабинет", url: `${appUrlBase()}/cabinet` }]);
+  return { inline_keyboard: rows };
 }
 
 function bookingsInlineKeyboard(clubs: { id: string; name: string }[]) {
@@ -242,28 +254,41 @@ export async function sendVerifiedWelcome(
   );
 }
 
+function placeMedal(placeLabel: string): string {
+  if (placeLabel === "1") return "🥇";
+  if (placeLabel === "2") return "🥈";
+  if (placeLabel === "3") return "🥉";
+  return "🏅";
+}
+
 function formatTournamentsTelegram(
-  registrations: Awaited<ReturnType<typeof loadPlayerRegistrations>>,
+  page: Awaited<ReturnType<typeof loadPlayerRegistrations>>,
+  total: number,
+  offset: number,
+  places: Map<string, string>,
 ): string {
-  if (registrations.length === 0) {
+  if (total === 0) {
     return "🏆 <b>Мои турниры</b>\n\nПока нет регистраций.";
   }
 
-  const lines = ["🏆 <b>Мои турниры</b>", ""];
-  for (const r of registrations.slice(0, LIST_LIMIT)) {
+  const header =
+    offset > 0
+      ? `🏆 <b>Мои турниры</b> (${offset + 1}–${offset + page.length} из ${total})`
+      : "🏆 <b>Мои турниры</b>";
+  const lines = [header, ""];
+  for (const r of page) {
     const status = REGISTRATION_STATUS_LABELS[r.status] ?? r.status;
     const format =
       TOURNAMENT_FORMAT_LABELS[r.tournament.format] ?? r.tournament.format;
     const tStatus = TOURNAMENT_STATUS_LABELS[r.tournament.status] ?? r.tournament.status;
+    const place = places.get(r.tournament.id);
+    const placeSuffix = place ? ` · ${placeMedal(place)} ${escapeHtml(place)} место` : "";
     lines.push(
       `• <b>${escapeHtml(r.tournament.name)}</b>`,
       `  ${escapeHtml(status)} · ${escapeHtml(r.tournament.club.name)}`,
-      `  ${escapeHtml(format)} · ${escapeHtml(tStatus)}`,
+      `  ${escapeHtml(format)} · ${escapeHtml(tStatus)}${placeSuffix}`,
       "",
     );
-  }
-  if (registrations.length > LIST_LIMIT) {
-    lines.push(`… и ещё ${registrations.length - LIST_LIMIT}. Откройте кабинет.`);
   }
   return lines.join("\n").trimEnd();
 }
@@ -344,6 +369,60 @@ async function loadPlayerRegistrations(playerId: string) {
   });
 }
 
+/** Занятое игроком место в завершённых турнирах: tournamentId → «1», «5–6». */
+async function loadPlayerTournamentPlaces(
+  playerId: string,
+  tournaments: { id: string; status: string }[],
+): Promise<Map<string, string>> {
+  const result = new Map<string, string>();
+  const finishedIds = tournaments
+    .filter((t) => t.status === "FINISHED")
+    .map((t) => t.id);
+  if (finishedIds.length === 0) return result;
+
+  const rows = await prisma.tournament.findMany({
+    where: { id: { in: finishedIds } },
+    include: {
+      club: { include: { city: { include: { country: true } } } },
+      registrations: {
+        where: { status: { in: [...PUBLIC_PARTICIPANT_STATUSES] } },
+        include: { player: { include: { city: true } } },
+      },
+      teams: {
+        where: { status: { in: [...PUBLIC_PARTICIPANT_STATUSES] } },
+        include: {
+          player1: { include: { city: true } },
+          player2: { include: { city: true } },
+        },
+      },
+      matches: {
+        include: {
+          team1: { include: { player1: true, player2: true } },
+          team2: { include: { player1: true, player2: true } },
+          winnerTeam: { include: { player1: true, player2: true } },
+        },
+        orderBy: [{ round: "asc" }, { slot: "asc" }],
+      },
+    },
+  });
+
+  const href = `/players/${playerId}`;
+  for (const t of rows) {
+    try {
+      const standings = buildPublicTournamentStandings(t as unknown as AdminTournament);
+      const row = standings.rows.find(
+        (r) => r.playerHref === href || r.secondPlayerHref === href,
+      );
+      if (row?.placeLabel && row.placeLabel !== "—") {
+        result.set(t.id, row.placeLabel);
+      }
+    } catch {
+      // протокол не построился — место просто не покажем
+    }
+  }
+  return result;
+}
+
 async function loadPlayerBookings(playerId: string) {
   return prisma.tableBooking.findMany({
     where: {
@@ -391,20 +470,43 @@ export async function handleMyProfile(telegramId: string): Promise<void> {
   );
 }
 
-export async function handleMyTournaments(telegramId: string): Promise<void> {
+export async function handleMyTournaments(
+  telegramId: string,
+  offset = 0,
+): Promise<void> {
   const player = await findVerifiedPlayerId(telegramId);
   if (!player) {
     await sendNotLinkedMessage(telegramId);
     return;
   }
 
-  const registrations = await loadPlayerRegistrations(player.id);
+  const all = await loadPlayerRegistrations(player.id);
+  const start = Math.max(0, offset);
+  const page = all.slice(start, start + TOURNAMENTS_PAGE_SIZE);
+  const places = await loadPlayerTournamentPlaces(
+    player.id,
+    page.map((r) => ({ id: r.tournament.id, status: r.tournament.status })),
+  );
+  const hasMore = start + TOURNAMENTS_PAGE_SIZE < all.length;
+
   await dispatchNotification(
     "bot-tournaments-summary",
     telegramId,
-    formatTournamentsTelegram(registrations),
-    { replyMarkup: tournamentsInlineKeyboard() },
+    formatTournamentsTelegram(page, all.length, start, places),
+    { replyMarkup: tournamentsInlineKeyboard(hasMore ? start + TOURNAMENTS_PAGE_SIZE : null) },
   );
+}
+
+export async function handleMyTournamentsMoreCallback(
+  data: string,
+  telegramId: string,
+  callbackQueryId: string,
+): Promise<boolean> {
+  if (!data.startsWith(BOT_TOURNAMENTS_MORE_PREFIX)) return false;
+  const offset = Number.parseInt(data.slice(BOT_TOURNAMENTS_MORE_PREFIX.length), 10);
+  await answerCallbackQuery(callbackQueryId);
+  await handleMyTournaments(telegramId, Number.isFinite(offset) ? offset : 0);
+  return true;
 }
 
 export async function handleMyBookings(telegramId: string): Promise<void> {

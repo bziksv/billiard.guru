@@ -51,14 +51,51 @@ export function tournamentCityIdsWhere(cityIds: string[]): Prisma.TournamentWher
   };
 }
 
-export function playerGeoWhere(params: GeoSearchParams): Prisma.PlayerWhereInput {
+export function playerGeoWhere(
+  params: GeoSearchParams,
+  options?: { verifiedOnly?: boolean },
+): Prisma.PlayerWhereInput {
+  const verifiedOnly = options?.verifiedOnly ?? true;
   return {
-    isVerified: true,
+    ...(verifiedOnly ? { isVerified: true } : {}),
     ...(params.cityId
       ? { cityId: params.cityId }
       : params.countryId
         ? { city: { countryId: params.countryId } }
         : {}),
+  };
+}
+
+/** Доступные размеры страницы для списка игроков. */
+export const PLAYERS_PAGE_SIZES = [100, 200, 500, 1000] as const;
+export const PLAYERS_DEFAULT_PAGE_SIZE = 100;
+
+export function normalizePlayersPageSize(raw: string | undefined): number {
+  const value = Number(raw);
+  return (PLAYERS_PAGE_SIZES as readonly number[]).includes(value)
+    ? value
+    : PLAYERS_DEFAULT_PAGE_SIZE;
+}
+
+/**
+ * Умный поиск игрока по имени/фамилии: запрос делится на слова, и каждое
+ * слово должно встретиться в имени или фамилии (в любом порядке).
+ * «вил ста» находит «Виленский Станислав».
+ */
+export function playerSearchWhere(
+  query: string | undefined,
+): Prisma.PlayerWhereInput {
+  const tokens = (query ?? "").trim().split(/\s+/).filter(Boolean);
+  if (tokens.length === 0) return {};
+  // MySQL: сравнение строк регистронезависимо по коллации (utf8mb4_*_ci),
+  // поэтому отдельный mode: "insensitive" не нужен (и не поддерживается).
+  return {
+    AND: tokens.map((token) => ({
+      OR: [
+        { firstName: { contains: token } },
+        { lastName: { contains: token } },
+      ],
+    })),
   };
 }
 

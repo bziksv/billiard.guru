@@ -13,6 +13,7 @@ import {
 import {
   handleBotMenuAction,
   handleNotificationToggleCallback,
+  handleMyTournamentsMoreCallback,
   buildMainMenuKeyboard,
   parseBotMenuAction,
   sendVerifiedWelcome,
@@ -335,6 +336,20 @@ export async function processTelegramUpdate(
         if (handled) return;
       } catch (err) {
         logger.error({ err }, "Booking callback failed");
+        await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
+      }
+      return;
+    }
+    if (data.startsWith("bmt_")) {
+      try {
+        const handled = await handleMyTournamentsMoreCallback(
+          data,
+          telegramId,
+          update.callback_query.id,
+        );
+        if (handled) return;
+      } catch (err) {
+        logger.error({ err }, "My tournaments pagination callback failed");
         await answerCallbackQuery(update.callback_query.id, "Ошибка сервера");
       }
       return;

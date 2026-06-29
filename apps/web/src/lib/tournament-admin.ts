@@ -86,6 +86,9 @@ export interface AdminTournament {
   name: string;
   description?: string | null;
   format: string;
+  /** Дисциплина (тип стола) и подвид (тип игры). */
+  discipline?: string | null;
+  gameType?: string | null;
   /** Парный режим поверх обычной сетки (регистрация по одному, пары собирает организатор). */
   isPair?: boolean;
   /** Подпись из /admin/brackets (если загружена с сервера) */

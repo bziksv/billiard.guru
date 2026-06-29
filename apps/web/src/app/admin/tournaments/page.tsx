@@ -28,6 +28,7 @@ import {
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
 import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
+import { DisciplinePicker } from "@/components/admin/discipline-picker";
 
 interface Club {
   id: string;
@@ -110,6 +111,8 @@ export default function TournamentsPage() {
   const [newClubId, setNewClubId] = useState("");
   const [newFormat, setNewFormat] = useState("OLYMPIC");
   const [newIsPair, setNewIsPair] = useState(false);
+  const [newDiscipline, setNewDiscipline] = useState<string | null>(null);
+  const [newGameType, setNewGameType] = useState<string | null>(null);
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
@@ -283,6 +286,10 @@ export default function TournamentsPage() {
       setCreateMessage("Выберите клуб");
       return;
     }
+    if (!newDiscipline || !newGameType) {
+      setCreateMessage("Выберите тип игры (дисциплину) и вид игры");
+      return;
+    }
     if (selectedTableIds.length === 0) {
       setCreateMessage("Выберите хотя бы один стол");
       return;
@@ -299,6 +306,8 @@ export default function TournamentsPage() {
         clubId: newClubId,
         format: newFormat,
         isPair: newIsPair,
+        discipline: newDiscipline,
+        gameType: newGameType,
         startsAt: form.get("startsAt") || undefined,
         ratingMax: tournamentDefaults.limitByRating
           ? Number(form.get("ratingMax"))
@@ -319,6 +328,8 @@ export default function TournamentsPage() {
     setNewClubId("");
     setNewFormat("OLYMPIC");
     setNewIsPair(false);
+    setNewDiscipline(null);
+    setNewGameType(null);
     setSelectedTableIds([]);
     setTableStreams({});
     formEl.reset();
@@ -431,6 +442,16 @@ export default function TournamentsPage() {
             searchPlaceholder="Поиск формата…"
             required
             disabled={formatOptionsLoading || formatOptions.length === 0}
+          />
+          <DisciplinePicker
+            discipline={newDiscipline}
+            gameType={newGameType}
+            onChange={(d, g) => {
+              setNewDiscipline(d);
+              setNewGameType(g);
+            }}
+            required
+            className="grid gap-3 sm:col-span-2 sm:grid-cols-2"
           />
           <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
             <input

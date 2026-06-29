@@ -294,10 +294,16 @@
     },
     "players": {
       "lead": "Player rankings and profiles. Filter by country and city.",
+      "searchPlaceholder": "Search by first or last name…",
+      "perPage": "Per page",
+      "showing": "Showing {from}–{to} of {total}",
+      "prev": "Previous",
+      "next": "Next",
       "columns": {
         "player": "Player",
         "city": "City",
-        "rating": "Rating"
+        "rating": "Rating",
+        "winRate": "Win %"
       }
     },
     "coaches": {
@@ -517,6 +523,23 @@
   "userRole": {
     "PLAYER": "Player",
     "SUPERADMIN": "Superadmin"
+  },
+  "playerStats": {
+    "title": "Match statistics",
+    "winRate": "Win rate",
+    "games": "Matches played",
+    "tournaments": "Tournaments played",
+    "record": "Wins / Losses",
+    "avgDuration": "Average match time",
+    "minutesShort": "{count} min",
+    "hoursMinutes": "{hours} h {minutes} min",
+    "winsShort": "Wins: {count}",
+    "lossesShort": "Losses: {count}",
+    "pairGames": "Of these, pair matches: {count}",
+    "byDiscipline": "By discipline",
+    "rivalsBeat": "You beat most often",
+    "rivalsLose": "You lose to most often",
+    "gamesShort": "{count} games"
   },
   "playListing": {
     "kind": {

@@ -14,6 +14,7 @@ import { OlympicBracketView } from "@/components/bracket/olympic-bracket-view";
 import { bracketPlayerLabelById } from "@/lib/bracket-display";
 import { SwissBracketView } from "@/components/bracket/swiss-bracket-view";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { DisciplinePicker } from "@/components/admin/discipline-picker";
 import { AsyncButton } from "@/components/ui/async-text-button";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
@@ -434,6 +435,12 @@ export function TournamentManageView({
   const [editDescription, setEditDescription] = useState(t.description ?? "");
   const [editClubId, setEditClubId] = useState(t.clubId);
   const [editFormat, setEditFormat] = useState(t.format);
+  const [editDiscipline, setEditDiscipline] = useState<string | null>(
+    t.discipline ?? null,
+  );
+  const [editGameType, setEditGameType] = useState<string | null>(
+    t.gameType ?? null,
+  );
   const { options: formatOptions, loading: formatOptionsLoading } =
     useBracketFormatOptions(editFormat);
   const [editStatus, setEditStatus] = useState(t.status);
@@ -471,6 +478,8 @@ export function TournamentManageView({
     setEditDescription(t.description ?? "");
     setEditClubId(t.clubId);
     setEditFormat(t.format);
+    setEditDiscipline(t.discipline ?? null);
+    setEditGameType(t.gameType ?? null);
     setEditStatus(t.status);
     setEditStartsAt(t.startsAt ? t.startsAt.slice(0, 16) : "");
     setEditHandicapHalfStep(t.handicapHalfStep !== false);
@@ -513,8 +522,14 @@ export function TournamentManageView({
         name: editName,
         description: editDescription,
         clubId: editClubId,
-        format: editFormat,
-        status: editStatus,
+        // Формат шлём только при изменении: иначе валидация по составу
+        // блокирует правки (тип игры, дата) у начатых/завершённых турниров.
+        ...(editFormat !== t.format && { format: editFormat }),
+        discipline: editDiscipline,
+        gameType: editGameType,
+        // Статус — только при изменении, иначе повторный FINISHED/ACTIVE
+        // упирается в проверки переходов и правка не сохраняется.
+        ...(editStatus !== t.status && { status: editStatus }),
         startsAt: editStartsAt || null,
         handicapHalfStep: editHandicapHalfStep,
         tableIds: editTableIds,
@@ -830,6 +845,15 @@ export function TournamentManageView({
             placeholder={formatOptionsLoading ? "Загрузка форматов…" : "Формат"}
             searchPlaceholder="Поиск формата…"
             disabled={formatOptionsLoading}
+          />
+          <DisciplinePicker
+            discipline={editDiscipline}
+            gameType={editGameType}
+            onChange={(d, g) => {
+              setEditDiscipline(d);
+              setEditGameType(g);
+            }}
+            selectClassName="admin-input w-full rounded-lg px-3 py-2 text-sm"
           />
           <SearchableSelect
             options={STATUS_OPTIONS}
