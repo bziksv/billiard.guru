@@ -45,6 +45,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   const [newIsPair, setNewIsPair] = useState(false);
   const [newDiscipline, setNewDiscipline] = useState<string | null>(null);
   const [newGameType, setNewGameType] = useState<string | null>(null);
+  const [disciplineInvalid, setDisciplineInvalid] = useState(false);
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
@@ -95,6 +96,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   async function createTournament(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!newDiscipline || !newGameType) {
+      setDisciplineInvalid(true);
       setCreateMessage("Выберите тип игры (дисциплину) и вид игры");
       return;
     }
@@ -139,6 +141,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
       setNewIsPair(false);
       setNewDiscipline(null);
       setNewGameType(null);
+      setDisciplineInvalid(false);
       setSelectedTableIds([]);
       setTableStreams({});
       formEl.reset();
@@ -227,8 +230,10 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               onChange={(d, g) => {
                 setNewDiscipline(d);
                 setNewGameType(g);
+                if (d && g) setDisciplineInvalid(false);
               }}
               required
+              invalid={disciplineInvalid}
               className="grid gap-3 sm:col-span-2 sm:grid-cols-2"
             />
             <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
@@ -347,9 +352,9 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               {createMessage && (
                 <p
                   className={`text-sm ${
-                    createMessage.toLowerCase().includes("ошиб")
-                      ? "text-red-400"
-                      : "text-emerald-400"
+                    /создан|created/i.test(createMessage)
+                      ? "text-emerald-400"
+                      : "text-red-400"
                   }`}
                 >
                   {createMessage}

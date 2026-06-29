@@ -113,6 +113,7 @@ export default function TournamentsPage() {
   const [newIsPair, setNewIsPair] = useState(false);
   const [newDiscipline, setNewDiscipline] = useState<string | null>(null);
   const [newGameType, setNewGameType] = useState<string | null>(null);
+  const [disciplineInvalid, setDisciplineInvalid] = useState(false);
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
@@ -287,6 +288,7 @@ export default function TournamentsPage() {
       return;
     }
     if (!newDiscipline || !newGameType) {
+      setDisciplineInvalid(true);
       setCreateMessage("Выберите тип игры (дисциплину) и вид игры");
       return;
     }
@@ -330,6 +332,7 @@ export default function TournamentsPage() {
     setNewIsPair(false);
     setNewDiscipline(null);
     setNewGameType(null);
+    setDisciplineInvalid(false);
     setSelectedTableIds([]);
     setTableStreams({});
     formEl.reset();
@@ -449,8 +452,10 @@ export default function TournamentsPage() {
             onChange={(d, g) => {
               setNewDiscipline(d);
               setNewGameType(g);
+              if (d && g) setDisciplineInvalid(false);
             }}
             required
+            invalid={disciplineInvalid}
             className="grid gap-3 sm:col-span-2 sm:grid-cols-2"
           />
           <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 text-sm">
@@ -565,7 +570,7 @@ export default function TournamentsPage() {
             </button>
             {createMessage && (
               <p
-                className={`text-sm ${createMessage.includes("ошиб") || createMessage.includes("Ошиб") ? "text-red-400" : "text-emerald-400"}`}
+                className={`text-sm ${/создан|created/i.test(createMessage) ? "text-emerald-400" : "text-red-400"}`}
               >
                 {createMessage}
               </p>

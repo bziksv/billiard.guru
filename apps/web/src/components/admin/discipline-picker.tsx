@@ -12,6 +12,7 @@ export function DisciplinePicker({
   className,
   selectClassName = "site-input w-full",
   required = false,
+  invalid = false,
 }: {
   discipline: string | null;
   gameType: string | null;
@@ -19,9 +20,18 @@ export function DisciplinePicker({
   className?: string;
   selectClassName?: string;
   required?: boolean;
+  invalid?: boolean;
 }) {
   const subtypes = gameTypesForDiscipline(discipline);
   const mark = required ? <span className="text-rose-500"> *</span> : null;
+  // Инлайн-стиль: .site-input/.admin-input задают border нелейерным CSS,
+  // который перекрывает Tailwind-утилиты, поэтому подсвечиваем через style.
+  const errorStyle = {
+    borderColor: "#f43f5e",
+    boxShadow: "0 0 0 1px #f43f5e",
+  } as const;
+  const disciplineError = invalid && !discipline;
+  const gameTypeError = invalid && !gameType;
 
   return (
     <div className={className ?? "grid gap-3 sm:grid-cols-2"}>
@@ -33,6 +43,7 @@ export function DisciplinePicker({
           value={discipline ?? ""}
           onChange={(e) => onChange(e.target.value || null, null)}
           className={selectClassName}
+          style={disciplineError ? errorStyle : undefined}
         >
           <option value="">Не указана</option>
           {TOURNAMENT_DISCIPLINES.map((d) => (
@@ -49,6 +60,7 @@ export function DisciplinePicker({
           disabled={subtypes.length === 0}
           onChange={(e) => onChange(discipline, e.target.value || null)}
           className={selectClassName}
+          style={gameTypeError ? errorStyle : undefined}
         >
           <option value="">{subtypes.length === 0 ? "—" : "Не указан"}</option>
           {subtypes.map((s) => (

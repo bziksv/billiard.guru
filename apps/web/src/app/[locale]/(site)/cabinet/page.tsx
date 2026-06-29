@@ -4,6 +4,7 @@ import { RegistrationCancelButton } from "@/components/site/registration-cancel-
 import { CoachProfileEditor } from "@/components/cabinet/coach-profile-editor";
 import { NotificationPreferencesEditor } from "@/components/cabinet/notification-preferences-editor";
 import { PlayerAboutEditor } from "@/components/cabinet/player-about-editor";
+import { PlayerCitySettings } from "@/components/cabinet/player-city-settings";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { Link } from "@/i18n/navigation";
@@ -128,6 +129,8 @@ export default async function CabinetPage() {
         </SiteCard>
 
         <PlayerStatsCard stats={stats} />
+
+        <PlayerCitySettings initialCityId={player.cityId} />
 
         <NotificationPreferencesEditor />
 

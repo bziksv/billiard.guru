@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
     }
 
-    return NextResponse.json({ about: player.about });
+    return NextResponse.json({ about: player.about, cityId: player.cityId });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
@@ -27,19 +27,30 @@ export async function PATCH(request: NextRequest) {
     }
 
     const data = playerAboutUpdateSchema.parse(await request.json());
-    const about = data.about?.trim() || null;
-    let aboutEn: string | null = null;
-    if (about) {
-      aboutEn = (await translateText(about, "ru", "en")) ?? null;
+
+    const updateData: { about?: string | null; aboutEn?: string | null; cityId?: string } = {};
+
+    if (data.about !== undefined) {
+      const about = data.about?.trim() || null;
+      updateData.about = about;
+      updateData.aboutEn = about ? ((await translateText(about, "ru", "en")) ?? null) : null;
+    }
+
+    if (data.cityId !== undefined) {
+      const city = await prisma.city.findUnique({ where: { id: data.cityId } });
+      if (!city) {
+        return NextResponse.json({ error: "Город не найден" }, { status: 400 });
+      }
+      updateData.cityId = data.cityId;
     }
 
     const updated = await prisma.player.update({
       where: { id: player.id },
-      data: { about, aboutEn },
-      select: { about: true, aboutEn: true },
+      data: updateData,
+      select: { about: true, cityId: true },
     });
 
-    return NextResponse.json({ about: updated.about });
+    return NextResponse.json({ about: updated.about, cityId: updated.cityId });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

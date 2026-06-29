@@ -212,6 +212,7 @@ export const clubPlayerRatingSchema = z.object({
 
 export const playerAboutUpdateSchema = z.object({
   about: z.string().max(4000).optional().nullable().or(z.literal("")),
+  cityId: z.string().min(1).optional(),
 });
 
 export const coachReviewSchema = z.object({

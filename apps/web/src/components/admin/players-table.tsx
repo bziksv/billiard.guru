@@ -24,6 +24,7 @@ import { AsyncTextButton } from "@/components/ui/async-text-button";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { formatRating } from "@/lib/rating";
+import { formatPhoneDashed } from "@/lib/phone";
 import { USER_ROLE_LABELS } from "@/lib/validators";
 
 interface Player {
@@ -363,7 +364,9 @@ export function PlayersAdminTable() {
                     <td className="px-4 py-3 font-mono text-emerald-400">
                       {formatRating(player.rating)}
                     </td>
-                    <td className="px-4 py-3">{player.phone}</td>
+                    <td className="px-4 py-3 whitespace-nowrap font-mono tabular-nums">
+                      {formatPhoneDashed(player.phone)}
+                    </td>
                     <td className="px-4 py-3">
                       {player.telegramUsername ? `@${player.telegramUsername}` : "—"}
                     </td>

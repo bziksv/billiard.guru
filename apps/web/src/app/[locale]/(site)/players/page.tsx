@@ -53,11 +53,10 @@ export default async function PlayersPage({
   const locale = (await getLocale()) as AppLocale;
   const params = await searchParams;
   const size = normalizePlayersPageSize(params.size);
-  // При поиске ищем по всем игрокам (вкл. неподтверждённых, добавленных клубом);
-  // без поиска показываем чистый рейтинг — только подтверждённых.
-  const hasQuery = (params.q ?? "").trim().length > 0;
+  // Показываем всех игроков, включая неподтверждённых (добавленных клубом) —
+  // они уже видны в сетках турниров и статистике.
   const where = {
-    ...playerGeoWhere(params, { verifiedOnly: !hasQuery }),
+    ...playerGeoWhere(params, { verifiedOnly: false }),
     ...playerSearchWhere(params.q),
   };
 

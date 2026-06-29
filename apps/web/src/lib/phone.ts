@@ -334,6 +334,22 @@ export function formatE164Display(e164: string, countryName?: string): string {
   return formatted;
 }
 
+/** E.164 → «+7-900-111-22-33» (через дефис, без скобок) для компактных таблиц. */
+export function formatPhoneDashed(e164: string, countryName?: string): string {
+  let input = e164.trim();
+  const digits = digitsOnly(input);
+  // 10-значный национальный РФ-мобильный без кода страны → считаем +7
+  if (!input.startsWith("+") && digits.length === 10 && digits.startsWith("9")) {
+    input = `+7${digits}`;
+  }
+  const display = formatE164Display(input, countryName);
+  if (!display) return display;
+  return display
+    .replace(/[()]/g, "")
+    .trim()
+    .replace(/\s+/g, "-");
+}
+
 /** Форматирование при вводе — принимает сырой ввод, возвращает display + e164 */
 export function formatPhoneInput(
   raw: string,
