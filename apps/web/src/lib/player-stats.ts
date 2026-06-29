@@ -285,6 +285,8 @@ export type PlayerWinRate = {
   wins: number;
   /** Доля побед 0..1, null если нет сыгранных встреч. */
   winRate: number | null;
+  /** Количество турниров, где сыграна хотя бы одна встреча. */
+  tournaments: number;
 };
 
 /**
@@ -323,14 +325,24 @@ export async function computeWinRatesForPlayers(
       winnerTeamId: { not: null },
       OR: [{ team1Id: { in: teamIds } }, { team2Id: { in: teamIds } }],
     },
-    select: { team1Id: true, team2Id: true, winnerTeamId: true },
+    select: {
+      team1Id: true,
+      team2Id: true,
+      winnerTeamId: true,
+      tournamentId: true,
+    },
   });
 
-  const agg = new Map<string, { played: number; wins: number }>();
-  const bump = (pid: string, won: boolean) => {
-    const a = agg.get(pid) ?? { played: 0, wins: 0 };
+  const agg = new Map<
+    string,
+    { played: number; wins: number; tournaments: Set<string> }
+  >();
+  const bump = (pid: string, won: boolean, tournamentId: string | null) => {
+    const a =
+      agg.get(pid) ?? { played: 0, wins: 0, tournaments: new Set<string>() };
     a.played += 1;
     if (won) a.wins += 1;
+    if (tournamentId) a.tournaments.add(tournamentId);
     agg.set(pid, a);
   };
 
@@ -340,7 +352,7 @@ export async function computeWinRatesForPlayers(
       const members = teamToPlayers.get(teamId);
       if (!members) continue;
       const won = m.winnerTeamId === teamId;
-      for (const pid of members) bump(pid, won);
+      for (const pid of members) bump(pid, won, m.tournamentId);
     }
   }
 
@@ -349,6 +361,7 @@ export async function computeWinRatesForPlayers(
       played: a.played,
       wins: a.wins,
       winRate: a.played > 0 ? a.wins / a.played : null,
+      tournaments: a.tournaments.size,
     });
   }
   return result;

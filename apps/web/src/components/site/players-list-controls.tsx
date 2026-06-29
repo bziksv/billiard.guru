@@ -82,16 +82,26 @@ export function PlayersSearchBar({ size }: { size: number }) {
   );
 }
 
+const SORT_FIELDS = ["name", "city", "rating", "winrate", "tournaments"] as const;
+type PlayersSortField = (typeof SORT_FIELDS)[number];
+
 export function PlayersSortHeader({
   field,
   label,
+  align = "end",
 }: {
-  field: "rating" | "winrate";
+  field: PlayersSortField;
   label: string;
+  align?: "start" | "end";
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const currentField = searchParams.get("sort") === "winrate" ? "winrate" : "rating";
+  const rawSort = searchParams.get("sort") ?? "";
+  const currentField: PlayersSortField = (
+    SORT_FIELDS as readonly string[]
+  ).includes(rawSort)
+    ? (rawSort as PlayersSortField)
+    : "rating";
   const currentDir = searchParams.get("dir") === "asc" ? "asc" : "desc";
   const active = currentField === field;
   const nextDir = active && currentDir === "desc" ? "asc" : "desc";
@@ -109,9 +119,9 @@ export function PlayersSortHeader({
     <button
       type="button"
       onClick={sort}
-      className={`ml-auto inline-flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 ${
-        active ? "text-emerald-600 dark:text-emerald-400" : ""
-      }`}
+      className={`inline-flex items-center gap-1 hover:text-emerald-600 dark:hover:text-emerald-400 ${
+        align === "end" ? "ml-auto" : ""
+      } ${active ? "text-emerald-600 dark:text-emerald-400" : ""}`}
     >
       {label}
       <span aria-hidden className="text-xs">

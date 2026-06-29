@@ -303,7 +303,8 @@
         "player": "Игрок",
         "city": "Город",
         "rating": "Рейтинг",
-        "winRate": "% побед"
+        "winRate": "% побед",
+        "tournaments": "Турниров"
       }
     },
     "coaches": {

@@ -19,6 +19,7 @@ import {
 } from "@/components/site/players-list-controls";
 import { computeWinRatesForPlayers } from "@/lib/player-stats";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@/generated/prisma/client";
 import type { GeoSearchParams } from "@/lib/site";
 import { getLocale, getTranslations } from "next-intl/server";
 import { buildLocalizedStaticMetadata } from "@/lib/seo-locale";
@@ -65,42 +66,66 @@ export default async function PlayersPage({
   const page = Math.min(Math.max(1, Number(params.page) || 1), pageCount);
   const skip = (page - 1) * size;
 
-  const sortField = params.sort === "winrate" ? "winrate" : "rating";
+  const SORT_FIELDS = [
+    "name",
+    "city",
+    "rating",
+    "winrate",
+    "tournaments",
+  ] as const;
+  type SortField = (typeof SORT_FIELDS)[number];
+  const sortField: SortField = (SORT_FIELDS as readonly string[]).includes(
+    params.sort ?? "",
+  )
+    ? (params.sort as SortField)
+    : "rating";
   const sortDir = params.dir === "asc" ? "asc" : "desc";
   const playerInclude = { city: { include: { country: true } } } as const;
+  // Город сортируем по локализованному названию: для EN — nameEn, иначе nameRu.
+  const cityNameField = locale === "en" ? "nameEn" : "nameRu";
 
   let players: Awaited<
     ReturnType<typeof prisma.player.findMany<{ include: typeof playerInclude }>>
   >;
   let winRates: Awaited<ReturnType<typeof computeWinRatesForPlayers>>;
 
-  if (sortField === "winrate") {
-    // Сортировка по проценту побед требует расчёта по всему отфильтрованному
-    // набору, затем берём страницу.
+  if (sortField === "winrate" || sortField === "tournaments") {
+    // Метрики (% побед, число турниров) считаются по сыгранным встречам, поэтому
+    // сортировку делаем по всему отфильтрованному набору, затем берём страницу.
     const all = await prisma.player.findMany({
       where,
       include: playerInclude,
       orderBy: [{ rating: "desc" }, { lastName: "asc" }],
     });
     winRates = await computeWinRatesForPlayers(all.map((p) => p.id));
+    const valueOf = (id: string): number | null =>
+      sortField === "winrate"
+        ? (winRates.get(id)?.winRate ?? null)
+        : (winRates.get(id)?.tournaments ?? 0);
     const sorted = [...all].sort((a, b) => {
-      const wa = winRates.get(a.id)?.winRate ?? null;
-      const wb = winRates.get(b.id)?.winRate ?? null;
+      const va = valueOf(a.id);
+      const vb = valueOf(b.id);
       // Игроки без сыгранных встреч — всегда в конце, независимо от направления.
-      if (wa == null && wb == null) return b.rating - a.rating;
-      if (wa == null) return 1;
-      if (wb == null) return -1;
-      const diff = wb - wa;
+      if (va == null && vb == null) return b.rating - a.rating;
+      if (va == null) return 1;
+      if (vb == null) return -1;
+      const diff = vb - va;
       const dirDiff = sortDir === "asc" ? -diff : diff;
       if (dirDiff !== 0) return dirDiff;
       return b.rating - a.rating;
     });
     players = sorted.slice(skip, skip + size);
   } else {
+    const orderBy: Prisma.PlayerOrderByWithRelationInput[] =
+      sortField === "name"
+        ? [{ lastName: sortDir }, { firstName: sortDir }]
+        : sortField === "city"
+          ? [{ city: { [cityNameField]: sortDir } }, { lastName: "asc" }]
+          : [{ rating: sortDir }, { lastName: "asc" }];
     players = await prisma.player.findMany({
       where,
       include: playerInclude,
-      orderBy: [{ rating: sortDir }, { lastName: "asc" }],
+      orderBy,
       skip,
       take: size,
     });
@@ -127,8 +152,20 @@ export default async function PlayersPage({
               <thead>
                 <tr>
                   <th className="w-12">#</th>
-                  <th>{t("pages.players.columns.player")}</th>
-                  <th>{t("pages.players.columns.city")}</th>
+                  <th>
+                    <PlayersSortHeader
+                      field="name"
+                      align="start"
+                      label={t("pages.players.columns.player")}
+                    />
+                  </th>
+                  <th>
+                    <PlayersSortHeader
+                      field="city"
+                      align="start"
+                      label={t("pages.players.columns.city")}
+                    />
+                  </th>
                   <th className="text-right">
                     <PlayersSortHeader
                       field="rating"
@@ -139,6 +176,12 @@ export default async function PlayersPage({
                     <PlayersSortHeader
                       field="winrate"
                       label={t("pages.players.columns.winRate")}
+                    />
+                  </th>
+                  <th className="text-right">
+                    <PlayersSortHeader
+                      field="tournaments"
+                      label={t("pages.players.columns.tournaments")}
                     />
                   </th>
                 </tr>
@@ -181,6 +224,9 @@ export default async function PlayersPage({
                     </td>
                     <td className="text-right font-mono text-[var(--text-muted)]">
                       {formatWinRate(winRates.get(player.id)?.winRate)}
+                    </td>
+                    <td className="text-right font-mono text-[var(--text-muted)]">
+                      {winRates.get(player.id)?.tournaments ?? 0}
                     </td>
                   </tr>
                 ))}

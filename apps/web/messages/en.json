@@ -303,7 +303,8 @@
         "player": "Player",
         "city": "City",
         "rating": "Rating",
-        "winRate": "Win %"
+        "winRate": "Win %",
+        "tournaments": "Tournaments"
       }
     },
     "coaches": {
