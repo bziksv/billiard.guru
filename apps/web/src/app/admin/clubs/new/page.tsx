@@ -16,6 +16,8 @@ export default function NewClubPage() {
   const [phoneValid, setPhoneValid] = useState(false);
   const [tableCounts, setTableCounts] = useState<ClubTableCounts>({});
   const [confirmLink, setConfirmLink] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [ownerPlayerName, setOwnerPlayerName] = useState<string | null>(null);
   const [telegramSent, setTelegramSent] = useState<boolean | null>(null);
   const [telegramSentReason, setTelegramSentReason] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -54,6 +56,8 @@ export default function NewClubPage() {
       return;
     }
     setConfirmLink(data.confirmLink);
+    setSuccessMessage(data.message ?? null);
+    setOwnerPlayerName(data.ownerPlayer?.name ?? null);
     setTelegramSent(data.telegramSent ?? null);
     setTelegramSentReason(data.telegramSentReason ?? null);
   }
@@ -78,6 +82,10 @@ export default function NewClubPage() {
           }}
           required
         />
+        <p className="text-xs admin-muted">
+          Телефон управляющего клуба. Если игрок с этим номером уже зарегистрирован, после
+          подтверждения клуба он получит доступ в раздел «Управление клубом» (/manage).
+        </p>
         <Field label="Email (необязательно)" name="email" type="email" />
         <Field label="Адрес" name="address" placeholder="Улица, дом, этаж" />
         <ClubTableCountsFields values={tableCounts} onChange={setTableCounts} />
@@ -105,6 +113,12 @@ export default function NewClubPage() {
       </form>
       {confirmLink && (
         <div className="mt-6 rounded-lg border border-emerald-800 bg-emerald-950/50 p-4 space-y-2">
+          {successMessage && <p className="text-sm text-emerald-300">{successMessage}</p>}
+          {ownerPlayerName && (
+            <p className="text-sm text-emerald-300/90">
+              Управляющий по номеру: {ownerPlayerName}
+            </p>
+          )}
           {telegramSent ? (
             <p className="text-sm text-emerald-300">
               Подтверждение отправлено в Telegram владельцу. Если сообщения нет —

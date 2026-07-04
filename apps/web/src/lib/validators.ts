@@ -1,7 +1,12 @@
 import { z } from "zod";
 import { getPhoneRule, normalizePhoneAuto } from "@/lib/phone";
 import { MAX_PLAYER_RATING } from "@/lib/rating";
-import { CLUB_TABLE_FORMATS, type ClubTableFormatId } from "@/lib/club-table-formats";
+import {
+  CLUB_TABLE_FORMATS,
+  parseClubTableCounts,
+  type ClubTableFormatId,
+  type ClubTableCounts,
+} from "@/lib/club-table-formats";
 import { isDisciplineId, isGameTypeId } from "@/lib/tournament-discipline";
 
 /** Валидация дисциплины и подвида (тип игры) для турнира. */
@@ -34,10 +39,26 @@ const tableFormatIds = CLUB_TABLE_FORMATS.map((f) => f.id) as [
   ...ClubTableFormatId[],
 ];
 
-const tableCountsSchema = z
-  .record(z.enum(tableFormatIds), z.coerce.number().int().min(0).max(500))
-  .optional()
-  .nullable();
+const TABLE_FORMAT_ID_SET = new Set<string>(CLUB_TABLE_FORMATS.map((f) => f.id));
+
+/** Zod 4: z.record(enum) требует все ключи; частичный объект — через preprocess + custom. */
+const tableCountsSchema = z.preprocess(
+  (val) => parseClubTableCounts(val),
+  z
+    .custom<ClubTableCounts>((val) => {
+      if (val == null) return true;
+      if (typeof val !== "object" || Array.isArray(val)) return false;
+      for (const [key, value] of Object.entries(val as ClubTableCounts)) {
+        if (!TABLE_FORMAT_ID_SET.has(key)) return false;
+        if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > 500) {
+          return false;
+        }
+      }
+      return true;
+    }, "Некорректное количество столов")
+    .optional()
+    .nullable(),
+);
 
 /** Рейтинг с шагом 0,5. Объявлен до tournamentSchema, чтобы не было TDZ при импортах. */
 export const ratingStepSchema = z

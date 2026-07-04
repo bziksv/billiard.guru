@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
 import { writeAuditLog } from "@/lib/audit";
 import { getSession } from "@/lib/auth";
 import { tryAutoSendClubConfirmTelegram } from "@/lib/club-confirm-server";
@@ -80,6 +81,17 @@ export async function POST(request: NextRequest) {
       priceTiers: parsePriceTiers(body.priceTiers),
     });
 
+    const ownerPlayer = await prisma.player.findFirst({
+      where: { phone: data.phone },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        isVerified: true,
+        telegramId: true,
+      },
+    });
+
     const club = await prisma.club.create({
       data: {
         name: data.name,
@@ -126,22 +138,40 @@ export async function POST(request: NextRequest) {
     });
     log.info({ clubId: club.id, telegramSent: telegram.sent }, "Club registered");
 
+    const ownerName = ownerPlayer
+      ? `${ownerPlayer.lastName} ${ownerPlayer.firstName}`.trim()
+      : null;
+    const ownerHint = ownerPlayer
+      ? ownerPlayer.isVerified
+        ? `Управляющий: ${ownerName}. После подтверждения клуба он увидит его в разделе «Управление клубом».`
+        : `Найден игрок ${ownerName} по номеру телефона. После подтверждения профиля и клуба он получит доступ к управлению.`
+      : "Игрок с этим номером пока не зарегистрирован — после регистрации он станет управляющим клуба.";
+
     return NextResponse.json(
       {
         ...club,
         confirmLink,
         telegramSent: telegram.sent,
         telegramSentReason: telegram.reason ?? null,
+        ownerPlayer: ownerPlayer
+          ? {
+              id: ownerPlayer.id,
+              name: ownerName,
+              isVerified: ownerPlayer.isVerified,
+              hasTelegram: Boolean(ownerPlayer.telegramId),
+            }
+          : null,
         message: telegram.sent
-          ? "Клуб создан. Подтверждение отправлено в Telegram владельцу."
-          : "Подтвердите регистрацию через Telegram",
+          ? `Клуб создан. Подтверждение отправлено в Telegram владельцу. ${ownerHint}`
+          : `Клуб создан. ${ownerHint} Подтвердите регистрацию через Telegram.`,
       },
       { status: 201 },
     );
   } catch (error) {
     log.error({ error }, "Club registration failed");
-    if (error instanceof Error && error.name === "ZodError") {
-      return NextResponse.json({ error: "Ошибка валидации" }, { status: 400 });
+    if (error instanceof ZodError) {
+      const detail = error.issues[0]?.message ?? "Ошибка валидации";
+      return NextResponse.json({ error: detail }, { status: 400 });
     }
     return NextResponse.json({ error: "Не удалось зарегистрировать клуб" }, { status: 500 });
   }
