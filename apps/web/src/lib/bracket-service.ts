@@ -44,12 +44,62 @@ import {
   usesFixedSwissGridEngine,
   OLYMPIC_BRONZE_MATCH_SLOT,
   teamRating,
+  type TeamWithPlayers,
 } from "@/lib/pair-tournament";
+import {
+  applyTournamentRatingsToTeam,
+  type TournamentRatingSource,
+} from "@/lib/tournament-rating-display";
 
 type Db = Pick<
   PrismaClient,
-  "tournamentMatch" | "tournamentTeam" | "tournament" | "tournamentRegistration"
+  | "tournamentMatch"
+  | "tournamentTeam"
+  | "tournament"
+  | "tournamentRegistration"
+  | "clubPlayerRating"
 >;
+
+async function loadClubPlayerRatingsMap(
+  db: Db,
+  clubId: string,
+  playerIds: string[],
+): Promise<Record<string, number>> {
+  if (playerIds.length === 0) return {};
+  const rows = await db.clubPlayerRating.findMany({
+    where: { clubId, playerId: { in: playerIds } },
+    select: { playerId: true, rating: true },
+  });
+  return Object.fromEntries(rows.map((r) => [r.playerId, r.rating]));
+}
+
+function teamsSortedByTournamentRating<T extends TeamWithPlayers>(
+  teams: T[],
+  ratingSource: TournamentRatingSource,
+  clubPlayerRatings: Record<string, number>,
+): T[] {
+  const rated = teams.map(
+    (team) => applyTournamentRatingsToTeam(team, ratingSource, clubPlayerRatings) ?? team,
+  );
+  return [...rated].sort((a, b) => teamRating(b) - teamRating(a));
+}
+
+async function seedTeamsByTournamentRating<T extends TeamWithPlayers>(
+  db: Db,
+  tournament: { clubId: string; ratingSource?: TournamentRatingSource | null },
+  teams: T[],
+): Promise<T[]> {
+  const playerIds = teams.flatMap((team) =>
+    [team.player1.id, team.player2?.id].filter((id): id is string => Boolean(id)),
+  );
+  const clubPlayerRatings = await loadClubPlayerRatingsMap(
+    db,
+    tournament.clubId,
+    playerIds,
+  );
+  const source = tournament.ratingSource ?? "CLUB";
+  return teamsSortedByTournamentRating(teams, source, clubPlayerRatings);
+}
 
 async function assertParticipantCountForFormat(format: string, count: number) {
   const rules = await getResolvedParticipantRules(format);
@@ -1087,7 +1137,7 @@ export async function generatePairBracket(db: Db, tournamentId: string) {
 
   await assertParticipantCountForFormat(tournament.format, teams.length);
 
-  const seeded = [...teams].sort((a, b) => teamRating(b) - teamRating(a));
+  const seeded = await seedTeamsByTournamentRating(db, tournament, teams);
   await assignSeeds(db, tournamentId, seeded);
 
   await db.tournamentMatch.deleteMany({ where: { tournamentId } });
@@ -1204,9 +1254,7 @@ export async function generateSoloOlympicBracket(db: Db, tournamentId: string) {
 
   await assertParticipantCountForFormat(tournament.format, teams.length);
 
-  const seeded = [...teams].sort(
-    (a, b) => teamRating(b) - teamRating(a),
-  );
+  const seeded = await seedTeamsByTournamentRating(db, tournament, teams);
   await assignSeeds(db, tournamentId, seeded);
 
   await db.tournamentMatch.deleteMany({ where: { tournamentId } });
@@ -1268,6 +1316,12 @@ async function seedTeamsForFixedSwiss(
     await ensureSoloTeams(db, tournamentId);
   }
 
+  const tournament = await db.tournament.findUnique({
+    where: { id: tournamentId },
+    select: { clubId: true, ratingSource: true },
+  });
+  if (!tournament) throw new Error("Турнир не найден");
+
   const teams = await db.tournamentTeam.findMany({
     where: { tournamentId, status: "CONFIRMED" },
     include: { player1: true, player2: true },
@@ -1282,7 +1336,7 @@ async function seedTeamsForFixedSwiss(
     );
   }
 
-  const seeded = [...teams].sort((a, b) => teamRating(b) - teamRating(a));
+  const seeded = await seedTeamsByTournamentRating(db, tournament, teams);
   await assignSeeds(db, tournamentId, seeded);
   return seeded;
 }
@@ -1448,8 +1502,22 @@ export async function generateSwissRound(db: Db, tournamentId: string) {
     opponents.get(match.team2Id)?.add(match.team1Id);
   }
 
+  const playerIds = teams.flatMap((team) =>
+    [team.player1.id, team.player2?.id].filter((id): id is string => Boolean(id)),
+  );
+  const clubPlayerRatings = await loadClubPlayerRatingsMap(
+    db,
+    tournament.clubId,
+    playerIds,
+  );
+  const ratingSource = tournament.ratingSource ?? "CLUB";
+  const ratedTeams = teams.map(
+    (team) =>
+      applyTournamentRatingsToTeam(team, ratingSource, clubPlayerRatings) ?? team,
+  );
+
   const pairings = buildSwissPairings(
-    teams.map((team) => ({
+    ratedTeams.map((team) => ({
       teamId: team.id,
       rating: teamRating(team),
       points: team.swissPoints,

@@ -35,7 +35,8 @@ export function ClubOwnerTournamentManagePage({
 }) {
   const { tid: tournamentId } = useParams<{ tid: string }>();
   const router = useRouter();
-  const clubPlayerRatings = useClubPlayerRatings(clubId);
+  const [ratingsRefreshKey, setRatingsRefreshKey] = useState(0);
+  const clubPlayerRatings = useClubPlayerRatings(clubId, ratingsRefreshKey);
   const [tournament, setTournament] = useState<AdminTournament | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,7 @@ export function ClubOwnerTournamentManagePage({
     }
     setTournament(data);
     setPublishWithoutNotifications(data.suppressNotifications === true);
+    setRatingsRefreshKey((n) => n + 1);
   }, [clubId, router, tournamentId]);
 
   const handlePlayerCreated = useCallback(

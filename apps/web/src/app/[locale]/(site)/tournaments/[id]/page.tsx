@@ -21,8 +21,10 @@ import { findPublicTournamentById } from "@/lib/tournament-public-read";
 import { formatRatingRange } from "@/lib/play-listing-display";
 import {
   getEffectivePlayerRatingForTournament,
+  loadClubPlayerRatingsMap,
   playerRatingExceedsTournamentMax,
 } from "@/lib/tournament-rating-limit-server";
+import { applyTournamentRatingsToPlayers } from "@/lib/tournament-rating-display";
 import { formatRating } from "@/lib/rating";
 import { getLocalizedBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import type { AdminTournament } from "@/lib/tournament-admin";
@@ -193,7 +195,11 @@ export default async function TournamentPage({
   const formatLabels = await getLocalizedBracketFormatLabels(locale);
   const formatDisplay = formatLabels[tournament.format] ?? tournament.format;
 
-  const adminTournament = tournament as unknown as AdminTournament;
+  const clubPlayerRatings = await loadClubPlayerRatingsMap(tournament.clubId);
+  const adminTournament = applyTournamentRatingsToPlayers(
+    tournament as unknown as AdminTournament,
+    clubPlayerRatings,
+  );
   const standings = buildPublicTournamentStandings(adminTournament);
   const participants = buildParticipantRows(
     adminTournament,

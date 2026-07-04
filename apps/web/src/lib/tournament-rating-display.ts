@@ -78,6 +78,47 @@ export function applyTournamentRatingsToTeam<T extends TeamWithPlayers>(
   };
 }
 
+/** Подставляет эффективный рейтинг турнира (клубный / общий) во всех игроках. */
+export function applyTournamentRatingsToPlayers<
+  T extends {
+    registrations: { player: { id: string; rating: number } }[];
+    teams: TeamWithPlayers[];
+    matches: {
+      team1: TeamWithPlayers | null;
+      team2: TeamWithPlayers | null;
+      winnerTeam: TeamWithPlayers | null;
+    }[];
+    ratingSource?: TournamentRatingSource;
+  },
+>(tournament: T, clubPlayerRatings: Record<string, number> = {}): T {
+  const source = tournament.ratingSource ?? "CLUB";
+  const mapPlayer = <P extends { id: string; rating: number }>(player: P): P => ({
+    ...player,
+    rating: effectiveTournamentPlayerRating(
+      player.rating,
+      clubPlayerRatings[player.id],
+      source,
+    ),
+  });
+  const mapTeam = <Team extends TeamWithPlayers>(team: Team): Team =>
+    applyTournamentRatingsToTeam(team, source, clubPlayerRatings) ?? team;
+
+  return {
+    ...tournament,
+    registrations: tournament.registrations.map((r) => ({
+      ...r,
+      player: mapPlayer(r.player),
+    })),
+    teams: tournament.teams.map(mapTeam),
+    matches: tournament.matches.map((m) => ({
+      ...m,
+      team1: m.team1 ? mapTeam(m.team1) : null,
+      team2: m.team2 ? mapTeam(m.team2) : null,
+      winnerTeam: m.winnerTeam ? mapTeam(m.winnerTeam) : null,
+    })),
+  };
+}
+
 export function playerExceedsTournamentRatingMax(
   systemRating: number,
   ratingMax: number | null | undefined,

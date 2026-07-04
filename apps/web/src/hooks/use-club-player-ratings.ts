@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-/** playerId → клубный рейтинг */
-export function useClubPlayerRatings(clubId: string) {
+/** playerId → клубный рейтинг. `refreshKey` — перезагрузка после смены рейтингов. */
+export function useClubPlayerRatings(clubId: string, refreshKey = 0) {
   const [ratings, setRatings] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function useClubPlayerRatings(clubId: string) {
     return () => {
       cancelled = true;
     };
-  }, [clubId]);
+  }, [clubId, refreshKey]);
 
   return ratings;
 }

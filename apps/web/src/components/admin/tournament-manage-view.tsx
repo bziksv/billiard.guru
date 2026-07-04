@@ -22,6 +22,7 @@ import { describeHandicap } from "@/lib/handicap";
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
 import {
+  applyTournamentRatingsToPlayers,
   applyTournamentRatingsToTeam,
   TOURNAMENT_RATING_SOURCE_OPTIONS,
   type TournamentRatingSource,
@@ -498,11 +499,17 @@ export function TournamentManageView({
     });
   }
 
-  const pendingRegistrations = t.registrations.filter((r) => r.status === "PENDING");
-  const confirmedRegistrations = t.registrations.filter(
+  const ratedTournament = useMemo(
+    () => applyTournamentRatingsToPlayers(t, clubPlayerRatings ?? {}),
+    [t, clubPlayerRatings],
+  );
+  const pendingRegistrations = ratedTournament.registrations.filter(
+    (r) => r.status === "PENDING",
+  );
+  const confirmedRegistrations = ratedTournament.registrations.filter(
     (r) => r.status === "CONFIRMED",
   );
-  const otherRegistrations = t.registrations.filter(
+  const otherRegistrations = ratedTournament.registrations.filter(
     (r) => r.status !== "PENDING" && r.status !== "CONFIRMED",
   );
 
@@ -552,7 +559,9 @@ export function TournamentManageView({
   const dynamicSwiss = isDynamicSwissFormat(t.format);
   const fixedSwiss = isFixedSwissFormat(t.format);
   const olympic = isOlympicFormat(t.format);
-  const confirmedTeams = t.teams.filter((team) => team.status === "CONFIRMED");
+  const confirmedTeams = ratedTournament.teams.filter(
+    (team) => team.status === "CONFIRMED",
+  );
   // Для генерации сетки считаем «единицы сетки»: пары (PAIR_* или isPair) либо игроков.
   const confirmedCount = pair
     ? confirmedTeams.length
@@ -563,7 +572,10 @@ export function TournamentManageView({
   const currentRoundOpen = t.matches.some(
     (m) => m.round === maxRound && !m.winnerTeam && m.status !== "FINISHED",
   );
-  const protocolRows = useMemo(() => computeTournamentStandings(t), [t]);
+  const protocolRows = useMemo(
+    () => computeTournamentStandings(ratedTournament),
+    [ratedTournament],
+  );
   const rounds = useMemo(() => {
     const map = new Map<number, Match[]>();
     for (const match of t.matches) {
@@ -576,8 +588,10 @@ export function TournamentManageView({
   const finalRound = rounds.at(-1)?.[0];
   const bracketLocked = t.matches.length > 0;
   const registrationOpen = canOrganizerRegisterParticipants(t.status, bracketLocked);
-  const activeTeams = t.teams.filter((team) => team.status !== "CANCELLED");
-  const inactiveTeams = t.teams.filter(
+  const activeTeams = ratedTournament.teams.filter(
+    (team) => team.status !== "CANCELLED",
+  );
+  const inactiveTeams = ratedTournament.teams.filter(
     (team) => team.status === "CANCELLED" || team.status === "REJECTED",
   );
   const canModifyRegistrations = canCancelRegistration(

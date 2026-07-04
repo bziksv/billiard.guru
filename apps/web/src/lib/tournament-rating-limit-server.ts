@@ -31,6 +31,23 @@ export async function getEffectivePlayerRatingForTournament(
   return effectiveTournamentPlayerRating(systemRating, row?.rating, source);
 }
 
+/** playerId → клубный рейтинг для турнира клуба. */
+export async function loadClubPlayerRatingsMap(
+  clubId: string,
+  playerIds?: string[],
+): Promise<Record<string, number>> {
+  const rows = await prisma.clubPlayerRating.findMany({
+    where: {
+      clubId,
+      ...(playerIds && playerIds.length > 0
+        ? { playerId: { in: playerIds } }
+        : {}),
+    },
+    select: { playerId: true, rating: true },
+  });
+  return Object.fromEntries(rows.map((r) => [r.playerId, r.rating]));
+}
+
 export async function assertPlayerEligibleForTournamentRating(
   playerId: string,
   tournament: {
