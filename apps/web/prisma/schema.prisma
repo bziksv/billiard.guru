@@ -354,6 +354,8 @@ model Player {
   coachReviewCount Int      @default(0) @map("coach_review_count")
   role             UserRole @default(PLAYER)
   isVerified       Boolean  @default(false) @map("is_verified")
+  /** Самoregistrant отметил «владелец клуба» — клуб создаётся без ручного подтверждения админом. */
+  registerAsClubOwner Boolean @default(false) @map("register_as_club_owner")
   confirmToken     String?  @unique @map("confirm_token")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")

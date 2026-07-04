@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
     }
 
     const coords = await resolveClubCoordinates(data.address ?? null, data.cityId);
-    const confirmToken = randomUUID();
+    const autoVerifyClub = player.registerAsClubOwner;
+    const confirmToken = autoVerifyClub ? null : randomUUID();
 
     const club = await prisma.club.create({
       data: {
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
         latitude: coords.latitude,
         longitude: coords.longitude,
         confirmToken,
-        isVerified: false,
+        isVerified: autoVerifyClub,
       },
       include: { city: { include: { country: true } } },
     });
@@ -68,14 +69,16 @@ export async function POST(request: NextRequest) {
       payload: { name: club.name, ownerPhone: player.phone },
     });
 
-    const confirmLink = buildConfirmLink(confirmToken);
-    const telegram = await tryAutoSendClubConfirmTelegram(club.id, {
-      actorType: "player",
-      actorId: player.id,
-      action: "club.confirm.telegram_auto",
-    });
+    const confirmLink = confirmToken ? buildConfirmLink(confirmToken) : null;
+    const telegram = autoVerifyClub
+      ? { sent: false, reason: null as string | null }
+      : await tryAutoSendClubConfirmTelegram(club.id, {
+          actorType: "player",
+          actorId: player.id,
+          action: "club.confirm.telegram_auto",
+        });
     log.info(
-      { clubId: club.id, playerId: player.id, telegramSent: telegram.sent },
+      { clubId: club.id, playerId: player.id, telegramSent: telegram.sent, autoVerifyClub },
       "Owner club created",
     );
 
@@ -83,11 +86,14 @@ export async function POST(request: NextRequest) {
       {
         ...club,
         confirmLink,
+        autoVerified: autoVerifyClub,
         telegramSent: telegram.sent,
         telegramSentReason: telegram.reason ?? null,
-        message: telegram.sent
-          ? "Клуб создан. Подтверждение отправлено в Telegram."
-          : "Подтвердите клуб через Telegram",
+        message: autoVerifyClub
+          ? "Клуб создан и сразу доступен для управления."
+          : telegram.sent
+            ? "Клуб создан. Подтверждение отправлено в Telegram."
+            : "Подтвердите клуб через Telegram",
       },
       { status: 201 },
     );

@@ -58,10 +58,19 @@ function LoginForm() {
   const [callAuthEnabled, setCallAuthEnabled] = useState(false);
   const [polling, setPolling] = useState(false);
   const [consentAccepted, setConsentAccepted] = useState(false);
+  const [registerAsPlayer, setRegisterAsPlayer] = useState(true);
+  const [registerAsClubOwner, setRegisterAsClubOwner] = useState(false);
+  const [pendingClubOwnerRedirect, setPendingClubOwnerRedirect] = useState(false);
 
   const finishSession = useCallback(
-    (result: { role?: string; needsTelegram?: boolean }) => {
+    (result: { role?: string; needsTelegram?: boolean; registerAsClubOwner?: boolean }) => {
+      const wantsClubOwner = Boolean(result.registerAsClubOwner ?? pendingClubOwnerRedirect);
       const phoneOnlyAuth = isPhoneOnlyAuthCountry(countryName);
+      if (wantsClubOwner) {
+        router.replace("/manage/clubs/new");
+        router.refresh();
+        return;
+      }
       if (result.needsTelegram && !phoneOnlyAuth) {
         setStep("telegram_nudge");
         setChallengeToken(null);
@@ -77,7 +86,7 @@ function LoginForm() {
       );
       router.refresh();
     },
-    [next, router, countryName],
+    [next, router, countryName, pendingClubOwnerRedirect],
   );
 
   const applyCallLogin = useCallback((data: CallLoginPayload) => {
@@ -218,10 +227,15 @@ function LoginForm() {
       setError(t("errors.registerFields"));
       return;
     }
+    if (!registerAsPlayer && !registerAsClubOwner) {
+      setError(t("errors.roleRequired"));
+      return;
+    }
     if (!consentAccepted) {
       setError(t("errors.consentRequired"));
       return;
     }
+    setPendingClubOwnerRedirect(registerAsClubOwner);
     setLoading(true);
     setError(null);
 
@@ -235,6 +249,7 @@ function LoginForm() {
           firstName: firstName.trim(),
           lastName: lastName.trim(),
           locale,
+          registerAsClubOwner,
         }),
         signal: AbortSignal.timeout(20_000),
       });
@@ -309,9 +324,17 @@ function LoginForm() {
     setPolling(false);
     setError(null);
     setInfo(null);
+    setRegisterAsPlayer(true);
+    setRegisterAsClubOwner(false);
+    setPendingClubOwnerRedirect(false);
   }
 
   function goToCabinet() {
+    if (pendingClubOwnerRedirect) {
+      router.replace("/manage/clubs/new");
+      router.refresh();
+      return;
+    }
     router.push(next.startsWith("/admin") ? "/cabinet" : next || "/cabinet");
     router.refresh();
   }
@@ -419,6 +442,40 @@ function LoginForm() {
             onCountryChange={(c) => setCountryName(c?.nameRu ?? DEFAULT_PHONE_COUNTRY)}
             required
           />
+          <fieldset className="space-y-2 rounded-lg border border-[var(--border-subtle)] p-3">
+            <legend className="px-1 text-sm font-medium text-[var(--text-primary)]">
+              {t("registerRolesLegend")}
+            </legend>
+            <p className="text-xs text-[var(--text-muted)]">{t("registerRolesHint")}</p>
+            <label className="flex cursor-pointer items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={registerAsPlayer}
+                onChange={(e) => setRegisterAsPlayer(e.target.checked)}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="font-medium text-[var(--text-primary)]">{t("registerAsPlayer")}</span>
+                <span className="mt-0.5 block text-xs text-[var(--text-muted)]">
+                  {t("registerAsPlayerHint")}
+                </span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={registerAsClubOwner}
+                onChange={(e) => setRegisterAsClubOwner(e.target.checked)}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="font-medium text-[var(--text-primary)]">{t("registerAsClubOwner")}</span>
+                <span className="mt-0.5 block text-xs text-[var(--text-muted)]">
+                  {t("registerAsClubOwnerHint")}
+                </span>
+              </span>
+            </label>
+          </fieldset>
           {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <PersonalDataConsentCheckbox
             checked={consentAccepted}
@@ -427,7 +484,11 @@ function LoginForm() {
           />
           <button
             type="submit"
-            disabled={loading || !consentAccepted}
+            disabled={
+              loading ||
+              !consentAccepted ||
+              (!registerAsPlayer && !registerAsClubOwner)
+            }
             className="site-btn-primary w-full disabled:opacity-50"
           >
             {loading ? t("registering") : t("register")}

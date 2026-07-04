@@ -217,6 +217,7 @@ export async function registerPlayerByPhone(input: {
   email?: string;
   birthDate?: string;
   locale?: AppLocale;
+  registerAsClubOwner?: boolean;
 }) {
   const phoneResult = await normalizePhoneForCity(input.phone, input.cityId);
   if (phoneResult.error || !phoneResult.e164) {
@@ -234,6 +235,7 @@ export async function registerPlayerByPhone(input: {
     ...input,
     phone: phoneResult.e164,
     rating: 0,
+    registerAsClubOwner: input.registerAsClubOwner ?? false,
   });
 
   const cityCountry = (await resolveCountryName(input.cityId)) ?? "Россия";
@@ -262,6 +264,7 @@ export async function registerPlayerByPhone(input: {
         email: data.email || null,
         birthDate: data.birthDate ? new Date(data.birthDate) : null,
         confirmToken,
+        registerAsClubOwner: data.registerAsClubOwner,
       },
     });
 
@@ -301,6 +304,7 @@ export async function registerPlayerByPhone(input: {
       birthDate: data.birthDate ? new Date(data.birthDate) : null,
       rating: 0,
       confirmToken,
+      registerAsClubOwner: data.registerAsClubOwner,
     },
   });
 

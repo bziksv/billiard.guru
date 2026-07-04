@@ -204,6 +204,7 @@ export const playerRegisterSchema = z.object({
       "Некорректная дата",
     ),
   rating: z.coerce.number().min(0).multipleOf(0.5).default(0),
+  registerAsClubOwner: z.boolean().optional().default(false),
 });
 
 export const playerUpdateSchema = z.object({

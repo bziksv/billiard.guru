@@ -401,12 +401,19 @@ function TournamentRow({
   tournament: AdminTournament;
   clubId: string;
 }) {
+  const tournamentHref = `/manage/clubs/${clubId}/tournaments/${t.id}`;
+
   return (
     <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-semibold">{t.name}</h3>
+            <Link
+              href={tournamentHref}
+              className="font-semibold hover:text-emerald-400 hover:underline"
+            >
+              {t.name}
+            </Link>
             <StatusBadge
               status={t.status}
               label={TOURNAMENT_STATUS_LABELS[t.status] ?? t.status}
@@ -423,7 +430,7 @@ function TournamentRow({
           )}
         </div>
         <Link
-          href={`/manage/clubs/${clubId}/tournaments/${t.id}`}
+          href={tournamentHref}
           className="rounded-lg border border-zinc-700 px-4 py-2 text-sm hover:border-emerald-600"
         >
           Управление

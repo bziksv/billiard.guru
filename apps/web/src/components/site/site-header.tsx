@@ -21,7 +21,9 @@ export async function SiteHeader() {
       ? ownedClubs.length === 1
         ? `/manage/clubs/${ownedClubs[0]!.id}`
         : "/manage"
-      : null;
+      : player?.registerAsClubOwner && player.isVerified
+        ? "/manage/clubs/new"
+        : null;
 
   return (
     <header className="site-header-shell overflow-visible border-b backdrop-blur-xl backdrop-saturate-150">

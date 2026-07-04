@@ -63,6 +63,7 @@ export type PlayerMinAggregateOutputType = {
   coachReviewCount: number | null
   role: $Enums.UserRole | null
   isVerified: boolean | null
+  registerAsClubOwner: boolean | null
   confirmToken: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -93,6 +94,7 @@ export type PlayerMaxAggregateOutputType = {
   coachReviewCount: number | null
   role: $Enums.UserRole | null
   isVerified: boolean | null
+  registerAsClubOwner: boolean | null
   confirmToken: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -124,6 +126,7 @@ export type PlayerCountAggregateOutputType = {
   coachReviewCount: number
   role: number
   isVerified: number
+  registerAsClubOwner: number
   confirmToken: number
   createdAt: number
   updatedAt: number
@@ -168,6 +171,7 @@ export type PlayerMinAggregateInputType = {
   coachReviewCount?: true
   role?: true
   isVerified?: true
+  registerAsClubOwner?: true
   confirmToken?: true
   createdAt?: true
   updatedAt?: true
@@ -198,6 +202,7 @@ export type PlayerMaxAggregateInputType = {
   coachReviewCount?: true
   role?: true
   isVerified?: true
+  registerAsClubOwner?: true
   confirmToken?: true
   createdAt?: true
   updatedAt?: true
@@ -229,6 +234,7 @@ export type PlayerCountAggregateInputType = {
   coachReviewCount?: true
   role?: true
   isVerified?: true
+  registerAsClubOwner?: true
   confirmToken?: true
   createdAt?: true
   updatedAt?: true
@@ -347,6 +353,7 @@ export type PlayerGroupByOutputType = {
   coachReviewCount: number
   role: $Enums.UserRole
   isVerified: boolean
+  registerAsClubOwner: boolean
   confirmToken: string | null
   createdAt: Date
   updatedAt: Date
@@ -401,6 +408,7 @@ export type PlayerWhereInput = {
   coachReviewCount?: Prisma.IntFilter<"Player"> | number
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
+  registerAsClubOwner?: Prisma.BoolFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableFilter<"Player"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
@@ -451,6 +459,7 @@ export type PlayerOrderByWithRelationInput = {
   coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  registerAsClubOwner?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -506,6 +515,7 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   coachReviewCount?: Prisma.IntFilter<"Player"> | number
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
+  registerAsClubOwner?: Prisma.BoolFilter<"Player"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   city?: Prisma.XOR<Prisma.CityScalarRelationFilter, Prisma.CityWhereInput>
@@ -555,6 +565,7 @@ export type PlayerOrderByWithAggregationInput = {
   coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  registerAsClubOwner?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -594,6 +605,7 @@ export type PlayerScalarWhereWithAggregatesInput = {
   coachReviewCount?: Prisma.IntWithAggregatesFilter<"Player"> | number
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
+  registerAsClubOwner?: Prisma.BoolWithAggregatesFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableWithAggregatesFilter<"Player"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Player"> | Date | string
@@ -624,6 +636,7 @@ export type PlayerCreateInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -674,6 +687,7 @@ export type PlayerUncheckedCreateInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -722,6 +736,7 @@ export type PlayerUpdateInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -772,6 +787,7 @@ export type PlayerUncheckedUpdateInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -821,6 +837,7 @@ export type PlayerCreateManyInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -851,6 +868,7 @@ export type PlayerUpdateManyMutationInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -882,6 +900,7 @@ export type PlayerUncheckedUpdateManyInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -939,6 +958,7 @@ export type PlayerCountOrderByAggregateInput = {
   coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  registerAsClubOwner?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -975,6 +995,7 @@ export type PlayerMaxOrderByAggregateInput = {
   coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  registerAsClubOwner?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -1005,6 +1026,7 @@ export type PlayerMinOrderByAggregateInput = {
   coachReviewCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isVerified?: Prisma.SortOrder
+  registerAsClubOwner?: Prisma.SortOrder
   confirmToken?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -1357,6 +1379,7 @@ export type PlayerCreateWithoutCityInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1405,6 +1428,7 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1483,6 +1507,7 @@ export type PlayerScalarWhereInput = {
   coachReviewCount?: Prisma.IntFilter<"Player"> | number
   role?: Prisma.EnumUserRoleFilter<"Player"> | $Enums.UserRole
   isVerified?: Prisma.BoolFilter<"Player"> | boolean
+  registerAsClubOwner?: Prisma.BoolFilter<"Player"> | boolean
   confirmToken?: Prisma.StringNullableFilter<"Player"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Player"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Player"> | Date | string
@@ -1513,6 +1538,7 @@ export type PlayerCreateWithoutClubStaffInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1562,6 +1588,7 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1625,6 +1652,7 @@ export type PlayerUpdateWithoutClubStaffInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1674,6 +1702,7 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1721,6 +1750,7 @@ export type PlayerCreateWithoutTableBookingsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1770,6 +1800,7 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1833,6 +1864,7 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1882,6 +1914,7 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1929,6 +1962,7 @@ export type PlayerCreateWithoutClubNewsAuthoredInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1978,6 +2012,7 @@ export type PlayerUncheckedCreateWithoutClubNewsAuthoredInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2041,6 +2076,7 @@ export type PlayerUpdateWithoutClubNewsAuthoredInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2090,6 +2126,7 @@ export type PlayerUncheckedUpdateWithoutClubNewsAuthoredInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2137,6 +2174,7 @@ export type PlayerCreateWithoutSiteNewsAuthoredInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2186,6 +2224,7 @@ export type PlayerUncheckedCreateWithoutSiteNewsAuthoredInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2249,6 +2288,7 @@ export type PlayerUpdateWithoutSiteNewsAuthoredInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2298,6 +2338,7 @@ export type PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2345,6 +2386,7 @@ export type PlayerCreateWithoutPageViewsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2394,6 +2436,7 @@ export type PlayerUncheckedCreateWithoutPageViewsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2457,6 +2500,7 @@ export type PlayerUpdateWithoutPageViewsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2506,6 +2550,7 @@ export type PlayerUncheckedUpdateWithoutPageViewsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2553,6 +2598,7 @@ export type PlayerCreateWithoutNotificationPreferencesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2602,6 +2648,7 @@ export type PlayerUncheckedCreateWithoutNotificationPreferencesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2665,6 +2712,7 @@ export type PlayerUpdateWithoutNotificationPreferencesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2714,6 +2762,7 @@ export type PlayerUncheckedUpdateWithoutNotificationPreferencesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2761,6 +2810,7 @@ export type PlayerCreateWithoutCoachReviewsReceivedInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2810,6 +2860,7 @@ export type PlayerUncheckedCreateWithoutCoachReviewsReceivedInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2862,6 +2913,7 @@ export type PlayerCreateWithoutCoachReviewsGivenInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2911,6 +2963,7 @@ export type PlayerUncheckedCreateWithoutCoachReviewsGivenInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2974,6 +3027,7 @@ export type PlayerUpdateWithoutCoachReviewsReceivedInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3023,6 +3077,7 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3081,6 +3136,7 @@ export type PlayerUpdateWithoutCoachReviewsGivenInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3130,6 +3186,7 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsGivenInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3177,6 +3234,7 @@ export type PlayerCreateWithoutClubRatingsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3226,6 +3284,7 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3289,6 +3348,7 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3338,6 +3398,7 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3385,6 +3446,7 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3434,6 +3496,7 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3497,6 +3560,7 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3546,6 +3610,7 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3593,6 +3658,7 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3642,6 +3708,7 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3694,6 +3761,7 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3743,6 +3811,7 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -3806,6 +3875,7 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3855,6 +3925,7 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3913,6 +3984,7 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -3962,6 +4034,7 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4009,6 +4082,7 @@ export type PlayerCreateWithoutRegistrationsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4058,6 +4132,7 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4121,6 +4196,7 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4170,6 +4246,7 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4217,6 +4294,7 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4266,6 +4344,7 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4329,6 +4408,7 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4378,6 +4458,7 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4425,6 +4506,7 @@ export type PlayerCreateWithoutIdeasInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4474,6 +4556,7 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4537,6 +4620,7 @@ export type PlayerUpdateWithoutIdeasInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4586,6 +4670,7 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4633,6 +4718,7 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4682,6 +4768,7 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4745,6 +4832,7 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4794,6 +4882,7 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -4841,6 +4930,7 @@ export type PlayerCreateWithoutPlayListingsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4890,6 +4980,7 @@ export type PlayerUncheckedCreateWithoutPlayListingsInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -4953,6 +5044,7 @@ export type PlayerUpdateWithoutPlayListingsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5002,6 +5094,7 @@ export type PlayerUncheckedUpdateWithoutPlayListingsInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5049,6 +5142,7 @@ export type PlayerCreateWithoutPlayListingResponsesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -5098,6 +5192,7 @@ export type PlayerUncheckedCreateWithoutPlayListingResponsesInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -5161,6 +5256,7 @@ export type PlayerUpdateWithoutPlayListingResponsesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5210,6 +5306,7 @@ export type PlayerUncheckedUpdateWithoutPlayListingResponsesInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5257,6 +5354,7 @@ export type PlayerCreateManyCityInput = {
   coachReviewCount?: number
   role?: $Enums.UserRole
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -5287,6 +5385,7 @@ export type PlayerUpdateWithoutCityInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5335,6 +5434,7 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5383,6 +5483,7 @@ export type PlayerUncheckedUpdateManyWithoutCityInput = {
   coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
   isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
   confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -5598,6 +5699,7 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   coachReviewCount?: boolean
   role?: boolean
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -5651,12 +5753,13 @@ export type PlayerSelectScalar = {
   coachReviewCount?: boolean
   role?: boolean
   isVerified?: boolean
+  registerAsClubOwner?: boolean
   confirmToken?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "firstNameLatin" | "lastNameLatin" | "middleNameLatin" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "aboutEn" | "isCoach" | "coachBio" | "coachBioEn" | "coachGalleryUrls" | "coachReviewAvg" | "coachReviewCount" | "role" | "isVerified" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
+export type PlayerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "middleName" | "firstNameLatin" | "lastNameLatin" | "middleNameLatin" | "cityId" | "phone" | "email" | "birthDate" | "photoUrl" | "telegramId" | "telegramUsername" | "rating" | "about" | "aboutEn" | "isCoach" | "coachBio" | "coachBioEn" | "coachGalleryUrls" | "coachReviewAvg" | "coachReviewCount" | "role" | "isVerified" | "registerAsClubOwner" | "confirmToken" | "createdAt" | "updatedAt", ExtArgs["result"]["player"]>
 export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   city?: boolean | Prisma.CityDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Player$registrationsArgs<ExtArgs>
@@ -5729,6 +5832,10 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     coachReviewCount: number
     role: $Enums.UserRole
     isVerified: boolean
+    /**
+     * * Самoregistrant отметил «владелец клуба» — клуб создаётся без ручного подтверждения админом.
+     */
+    registerAsClubOwner: boolean
     confirmToken: string | null
     createdAt: Date
     updatedAt: Date
@@ -6145,6 +6252,7 @@ export interface PlayerFieldRefs {
   readonly coachReviewCount: Prisma.FieldRef<"Player", 'Int'>
   readonly role: Prisma.FieldRef<"Player", 'UserRole'>
   readonly isVerified: Prisma.FieldRef<"Player", 'Boolean'>
+  readonly registerAsClubOwner: Prisma.FieldRef<"Player", 'Boolean'>
   readonly confirmToken: Prisma.FieldRef<"Player", 'String'>
   readonly createdAt: Prisma.FieldRef<"Player", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Player", 'DateTime'>

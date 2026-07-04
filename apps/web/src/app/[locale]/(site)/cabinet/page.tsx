@@ -10,6 +10,7 @@ import { SiteCard } from "@/components/site/site-card";
 import { Link } from "@/i18n/navigation";
 import { redirect as nextRedirect } from "next/navigation";
 import { getCurrentPlayer, isSuperAdmin } from "@/lib/auth";
+import { getAccessibleOwnedClubs } from "@/lib/club-owner-access";
 import { localizedClubName } from "@/lib/latin-names";
 import { localizedGeoName } from "@/lib/geo-display";
 import { resolveLocalizedField } from "@/lib/localized-db-text";
@@ -29,6 +30,11 @@ export default async function CabinetPage() {
   const player = await getCurrentPlayer();
   if (!player) {
     nextRedirect("/login?next=/cabinet");
+  }
+
+  const ownedClubs = await getAccessibleOwnedClubs();
+  if (player.registerAsClubOwner && player.isVerified && ownedClubs.length === 0) {
+    nextRedirect("/manage/clubs/new");
   }
 
   const registrations = await prisma.tournamentRegistration.findMany({
@@ -120,6 +126,23 @@ export default async function CabinetPage() {
             <Link href={`/players/${player.id}`} className="site-btn-secondary">
               {tc("publicProfile")}
             </Link>
+            {ownedClubs.length > 0 && (
+              <Link
+                href={
+                  ownedClubs.length === 1
+                    ? `/manage/clubs/${ownedClubs[0]!.id}`
+                    : "/manage"
+                }
+                className="site-btn-primary"
+              >
+                {tc("manageClub")}
+              </Link>
+            )}
+            {player.registerAsClubOwner && ownedClubs.length === 0 && player.isVerified && (
+              <Link href="/manage/clubs/new" className="site-btn-primary">
+                {tc("createClub")}
+              </Link>
+            )}
             {isSuperAdmin(player.role) && (
               <Link href="/admin" className="site-btn-primary">
                 {t("nav.admin")}

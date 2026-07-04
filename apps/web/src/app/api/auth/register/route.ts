@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
       email,
       birthDate,
       locale: localeRaw,
+      registerAsClubOwner,
     } = body;
     const locale = parseApiLocale(localeRaw);
 
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
       email: email ? String(email) : undefined,
       birthDate: birthDate ? String(birthDate) : undefined,
       locale,
+      registerAsClubOwner: registerAsClubOwner === true,
     });
 
     if (error) {

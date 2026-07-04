@@ -16,18 +16,22 @@ export default async function ManageLayout({
 
   const clubs = await getAccessibleOwnedClubs();
   if (clubs.length === 0) {
-    redirect("/cabinet");
+    return (
+      <div className="admin-app min-h-screen p-4 lg:p-6">
+        {children}
+      </div>
+    );
   }
 
   return (
     <>
-    <ManageShell
-      userName={`${player.lastName} ${player.firstName}`}
-      clubs={clubs}
-    >
-      {children}
-    </ManageShell>
-    <PageviewBeacon surface="MANAGE" />
+      <ManageShell
+        userName={`${player.lastName} ${player.firstName}`}
+        clubs={clubs}
+      >
+        {children}
+      </ManageShell>
+      <PageviewBeacon surface="MANAGE" />
     </>
   );
 }

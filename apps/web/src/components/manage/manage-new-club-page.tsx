@@ -54,6 +54,11 @@ export function ManageNewClubPage({ ownerPhone }: ManageNewClubPageProps) {
       setError(data.error ?? "Ошибка");
       return;
     }
+    if (data.autoVerified || data.isVerified) {
+      router.push(`/manage/clubs/${data.id}`);
+      router.refresh();
+      return;
+    }
     setConfirmLink(data.confirmLink ?? null);
     setTelegramSent(data.telegramSent ?? null);
     setTelegramSentReason(data.telegramSentReason ?? null);

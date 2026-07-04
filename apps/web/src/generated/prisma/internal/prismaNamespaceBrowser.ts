@@ -252,6 +252,7 @@ export const PlayerScalarFieldEnum = {
   coachReviewCount: 'coachReviewCount',
   role: 'role',
   isVerified: 'isVerified',
+  registerAsClubOwner: 'registerAsClubOwner',
   confirmToken: 'confirmToken',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

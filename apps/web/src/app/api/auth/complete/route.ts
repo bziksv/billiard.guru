@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       role: player.role,
       needsTelegram,
+      registerAsClubOwner: player.registerAsClubOwner,
       player: {
         id: player.id,
         firstName: player.firstName,
