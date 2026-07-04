@@ -514,7 +514,6 @@ export function TournamentParticipantRegistrationPanel({
               }
               searchPlaceholder="Поиск игрока…"
               disabled={slotsLeft <= 0}
-              dropdownClassName="absolute z-50 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
               maxSelectable={slotsLeft > 0 ? slotsLeft : undefined}
             />
           ) : (

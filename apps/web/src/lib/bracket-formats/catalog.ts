@@ -1,5 +1,6 @@
 import {
   FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
+  FIXED_SWISS_8R2_1_3_mesto_FORMAT_LABEL,
   FIXED_SWISS_16_8_FORMAT_LABEL,
   FIXED_SWISS_16_BRONZE_FORMAT_LABEL,
   FIXED_SWISS_16R2_1_3_mesto_FORMAT_LABEL,
@@ -22,6 +23,7 @@ export type BracketFormatCode =
   | "OLYMPIC"
   | "OLYMPIC_1L_BRONZE"
   | "FIXED_SWISS_8R4_1_3_mesto"
+  | "FIXED_SWISS_8R2_1_3_mesto"
   | "FIXED_SWISS_16R4_2_3_mesta"
   | "FIXED_SWISS_16R4_1_3_mesto"
   | "FIXED_SWISS_16R2_1_3_mesto"
@@ -128,6 +130,22 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     ],
   },
   {
+    code: "FIXED_SWISS_8R2_1_3_mesto",
+    adminLabel: FIXED_SWISS_8R2_1_3_mesto_FORMAT_LABEL,
+    pairing: "single",
+    layout: "swiss_fixed",
+    shortDescription:
+      "14 встреч — олимпийка с 1/2: #7–#8 полуфинал, нижняя сетка #5–#12, #13 за 3–4, #14 финал.",
+    guideSectionId: "swiss-fixed-bronze",
+    docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
+    implementation: [
+      "fixed-swiss-ts-grid.ts — buildFixedSwissTs8R2ElimAtSemiBronzeTemplate",
+      "fixed-swiss-layout.ts — buildTsPositions8R2ElimAtSemiBronze",
+      "swiss-bracket-view.tsx",
+    ],
+    testCommand: "cd apps/web && npx tsx scripts/test-fixed-swiss-layout.ts",
+  },
+  {
     code: "FIXED_SWISS_8R4_1_3_mesto",
     adminLabel: FIXED_SWISS_8_4_BRONZE_FORMAT_LABEL,
     pairing: "single",
@@ -167,7 +185,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     layout: "swiss_fixed",
     isReference: true,
     shortDescription:
-      "Копия FIXED_SWISS (27 встреч) — та же сетка 16→8, oлимпийka с 1/4, проигравшие полуфиналисты делят 3-е место без доп. игры.",
+      "Копия FIXED_SWISS (27 встреч) — та же сетка 16→8, олимпийка с 1/4, проигравшие полуфиналисты делят 3-е место без доп. игры.",
     guideSectionId: "swiss-fixed",
     docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
     implementation: [
@@ -184,7 +202,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     layout: "swiss_fixed",
     isReference: true,
     shortDescription:
-      "Копия FIXED_SWISS_16_BRONZE (28 встреч) — та же сетка 16→8, oлимпийka с 1/4 + матч #28 за 3–4.",
+      "Копия FIXED_SWISS_16_BRONZE (28 встреч) — та же сетка 16→8, олимпийка с 1/4 + матч #28 за 3–4.",
     guideSectionId: "swiss-fixed-bronze",
     docPaths: ["docs/BRACKET_REFERENCE_16_8.md"],
     implementation: [
@@ -317,7 +335,7 @@ export const BRACKET_FORMAT_CATALOG: BracketFormatDefinition[] = [
     pairing: "single",
     layout: "swiss_fixed",
     shortDescription:
-      "456 встреч — oлимпийka с 1/16, #456 бронза под финалом; 5 нижних туров.",
+      "456 встреч — олимпийка с 1/16, #456 бронза под финалом; 5 нижних туров.",
     guideSectionId: "swiss-fixed-256-r8-1-3",
     docPaths: ["docs/FIXED_SWISS_128R8_1_3_mesto.md"],
     implementation: [...TS256_R8_ELIM_BRONZE_IMPL],

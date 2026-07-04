@@ -1,0 +1,43 @@
+---
+description: Щадящий запуск dev-сервера — не забивать RAM
+alwaysApply: true
+---
+
+# Dev-сервер: щадящий режим
+
+Агент **никогда** не запускает голый `npm run dev` (Turbopack без лимита RAM). Только **`npm run dev:lite`**.
+
+## Команда
+
+```bash
+cd ~/Documents/projects/setka/apps/web && npm run dev:lite
+```
+
+- **Webpack** вместо Turbopack (`--webpack`) — меньше пиковая память на Mac.
+- **Лимит heap Node:** 2048 МБ (`NODE_OPTIONS=--max-old-space-size=2048`).
+
+Порт **3010**, URL: http://localhost:3010
+
+## Перед запуском
+
+1. Проверь terminals — сервер уже не крутится на 3010.
+2. Если есть старый `next dev` — останови (kill по pid), не дублируй процессы.
+
+## После запуска
+
+1. Дождись строки `Ready` в логе (не дергай сайт во время `Compiling…`).
+2. Проверка одним запросом с таймаутом, не параллельно с первой компиляцией:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" --max-time 120 http://localhost:3010/
+```
+
+3. Кратко сообщи, что сервер поднят в lite-режиме.
+
+## Перезапуск
+
+См. `dev-server-restart.mdc`, но всегда **`dev:lite`**, не `dev`.
+
+## Пользователь сам
+
+Если нужен полный Turbopack (быстрее HMR, больше RAM) — пользователь запускает `npm run dev` в своём терминале.

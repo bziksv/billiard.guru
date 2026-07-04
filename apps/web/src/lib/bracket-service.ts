@@ -1302,6 +1302,7 @@ async function seedTeamsForFixedSwiss(
     !isPair &&
     (format === "FIXED_SWISS" ||
     format === "FIXED_SWISS_8R4_1_3_mesto" ||
+    format === "FIXED_SWISS_8R2_1_3_mesto" ||
     format === "FIXED_SWISS_16_BRONZE" ||
     format === "FIXED_SWISS_16R4_2_3_mesta" ||
     format === "FIXED_SWISS_16R4_1_3_mesto" ||

@@ -18,13 +18,13 @@ alwaysApply: true
 
 1. Проверь папку terminals — есть ли `npm run dev` в `apps/web`
 2. Останови старый процесс (Ctrl+C или kill по pid)
-3. Запусти заново:
+3. Запусти заново в **щадящем режиме** (см. `dev-server-lite.mdc`):
 
 ```bash
-cd ~/Documents/projects/setka/apps/web && npm run dev
+cd ~/Documents/projects/setka/apps/web && npm run dev:lite
 ```
 
-Порт: **3010**. URL: http://localhost:3010
+Порт: **3010**. URL: http://localhost:3010. Агент — только `dev:lite`, не `dev`.
 
 ## После перезапуска
 

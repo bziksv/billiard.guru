@@ -6,6 +6,7 @@ import {
   buildFixedSwissTs32R8ElimAtEighthBronzeTemplate,
   buildFixedSwissTs16R2ElimAtSemiTemplate,
   buildFixedSwissTs16R2ElimAtSemiBronzeTemplate,
+  buildFixedSwissTs8R2ElimAtSemiBronzeTemplate,
   buildFixedSwissTs64R8ElimAtEighthTemplate,
   buildFixedSwissTs64R8ElimAtEighthBronzeTemplate,
   buildFixedSwissTs128R8ElimAtEighthTemplate,
@@ -25,6 +26,9 @@ import {
   isFixedSwissTs16R2ElimAtSemiBronzeMatchCount,
   isFixedSwissTs16R2ElimAtSemiFamily,
   isFixedSwissTs16R2ChartFromMatches,
+  isFixedSwissTs8R2ElimAtSemiBronzeMatchCount,
+  isFixedSwissTs8R2ChartFromMatches,
+  fixedSwissTs8R2MatchNo,
   isFixedSwissTs64R8ElimAtEighthMatchCount,
   isFixedSwissTs64R8ElimAtEighthBronzeMatchCount,
   isFixedSwissTs64R8ElimAtEighthFamily,
@@ -64,10 +68,14 @@ export {
   buildFixedSwissTs32R8ElimAtEighthBronzeTemplate,
   buildFixedSwissTs16R2ElimAtSemiTemplate,
   buildFixedSwissTs16R2ElimAtSemiBronzeTemplate,
+  buildFixedSwissTs8R2ElimAtSemiBronzeTemplate,
   isFixedSwissTs16R2ElimAtSemiMatchCount,
   isFixedSwissTs16R2ElimAtSemiBronzeMatchCount,
   isFixedSwissTs16R2ElimAtSemiFamily,
   isFixedSwissTs16R2ChartFromMatches,
+  isFixedSwissTs8R2ElimAtSemiBronzeMatchCount,
+  isFixedSwissTs8R2ChartFromMatches,
+  fixedSwissTs8R2MatchNo,
   buildFixedSwissTs64R8ElimAtEighthTemplate,
   buildFixedSwissTs64R8ElimAtEighthBronzeTemplate,
   buildFixedSwissTs128R8ElimAtEighthTemplate,
@@ -145,7 +153,9 @@ export function fixedSwissNominalGridSize(
   }
   if (
     format === "FIXED_SWISS_8R4_1_3_mesto" ||
-    format === "FIXED_PAIR_SWISS_8R4_1_3_mesto"
+    format === "FIXED_PAIR_SWISS_8R4_1_3_mesto" ||
+    format === "FIXED_SWISS_8R2_1_3_mesto" ||
+    format === "FIXED_PAIR_SWISS_8R2_1_3_mesto"
   ) {
     return 8;
   }
@@ -596,13 +606,19 @@ export function buildFixedSwissTemplate(
 
   if (gridSize === 8) {
     if (
+      format === "FIXED_SWISS_8R2_1_3_mesto" ||
+      format === "FIXED_PAIR_SWISS_8R2_1_3_mesto"
+    ) {
+      return buildFixedSwissTs8R2ElimAtSemiBronzeTemplate();
+    }
+    if (
       format === "FIXED_SWISS_8R4_1_3_mesto" ||
       format === "FIXED_PAIR_SWISS_8R4_1_3_mesto"
     ) {
       return buildFixedSwissTsTemplateForGridSize(8, true);
     }
     throw new Error(
-      "Фиксированная швейцарская сетка на 8: доступен только формат с матчем за 3–4",
+      "Фиксированная швейцарская сетка на 8: доступны форматы 8R4 и 8R2 с матчем за 3–4",
     );
   }
 
@@ -947,7 +963,10 @@ export function fixedSwissMatchNo(
   if (isFixedSwissTs16R2ElimAtSemiFamily(matchCount, maxRound, matches)) {
     return fixedSwissTsLegacy29MatchNo(round, slot);
   }
-  if (isFixedSwissTs84BronzeMatchCount(matchCount)) {
+  if (isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount, maxRound, matches)) {
+    return fixedSwissTs8R2MatchNo(round, slot);
+  }
+  if (isFixedSwissTs84BronzeMatchCount(matchCount, maxRound, matches)) {
     return fixedSwissTsBronzeMatchNoForHalf2(round, slot, 4);
   }
   if (isFixedSwissTs84MatchCount(matchCount, maxRound)) {
@@ -987,6 +1006,9 @@ export function fixedSwissProtocolPlace(
   maxRound?: number,
 ): FixedSwissProtocolPlaceResult | null {
   if (role === "winner") {
+    if (isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount, maxRound)) {
+      return fixedSwissProtocolPlace8R2Elim(matchNo, role);
+    }
     if (isFixedSwissTsLegacy29MatchCount(matchCount) && matchNo === 29) {
       return protocolExact(1);
     }
@@ -1157,6 +1179,10 @@ export function fixedSwissProtocolPlace(
       role,
       isFixedSwissTs16R2ElimAtSemiBronzeMatchCount(matchCount, maxRound),
     );
+  }
+
+  if (isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount, maxRound)) {
+    return fixedSwissProtocolPlace8R2Elim(matchNo, role);
   }
 
   if (isOutdatedFixedSwiss32Bracket(matchCount)) {
@@ -1393,6 +1419,26 @@ function fixedSwissProtocolPlace32(
   return null;
 }
 
+function fixedSwissProtocolPlace8R2Elim(
+  matchNo: number,
+  role: "winner" | "loser",
+): FixedSwissProtocolPlaceResult | null {
+  if (role === "winner") {
+    if (matchNo === 14) return protocolExact(1);
+    return null;
+  }
+
+  if (matchNo === 14) return protocolExact(2);
+  if (matchNo === 13) return protocolExact(3);
+  if (matchNo === 11) return null;
+  if (matchNo === 12) return protocolExact(4);
+  if (matchNo === 5) return protocolExact(7);
+  if (matchNo === 6) return protocolExact(8);
+  if (matchNo === 9) return protocolExact(5);
+  if (matchNo === 10) return protocolExact(6);
+  return null;
+}
+
 function fixedSwissProtocolPlace16R2Elim(
   matchNo: number,
   role: "winner" | "loser",
@@ -1499,6 +1545,9 @@ export function getFixedSwissLinksForGrid(
   matchCount?: number,
   maxRound?: number,
 ): FixedSwissLink[] {
+  if (gridSize === 8 && isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount ?? 0, maxRound)) {
+    return buildFixedSwissTs8R2ElimAtSemiBronzeTemplate().links;
+  }
   if (gridSize === 8 && matchCount === 14) {
     return buildFixedSwissTsTemplateForGridSize(8, true).links;
   }

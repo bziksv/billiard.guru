@@ -2,6 +2,7 @@ import {
   fixedSwissMatchNo,
   fixedSwissProtocolPlace,
 } from "@/lib/fixed-swiss-grid";
+import { isFixedSwissTs8R2ElimAtSemiBronzeMatchCount } from "@/lib/fixed-swiss-ts-grid";
 import {
   isFixedSwissFormat,
   isOlympicBronzeFormat,
@@ -368,6 +369,22 @@ function computeFixedSwissStandings(t: AdminTournament): TournamentStandingRow[]
       standings.push(
         standingFromTeam(t, team, result.place, undefined, result.placeTo ?? null),
       );
+    }
+  }
+
+  const confirmedCount = confirmed.length;
+  if (
+    confirmedCount > 0 &&
+    confirmedCount < 8 &&
+    isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount, maxRound, t.matches)
+  ) {
+    for (const row of standings) {
+      if (row.place != null && row.place > confirmedCount) {
+        row.place = confirmedCount;
+      }
+      if (row.placeTo != null && row.placeTo > confirmedCount) {
+        row.placeTo = confirmedCount;
+      }
     }
   }
 

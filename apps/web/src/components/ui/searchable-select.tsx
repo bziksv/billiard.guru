@@ -321,7 +321,9 @@ export function SearchableMultiSelect({
 }: SearchableMultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [menuPos, setMenuPos] = useState<FloatingMenuPosition | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
 
@@ -329,12 +331,32 @@ export function SearchableMultiSelect({
 
   const filtered = useMemo(() => filterOptions(options, query), [options, query]);
 
+  useLayoutEffect(() => {
+    if (!open) {
+      setMenuPos(null);
+      return;
+    }
+
+    function update() {
+      setMenuPos(measureFloatingMenu(inputRef.current));
+    }
+
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open, filtered.length]);
+
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (!containerRef.current?.contains(e.target as Node)) {
-        setOpen(false);
-        setQuery("");
-      }
+      const target = e.target as Node;
+      if (containerRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
+      setOpen(false);
+      setQuery("");
     }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -430,75 +452,90 @@ export function SearchableMultiSelect({
           }}
           className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
         />
-        {open && !disabled && (
-          <ul
-            id={listId}
-            role="listbox"
-            aria-multiselectable
-            className={
-              dropdownClassName ??
-              "absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
-            }
-          >
-            {filtered.length > 0 && (
-              <li className="sticky top-0 z-10 flex gap-2 border-b border-zinc-800 bg-zinc-900 px-2 py-1.5">
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={selectAllFiltered}
-                  className="rounded px-2 py-1 text-xs text-emerald-400 hover:bg-zinc-800"
-                >
-                  Выбрать все в списке
-                </button>
-                <button
-                  type="button"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={clearFiltered}
-                  className="rounded px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-800"
-                >
-                  Снять в списке
-                </button>
-              </li>
-            )}
-            {filtered.length === 0 ? (
-              <li className="px-3 py-2 text-sm text-zinc-500">Ничего не найдено</li>
-            ) : (
-              filtered.map((option) => {
-                const checked = selectedSet.has(option.value);
-                const atLimit =
-                  maxSelectable != null &&
-                  !checked &&
-                  values.length >= maxSelectable;
-                return (
-                  <li key={option.value}>
-                    <button
-                      type="button"
-                      role="option"
-                      aria-selected={checked}
-                      disabled={option.disabled || atLimit}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => toggle(option)}
-                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 ${
-                        checked ? "bg-zinc-800 text-emerald-400" : "text-zinc-200"
-                      }`}
-                    >
-                      <span
-                        className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
-                          checked
-                            ? "border-emerald-500 bg-emerald-600 text-[10px] text-white"
-                            : "border-zinc-600"
+        {open &&
+          !disabled &&
+          menuPos &&
+          typeof document !== "undefined" &&
+          createPortal(
+            <ul
+              ref={menuRef}
+              id={listId}
+              role="listbox"
+              aria-multiselectable
+              style={{
+                position: "fixed",
+                top: menuPos.top,
+                bottom: menuPos.bottom,
+                left: menuPos.left,
+                width: menuPos.width,
+                maxHeight: menuPos.maxHeight,
+                zIndex: MENU_Z_INDEX,
+              }}
+              className={
+                dropdownClassName ??
+                "overflow-auto rounded-lg border border-zinc-700 bg-zinc-900 py-1 shadow-xl"
+              }
+            >
+              {filtered.length > 0 && (
+                <li className="sticky top-0 z-10 flex gap-2 border-b border-zinc-800 bg-zinc-900 px-2 py-1.5">
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={selectAllFiltered}
+                    className="rounded px-2 py-1 text-xs text-emerald-400 hover:bg-zinc-800"
+                  >
+                    Выбрать все в списке
+                  </button>
+                  <button
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={clearFiltered}
+                    className="rounded px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-800"
+                  >
+                    Снять в списке
+                  </button>
+                </li>
+              )}
+              {filtered.length === 0 ? (
+                <li className="px-3 py-2 text-sm text-zinc-500">Ничего не найдено</li>
+              ) : (
+                filtered.map((option) => {
+                  const checked = selectedSet.has(option.value);
+                  const atLimit =
+                    maxSelectable != null &&
+                    !checked &&
+                    values.length >= maxSelectable;
+                  return (
+                    <li key={option.value}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={checked}
+                        disabled={option.disabled || atLimit}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => toggle(option)}
+                        className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 ${
+                          checked ? "bg-zinc-800 text-emerald-400" : "text-zinc-200"
                         }`}
                       >
-                        {checked ? "✓" : ""}
-                      </span>
-                      {option.label}
-                    </button>
-                  </li>
-                );
-              })
-            )}
-          </ul>
-        )}
+                        <span
+                          className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border ${
+                            checked
+                              ? "border-emerald-500 bg-emerald-600 text-[10px] text-white"
+                              : "border-zinc-600"
+                          }`}
+                        >
+                          {checked ? "✓" : ""}
+                        </span>
+                        {option.label}
+                      </button>
+                    </li>
+                  );
+                })
+              )}
+            </ul>,
+            document.body,
+          )}
       </div>
       {selectedLabels.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">

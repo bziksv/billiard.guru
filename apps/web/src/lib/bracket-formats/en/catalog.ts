@@ -5,6 +5,8 @@ export const BRACKET_SHORT_DESCRIPTION_EN: Record<BracketFormatCode, string> = {
     "Elimination after one loss; semifinal losers share 3rd place with no extra match.",
   OLYMPIC_1L_BRONZE:
     "Same single-elimination bracket as the shared-3rd variant, plus a match between semifinal losers for 3rd–4th place.",
+  FIXED_SWISS_8R2_1_3_mesto:
+    "8-player bracket (SF) + bronze — 14 matches, #13 3rd place, #14 final",
   FIXED_SWISS_8R4_1_3_mesto:
     "8-player copy of the 16R4 bronze format — 14 matches (13 + #14 for 3rd–4th), knockout from QF.",
   FIXED_SWISS_16R4_2_3_mesta:

@@ -458,7 +458,131 @@ export function buildFixedSwissTs16R2ElimAtSemiBronzeTemplate(): FixedSwissTempl
   return buildFixedSwissTs16R2ElimAtSemiBronzeCore();
 }
 
-/** 27 встреч / 5 туров — oлимпийka с 1/2, без доп.игры. */
+/** 8→4 (14 встреч): олимпийка с 1/2 — #7–#8 полуфинал, #13 за 3–4, #14 финал. */
+function buildFixedSwissTs8R2ElimAtSemiBronzeCore(): FixedSwissTemplate {
+  const matches: BracketMatchInput[] = [];
+
+  for (let slot = 1; slot <= 4; slot++) {
+    matches.push({ round: 1, slot, team1Id: null, team2Id: null });
+  }
+  for (let slot = 1; slot <= 4; slot++) {
+    matches.push({ round: 2, slot, team1Id: null, team2Id: null });
+  }
+  for (let slot = 1; slot <= 3; slot++) {
+    matches.push({ round: 3, slot, team1Id: null, team2Id: null });
+  }
+  matches.push({ round: 4, slot: 1, team1Id: null, team2Id: null });
+  matches.push({ round: 5, slot: 1, team1Id: null, team2Id: null });
+  matches.push({ round: 5, slot: 2, team1Id: null, team2Id: null });
+
+  const links: FixedSwissLink[] = [];
+
+  for (let slot = 1; slot <= 4; slot++) {
+    const toTeam = slotParityTeam(slot);
+    links.push({
+      fromRound: 1,
+      fromSlot: slot,
+      kind: "win",
+      toRound: 2,
+      toSlot: 2 + Math.ceil(slot / 2),
+      toTeam,
+    });
+    links.push({
+      fromRound: 1,
+      fromSlot: slot,
+      kind: "loss",
+      toRound: 2,
+      toSlot: Math.ceil(slot / 2),
+      toTeam,
+    });
+  }
+
+  for (let slot = 1; slot <= 2; slot++) {
+    links.push({
+      fromRound: 2,
+      fromSlot: slot,
+      kind: "win",
+      toRound: 3,
+      toSlot: slot,
+      toTeam: 2,
+    });
+  }
+
+  for (let slot = 3; slot <= 4; slot++) {
+    const k = slot - 2;
+    const toTeam = slotParityTeam(slot);
+    links.push({
+      fromRound: 2,
+      fromSlot: slot,
+      kind: "win",
+      toRound: 3,
+      toSlot: 3,
+      toTeam,
+    });
+    links.push({
+      fromRound: 2,
+      fromSlot: slot,
+      kind: "loss",
+      toRound: 3,
+      toSlot: k,
+      toTeam: fixedSwissCrossUpperLossTeam(k),
+    });
+  }
+
+  links.push({ fromRound: 3, fromSlot: 1, kind: "win", toRound: 4, toSlot: 1, toTeam: 1 });
+  links.push({ fromRound: 3, fromSlot: 2, kind: "win", toRound: 4, toSlot: 1, toTeam: 2 });
+  links.push({ fromRound: 3, fromSlot: 3, kind: "win", toRound: 5, toSlot: 1, toTeam: 1 });
+  links.push({ fromRound: 3, fromSlot: 3, kind: "loss", toRound: 5, toSlot: 2, toTeam: 1 });
+  links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 5, toSlot: 2, toTeam: 2 });
+  links.push({ fromRound: 5, fromSlot: 2, kind: "win", toRound: 5, toSlot: 1, toTeam: 2 });
+
+  return {
+    gridSize: 8,
+    rounds: 5,
+    matchesPerRound: 4,
+    matches,
+    links,
+    variant: "ts84r2elimbronze",
+  };
+}
+
+export function buildFixedSwissTs8R2ElimAtSemiBronzeTemplate(): FixedSwissTemplate {
+  return buildFixedSwissTs8R2ElimAtSemiBronzeCore();
+}
+
+export function isFixedSwissTs8R2ChartFromMatches(
+  matches: Array<{ round: number }>,
+): boolean {
+  return (
+    matches.filter((m) => m.round === 3).length === 3 &&
+    matches.some((m) => m.round === 5)
+  );
+}
+
+export function isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(
+  matchCount: number,
+  maxRound?: number,
+  matches?: Array<{ round: number }>,
+): boolean {
+  if (matchCount !== 14) return false;
+  if (matches && matches.length > 0) {
+    return isFixedSwissTs8R2ChartFromMatches(matches);
+  }
+  return maxRound !== undefined && maxRound >= 5;
+}
+
+export function fixedSwissTs8R2MatchNo(round: number, slot: number): number {
+  if (round === 1) return slot;
+  if (round === 2 && slot <= 2) return 4 + slot;
+  if (round === 2) return slot + 4;
+  if (round === 3) return 8 + slot;
+  if (round === 4) return 12;
+  if (round === 5 && slot === 2) return 13;
+  if (round === 5 && slot === 1) return 14;
+  throw new Error(`Некорректный слот TS 8R2: тур ${round}, слот ${slot}`);
+}
+
+/** 27 встреч / 5 туров — олимпийка с 1/2, без доп.игры. */
 export function isFixedSwissTs16R2ElimAtSemiMatchCount(
   matchCount: number,
   maxRound?: number,
@@ -1884,8 +2008,13 @@ export function fixedSwissTs32StageByMatchNo(no: number): string | null {
   return null;
 }
 
-export function isFixedSwissTs84BronzeMatchCount(matchCount: number): boolean {
-  return matchCount === 14;
+export function isFixedSwissTs84BronzeMatchCount(
+  matchCount: number,
+  maxRound?: number,
+  matches?: Array<{ round: number }>,
+): boolean {
+  if (matchCount !== 14) return false;
+  return !isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount, maxRound, matches);
 }
 
 export function isFixedSwissTs84MatchCount(

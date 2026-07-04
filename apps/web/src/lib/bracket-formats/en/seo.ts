@@ -164,6 +164,8 @@ export const BRACKET_FORMAT_SEO_EN: Record<BracketFormatCode, BracketFormatSeoEn
       "3rd place match R16",
     ],
   },
+  FIXED_SWISS_8R2_1_3_mesto:
+    "8-player bracket (SF) + bronze — 14 matches, #13 3rd place, #14 final",
   FIXED_SWISS_8R4_1_3_mesto: {
     code: "FIXED_SWISS_8R4_1_3_mesto",
     slug: "setka-8-chelovek-1-4-s-bronzoy",

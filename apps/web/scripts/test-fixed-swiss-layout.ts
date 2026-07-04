@@ -42,6 +42,7 @@ import {
   fixedSwissEdgeToY,
   fixedSwissTs28PlacementByMatchNo,
   fixedSwissTs16R2ElimPlacementByMatchNo,
+  fixedSwissTs8R2ElimPlacementByMatchNo,
   fixedSwissTs32MatchCol,
   fixedSwissTs32PlacementByMatchNo,
   fixedSwissTs32R8ElimPlacementByMatchNo,
@@ -416,6 +417,107 @@ assert.equal(
   14,
   "FIXED_SWISS_8R4_1_3_mesto: 14 встреч",
 );
+assert.equal(
+  buildFixedSwissTemplate(8, "FIXED_SWISS_8R2_1_3_mesto").matches.length,
+  14,
+  "FIXED_SWISS_8R2_1_3_mesto: 14 встреч",
+);
+{
+  const tpl8R2 = buildFixedSwissTemplate(8, "FIXED_SWISS_8R2_1_3_mesto");
+  const r2Links = tpl8R2.links;
+  assert.equal(fixedSwissMatchNo(2, 3, 14, 5, tpl8R2.matches), 7, "8R2: #7 полуфинал");
+  assert.equal(fixedSwissMatchNo(3, 3, 14, 5, tpl8R2.matches), 11, "8R2: #11 перед финалом");
+  assert.equal(fixedSwissMatchNo(5, 1, 14, 5, tpl8R2.matches), 14, "8R2: #14 финал");
+  assert.equal(fixedSwissMatchNo(5, 2, 14, 5, tpl8R2.matches), 13, "8R2: #13 bronze");
+  const loss7 = r2Links.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 3 && l.kind === "loss",
+  );
+  assert.equal(loss7?.toRound, 3);
+  assert.equal(loss7?.toSlot, 1);
+  assert.equal(
+    fixedSwissMatchNo(loss7!.fromRound, loss7!.fromSlot, 14, 5, tpl8R2.matches),
+    7,
+    "8R2: проигравший #7 → #9",
+  );
+  const loss11 = r2Links.find(
+    (l) => l.fromRound === 3 && l.fromSlot === 3 && l.kind === "loss",
+  );
+  assert.equal(loss11?.toRound, 5);
+  assert.equal(loss11?.toSlot, 2);
+  const win13 = tpl8R2.links.find(
+    (l) =>
+      l.fromRound === 5 &&
+      l.fromSlot === 2 &&
+      l.toRound === 5 &&
+      l.toSlot === 1 &&
+      l.kind === "win",
+  );
+  assert.ok(win13, "8R2: победитель #13 → #14");
+  assert.equal(win13?.toTeam, 2, "8R2: #13 winner → #14 team2");
+  assertProtocolPlace(14, "winner", 14, { place: 1 }, 5);
+  assertProtocolPlace(14, "loser", 14, { place: 2 }, 5);
+  assertProtocolPlace(13, "winner", 14, null, 5);
+  assertProtocolPlace(13, "loser", 14, { place: 3 }, 5);
+  assertProtocolPlace(12, "loser", 14, { place: 4 }, 5);
+  assertProtocolPlace(9, "loser", 14, { place: 5 }, 5);
+  assertProtocolPlace(10, "loser", 14, { place: 6 }, 5);
+  assertProtocolPlace(5, "loser", 14, { place: 7 }, 5);
+  assertProtocolPlace(6, "loser", 14, { place: 8 }, 5);
+  assert.equal(fixedSwissTs8R2ElimPlacementByMatchNo(7), "полуфинал");
+  assert.equal(fixedSwissTs8R2ElimPlacementByMatchNo(13), "матч за 3–4 место");
+  const mk8R2 = tpl8R2.matches.map((m) => ({
+    id: `r${m.round}s${m.slot}`,
+    round: m.round,
+    slot: m.slot,
+    team1: null,
+    team2: null,
+  }));
+  assertAllWinEdgesDrawn(mk8R2, 14, 5, "8R2_1_3");
+  assert.equal(
+    shouldDrawFixedSwissWinEdge(1, 2, 2, 3, "win", 4, 3, 14, 5),
+    true,
+    "8R2 SVG: #8 → #11",
+  );
+  assert.equal(
+    shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 1, 1, 14, 5),
+    true,
+    "8R2 SVG: #9 → #12",
+  );
+  assert.equal(
+    shouldDrawFixedSwissWinEdge(-2, -3, 3, 4, "win", 2, 1, 14, 5),
+    true,
+    "8R2 SVG: #10 → #12",
+  );
+  assert.equal(
+    shouldDrawFixedSwissWinEdge(2, 3, 3, 5, "win", 3, 1, 14, 5),
+    true,
+    "8R2 SVG: #11 → #14",
+  );
+  assert.equal(
+    shouldDrawFixedSwissWinEdge(-3, 3, 4, 5, "win", 1, 2, 14, 5),
+    false,
+    "8R2 SVG: #12 → #13 без линии (только подпись)",
+  );
+  const win12to13 = r2Links.find(
+    (l) =>
+      l.fromRound === 4 &&
+      l.fromSlot === 1 &&
+      l.toRound === 5 &&
+      l.toSlot === 2 &&
+      l.kind === "win",
+  );
+  assert.ok(win12to13, "8R2: link #12 → #13");
+  assert.equal(
+    isFixedSwissWinLinkFooterOnly(win12to13!, 14, 5),
+    true,
+    "8R2: #12 → #13 footer-only",
+  );
+  assert.equal(
+    shouldDrawFixedSwissWinEdge(3, 3, 5, 5, "win", 2, 1, 14, 5),
+    true,
+    "8R2 SVG: #13 → #14",
+  );
+}
 assert.equal(inferFixedSwissGridSize(14), 8);
 assert.equal(inferFixedSwissGridSize(13), 8);
 assert.equal(isFixedSwissTsBronzeMatchCount(14), true);
@@ -979,7 +1081,7 @@ assert.equal(
 assert.equal(
   buildFixedSwissTemplate(12, "FIXED_SWISS_32R8").matches.length,
   59,
-  "legacy FIXED_SWISS_32R8: oлимпийka с 1/8",
+  "legacy FIXED_SWISS_32R8: олимпийка с 1/8",
 );
 assert.equal(
   buildFixedSwissTemplate(12, "FIXED_SWISS_32R8_2_3_mesta").matches.length,

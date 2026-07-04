@@ -54,6 +54,8 @@ export const BRACKET_INDEX_TEASER_EN: Record<string, string> = {
   SWISS: "Many games for everyone — round pairings follow the standings.",
   FIXED_SWISS: "Ready-made bracket for 16 players, up to two losses.",
   FIXED_SWISS_16_BRONZE: "16-player bracket with a proper 3rd/4th place resolution.",
+  FIXED_SWISS_8R2_1_3_mesto:
+    "8-player bracket (SF) + bronze — 14 matches, #13 3rd place, #14 final",
   FIXED_SWISS_8R4_1_3_mesto:
     "8 players, quarterfinal start, and match #14 for bronze between semifinal losers.",
   FIXED_SWISS_16R4_2_3_mesta:

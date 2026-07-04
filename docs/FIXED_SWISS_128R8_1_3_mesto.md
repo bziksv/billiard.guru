@@ -205,7 +205,7 @@ cd apps/web && npx tsx scripts/simulate-fixed-swiss-tournament.ts --format FIXED
 
 ## Масштабирование на 256
 
-См. формат **`FIXED_SWISS_256R8_1_3_mesto`** — half1=64, half2=128, **455/456** встреч, oлимпийka с **1/16** (не 1/8).
+См. формат **`FIXED_SWISS_256R8_1_3_mesto`** — half1=64, half2=128, **455/456** встреч, олимпийка с **1/16** (не 1/8).
 
 | Параметр | 128R8 | 256 R16 |
 |----------|-------|---------|
