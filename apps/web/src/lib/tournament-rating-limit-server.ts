@@ -1,9 +1,11 @@
 import { formatRating } from "@/lib/rating";
 import { prisma } from "@/lib/prisma";
 import {
+  applyTournamentRatingsToPlayers,
   effectiveTournamentPlayerRating,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
+import type { TeamWithPlayers } from "@/lib/pair-tournament";
 
 export function playerRatingExceedsTournamentMax(
   effectiveRating: number,
@@ -46,6 +48,25 @@ export async function loadClubPlayerRatingsMap(
     select: { playerId: true, rating: true },
   });
   return Object.fromEntries(rows.map((r) => [r.playerId, r.rating]));
+}
+
+/** Для API управления турниром: эффективные рейтинги + карта клубных. */
+export async function withTournamentEffectiveRatings<
+  T extends {
+    clubId: string;
+    ratingSource?: TournamentRatingSource;
+    registrations: { player: { id: string; rating: number } }[];
+    teams: TeamWithPlayers[];
+    matches: {
+      team1: TeamWithPlayers | null;
+      team2: TeamWithPlayers | null;
+      winnerTeam: TeamWithPlayers | null;
+    }[];
+  },
+>(tournament: T): Promise<T & { clubPlayerRatings: Record<string, number> }> {
+  const clubPlayerRatings = await loadClubPlayerRatingsMap(tournament.clubId);
+  const rated = applyTournamentRatingsToPlayers(tournament, clubPlayerRatings);
+  return { ...rated, clubPlayerRatings };
 }
 
 export async function assertPlayerEligibleForTournamentRating(

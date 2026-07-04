@@ -21,6 +21,7 @@ import {
 } from "@/lib/tournament-manage";
 import { assertTournamentFitsFormat } from "@/lib/tournament-participant-limit-server";
 import { reopenTournamentIfBracketEmpty } from "@/lib/tournament-registration-server";
+import { withTournamentEffectiveRatings } from "@/lib/tournament-rating-limit-server";
 import {
   sanitizeTournamentTableStreams,
   tableStreamsToJson,
@@ -51,9 +52,10 @@ export async function GET(
     }
 
     const participantRules = await getResolvedParticipantRules(tournament.format);
+    const rated = await withTournamentEffectiveRatings(tournament);
 
     return NextResponse.json(
-      await withTournamentFormatLabel({ ...tournament, participantRules }),
+      await withTournamentFormatLabel({ ...rated, participantRules }),
     );
   } catch (error) {
     const authResp = authErrorResponse(error);

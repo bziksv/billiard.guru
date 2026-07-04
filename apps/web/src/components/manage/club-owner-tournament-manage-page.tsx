@@ -12,7 +12,6 @@ import {
   countConfirmedParticipants,
   type AdminTournament,
 } from "@/lib/tournament-admin";
-import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
 import { formatTournamentPlayerSelectLabel } from "@/lib/tournament-rating-display";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
@@ -26,6 +25,18 @@ interface Player {
   city?: { nameRu: string; country?: { nameRu: string } | null } | null;
 }
 
+type TournamentManagePayload = AdminTournament & {
+  clubPlayerRatings?: Record<string, number>;
+};
+
+function splitTournamentPayload(data: TournamentManagePayload) {
+  const { clubPlayerRatings, ...tournament } = data;
+  return {
+    tournament,
+    clubPlayerRatings: clubPlayerRatings ?? {},
+  };
+}
+
 export function ClubOwnerTournamentManagePage({
   clubId,
   clubName,
@@ -35,8 +46,7 @@ export function ClubOwnerTournamentManagePage({
 }) {
   const { tid: tournamentId } = useParams<{ tid: string }>();
   const router = useRouter();
-  const [ratingsRefreshKey, setRatingsRefreshKey] = useState(0);
-  const clubPlayerRatings = useClubPlayerRatings(clubId, ratingsRefreshKey);
+  const [clubPlayerRatings, setClubPlayerRatings] = useState<Record<string, number>>({});
   const [tournament, setTournament] = useState<AdminTournament | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,9 +73,11 @@ export function ClubOwnerTournamentManagePage({
       router.replace(`/manage/clubs/${clubId}/tournaments`);
       return;
     }
-    setTournament(data);
-    setPublishWithoutNotifications(data.suppressNotifications === true);
-    setRatingsRefreshKey((n) => n + 1);
+    const { tournament: nextTournament, clubPlayerRatings: nextRatings } =
+      splitTournamentPayload(data);
+    setTournament(nextTournament);
+    setClubPlayerRatings(nextRatings);
+    setPublishWithoutNotifications(nextTournament.suppressNotifications === true);
   }, [clubId, router, tournamentId]);
 
   const handlePlayerCreated = useCallback(
@@ -89,8 +101,11 @@ export function ClubOwnerTournamentManagePage({
         router.replace(`/manage/clubs/${clubId}/tournaments`);
         return;
       }
-      setTournament(t);
-      setPublishWithoutNotifications(t.suppressNotifications === true);
+      const { tournament: nextTournament, clubPlayerRatings: nextRatings } =
+        splitTournamentPayload(t);
+      setTournament(nextTournament);
+      setClubPlayerRatings(nextRatings);
+      setPublishWithoutNotifications(nextTournament.suppressNotifications === true);
       setPlayers(Array.isArray(p) ? p : []);
       setLoading(false);
     });
