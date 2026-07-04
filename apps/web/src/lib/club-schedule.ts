@@ -231,7 +231,24 @@ function formatIndexRange(start: number, end: number, locale: ScheduleLocale): s
   return `${labels[startDay]}–${labels[endDay]}`;
 }
 
-export function formatHoursSlot(slot: WeeklyHoursSlot): string {
+/** Круглосуточно: 00:00–00:00 с закрытием после полуночи (конец суток = полночь). */
+export function isRoundTheClockSlot(slot: WeeklyHoursSlot): boolean {
+  if (slot.open !== "00:00" || slot.close !== "00:00") return false;
+  const closeM = timeToMinutes(slot.close);
+  const openM = timeToMinutes(slot.open);
+  return slot.closesAfterMidnight ?? closeM <= openM;
+}
+
+export function roundTheClockHoursLabel(locale: ScheduleLocale = "ru"): string {
+  return locale === "en" ? "Open 24 hours" : "Круглосуточно";
+}
+
+export function roundTheClockOpenDetail(locale: ScheduleLocale = "ru"): string {
+  return locale === "en" ? "Open 24 hours" : "Открыто круглосуточно";
+}
+
+export function formatHoursSlot(slot: WeeklyHoursSlot, locale: ScheduleLocale = "ru"): string {
+  if (isRoundTheClockSlot(slot)) return roundTheClockHoursLabel(locale);
   return `${slot.open} – ${slot.close}`;
 }
 
@@ -239,7 +256,7 @@ export function scheduleRows(slots: WeeklyHoursSlot[], today: Weekday, locale: S
   return slots.map((slot) => ({
     key: `${slot.days.join("-")}-${slot.open}-${slot.close}`,
     daysLabel: formatDayRange(slot.days, locale),
-    hoursLabel: formatHoursSlot(slot),
+    hoursLabel: formatHoursSlot(slot, locale),
     isToday: slot.days.includes(today),
   }));
 }
@@ -259,16 +276,18 @@ export function getClubOpenStatus(
   for (const slot of slots) {
     const interval = activeIntervalForSlot(slot, today, minutesNow, timeZone, now);
     if (interval?.isOpen) {
+      const roundTheClock = isRoundTheClockSlot(slot);
       return {
         isOpen: true,
         today,
         todayLabel: fullLabels[today],
         message: locale === "en" ? "Open now" : "Сейчас открыто",
-        detail:
-          locale === "en"
+        detail: roundTheClock
+          ? roundTheClockOpenDetail(locale)
+          : locale === "en"
             ? `Closes at ${interval.closesAt}`
             : `Закроется в ${interval.closesAt}`,
-        closesAt: interval.closesAt,
+        closesAt: roundTheClock ? undefined : interval.closesAt,
       };
     }
   }

@@ -128,9 +128,9 @@ export function BracketPresentationShell({
       </header>
       <div
         className={cn(
-          "bracket-presentation__content min-h-0 flex-1 overflow-hidden p-1.5 sm:p-2",
+          "bracket-presentation__content min-h-0 flex-1 p-1.5 sm:p-2",
           variant === "site" && "site-bracket-presentation__content",
-          contentClassName,
+          contentClassName ?? "overflow-auto",
         )}
       >
         {children}

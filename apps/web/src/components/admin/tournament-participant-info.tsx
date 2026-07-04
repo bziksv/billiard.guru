@@ -8,6 +8,7 @@ export function TournamentParticipantInfo({
   phone,
   telegramUsername,
   note,
+  hideRating,
 }: {
   lastName: string;
   firstName: string;
@@ -15,6 +16,7 @@ export function TournamentParticipantInfo({
   phone: string;
   telegramUsername?: string | null;
   note?: string | null;
+  hideRating?: boolean;
 }) {
   return (
     <div className="tournament-participant-info">
@@ -26,10 +28,12 @@ export function TournamentParticipantInfo({
       </div>
       <div className="tournament-participant-details">
         <PlayerContactLinks phone={phone} telegramUsername={telegramUsername} />
-        <span className="tournament-participant-rating" title="Рейтинг участника">
-          <span className="tournament-participant-rating-label">Рейтинг</span>
-          <span className="tournament-participant-rating-value">{formatRating(rating)}</span>
-        </span>
+        {!hideRating ? (
+          <span className="tournament-participant-rating" title="Рейтинг участника">
+            <span className="tournament-participant-rating-label">Рейтинг</span>
+            <span className="tournament-participant-rating-value">{formatRating(rating)}</span>
+          </span>
+        ) : null}
       </div>
     </div>
   );

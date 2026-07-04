@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { PlayerContactLinks } from "@/components/admin/player-contact-links";
 import { TournamentParticipantInfo } from "@/components/admin/tournament-participant-info";
+import { TournamentTeamRatingEditor } from "@/components/admin/tournament-team-rating-editor";
 import {
   buildMatchStartNowPayload,
   MatchResultModal,
@@ -1128,7 +1129,9 @@ export function TournamentManageView({
         onClose={() => setPresentationOpen(false)}
         tabs={manageTabStrip}
         contentClassName={
-          presentationContentIsBracket ? "flex flex-col" : "overflow-auto"
+          presentationContentIsBracket
+            ? "flex min-h-0 flex-col overflow-hidden"
+            : "overflow-auto"
         }
       >
         {!editing && participantRegistrationPanel}
@@ -1387,6 +1390,15 @@ function ParticipantsTab({
 
   const markAllFeeLabel = pair ? "команд" : "заявок";
 
+  const soloTeamByPlayerId = useMemo(() => {
+    const map = new Map<string, Team>();
+    for (const team of activeTeams) {
+      if (team.status !== "CONFIRMED" || team.player2) continue;
+      map.set(team.player1.id, team);
+    }
+    return map;
+  }, [activeTeams]);
+
   return (
     <div className="space-y-4">
       {t.isPair && (
@@ -1517,14 +1529,18 @@ function ParticipantsTab({
         <div>
           {bracketLocked && (
             <p className="tournament-bracket-locked-hint mb-2">
-              Сетка сформирована — состав участников зафиксирован, снять или добавить нельзя.
+              Сетка сформирована — состав участников зафиксирован, снять или добавить
+              нельзя. Рейтинг можно скорректировать (повлияет на фору в предстоящих
+              встречах).
             </p>
           )}
           <p className="tournament-section-label">
             Подтверждённые участники ({confirmedRegistrations.length})
           </p>
           <ul className="space-y-2">
-            {confirmedRegistrations.map((r, index) => (
+            {confirmedRegistrations.map((r, index) => {
+              const team = soloTeamByPlayerId.get(r.player.id);
+              return (
               <li key={r.id} className="tournament-participant-card">
                 <ParticipantIndex index={index + 1} />
                 <div className="tournament-participant-card-main">
@@ -1534,7 +1550,20 @@ function ParticipantsTab({
                     rating={r.player.rating}
                     phone={r.player.phone}
                     telegramUsername={r.player.telegramUsername}
+                    hideRating={Boolean(team)}
                   />
+                  {team ? (
+                    <div className="mt-2">
+                      <TournamentTeamRatingEditor
+                        teamId={team.id}
+                        baseRating={r.player.rating}
+                        ratingOverride={team.ratingOverride}
+                        bracketLocked={bracketLocked}
+                        onUpdated={onUpdated}
+                        resetHint={`сброс (${r.player.rating.toFixed(1)})`}
+                      />
+                    </div>
+                  ) : null}
                 </div>
                 <div className="tournament-participant-card-actions">
                   <FeePaidCheckbox checked disabled onChange={async () => {}} />
@@ -1553,7 +1582,8 @@ function ParticipantsTab({
                   )}
                 </div>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       )}

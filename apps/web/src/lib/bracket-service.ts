@@ -39,6 +39,7 @@ import {
   isOlympicBronzeFormat,
   isOlympicFormat,
   isOlympicPairFormat,
+  isPairFormat,
   isSwissFormat,
   isSwissPairFormat,
   usesFixedSwissGridEngine,
@@ -1229,6 +1230,15 @@ async function ensureSoloTeams(db: Db, tournamentId: string) {
     },
     data: { status: "CANCELLED" },
   });
+}
+
+/** Solo-команды (player1 без player2) для одиночных турниров — нужны для сетки и ratingOverride. */
+export async function syncSoloTeamsForTournament(
+  db: Db,
+  tournament: { id: string; isPair?: boolean | null; format: string },
+) {
+  if (tournament.isPair || isPairFormat(tournament.format)) return;
+  await ensureSoloTeams(db, tournament.id);
 }
 
 export async function generateSoloOlympicBracket(db: Db, tournamentId: string) {

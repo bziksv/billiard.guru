@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { TournamentTeamRatingEditor } from "@/components/admin/tournament-team-rating-editor";
 import type { AdminTournament } from "@/lib/tournament-admin";
 
 type PlayerLite = {
@@ -12,13 +13,6 @@ type PlayerLite = {
 
 function playerName(p: PlayerLite): string {
   return `${p.lastName} ${p.firstName}`.trim();
-}
-
-/** Привязка рейтинга к шагу 0,5 (рейтинги и фора всегда кратны 0,5). */
-function snapRating(value: string | number): string {
-  const n = typeof value === "number" ? value : Number(value);
-  if (!Number.isFinite(n)) return "";
-  return Math.max(0, Math.round(n * 2) / 2).toFixed(1);
 }
 
 /**
@@ -38,8 +32,6 @@ export function TournamentPairBuilder({
   const [overId, setOverId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Локальный черновик ввода рейтинга по парам (teamId → строка), пока поле в фокусе.
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const pairedPlayerIds = useMemo(() => {
     const ids = new Set<string>();
@@ -122,50 +114,6 @@ export function TournamentPairBuilder({
     } finally {
       setBusy(false);
     }
-  }
-
-  async function savePairRating(teamId: string, value: number | null) {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/tournaments/pairs", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ teamId, ratingOverride: value }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Не удалось изменить рейтинг пары");
-        return;
-      }
-      setDrafts((prev) => {
-        const next = { ...prev };
-        delete next[teamId];
-        return next;
-      });
-      await onUpdated();
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  /** Шаг ±0,5 от текущего эффективного рейтинга, сразу сохраняет. */
-  function stepRating(teamId: string, current: number, delta: number) {
-    void savePairRating(teamId, Number(snapRating(current + delta)));
-  }
-
-  /** Сохранить введённое в поле значение (по blur/Enter), если изменилось. */
-  function commitDraft(teamId: string, current: number) {
-    const raw = drafts[teamId];
-    if (raw === undefined) return;
-    const snapped = snapRating(raw);
-    setDrafts((prev) => {
-      const next = { ...prev };
-      delete next[teamId];
-      return next;
-    });
-    if (snapped === "" || Number(snapped) === current) return;
-    void savePairRating(teamId, Number(snapped));
   }
 
   function onDrop(targetId: string) {
@@ -269,12 +217,6 @@ export function TournamentPairBuilder({
             {pairs.map((team, index) => {
               const sumRating =
                 team.player1.rating + (team.player2?.rating ?? 0);
-              const hasOverride = team.ratingOverride != null;
-              const effectiveRating = hasOverride
-                ? (team.ratingOverride as number)
-                : sumRating;
-              const inputValue =
-                drafts[team.id] ?? effectiveRating.toFixed(1);
               return (
                 <li
                   key={team.id}
@@ -287,78 +229,18 @@ export function TournamentPairBuilder({
                       {" / "}
                       {team.player2?.lastName} {team.player2?.firstName}
                     </span>
-                    <span
-                      className="flex items-center gap-1"
-                      title={
-                        bracketLocked
-                          ? "Рейтинг пары (влияет на фору)"
-                          : "Рейтинг пары для посева"
-                      }
-                    >
-                      <span className="mr-0.5 text-xs text-zinc-500">
-                        рейтинг
-                      </span>
-                      <button
-                        type="button"
-                        disabled={busy}
-                        onClick={() =>
-                          stepRating(team.id, effectiveRating, -0.5)
-                        }
-                        aria-label="Уменьшить на 0,5"
-                        className="admin-btn admin-btn--outline px-2 py-0.5 text-xs disabled:opacity-50"
-                      >
-                        −
-                      </button>
-                      <input
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        value={inputValue}
-                        disabled={busy}
-                        onChange={(e) =>
-                          setDrafts((prev) => ({
-                            ...prev,
-                            [team.id]: e.target.value,
-                          }))
-                        }
-                        onBlur={() => commitDraft(team.id, effectiveRating)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") e.currentTarget.blur();
-                        }}
-                        className={[
-                          "w-16 rounded border bg-zinc-900 px-2 py-0.5 text-center text-xs",
-                          hasOverride
-                            ? "border-amber-700/60 text-amber-300"
-                            : "border-zinc-600 text-zinc-100",
-                        ].join(" ")}
-                      />
-                      <button
-                        type="button"
-                        disabled={busy}
-                        onClick={() =>
-                          stepRating(team.id, effectiveRating, 0.5)
-                        }
-                        aria-label="Увеличить на 0,5"
-                        className="admin-btn admin-btn--outline px-2 py-0.5 text-xs disabled:opacity-50"
-                      >
-                        +
-                      </button>
-                      {hasOverride ? (
-                        <button
-                          type="button"
-                          disabled={busy}
-                          onClick={() => void savePairRating(team.id, null)}
-                          title={`Сбросить к сумме рейтингов (${sumRating.toFixed(1)})`}
-                          className="ml-1 text-xs text-zinc-500 underline hover:text-zinc-300 disabled:opacity-50"
-                        >
-                          сброс (Σ {sumRating.toFixed(1)})
-                        </button>
-                      ) : (
-                        <span className="ml-1 text-[10px] text-zinc-600">
-                          = сумма
-                        </span>
-                      )}
-                    </span>
+                    <TournamentTeamRatingEditor
+                      teamId={team.id}
+                      baseRating={sumRating}
+                      ratingOverride={team.ratingOverride}
+                      bracketLocked={bracketLocked}
+                      onUpdated={onUpdated}
+                      disabled={busy}
+                      resetHint={`сброс (Σ ${sumRating.toFixed(1)})`}
+                    />
+                    {team.ratingOverride == null ? (
+                      <span className="text-[10px] text-zinc-600">= сумма</span>
+                    ) : null}
                   </div>
                   {!bracketLocked && (
                     <button

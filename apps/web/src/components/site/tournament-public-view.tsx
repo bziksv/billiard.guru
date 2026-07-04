@@ -668,7 +668,9 @@ export function TournamentPublicView({
               )}
             </>
           }
-          contentClassName={tab === "bracket" ? "flex flex-col" : "overflow-auto"}
+          contentClassName={
+            tab === "bracket" ? "flex min-h-0 flex-col overflow-hidden" : "overflow-auto"
+          }
         >
           <div
             className={cn(

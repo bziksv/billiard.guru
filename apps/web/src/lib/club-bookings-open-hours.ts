@@ -1,5 +1,7 @@
 import { BOOKING_TIMEZONE } from "@/lib/table-booking";
 import {
+  formatHoursSlot,
+  isRoundTheClockSlot,
   resolveWeeklyHours,
   type WeeklyHoursSlot,
   WEEKDAYS,
@@ -82,7 +84,7 @@ export function buildDayTimelineMinutes(
   return {
     minutes,
     closed: false,
-    openLabel: `${slot.open}–${slot.close}`,
+    openLabel: isRoundTheClockSlot(slot) ? formatHoursSlot(slot) : `${slot.open}–${slot.close}`,
   };
 }
 

@@ -14,6 +14,7 @@ import {
   isTournamentRegistrationOpen,
 } from "@/lib/tournament-registration";
 import { reopenTournamentIfBracketEmpty } from "@/lib/tournament-registration-server";
+import { syncSoloTeamsForTournament } from "@/lib/bracket-service";
 import {
   notifyTournamentRegisteredByClub,
   notifyTournamentRegistrationConfirmed,
@@ -95,6 +96,7 @@ export async function POST(request: NextRequest) {
           entityId: registration.id,
         });
         if (confirmNow) {
+          await syncSoloTeamsForTournament(prisma, registration.tournament);
           await notifyTournamentRegistrationConfirmed(registration.id);
         } else if (data.source === "CLUB") {
           await notifyTournamentRegisteredByClub(registration.id);
@@ -136,6 +138,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (confirmNow) {
+      await syncSoloTeamsForTournament(prisma, registration.tournament);
       await notifyTournamentRegistrationConfirmed(registration.id);
     } else if (data.source === "CLUB") {
       await notifyTournamentRegisteredByClub(registration.id);
@@ -296,6 +299,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     if (status === "CONFIRMED") {
+      await syncSoloTeamsForTournament(prisma, registration.tournament);
       await notifyTournamentRegistrationConfirmed(registration.id);
     } else if (status === "REJECTED") {
       await notifyTournamentRegistrationRejected(registration.id);

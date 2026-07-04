@@ -81,7 +81,7 @@ export function PublicTournamentBracketPanel({
             className="flex flex-wrap items-center gap-3"
           />
         }
-        contentClassName="flex flex-col"
+        contentClassName="flex min-h-0 flex-col overflow-hidden"
       >
         <PublicTournamentBracketCanvas
           format={format}

@@ -9,9 +9,11 @@ import {
   formatPriceTierTimeRange,
   getClubOpenStatus,
   hoursFootnote,
+  isRoundTheClockSlot,
   parsePriceTiers,
   priceTierDaysLabel,
   resolveWeeklyHours,
+  roundTheClockHoursLabel,
   scheduleRows,
   type PriceTier,
   type ScheduleLocale,
@@ -60,6 +62,12 @@ export function ClubScheduleDisplay({
     workingHoursEn,
   );
   const footnote = hoursFootnote(workingHoursForFootnote);
+  const footnoteIsRoundTheClockDuplicate =
+    slots.length > 0 &&
+    slots.every(isRoundTheClockSlot) &&
+    Boolean(footnote?.trim()) &&
+    footnote!.trim().toLowerCase() === roundTheClockHoursLabel(scheduleLocale).toLowerCase();
+  const displayFootnote = footnoteIsRoundTheClockDuplicate ? null : footnote;
   const displayGamePrice = resolveLocalizedField(appLocale, gamePrice ?? "", gamePriceEn);
 
   const minutesNow = useMemo(() => {
@@ -120,7 +128,7 @@ export function ClubScheduleDisplay({
         </ul>
       )}
 
-      {footnote && <p className="club-schedule-footnote">{footnote}</p>}
+      {displayFootnote && <p className="club-schedule-footnote">{displayFootnote}</p>}
 
       {hasPrices && (
         <div className="club-schedule-prices">
