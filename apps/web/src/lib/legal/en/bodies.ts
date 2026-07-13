@@ -96,29 +96,4 @@ export const LEGAL_BODIES_EN: Record<LegalDocSlug, LegalDocBody> = {
       },
     ],
   },
-  "personal-data-consent": {
-    updatedAt: "2026-06-08",
-    sections: [
-      {
-        paragraphs: [
-          "By registering on billiard.guru and using the Service, you consent to personal data processing as described in the privacy policy.",
-        ],
-      },
-      {
-        title: "Scope of consent",
-        paragraphs: [
-          "Processing of name, contacts, city, photo, tournament participation, and reviews.",
-          "Publishing your profile and results in public sections of the site.",
-          "Sending notifications via the Telegram bot (when enabled in settings).",
-        ],
-      },
-      {
-        title: "Withdrawal",
-        paragraphs: [
-          "Consent may be withdrawn by contacting the Service operator. Withdrawal does not affect the lawfulness of processing before withdrawal.",
-          "Account deletion and limiting data publication is available on request.",
-        ],
-      },
-    ],
-  },
 };

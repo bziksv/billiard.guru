@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { LegalDocContent } from "@/components/site/legal/legal-doc-content";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
 import { getLegalDocBody } from "@/lib/legal-bodies";
@@ -53,29 +54,10 @@ export default async function LegalDocumentPage({
             {t("updated", { date: body.updatedAt })}
           </p>
 
-          {body.sections.map((section) => (
-            <section key={section.title ?? section.paragraphs[0]}>
-              {section.title && (
-                <h2 className="site-section-title text-lg">{section.title}</h2>
-              )}
-              <div className={section.title ? "mt-3 space-y-3" : "space-y-3"}>
-                {section.paragraphs.map((paragraph) => (
-                  <p key={paragraph} className="guide-body-text text-sm leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </section>
-          ))}
+          <LegalDocContent sections={body.sections} />
 
           <div className="border-t border-[var(--border-subtle)] pt-4">
-            <p className="guide-body-text text-sm">
-              <Link href={entry.filePath} className="text-emerald-600 hover:underline">
-                {t("download")}
-              </Link>{" "}
-              {t("downloadNote")}
-            </p>
-            <Link href="/" className="mt-3 inline-block text-sm text-emerald-600 hover:underline">
+            <Link href="/" className="inline-block text-sm text-emerald-600 hover:underline">
               {t("backHome")}
             </Link>
           </div>

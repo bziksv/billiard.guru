@@ -2,7 +2,6 @@
 export const LEGAL_URLS = {
   privacy: "/legal/privacy",
   cookies: "/legal/cookies",
-  personalDataConsent: "/legal/personal-data-consent",
   recommendationTechnologies: "/legal/recommendation-technologies",
 } as const;
 
@@ -12,24 +11,18 @@ export type LegalDocSlug = keyof typeof LEGAL_DOCS;
 
 export const LEGAL_DOCS = {
   privacy: {
-    title: "Политика конфиденциальности",
-    description: "Как billiard.guru обрабатывает и защищает персональные данные пользователей.",
-    filePath: "/legal/privacy.pdf",
+    title: "Политика об обработке и защите персональных данных пользователей",
+    description: "",
+    filePath: "/legal/privacy.odt",
   },
   cookies: {
     title: "Политика использования cookie-файлов",
-    description: "Какие cookie используются на сайте и как ими управлять.",
-    filePath: "/legal/cookies.pdf",
+    description: "",
+    filePath: "/legal/cookies.odt",
   },
   "recommendation-technologies": {
-    title: "Рекомендательные технологии",
-    description:
-      "Как на billiard.guru используются рекомендательные технологии и персонализация контента.",
-    filePath: "/legal/recommendation-technologies.pdf",
-  },
-  "personal-data-consent": {
-    title: "Согласие на обработку персональных данных",
-    description: "Текст согласия на обработку персональных данных при использовании сервиса.",
-    filePath: "/legal/personal-data-consent.pdf",
+    title: "Правила применения рекомендательных технологий",
+    description: "",
+    filePath: "/legal/recommendation-technologies.odt",
   },
 } as const;

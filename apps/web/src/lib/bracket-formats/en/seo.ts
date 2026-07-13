@@ -164,8 +164,21 @@ export const BRACKET_FORMAT_SEO_EN: Record<BracketFormatCode, BracketFormatSeoEn
       "3rd place match R16",
     ],
   },
-  FIXED_SWISS_8R2_1_3_mesto:
-    "8-player bracket (SF) + bronze — 14 matches, #13 3rd place, #14 final",
+  FIXED_SWISS_8R2_1_3_mesto: {
+    code: "FIXED_SWISS_8R2_1_3_mesto",
+    slug: "setka-8-chelovek-1-2-s-bronzoy",
+    pageTitle: "8-player bracket with SF start and 3rd–4th place match",
+    metaTitle: "8-player bracket (SF) + 3rd–4th place match",
+    metaDescription:
+      "8-player bracket with knockout from SF, lower bracket to 4th place, bronze match #13 and final #14. Demo on billiard.guru.",
+    lead: "8→4 bracket (14 matches) with knockout from SF: semifinals #7–#8, lower rounds through #12, match #13 for 3rd–4th, final #14.",
+    participantBadge: "8 players",
+    keywords: [
+      "8 player bracket semifinal",
+      "8 player tournament table SF",
+      "3rd place match 8 players",
+    ],
+  },
   FIXED_SWISS_8R4_1_3_mesto: {
     code: "FIXED_SWISS_8R4_1_3_mesto",
     slug: "setka-8-chelovek-1-4-s-bronzoy",

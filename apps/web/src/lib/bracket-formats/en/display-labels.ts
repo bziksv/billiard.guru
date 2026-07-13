@@ -3,6 +3,8 @@ import type { BracketFormatCode } from "@/lib/bracket-formats/catalog";
 export const BRACKET_ADMIN_LABEL_EN: Record<BracketFormatCode, string> = {
   OLYMPIC: "Single elimination (one loss), shared 3rd places",
   OLYMPIC_1L_BRONZE: "Single elimination (one loss) with separate 3rd–4th place match",
+  FIXED_SWISS_8R2_1_3_mesto:
+    "8-player bracket (up to 2 losses), SF start with 3rd–4th place match",
   FIXED_SWISS_8R4_1_3_mesto:
     "8-player bracket (up to 2 losses), QF start with 3rd–4th place match",
   FIXED_SWISS_16R4_2_3_mesta:

@@ -10,29 +10,22 @@ export type LegalDocEntry = {
 
 const LEGAL_DOCS_EN: Record<LegalDocSlug, LegalDocEntry> = {
   privacy: {
-    title: "Privacy policy",
-    description: "How billiard.guru processes and protects users' personal data.",
-    filePath: "/legal/privacy.pdf",
+    title: "Privacy and personal data protection policy",
+    description: "",
+    filePath: "/legal/privacy.odt",
     keywords: ["privacy policy", "billiard guru privacy", "personal data"],
   },
   cookies: {
     title: "Cookie policy",
-    description: "Which cookies are used on the site and how to manage them.",
-    filePath: "/legal/cookies.pdf",
+    description: "",
+    filePath: "/legal/cookies.odt",
     keywords: ["cookie policy", "billiard guru cookies"],
   },
   "recommendation-technologies": {
     title: "Recommendation technologies",
-    description:
-      "How billiard.guru uses recommendation technologies and content personalization.",
-    filePath: "/legal/recommendation-technologies.pdf",
+    description: "",
+    filePath: "/legal/recommendation-technologies.odt",
     keywords: ["recommendation technologies", "personalization billiard guru"],
-  },
-  "personal-data-consent": {
-    title: "Personal data processing consent",
-    description: "Consent text for personal data processing when using the service.",
-    filePath: "/legal/personal-data-consent.pdf",
-    keywords: ["personal data consent", "data processing billiard guru"],
   },
 };
 
@@ -42,10 +35,6 @@ const LEGAL_KEYWORDS_RU: Record<LegalDocSlug, string[]> = {
   "recommendation-technologies": [
     "рекомендательные технологии",
     "персонализация billiard guru",
-  ],
-  "personal-data-consent": [
-    "согласие персональные данные",
-    "обработка данных billiard guru",
   ],
 };
 

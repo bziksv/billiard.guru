@@ -356,7 +356,7 @@ export function buildLocalizedLegalMetadata(
   return buildDetailMetadataWithAlternates(
     {
       title: doc.title,
-      description: doc.description,
+      description: doc.description || doc.title,
       keywords: doc.keywords,
     },
     `/legal/${slug}`,

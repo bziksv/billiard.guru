@@ -196,17 +196,13 @@ const LEGAL_KEYWORDS: Record<LegalDocSlug, string[]> = {
     "рекомендательные технологии",
     "персонализация billiard guru",
   ],
-  "personal-data-consent": [
-    "согласие персональные данные",
-    "обработка данных billiard guru",
-  ],
 };
 
 export function legalDocMetadata(doc: LegalDocSlug): Metadata {
   const entry = LEGAL_DOCS[doc];
   return buildPageMetadata({
     title: entry.title,
-    description: entry.description,
+    description: entry.description || entry.title,
     keywords: LEGAL_KEYWORDS[doc],
     path: `/legal/${doc}`,
   });

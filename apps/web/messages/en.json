@@ -918,15 +918,13 @@
   },
   "legal": {
     "consentCheckbox": {
-      "text": "By clicking this button, I consent to <personalData>personal data processing</personalData> and agree to the terms of the <privacy>privacy policy</privacy>."
+      "text": "By clicking this button, I consent to personal data processing and agree to the <privacy>privacy policy</privacy>."
     },
     "page": {
       "notFound": "Document not found",
       "updated": "Last updated: {date}",
       "stubLead": "The full text will be published on this page. You can place a file at",
       "stubOr": "or replace the page content in code.",
-      "download": "Download document (PDF)",
-      "downloadNote": "— the link will work after the file is uploaded.",
       "backHome": "← Home"
     }
   },

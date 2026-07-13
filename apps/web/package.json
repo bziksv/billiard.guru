@@ -18,6 +18,7 @@
     "verify:seo": "tsx scripts/verify-seo-uniqueness.ts",
     "verify:en-cyrillic": "tsx scripts/verify-en-no-cyrillic.ts",
     "verify:hreflang": "tsx scripts/verify-hreflang-paths.ts",
+    "sync:legal": "python3 scripts/sync-legal-bodies-from-odt.py",
     "verify:phones": "tsx scripts/verify-phone-countries.ts",
     "i18n:backfill": "tsx scripts/backfill-translations.ts",
     "i18n:backfill:count": "tsx scripts/backfill-translations.ts --count"
