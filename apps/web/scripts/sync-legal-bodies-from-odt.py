@@ -104,6 +104,10 @@ def extract_list(list_element: ET.Element) -> list[str]:
     return items
 
 
+def should_skip_paragraph(text: str) -> bool:
+    return bool(re.match(r"^Версия от \d{2}\.\d{2}\.\d{4}", text))
+
+
 def extract_blocks(path: Path) -> list[dict[str, object]]:
     with zipfile.ZipFile(path) as archive:
         root = ET.fromstring(archive.read("content.xml"))
@@ -117,7 +121,7 @@ def extract_blocks(path: Path) -> list[dict[str, object]]:
         tag = child.tag.split("}")[-1]
         if tag == "p":
             text = paragraph_text(child)
-            if not text:
+            if not text or should_skip_paragraph(text):
                 continue
             blocks.append(
                 {
