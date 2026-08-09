@@ -1,0 +1,23 @@
+/** Короткий title раздела; суффикс «| billiard.guru» даёт template в admin/layout. */
+export const ADMIN_PAGE_TITLES = {
+  overview: "Обзор",
+  clubs: "Клубы",
+  clubNew: "Новый клуб",
+  club: "Клуб",
+  players: "Игроки",
+  playerNew: "Регистрация игрока",
+  tournaments: "Турниры",
+  tournament: "Турнир",
+  brackets: "Сетки",
+  bracketFormat: "Формат сетки",
+  bracketTournament: "Сетка турнира",
+  notifications: "Уведомления",
+  analytics: "Статистика посетителей",
+  clubNews: "Новости клубов",
+  siteNews: "Новости сервиса",
+  ideas: "Идеи",
+  handicap: "Фора и расчёт",
+  dbBackups: "Бэкап БД",
+  preview: "Просмотр как…",
+  cabinet: "Кабинет",
+} as const;

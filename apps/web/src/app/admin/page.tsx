@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BRACKET_FORMAT_CATALOG } from "@/lib/bracket-formats/catalog";
+import { ADMIN_PAGE_TITLES } from "@/lib/admin-page-title";
 import { NOTIFICATION_CATALOG } from "@/lib/notifications/catalog";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = { title: ADMIN_PAGE_TITLES.overview };
 
 export default async function AdminDashboard() {
   const weekAgo = new Date();
