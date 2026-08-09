@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { getCurrentPlayer, getSession } from "@/lib/auth";
-import { SESSION_COOKIE } from "@/lib/session";
+import {
+  SESSION_COOKIE,
+  clearSessionCookieOptions,
+  createSessionToken,
+  sessionCookieOptions,
+  shouldRefreshSession,
+} from "@/lib/session";
 
 export async function GET() {
   const session = await getSession();
@@ -13,7 +19,7 @@ export async function GET() {
     return NextResponse.json({ user: null });
   }
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     user: {
       id: player.id,
       firstName: player.firstName,
@@ -30,14 +36,25 @@ export async function GET() {
       telegramUsername: player.telegramUsername,
     },
   });
+
+  // Скользящая сессия: роль из БД (не устаревшая из cookie).
+  if (shouldRefreshSession(session) || player.role !== session.role) {
+    const token = createSessionToken(player.id, player.role);
+    const cookie = sessionCookieOptions(token);
+    response.cookies.set(cookie.name, cookie.value, {
+      httpOnly: cookie.httpOnly,
+      sameSite: cookie.sameSite,
+      secure: cookie.secure,
+      path: cookie.path,
+      maxAge: cookie.maxAge,
+    });
+  }
+
+  return response;
 }
 
 export async function DELETE() {
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(SESSION_COOKIE, "", {
-    httpOnly: true,
-    path: "/",
-    maxAge: 0,
-  });
+  response.cookies.set(SESSION_COOKIE, "", clearSessionCookieOptions());
   return response;
 }

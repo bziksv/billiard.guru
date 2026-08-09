@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { ManageShell } from "@/components/manage/manage-shell";
 import { PageviewBeacon } from "@/components/analytics/pageview-beacon";
+import { SessionKeepAlive } from "@/components/auth/session-keep-alive";
 import { getCurrentPlayer } from "@/lib/auth";
 import { getAccessibleOwnedClubs } from "@/lib/club-owner-access";
 
@@ -31,6 +32,7 @@ export default async function ManageLayout({
       >
         {children}
       </ManageShell>
+      <SessionKeepAlive />
       <PageviewBeacon surface="MANAGE" />
     </>
   );

@@ -30,10 +30,15 @@ function escapeHtml(text: string): string {
 }
 
 export const BOT_MENU_CLUB_POKATAT = "🏢 Покатать (клуб)";
+export const BOT_MENU_BACK_MAIN = "← В главное меню";
 
 export function clubPokatatMenuKeyboard() {
   return {
-    keyboard: [[{ text: BOT_MENU_CLUB_POKATAT }], [{ text: "🌐 Управление на сайте" }]],
+    keyboard: [
+      [{ text: BOT_MENU_CLUB_POKATAT }],
+      [{ text: "🌐 Управление на сайте" }],
+      [{ text: BOT_MENU_BACK_MAIN }],
+    ],
     resize_keyboard: true,
     is_persistent: true,
   };

@@ -25,6 +25,7 @@ import {
 } from "@/lib/table-booking";
 import {
   answerCallbackQuery,
+  clearInlineKeyboard,
   editTelegramMessage,
   editTelegramPhotoCaption,
   sendTelegramMessage,
@@ -195,11 +196,12 @@ async function editBookingWizardMessage(
   messageId: number,
   text: string,
   keyboard?: { inline_keyboard: InlineButton[][] },
-) {
+): Promise<boolean> {
   const opts = keyboard ? { replyMarkup: keyboard } : { replyMarkup: { inline_keyboard: [] } };
-  const captionOk = await editTelegramPhotoCaption(chatId, messageId, text, opts);
-  if (captionOk) return;
-  await editTelegramMessage(chatId, messageId, text, opts);
+  // Сначала caption — шаг с планом зала это photo-сообщение.
+  if (await editTelegramPhotoCaption(chatId, messageId, text, opts)) return true;
+  if (await editTelegramMessage(chatId, messageId, text, opts)) return true;
+  return false;
 }
 
 async function replyOrEdit(
@@ -209,15 +211,21 @@ async function replyOrEdit(
   sourceMessage?: { chatId: string; messageId: number },
 ) {
   if (sourceMessage) {
-    await editBookingWizardMessage(
+    const edited = await editBookingWizardMessage(
       sourceMessage.chatId,
       sourceMessage.messageId,
       text,
       keyboard,
     );
-  } else {
-    await sendTelegramMessage(telegramId, text, { replyMarkup: keyboard });
+    if (edited) return;
+    // Редактирование не удалось (устаревшее сообщение и т.п.) — не молчим.
+    try {
+      await clearInlineKeyboard(sourceMessage.chatId, sourceMessage.messageId);
+    } catch {
+      /* ignore */
+    }
   }
+  await sendTelegramMessage(telegramId, text, { replyMarkup: keyboard });
 }
 
 export async function startBookingClubList(
@@ -532,6 +540,16 @@ async function showTableOrConfirmStep(
   const png = await renderFloorPlanPngForBooking(club.floorPlan, format, tables);
   if (png) {
     if (sourceMessage) {
+      // Возврат «← Назад» с подтверждения: сообщение уже photo — обновляем caption/кнопки.
+      const captionOk = await editTelegramPhotoCaption(
+        sourceMessage.chatId,
+        sourceMessage.messageId,
+        caption,
+        { replyMarkup: { inline_keyboard: rows } },
+      );
+      if (captionOk) return;
+
+      // Пришли с текстового шага — снимаем кнопки и шлём новое фото.
       await editTelegramMessage(
         sourceMessage.chatId,
         sourceMessage.messageId,

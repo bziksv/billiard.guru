@@ -2,7 +2,11 @@ import { createHmac, timingSafeEqual } from "crypto";
 import type { UserRole } from "@/generated/prisma/client";
 
 export const SESSION_COOKIE = "setka_session";
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** Срок сессии для всех ролей (скользящее продление при активности). */
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+/** Продлевать cookie, если осталось меньше половины TTL. */
+const SESSION_REFRESH_RATIO = 0.5;
 
 export interface SessionPayload {
   playerId: string;
@@ -16,6 +20,15 @@ function getSecret(): string {
     throw new Error("SESSION_SECRET is not set");
   }
   return secret;
+}
+
+/** Cookie Secure: prod или явный HTTPS (Passenger иногда без NODE_ENV). */
+export function sessionCookieSecure(): boolean {
+  if (process.env.COOKIE_SECURE === "1") return true;
+  if (process.env.COOKIE_SECURE === "0") return false;
+  if (process.env.NODE_ENV === "production") return true;
+  const appUrl = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? "";
+  return appUrl.startsWith("https://");
 }
 
 export function createSessionToken(playerId: string, role: UserRole): string {
@@ -49,14 +62,31 @@ export function verifySessionToken(token: string): SessionPayload | null {
   }
 }
 
+/** Нужно ли перевыпустить cookie (скользящая сессия). */
+export function shouldRefreshSession(payload: SessionPayload): boolean {
+  const remaining = payload.exp - Date.now();
+  return remaining < SESSION_TTL_MS * SESSION_REFRESH_RATIO;
+}
+
 export function sessionCookieOptions(token: string) {
   return {
     name: SESSION_COOKIE,
     value: token,
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure: sessionCookieSecure(),
     path: "/",
     maxAge: SESSION_TTL_MS / 1000,
+  };
+}
+
+/** Опции для очистки cookie — те же флаги, что при выдаче. */
+export function clearSessionCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: sessionCookieSecure(),
+    path: "/",
+    maxAge: 0,
   };
 }

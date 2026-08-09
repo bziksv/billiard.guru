@@ -20,6 +20,7 @@ import {
   BOT_MENU_CLUB_POKATAT,
 } from "@/lib/telegram-bot-menu";
 import {
+  BOT_MENU_BACK_MAIN,
   clubPokatatMenuKeyboard,
   handleClubPokatatCallback,
   startClubPokatatMenu,
@@ -469,6 +470,15 @@ export async function processTelegramUpdate(
         "⚠️ Не удалось загрузить данные. Попробуйте позже.",
       );
     }
+    return;
+  }
+
+  if (text.trim() === BOT_MENU_BACK_MAIN) {
+    await sendTelegramMessage(
+      telegramId,
+      "Главное меню:",
+      { replyMarkup: await buildMainMenuKeyboard(telegramId) },
+    );
     return;
   }
 

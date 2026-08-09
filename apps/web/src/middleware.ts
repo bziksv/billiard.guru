@@ -31,6 +31,17 @@ function wwwToApexRedirect(request: NextRequest): NextResponse | null {
 export default function middleware(request: NextRequest) {
   const redirect = wwwToApexRedirect(request);
   if (redirect) return redirect;
+
+  const { pathname } = request.nextUrl;
+  // /admin, /manage, /api — без i18n, но www→apex уже отработал выше.
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/manage") ||
+    pathname.startsWith("/api")
+  ) {
+    return NextResponse.next();
+  }
+
   return handleI18nRouting(request);
 }
 
@@ -38,6 +49,8 @@ export const config = {
   matcher: [
     "/",
     "/(en)/:path*",
-    "/((?!api|admin|manage|_next|_vercel|.*\\..*).*)",
+    "/admin/:path*",
+    "/manage/:path*",
+    "/((?!_next|_vercel|.*\\..*).*)",
   ],
 };

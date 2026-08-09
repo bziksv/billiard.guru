@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import { getCurrentPlayer, getSession } from "@/lib/auth";
+import { getCurrentPlayer, getRealPlayer, getSession } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { PageviewBeacon } from "@/components/analytics/pageview-beacon";
+import { SessionKeepAlive } from "@/components/auth/session-keep-alive";
 
 export default async function AdminLayout({
   children,
@@ -9,7 +10,9 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
-  if (!session || session.role !== "SUPERADMIN") {
+  // Роль из БД — cookie могла устареть после смены прав или чужого логина.
+  const realPlayer = await getRealPlayer();
+  if (!session || !realPlayer || realPlayer.role !== "SUPERADMIN") {
     redirect("/login?next=/admin");
   }
 
@@ -25,6 +28,7 @@ export default async function AdminLayout({
         }
       />
       <main className="admin-main min-h-0 min-w-0 w-full flex-1 overflow-x-hidden overflow-y-auto">{children}</main>
+      <SessionKeepAlive />
       <PageviewBeacon surface="ADMIN" />
     </div>
   );
