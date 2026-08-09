@@ -8,8 +8,10 @@ import {
   newsHasEnTranslation,
   resolveLocalizedField,
 } from "@/lib/localized-db-text";
+import { computeWinRatesForPlayers } from "@/lib/player-stats";
 import {
   clubGeoWhere,
+  playerGeoWhere,
   playListingGeoWhere,
   playListingListInclude,
 } from "@/lib/public-queries";
@@ -20,6 +22,24 @@ import { pickHomeTournaments } from "@/lib/tournament-tabs";
 import type { GeoSearchParams } from "@/lib/site";
 import { formatPlayListingSchedule } from "@/lib/play-listing-display";
 import { getTranslations } from "next-intl/server";
+
+/** Минимум сыгранных встреч, чтобы попасть в топ по % побед на главной. */
+const HOME_WINRATE_MIN_PLAYED = 3;
+
+export type HomePlayerCardItem = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  middleName: string | null;
+  firstNameLatin: string | null;
+  lastNameLatin: string | null;
+  middleNameLatin: string | null;
+  rating: number;
+  photoUrl: string | null;
+  city: { nameRu: string; nameEn: string | null };
+  winRate?: number | null;
+  played?: number;
+};
 
 function formatNewsDate(date: Date, locale: AppLocale) {
   return date.toLocaleDateString(locale === "en" ? "en-GB" : "ru-RU", {
@@ -270,6 +290,56 @@ export async function loadHomeStats() {
   ]);
 
   return { tournaments, clubs, players, playListings };
+}
+
+/** Топ по рейтингу силы для блока на главной. */
+export async function loadHomeTopByRating(
+  geo: GeoSearchParams,
+  take = 8,
+): Promise<HomePlayerCardItem[]> {
+  return prisma.player.findMany({
+    where: playerGeoWhere(geo),
+    include: { city: { select: { nameRu: true, nameEn: true } } },
+    orderBy: [{ rating: "desc" }, { lastName: "asc" }],
+    take,
+  });
+}
+
+/** Топ по % побед в турнирных встречах (мин. HOME_WINRATE_MIN_PLAYED матчей). */
+export async function loadHomeTopByWinRate(
+  geo: GeoSearchParams,
+  take = 8,
+): Promise<HomePlayerCardItem[]> {
+  const players = await prisma.player.findMany({
+    where: playerGeoWhere(geo),
+    include: { city: { select: { nameRu: true, nameEn: true } } },
+    orderBy: [{ rating: "desc" }, { lastName: "asc" }],
+  });
+  if (players.length === 0) return [];
+
+  const rates = await computeWinRatesForPlayers(players.map((p) => p.id));
+  return [...players]
+    .map((p) => {
+      const wr = rates.get(p.id);
+      return {
+        ...p,
+        winRate: wr?.winRate ?? null,
+        played: wr?.played ?? 0,
+      };
+    })
+    .filter(
+      (p) =>
+        p.winRate != null && (p.played ?? 0) >= HOME_WINRATE_MIN_PLAYED,
+    )
+    .sort((a, b) => {
+      const d = (b.winRate ?? 0) - (a.winRate ?? 0);
+      if (d !== 0) return d;
+      if ((b.played ?? 0) !== (a.played ?? 0)) {
+        return (b.played ?? 0) - (a.played ?? 0);
+      }
+      return b.rating - a.rating;
+    })
+    .slice(0, take);
 }
 
 /** Турниры для блока на главной: город + соседние, приоритет OPEN с ближайшей датой. */

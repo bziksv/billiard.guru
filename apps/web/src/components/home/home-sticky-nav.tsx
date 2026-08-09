@@ -9,6 +9,7 @@ const LINK_KEYS = [
   { href: "#news", key: "news" },
   { href: "#tournaments", key: "tournaments" },
   { href: "#players", key: "players" },
+  { href: "#winrate", key: "winRate" },
   { href: "#announcements", key: "announcements" },
   { href: "#clubs", key: "clubs" },
 ] as const;

@@ -19,14 +19,12 @@ import {
   loadHomeNews,
   loadHomePlayAnnouncements,
   loadHomeStats,
+  loadHomeTopByRating,
+  loadHomeTopByWinRate,
   loadHomeTournaments,
 } from "@/lib/home-data";
 import { getNearbyCityIds, NOTIFY_RADIUS_KM } from "@/lib/geo";
-import {
-  clubGeoWhere,
-  clubListInclude,
-  playerGeoWhere,
-} from "@/lib/public-queries";
+import { clubGeoWhere, clubListInclude } from "@/lib/public-queries";
 import { getLocalizedBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -95,22 +93,19 @@ export default async function HomePage({
     return loadHomeTournaments({ geo });
   }
 
-  const [localTournaments, clubs, topPlayers, playAnnouncements] = await Promise.all([
-    loadTournamentsForHome(),
-    prisma.club.findMany({
-      where: { ...clubGeoWhere(geo), isVerified: true },
-      include: clubListInclude,
-      orderBy: { name: "asc" },
-      take: 4,
-    }),
-    prisma.player.findMany({
-      where: playerGeoWhere(geo),
-      include: { city: true },
-      orderBy: [{ rating: "desc" }, { lastName: "asc" }],
-      take: 8,
-    }),
-    loadHomePlayAnnouncements(geo, locale),
-  ]);
+  const [localTournaments, clubs, topByRating, topByWinRate, playAnnouncements] =
+    await Promise.all([
+      loadTournamentsForHome(),
+      prisma.club.findMany({
+        where: { ...clubGeoWhere(geo), isVerified: true },
+        include: clubListInclude,
+        orderBy: { name: "asc" },
+        take: 4,
+      }),
+      loadHomeTopByRating(geo, 5),
+      loadHomeTopByWinRate(geo, 10),
+      loadHomePlayAnnouncements(geo, locale),
+    ]);
 
   const [stats, news, bracketFormats, formatLabels] = await Promise.all([
     loadHomeStats(),
@@ -123,6 +118,13 @@ export default async function HomePage({
   const featured = localTournaments[0];
   const restTournaments = localTournaments.slice(1);
   const { playerAds, clubAds } = playAnnouncements;
+  const playersWinRateHref = (() => {
+    const q = new URLSearchParams();
+    if (geo.countryId) q.set("countryId", geo.countryId);
+    if (geo.cityId) q.set("cityId", geo.cityId);
+    q.set("sort", "winrate");
+    return `/players?${q.toString()}`;
+  })();
 
   return (
     <>
@@ -205,7 +207,32 @@ export default async function HomePage({
         action={{ href: hrefWithGeo("/players", geo), label: t("home.sections.players.action") }}
       >
         <HomeReveal>
-          <HomePlayerCards players={topPlayers} />
+          <HomePlayerCards
+            players={topByRating}
+            metric="rating"
+            metricLabel={t("home.sections.players.metric")}
+          />
+        </HomeReveal>
+      </HomeSection>
+
+      <HomeSection
+        id="winrate"
+        eyebrow={t("home.sections.winRate.eyebrow")}
+        title={t("home.sections.winRate.title")}
+        lead={t("home.sections.winRate.lead")}
+        action={{
+          href: playersWinRateHref,
+          label: t("home.sections.winRate.action"),
+        }}
+        className="home-section-alt"
+      >
+        <HomeReveal>
+          <HomePlayerCards
+            players={topByWinRate}
+            metric="winRate"
+            emptyKey="home.players.winRateEmpty"
+            metricLabel={t("home.sections.winRate.metric")}
+          />
         </HomeReveal>
       </HomeSection>
 

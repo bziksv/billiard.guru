@@ -116,7 +116,8 @@
       "label": "Home sections",
       "news": "News",
       "tournaments": "Tournaments",
-      "players": "Players",
+      "players": "Strength",
+      "winRate": "Win %",
       "announcements": "Listings",
       "clubs": "Clubs"
     },
@@ -144,9 +145,17 @@
       },
       "players": {
         "eyebrow": "Ratings",
-        "title": "Players",
-        "lead": "Top players in your region — profile, rating, and tournament history.",
-        "action": "Full rankings"
+        "title": "By strength",
+        "lead": "Top players in your region by strength rating — profile and tournament history.",
+        "action": "Full rankings",
+        "metric": "rating"
+      },
+      "winRate": {
+        "eyebrow": "Ratings",
+        "title": "By win rate",
+        "lead": "Who wins tournament matches most often — at least three matches played.",
+        "action": "Sort by win rate",
+        "metric": "win %"
       },
       "announcements": {
         "eyebrow": "Board",
@@ -186,7 +195,8 @@
       "booking": "table booking"
     },
     "players": {
-      "empty": "No verified players in this region yet."
+      "empty": "No verified players in this region yet.",
+      "winRateEmpty": "No players with enough tournament matches in this region yet."
     },
     "announcements": {
       "fromPlayers": "From players",
