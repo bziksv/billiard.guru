@@ -105,8 +105,8 @@
       "brackets": "Bracket formats"
     },
     "stats": {
-      "tournaments": "Tournaments",
-      "clubs": "Clubs",
+      "tournaments": "Tournaments held",
+      "clubs": "Clubs on the platform",
       "players": "Players"
     },
     "local": "Tournaments in your region",

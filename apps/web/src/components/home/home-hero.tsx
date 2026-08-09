@@ -110,7 +110,7 @@ export function HomeHero({
             ] as const
           ).map(([label, val]) => (
             <div key={label} className="home-stat-card px-4 py-4">
-              <dt className="home-card-muted text-[10px] font-medium uppercase tracking-wider sm:text-xs">
+              <dt className="home-card-muted text-[10px] font-medium leading-snug tracking-wide sm:text-xs">
                 {label}
               </dt>
               <dd className="mt-1 font-mono text-2xl font-semibold text-emerald-600 sm:text-3xl">

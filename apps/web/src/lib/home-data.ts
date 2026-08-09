@@ -259,8 +259,8 @@ export async function loadHomeStats() {
     prisma.tournament.count({
       where: { status: { in: ["OPEN", "ACTIVE", "FINISHED"] } },
     }),
-    prisma.club.count({ where: { isVerified: true } }),
-    prisma.player.count({ where: { isVerified: true } }),
+    prisma.club.count(),
+    prisma.player.count(),
     prisma.playListing.count({
       where: {
         status: "OPEN",
