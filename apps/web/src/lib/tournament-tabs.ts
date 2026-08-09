@@ -41,7 +41,12 @@ export function countTournamentsByTab(
   for (const tournament of tournaments) {
     if (tournament.status === "OPEN") counts.upcoming += 1;
     else if (tournament.status === "ACTIVE") counts.active += 1;
-    else if (tournament.status === "FINISHED") counts.finished += 1;
+    else if (
+      tournament.status === "FINISHED" ||
+      tournament.status === "DID_NOT_TAKE_PLACE"
+    ) {
+      counts.finished += 1;
+    }
   }
   return counts;
 }
@@ -50,6 +55,11 @@ export function filterTournamentsByTab<T extends { status: string }>(
   tournaments: T[],
   tab: TournamentTab,
 ): T[] {
+  if (tab === "finished") {
+    return tournaments.filter(
+      (t) => t.status === "FINISHED" || t.status === "DID_NOT_TAKE_PLACE",
+    );
+  }
   const status = tournamentTabStatus(tab);
   return tournaments.filter((t) => t.status === status);
 }
@@ -67,6 +77,7 @@ const HOME_STATUS_PRIORITY: Record<string, number> = {
   OPEN: 0,
   ACTIVE: 1,
   FINISHED: 2,
+  DID_NOT_TAKE_PLACE: 3,
 };
 
 function compareStartsAtForTab(

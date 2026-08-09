@@ -78,7 +78,8 @@ export const TournamentStatus = {
   PENDING_CLUB_APPROVAL: 'PENDING_CLUB_APPROVAL',
   OPEN: 'OPEN',
   ACTIVE: 'ACTIVE',
-  FINISHED: 'FINISHED'
+  FINISHED: 'FINISHED',
+  DID_NOT_TAKE_PLACE: 'DID_NOT_TAKE_PLACE'
 } as const
 
 export type TournamentStatus = (typeof TournamentStatus)[keyof typeof TournamentStatus]

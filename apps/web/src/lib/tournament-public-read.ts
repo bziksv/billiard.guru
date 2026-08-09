@@ -125,6 +125,9 @@ export async function findPublicTournamentsList(options: {
   cityIds?: string[];
   take?: number;
 }): Promise<PublicTournamentListItem[]> {
+  const { closeStaleTournaments } = await import("@/lib/tournament-stale");
+  await closeStaleTournaments();
+
   const where =
     options.cityIds && options.cityIds.length > 0
       ? tournamentCityIdsWhere(options.cityIds)

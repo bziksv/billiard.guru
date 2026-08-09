@@ -34,7 +34,7 @@ type TournamentListItem = {
   _count: { registrations: number; teams: number };
 };
 
-const PUBLIC_STATUSES = ["OPEN", "ACTIVE", "FINISHED"] as const;
+const PUBLIC_STATUSES = ["OPEN", "ACTIVE", "FINISHED", "DID_NOT_TAKE_PLACE"] as const;
 
 export function TournamentCard({
   tournament: t,

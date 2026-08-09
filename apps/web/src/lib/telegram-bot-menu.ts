@@ -10,13 +10,13 @@ import {
   getPlayerNotificationPreferencesForCabinet,
   setPlayerNotificationEnabled,
 } from "@/lib/notifications/player-preferences-server";
-import { playerName, PUBLIC_PARTICIPANT_STATUSES } from "@/lib/public-display";
+import { playerName } from "@/lib/public-display";
 import { prisma } from "@/lib/prisma";
 import { formatRating } from "@/lib/rating";
 import {
-  buildPublicTournamentStandings,
-} from "@/lib/tournament-public-standings";
-import type { AdminTournament } from "@/lib/tournament-admin";
+  loadPlayerTournamentPlaces,
+  placeMedal,
+} from "@/lib/player-tournament-places-server";
 import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
 import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import {
@@ -254,13 +254,6 @@ export async function sendVerifiedWelcome(
   );
 }
 
-function placeMedal(placeLabel: string): string {
-  if (placeLabel === "1") return "🥇";
-  if (placeLabel === "2") return "🥈";
-  if (placeLabel === "3") return "🥉";
-  return "🏅";
-}
-
 function formatTournamentsTelegram(
   page: Awaited<ReturnType<typeof loadPlayerRegistrations>>,
   total: number,
@@ -367,60 +360,6 @@ async function loadPlayerRegistrations(playerId: string) {
     include: { tournament: { include: { club: true } } },
     orderBy: { createdAt: "desc" },
   });
-}
-
-/** Занятое игроком место в завершённых турнирах: tournamentId → «1», «5–6». */
-async function loadPlayerTournamentPlaces(
-  playerId: string,
-  tournaments: { id: string; status: string }[],
-): Promise<Map<string, string>> {
-  const result = new Map<string, string>();
-  const finishedIds = tournaments
-    .filter((t) => t.status === "FINISHED")
-    .map((t) => t.id);
-  if (finishedIds.length === 0) return result;
-
-  const rows = await prisma.tournament.findMany({
-    where: { id: { in: finishedIds } },
-    include: {
-      club: { include: { city: { include: { country: true } } } },
-      registrations: {
-        where: { status: { in: [...PUBLIC_PARTICIPANT_STATUSES] } },
-        include: { player: { include: { city: true } } },
-      },
-      teams: {
-        where: { status: { in: [...PUBLIC_PARTICIPANT_STATUSES] } },
-        include: {
-          player1: { include: { city: true } },
-          player2: { include: { city: true } },
-        },
-      },
-      matches: {
-        include: {
-          team1: { include: { player1: true, player2: true } },
-          team2: { include: { player1: true, player2: true } },
-          winnerTeam: { include: { player1: true, player2: true } },
-        },
-        orderBy: [{ round: "asc" }, { slot: "asc" }],
-      },
-    },
-  });
-
-  const href = `/players/${playerId}`;
-  for (const t of rows) {
-    try {
-      const standings = buildPublicTournamentStandings(t as unknown as AdminTournament);
-      const row = standings.rows.find(
-        (r) => r.playerHref === href || r.secondPlayerHref === href,
-      );
-      if (row?.placeLabel && row.placeLabel !== "—") {
-        result.set(t.id, row.placeLabel);
-      }
-    } catch {
-      // протокол не построился — место просто не покажем
-    }
-  }
-  return result;
 }
 
 async function loadPlayerBookings(playerId: string) {

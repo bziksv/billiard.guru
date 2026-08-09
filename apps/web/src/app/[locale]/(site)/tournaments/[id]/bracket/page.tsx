@@ -24,7 +24,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { APP_NAME } from "@/lib/brand";
 import { getLocale, getTranslations } from "next-intl/server";
 
-const TOURNAMENT_STATUSES = ["OPEN", "ACTIVE", "FINISHED"] as const;
+const TOURNAMENT_STATUSES = ["OPEN", "ACTIVE", "FINISHED", "DID_NOT_TAKE_PLACE"] as const;
 
 export async function generateMetadata({
   params,

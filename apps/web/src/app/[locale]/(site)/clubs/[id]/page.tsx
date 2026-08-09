@@ -23,6 +23,10 @@ import {
 } from "@/lib/public-queries";
 import { getLocalizedBracketFormatLabels } from "@/lib/bracket-formats/settings-server";
 import { prisma } from "@/lib/prisma";
+import {
+  closeStaleTournaments,
+  isPastTournamentStatus,
+} from "@/lib/tournament-stale";
 import type { AppLocale } from "@/i18n/routing";
 import { resolveLocalizedField, resolveLocalizedPriceTiers } from "@/lib/localized-db-text";
 import { priceTiersToJson } from "@/lib/club-schedule";
@@ -67,6 +71,8 @@ export default async function ClubPage({
   const t = await getTranslations();
   const locale = (await getLocale()) as AppLocale;
 
+  await closeStaleTournaments();
+
   const club = await prisma.club.findUnique({
     where: { id },
     include: {
@@ -90,8 +96,12 @@ export default async function ClubPage({
   const player = await getCurrentPlayer();
   const mapLat = club.latitude ?? club.city.latitude;
   const mapLng = club.longitude ?? club.city.longitude;
-  const upcoming = club.tournaments.filter((tournament) => tournament.status !== "FINISHED");
-  const past = club.tournaments.filter((tournament) => tournament.status === "FINISHED");
+  const upcoming = club.tournaments.filter(
+    (tournament) => !isPastTournamentStatus(tournament.status),
+  );
+  const past = club.tournaments.filter((tournament) =>
+    isPastTournamentStatus(tournament.status),
+  );
   const photos = clubPhotoUrls(club);
   const hasFloorPlan = floorPlanHasItems(club.floorPlan);
   const localizedPriceTiers = priceTiersToJson(

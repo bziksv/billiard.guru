@@ -9,6 +9,7 @@ const STATUS_CLASS: Record<string, string> = {
   OPEN: "status-badge--open",
   ACTIVE: "status-badge--active",
   FINISHED: "status-badge--finished",
+  DID_NOT_TAKE_PLACE: "status-badge--neutral",
 };
 
 export function StatusBadge({

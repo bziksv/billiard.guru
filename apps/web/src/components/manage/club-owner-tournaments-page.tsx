@@ -89,7 +89,10 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   );
 
   const finishedTournaments = useMemo(
-    () => clubTournaments.filter((t) => t.status === "FINISHED"),
+    () =>
+      clubTournaments.filter(
+        (t) => t.status === "FINISHED" || t.status === "DID_NOT_TAKE_PLACE",
+      ),
     [clubTournaments],
   );
 

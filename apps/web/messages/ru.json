@@ -610,7 +610,8 @@
   "tournamentStatus": {
     "OPEN": "Открыта регистрация",
     "ACTIVE": "Идёт",
-    "FINISHED": "Завершён"
+    "FINISHED": "Завершён",
+    "DID_NOT_TAKE_PLACE": "Не состоялся"
   },
   "tournamentCard": {
     "participants": "{count} участников"
@@ -650,6 +651,7 @@
       "about": "О себе",
       "tournaments": "Турниры",
       "noTournaments": "Участий пока нет.",
+      "placeSuffix": "место",
       "reviewCount": "{count, plural, one {# оценка} few {# оценки} many {# оценок} other {# оценок}}",
       "noReviews": "Пока нет оценок"
     },

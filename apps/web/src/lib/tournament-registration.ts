@@ -1,9 +1,15 @@
+function isTournamentClosed(tournamentStatus: string): boolean {
+  return (
+    tournamentStatus === "FINISHED" || tournamentStatus === "DID_NOT_TAKE_PLACE"
+  );
+}
+
 /** Публичная регистрация: OPEN или сетка снесена у идущего турнира. */
 export function isTournamentRegistrationOpen(
   tournamentStatus: string,
   bracketFormed: boolean,
 ): boolean {
-  if (tournamentStatus === "FINISHED") return false;
+  if (isTournamentClosed(tournamentStatus)) return false;
   if (tournamentStatus === "OPEN") return true;
   if (tournamentStatus === "ACTIVE" && !bracketFormed) return true;
   return false;
@@ -14,7 +20,7 @@ export function canOrganizerRegisterParticipants(
   tournamentStatus: string,
   bracketFormed: boolean,
 ): boolean {
-  if (tournamentStatus === "FINISHED") return false;
+  if (isTournamentClosed(tournamentStatus)) return false;
   if (bracketFormed) return false;
   return (
     tournamentStatus === "DRAFT" ||
@@ -30,7 +36,7 @@ export function canCancelRegistration(
   role: "player" | "organizer",
   bracketFormed = false,
 ): boolean {
-  if (tournamentStatus === "FINISHED") return false;
+  if (isTournamentClosed(tournamentStatus)) return false;
   if (bracketFormed) return false;
   if (role === "organizer") {
     return tournamentStatus === "OPEN" || tournamentStatus === "ACTIVE";

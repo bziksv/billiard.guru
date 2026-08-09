@@ -113,7 +113,7 @@ function buildParticipantRows(
     }));
 }
 
-const TOURNAMENT_STATUSES = ["OPEN", "ACTIVE", "FINISHED"] as const;
+const TOURNAMENT_STATUSES = ["OPEN", "ACTIVE", "FINISHED", "DID_NOT_TAKE_PLACE"] as const;
 const REG_STATUSES = ["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"] as const;
 
 export async function generateMetadata({

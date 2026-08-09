@@ -321,7 +321,16 @@ export const tournamentSchema = z.object({
   suppressNotifications: z.boolean().optional().default(false),
   tableIds: z.array(z.string().min(1)).min(1, "Выберите хотя бы один стол"),
   tableStreams: z.record(z.string().min(1), z.string().max(2000)).optional(),
-  status: z.enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"]).optional(),
+  status: z
+    .enum([
+      "DRAFT",
+      "PENDING_CLUB_APPROVAL",
+      "OPEN",
+      "ACTIVE",
+      "FINISHED",
+      "DID_NOT_TAKE_PLACE",
+    ])
+    .optional(),
 }).superRefine(refineDiscipline);
 
 export const tournamentUpdateSchema = z.object({
@@ -374,7 +383,14 @@ export const tournamentUpdateSchema = z.object({
     .optional(),
   startsAt: z.string().optional().nullable(),
   status: z
-    .enum(["DRAFT", "PENDING_CLUB_APPROVAL", "OPEN", "ACTIVE", "FINISHED"])
+    .enum([
+      "DRAFT",
+      "PENDING_CLUB_APPROVAL",
+      "OPEN",
+      "ACTIVE",
+      "FINISHED",
+      "DID_NOT_TAKE_PLACE",
+    ])
     .optional(),
   isPair: z.boolean().optional(),
   discipline: z.string().optional().nullable(),
@@ -716,6 +732,7 @@ export const TOURNAMENT_STATUS_LABELS: Record<string, string> = {
   OPEN: "Открыта регистрация",
   ACTIVE: "Идёт",
   FINISHED: "Завершён",
+  DID_NOT_TAKE_PLACE: "Не состоялся",
 };
 
 export const USER_ROLE_LABELS: Record<string, string> = {

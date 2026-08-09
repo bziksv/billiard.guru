@@ -532,6 +532,7 @@ export const STATUS_OPTIONS = [
   { value: "OPEN", label: "Открыта регистрация" },
   { value: "ACTIVE", label: "Идёт" },
   { value: "FINISHED", label: "Завершён" },
+  { value: "DID_NOT_TAKE_PLACE", label: "Не состоялся" },
 ];
 
 const playerWithCity = { include: { city: true } };

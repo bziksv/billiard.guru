@@ -1,6 +1,11 @@
 import type { AppLocale } from "@/i18n/routing";
 
-export const PUBLIC_TOURNAMENT_STATUSES = ["OPEN", "ACTIVE", "FINISHED"] as const;
+export const PUBLIC_TOURNAMENT_STATUSES = [
+  "OPEN",
+  "ACTIVE",
+  "FINISHED",
+  "DID_NOT_TAKE_PLACE",
+] as const;
 
 /** Участники и заявки, видимые на публичной странице турнира. */
 export const PUBLIC_PARTICIPANT_STATUSES = ["CONFIRMED", "PENDING"] as const;
