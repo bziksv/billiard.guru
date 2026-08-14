@@ -8,7 +8,7 @@ import {
 } from "@/lib/rating-recalc-server";
 
 const recalcSchema = z.object({
-  confirm: z.literal("RECALC_FROM_ZERO"),
+  confirm: z.literal("RECALC"),
   formula: z.string().min(1),
 });
 
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Подтвердите прогон с нуля: { "confirm": "RECALC_FROM_ZERO", "formula": "…" }' },
+        { error: 'Подтвердите прогон: { "confirm": "RECALC", "formula": "…" }' },
         { status: 400 },
       );
     }

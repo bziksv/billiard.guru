@@ -192,21 +192,13 @@ export function RatingPreviewPanel() {
       RATING_PREVIEW_FORMULA_OPTIONS.find((o) => o.value === formula)?.short ??
       formula;
     const ok = window.confirm(
-      `ОПАСНО: прогон «${opt}» с нуля.\n\n` +
-        "Все текущие общие рейтинги будут заменены результатом симуляции с 0.\n" +
-        "Пример: было 5 → станет доли вроде 0,15 (не 5).\n\n" +
-        "Перед этим сохранится снимок — его можно вернуть кнопкой «Вернуть».\n" +
-        "Клубный рейтинг не трогаем.\n\n" +
-        "Для обычной работы достаточно автопересчёта после НОВЫХ встреч — без этого прогона.",
+      `Пересчитать общий рейтинг формулой «${opt}» по всем завершённым встречам?\n\n` +
+        "Старт — текущие рейтинги (не с нуля). По хронологии матчей накатывается формула.\n" +
+        "Перед прогоном сохранится снимок — можно откатить «Вернуть».\n\n" +
+        "Важно: если уже прогоняли — сначала «Вернуть» снимок, иначе формула наложится второй раз.\n" +
+        "Клубный рейтинг не меняется.",
     );
     if (!ok) return;
-    const typed = window.prompt(
-      'Чтобы продолжить, введите точно: С НУЛЯ\n(иначе прогон не запустится)',
-    );
-    if (typed !== "С НУЛЯ") {
-      setRecalcMessage("Прогон отменён — не подтверждено «С НУЛЯ»");
-      return;
-    }
 
     setRecalcStatus("running");
     setRecalcMessage(null);
@@ -214,7 +206,7 @@ export function RatingPreviewPanel() {
       const res = await fetch("/api/admin/rating-recalc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ confirm: "RECALC_FROM_ZERO", formula }),
+        body: JSON.stringify({ confirm: "RECALC", formula }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -225,7 +217,7 @@ export function RatingPreviewPanel() {
       if (Array.isArray(data.snapshots)) setSnapshots(data.snapshots);
       setRecalcStatus("idle");
       setRecalcMessage(
-        `Готово: ${data.matchCount} встреч, затронуто игроков ${data.playersTouched}. Снимок сохранён — при необходимости нажмите «Вернуть».`,
+        `Готово: ${data.matchCount} встреч, изменено игроков ${data.playersTouched}. Снимок сохранён.`,
       );
     } catch {
       setRecalcStatus("error");
@@ -387,11 +379,10 @@ export function RatingPreviewPanel() {
             Прогон по всем встречам
           </h3>
           <p className="admin-muted text-xs leading-relaxed">
-            Не для повседневной работы. Прогон с нуля пересчитывает историю матчей и
-            затирает текущие общие рейтинги (было 5 → станет доли вроде 0,15). Нужен
-            только для экспериментов; перед записью — снимок и откат кнопкой «Вернуть».
-            Обычный режим: галочка автопересчёта — только новые встречи поверх текущих
-            рейтингов.
+            Пересчёт от текущих общих рейтингов: по всем завершённым встречам накатывается
+            выбранная формула (рейтинги не обнуляются). Перед записью — снимок, откат
+            кнопкой «Вернуть». Чтобы сравнить другую формулу: сначала «Вернуть», потом снова
+            прогон. Автопересчёт новых матчей — отдельная галочка выше.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">

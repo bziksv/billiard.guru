@@ -207,8 +207,8 @@ async function loadFinishedMatchesForRecalc(): Promise<FinishedMatch[]> {
 }
 
 /**
- * Перед прогоном сохраняет текущие рейтинги, считает новые в памяти,
- * затем атомарнее пишет результат (без «все на 0» до конца расчёта).
+ * Перед прогоном сохраняет снимок, затем прогоняет все завершённые встречи
+ * от ТЕКУЩИХ рейтингов (не с нуля) выбранной формулой.
  */
 export async function bulkRecalcSystemRating(options: {
   formula: RatingPreviewFormula;
@@ -220,6 +220,10 @@ export async function bulkRecalcSystemRating(options: {
   recalcLock = true;
   try {
     const matches = await loadFinishedMatchesForRecalc();
+    const players = await prisma.player.findMany({
+      select: { id: true, rating: true },
+    });
+
     const snapshotId = await snapshotAllRatings({
       label: `Перед прогоном (${options.formula})`,
       formula: options.formula,
@@ -227,8 +231,8 @@ export async function bulkRecalcSystemRating(options: {
       matchCount: matches.length,
     });
 
-    // Сначала полный расчёт в памяти (старт с 0) — в БД пока старые рейтинги
-    const ratings = new Map<string, number>();
+    // Старт = текущие рейтинги (ручная база / прошлый результат), не ноль
+    const ratings = new Map(players.map((p) => [p.id, p.rating]));
     const changeRows: {
       playerId: string;
       oldRating: number;
@@ -293,16 +297,14 @@ export async function bulkRecalcSystemRating(options: {
       }
     }
 
-    // Запись: очистка журнала матчей, затем сразу итоговые рейтинги
-    // (игроки без матчей → 0; без промежуточного «все в ноль» надолго)
     await prisma.ratingChange.deleteMany({
       where: { matchId: { not: null } },
     });
 
-    const allPlayers = await prisma.player.findMany({ select: { id: true } });
-    const finalRows = allPlayers.map((p) => ({
-      id: p.id,
-      rating: ratings.get(p.id) ?? 0,
+    // Пишем итог; кто без матчей — остаётся на своём рейтинге из Map
+    const finalRows = [...ratings.entries()].map(([id, rating]) => ({
+      id,
+      rating,
     }));
     for (let i = 0; i < finalRows.length; i += CHUNK) {
       const chunk = finalRows.slice(i, i + CHUNK);
@@ -326,7 +328,7 @@ export async function bulkRecalcSystemRating(options: {
       action: "rating.bulk_recalc",
       entityType: "rating_snapshot",
       entityId: snapshotId,
-      summary: `Прогон общего рейтинга (${options.formula}): ${matches.length} встреч`,
+      summary: `Прогон общего рейтинга от текущих (${options.formula}): ${matches.length} встреч`,
       payload: {
         formula: options.formula,
         snapshotId,
@@ -334,6 +336,7 @@ export async function bulkRecalcSystemRating(options: {
         skippedMatches,
         playersTouched: touched.size,
         changeRows: changeRows.length,
+        seed: "current",
       },
     });
 
