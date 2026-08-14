@@ -207,8 +207,8 @@ async function loadFinishedMatchesForRecalc(): Promise<FinishedMatch[]> {
 }
 
 /**
- * Перед прогоном сохраняет текущие рейтинги, обнуляет общий рейтинг,
- * удаляет match_* RatingChange и заново прогоняет все завершённые встречи.
+ * Перед прогоном сохраняет текущие рейтинги, считает новые в памяти,
+ * затем атомарнее пишет результат (без «все на 0» до конца расчёта).
  */
 export async function bulkRecalcSystemRating(options: {
   formula: RatingPreviewFormula;
@@ -227,13 +227,7 @@ export async function bulkRecalcSystemRating(options: {
       matchCount: matches.length,
     });
 
-    await prisma.ratingChange.deleteMany({
-      where: { matchId: { not: null } },
-    });
-
-    // С нуля: все игроки → 0, затем хронологический прогон
-    await prisma.player.updateMany({ data: { rating: 0 } });
-
+    // Сначала полный расчёт в памяти (старт с 0) — в БД пока старые рейтинги
     const ratings = new Map<string, number>();
     const changeRows: {
       playerId: string;
@@ -299,12 +293,25 @@ export async function bulkRecalcSystemRating(options: {
       }
     }
 
-    const finalUpdates = [...ratings.entries()];
-    for (let i = 0; i < finalUpdates.length; i += CHUNK) {
-      const chunk = finalUpdates.slice(i, i + CHUNK);
+    // Запись: очистка журнала матчей, затем сразу итоговые рейтинги
+    // (игроки без матчей → 0; без промежуточного «все в ноль» надолго)
+    await prisma.ratingChange.deleteMany({
+      where: { matchId: { not: null } },
+    });
+
+    const allPlayers = await prisma.player.findMany({ select: { id: true } });
+    const finalRows = allPlayers.map((p) => ({
+      id: p.id,
+      rating: ratings.get(p.id) ?? 0,
+    }));
+    for (let i = 0; i < finalRows.length; i += CHUNK) {
+      const chunk = finalRows.slice(i, i + CHUNK);
       await prisma.$transaction(
-        chunk.map(([id, rating]) =>
-          prisma.player.updateMany({ where: { id }, data: { rating } }),
+        chunk.map((row) =>
+          prisma.player.updateMany({
+            where: { id: row.id },
+            data: { rating: row.rating },
+          }),
         ),
       );
     }

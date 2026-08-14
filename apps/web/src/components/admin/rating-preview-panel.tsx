@@ -355,15 +355,15 @@ export function RatingPreviewPanel() {
             type="button"
             onClick={saveAutoConfig}
             disabled={!configLoaded || saveStatus === "saving"}
-            className="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-2 text-sm font-medium hover:bg-sky-500 disabled:opacity-60"
+            className="admin-btn admin-btn--primary px-5 py-2 text-sm"
           >
             {saveStatus === "saving" ? "Сохраняем…" : "Сохранить формулу и настройки"}
           </button>
           {saveStatus === "saved" && (
-            <span className="text-sm text-emerald-400">Сохранено</span>
+            <span className="text-sm text-[var(--admin-notify-outbound-text)]">Сохранено</span>
           )}
           {saveStatus === "error" && saveError && (
-            <span className="text-sm text-red-400">{saveError}</span>
+            <span className="text-sm text-red-600">{saveError}</span>
           )}
           {configLoaded && (
             <span className="admin-muted text-xs">
@@ -375,10 +375,12 @@ export function RatingPreviewPanel() {
 
       <div className="admin-inset space-y-4 p-4">
         <div>
-          <h3 className="mb-1 text-sm font-semibold">Прогон по всем встречам</h3>
+          <h3 className="mb-1 text-sm font-semibold text-[var(--admin-text)]">
+            Прогон по всем встречам
+          </h3>
           <p className="admin-muted text-xs leading-relaxed">
             Записывает общий рейтинг в базу: перед прогоном сохраняется снимок текущих
-            значений, рейтинг обнуляется и пересчитывается с нуля выбранной формулой по
+            значений, затем рейтинг пересчитывается с нуля выбранной формулой по
             хронологии завершённых матчей. Можно откатить снимок и прогнать другую
             формулу. На автопересчёт после новых матчей это не влияет — галочка «Включить»
             настраивается отдельно.
@@ -389,7 +391,7 @@ export function RatingPreviewPanel() {
             type="button"
             onClick={runBulkRecalc}
             disabled={!configLoaded || recalcStatus === "running" || restoreBusyId != null}
-            className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-600 px-5 py-2 text-sm font-medium hover:bg-amber-500 disabled:opacity-60"
+            className="admin-btn admin-btn--primary px-5 py-2 text-sm"
           >
             {recalcStatus === "running" && (
               <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -401,7 +403,9 @@ export function RatingPreviewPanel() {
           {recalcMessage && (
             <span
               className={`text-sm ${
-                recalcStatus === "error" ? "text-red-400" : "text-emerald-400"
+                recalcStatus === "error"
+                  ? "text-red-600"
+                  : "text-[var(--admin-notify-outbound-text)]"
               }`}
             >
               {recalcMessage}
@@ -410,15 +414,15 @@ export function RatingPreviewPanel() {
         </div>
         {snapshots.length > 0 && (
           <div className="space-y-2">
-            <p className="text-xs font-medium text-zinc-300">Снимки для отката</p>
+            <p className="admin-label">Снимки для отката</p>
             <ul className="space-y-2">
               {snapshots.map((s) => (
                 <li
                   key={s.id}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm"
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-card-bg)] px-3 py-2.5 text-sm shadow-sm"
                 >
                   <div className="min-w-0">
-                    <div className="truncate font-medium text-zinc-200">
+                    <div className="truncate font-medium text-[var(--admin-text)]">
                       {s.label ?? "Снимок"}
                     </div>
                     <div className="admin-muted text-xs">
@@ -431,7 +435,7 @@ export function RatingPreviewPanel() {
                     type="button"
                     onClick={() => restoreSnapshot(s.id)}
                     disabled={recalcStatus === "running" || restoreBusyId != null}
-                    className="shrink-0 rounded-md border border-white/15 px-3 py-1.5 text-xs font-medium hover:bg-white/5 disabled:opacity-60"
+                    className="admin-btn admin-btn--outline shrink-0 px-3 py-1.5 text-xs"
                   >
                     {restoreBusyId === s.id ? "Восстанавливаем…" : "Вернуть"}
                   </button>
@@ -442,9 +446,11 @@ export function RatingPreviewPanel() {
         )}
       </div>
 
-      <div className="space-y-3 border-t border-white/10 pt-5">
+      <div className="space-y-3 border-t border-[var(--admin-border)] pt-5">
         <div>
-          <h3 className="mb-1 text-sm font-semibold">Превью (без записи в базу)</h3>
+          <h3 className="mb-1 text-sm font-semibold text-[var(--admin-text)]">
+            Превью (без записи в базу)
+          </h3>
           <p className="admin-muted text-xs">
             Сравнение формул на истории матчей. Для авторежима важен общий рейтинг
             (источник SYSTEM).
@@ -476,14 +482,14 @@ export function RatingPreviewPanel() {
           type="button"
           onClick={runPreview}
           disabled={loading || (ratingSource === "CLUB" && !clubId)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+          className="admin-btn admin-btn--outline px-5 py-2 text-sm"
         >
           {loading && (
             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
           )}
           {loading ? "Считаем…" : "Показать превью всех формул"}
         </button>
-        {error && <span className="text-sm text-red-400">{error}</span>}
+        {error && <span className="text-sm text-red-600">{error}</span>}
       </div>
 
       {bundle && (
