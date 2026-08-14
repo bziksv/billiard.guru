@@ -23,7 +23,7 @@ export async function getEffectivePlayerRatingForTournament(
   playerId: string,
   clubId: string,
   systemRating: number,
-  source: TournamentRatingSource = "CLUB",
+  source: TournamentRatingSource = "SYSTEM",
 ): Promise<number> {
   if (source === "SYSTEM") return systemRating;
   const row = await prisma.clubPlayerRating.findUnique({
@@ -79,7 +79,7 @@ export async function assertPlayerEligibleForTournamentRating(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   if (tournament.ratingMax == null) return { ok: true };
 
-  const source = tournament.ratingSource ?? "CLUB";
+  const source = tournament.ratingSource ?? "SYSTEM";
 
   const player = await prisma.player.findUnique({
     where: { id: playerId },
@@ -121,7 +121,7 @@ export async function filterPlayersByTournamentRatingMax<T extends PlayerWithSys
   players: T[],
   clubId: string,
   ratingMax: number | null | undefined,
-  source: TournamentRatingSource = "CLUB",
+  source: TournamentRatingSource = "SYSTEM",
 ): Promise<{ eligible: T[]; skippedByRating: number }> {
   if (ratingMax == null || players.length === 0) {
     return { eligible: players, skippedByRating: 0 };

@@ -177,6 +177,21 @@ export type BracketFormatConfig = Prisma.BracketFormatConfigModel
  */
 export type TournamentDefaultsConfig = Prisma.TournamentDefaultsConfigModel
 /**
+ * Model RatingAutoConfig
+ * Автопересчёт общего рейтинга (Player.rating) по выбранной формуле превью.
+ */
+export type RatingAutoConfig = Prisma.RatingAutoConfigModel
+/**
+ * Model PlayerRatingSnapshot
+ * Снимок общего рейтинга перед массовым прогоном (можно откатить и сравнить формулы).
+ */
+export type PlayerRatingSnapshot = Prisma.PlayerRatingSnapshotModel
+/**
+ * Model PlayerRatingSnapshotRow
+ * 
+ */
+export type PlayerRatingSnapshotRow = Prisma.PlayerRatingSnapshotRowModel
+/**
  * Model DbBackupConfig
  * Настройки автобэкапа БД (одна строка, /admin/db-backups).
  */

@@ -7,6 +7,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { TournamentManageView } from "@/components/admin/tournament-manage-view";
 import type { MatchResultPayload } from "@/components/bracket/match-result-modal";
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
+import { alertMatchRatingChanges } from "@/lib/match-rating-alert";
 import {
   canStartTournament,
   countConfirmedParticipants,
@@ -123,7 +124,7 @@ export function ClubOwnerTournamentManagePage({
         label: formatTournamentPlayerSelectLabel(
           p,
           clubPlayerRatings[p.id],
-          tournament?.ratingSource ?? "CLUB",
+          tournament?.ratingSource ?? "SYSTEM",
         ),
       })),
     [players, clubPlayerRatings, tournament?.ratingSource],
@@ -273,6 +274,7 @@ export function ClubOwnerTournamentManagePage({
     if (!res.ok) {
       throw new Error(data.error ?? "Ошибка");
     }
+    alertMatchRatingChanges(data);
     await reload();
   }
 

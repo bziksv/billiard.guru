@@ -22,13 +22,10 @@ import { FORMAT_OPTIONS } from "@/lib/bracket-formats/catalog";
 import { adminTabClass } from "@/lib/admin-ui";
 import { MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
 import { useTournamentDefaults } from "@/hooks/use-tournament-defaults";
-import {
-  TOURNAMENT_RATING_SOURCE_OPTIONS,
-  tournamentRatingSourceHint,
-  type TournamentRatingSource,
-} from "@/lib/tournament-rating-display";
 import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
+import { TournamentRatingSourceSelect } from "@/components/tournament/tournament-rating-source-select";
 import { DisciplinePicker } from "@/components/admin/discipline-picker";
+import type { TournamentRatingSource } from "@/lib/tournament-rating-display";
 
 interface Club {
   id: string;
@@ -115,7 +112,7 @@ export default function TournamentsPage() {
   const [newDiscipline, setNewDiscipline] = useState<string | null>(null);
   const [newGameType, setNewGameType] = useState<string | null>(null);
   const [disciplineInvalid, setDisciplineInvalid] = useState(false);
-  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
+  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("SYSTEM");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
   const [tableStreams, setTableStreams] = useState<Record<string, string>>({});
@@ -315,7 +312,7 @@ export default function TournamentsPage() {
         ratingMax: tournamentDefaults.limitByRating
           ? Number(form.get("ratingMax"))
           : null,
-        ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
+        ratingSource: tournamentDefaults.limitByRating ? ratingSource : "SYSTEM",
         handicapHalfStep: form.get("handicapHalfStep") === "on",
         suppressNotifications: form.get("suppressNotifications") === "on",
         tableIds: selectedTableIds,
@@ -510,7 +507,7 @@ export default function TournamentsPage() {
               <span className="font-medium text-zinc-200">Учитывать рейтинг 0,5</span>
               <span className="mt-1 block text-xs text-zinc-500">
                 С галкой — фора по шагу 0,5. Без галки — только целые шары по разнице рейтингов, без
-                дополнительного шара в нечётных партиях.
+                дополнительного шара в чётных партиях.
               </span>
             </span>
           </label>
@@ -531,13 +528,9 @@ export default function TournamentsPage() {
           {tournamentDefaults.limitByRating && (
             <>
               <div className="sm:col-span-2">
-                <SearchableSelect
-                  label="Источник рейтинга для лимита"
-                  options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+                <TournamentRatingSourceSelect
                   value={ratingSource}
-                  onChange={(v) => setRatingSource(v as TournamentRatingSource)}
-                  placeholder="Источник рейтинга"
-                  searchPlaceholder="Рейтинг…"
+                  onChange={setRatingSource}
                 />
               </div>
               <label className="sm:col-span-2 block text-sm">
@@ -555,8 +548,7 @@ export default function TournamentsPage() {
                   className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
                 />
                 <span className="mt-1 block text-xs text-zinc-500">
-                  {tournamentRatingSourceHint(ratingSource)} Выше лимита — без уведомления и без
-                  записи.
+                  Выше лимита — без уведомления и без записи.
                 </span>
               </label>
             </>

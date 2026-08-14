@@ -12,16 +12,12 @@ import {
   useBracketFormatOptions,
 } from "@/hooks/use-bracket-format-options";
 import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
-import { SearchableSelect } from "@/components/ui/searchable-select";
 import { useTournamentDefaults } from "@/hooks/use-tournament-defaults";
-import {
-  TOURNAMENT_RATING_SOURCE_OPTIONS,
-  tournamentRatingSourceHint,
-  type TournamentRatingSource,
-} from "@/lib/tournament-rating-display";
+import type { TournamentRatingSource } from "@/lib/tournament-rating-display";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
 import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
+import { TournamentRatingSourceSelect } from "@/components/tournament/tournament-rating-source-select";
 import { DisciplinePicker } from "@/components/admin/discipline-picker";
 
 const CURRENT_STATUSES = new Set([
@@ -46,7 +42,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
   const [newDiscipline, setNewDiscipline] = useState<string | null>(null);
   const [newGameType, setNewGameType] = useState<string | null>(null);
   const [disciplineInvalid, setDisciplineInvalid] = useState(false);
-  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
+  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("SYSTEM");
   const [createMessage, setCreateMessage] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [selectedTableIds, setSelectedTableIds] = useState<string[]>([]);
@@ -127,7 +123,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
           ratingMax: tournamentDefaults.limitByRating
             ? Number(form.get("ratingMax"))
             : null,
-          ratingSource: tournamentDefaults.limitByRating ? ratingSource : "CLUB",
+          ratingSource: tournamentDefaults.limitByRating ? ratingSource : "SYSTEM",
           handicapHalfStep: form.get("handicapHalfStep") === "on",
           suppressNotifications: form.get("suppressNotifications") === "on",
           tableIds: selectedTableIds,
@@ -287,9 +283,9 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
               <span>
                 <span className="font-medium text-zinc-200">Учитывать рейтинг 0,5</span>
                 <span className="mt-1 block text-xs text-zinc-500">
-                  Включено: фора по системе 0,5 (например 3,5 vs 0 — 3 шара в каждой партии и +1 в
-                  нечётных). Если снять галку — только целая часть разницы (3,5 vs 0 — 3 шара в
-                  каждой, без доп. шара в нечётных).
+                  С галкой — фора по шагу 0,5 (+1 шар в чётных партиях при дробной разнице).
+                  Без галки — только целая часть разницы (3,5 vs 0 — 3 шара в каждой, без доп.
+                  шара в чётных).
                 </span>
               </span>
             </label>
@@ -309,13 +305,9 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
             </label>
             {tournamentDefaults.limitByRating && (
               <>
-                <SearchableSelect
-                  label="Источник рейтинга для лимита"
-                  options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+                <TournamentRatingSourceSelect
                   value={ratingSource}
-                  onChange={(v) => setRatingSource(v as TournamentRatingSource)}
-                  placeholder="Источник рейтинга"
-                  searchPlaceholder="Рейтинг…"
+                  onChange={setRatingSource}
                 />
                 <label className="block text-sm">
                   <span className="mb-1 block text-zinc-400">
@@ -332,8 +324,7 @@ export function ClubOwnerTournamentsPage({ clubId }: { clubId: string }) {
                     className="site-input w-full"
                   />
                   <span className="mt-1 block text-xs text-zinc-500">
-                    {tournamentRatingSourceHint(ratingSource)} Игроки с рейтингом выше не
-                    получат уведомление и не смогут записаться.
+                    Игроки с рейтингом выше не получат уведомление и не смогут записаться.
                   </span>
                 </label>
               </>

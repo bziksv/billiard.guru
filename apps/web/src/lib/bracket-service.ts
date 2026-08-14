@@ -24,6 +24,10 @@ import { logger } from "@/lib/logger";
 import excelRef from "@/lib/excel-bracket-64-reference.json";
 import { notifyMatchStartScheduled } from "@/lib/match-start-notification";
 import {
+  applyAutoRatingForMatch,
+  reverseAutoRatingForMatch,
+} from "@/lib/rating-apply-match-server";
+import {
   listBusyTournamentTableIds,
   pickFreeTournamentTableId,
 } from "@/lib/tournament-stream";
@@ -98,7 +102,7 @@ async function seedTeamsByTournamentRating<T extends TeamWithPlayers>(
     tournament.clubId,
     playerIds,
   );
-  const source = tournament.ratingSource ?? "CLUB";
+  const source = tournament.ratingSource ?? "SYSTEM";
   return teamsSortedByTournamentRating(teams, source, clubPlayerRatings);
 }
 
@@ -355,6 +359,8 @@ export async function cancelMatchResult(db: Db, matchId: string) {
       finishedAt: null,
     },
   });
+
+  await reverseAutoRatingForMatch(matchId);
 
   if (
     isOlympicFormat(format) &&
@@ -1521,7 +1527,7 @@ export async function generateSwissRound(db: Db, tournamentId: string) {
     tournament.clubId,
     playerIds,
   );
-  const ratingSource = tournament.ratingSource ?? "CLUB";
+  const ratingSource = tournament.ratingSource ?? "SYSTEM";
   const ratedTeams = teams.map(
     (team) =>
       applyTournamentRatingsToTeam(team, ratingSource, clubPlayerRatings) ?? team,
@@ -1778,7 +1784,9 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
 
   await processByes(db, match.tournamentId, match.tournament.format);
 
-  return db.tournamentMatch.findUnique({
+  const ratingChanges = await applyAutoRatingForMatch(input.matchId);
+
+  const finalMatch = await db.tournamentMatch.findUnique({
     where: { id: input.matchId },
     include: {
       team1: { include: { player1: true, player2: true } },
@@ -1786,6 +1794,10 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
       winnerTeam: { include: { player1: true, player2: true } },
     },
   });
+
+  if (!finalMatch) return null;
+  if (!ratingChanges) return finalMatch;
+  return Object.assign(finalMatch, { ratingChanges });
 }
 
 export async function resetAllMatchResults(db: Db, tournamentId: string) {
@@ -1845,6 +1857,9 @@ export async function resetAllMatchResults(db: Db, tournamentId: string) {
   }
 
   for (const m of matches) {
+    if (m.winnerTeamId) {
+      await reverseAutoRatingForMatch(m.id);
+    }
     await db.tournamentMatch.update({
       where: { id: m.id },
       data: {

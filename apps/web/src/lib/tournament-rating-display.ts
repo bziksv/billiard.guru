@@ -9,21 +9,21 @@ export const TOURNAMENT_RATING_SOURCE_OPTIONS: {
   value: TournamentRatingSource;
   label: string;
 }[] = [
-  { value: "CLUB", label: "Рейтинг клуба" },
   { value: "SYSTEM", label: "Общий рейтинг" },
+  { value: "CLUB", label: "Рейтинг клуба" },
 ];
 
 export function tournamentRatingSourceLabel(
-  source: TournamentRatingSource = "CLUB",
+  source: TournamentRatingSource = "SYSTEM",
 ): string {
   return source === "CLUB" ? "рейтинг клуба" : "общий рейтинг";
 }
 
 export function tournamentRatingSourceHint(
-  source: TournamentRatingSource = "CLUB",
+  source: TournamentRatingSource = "SYSTEM",
 ): string {
   return source === "CLUB"
-    ? "Сначала рейтинг в клубе, при отсутствии — общий."
+    ? "Сначала рейтинг в клубе, при отсутствии — общий. Обычно лучше общий рейтинг."
     : "Только общий рейтинг игрока, клубный не учитывается.";
 }
 
@@ -31,7 +31,7 @@ export function tournamentRatingSourceHint(
 export function effectiveTournamentPlayerRating(
   systemRating: number,
   clubRating: number | null | undefined,
-  source: TournamentRatingSource = "CLUB",
+  source: TournamentRatingSource = "SYSTEM",
 ): number {
   if (source === "SYSTEM") return systemRating;
   return clubRating ?? systemRating;
@@ -40,7 +40,7 @@ export function effectiveTournamentPlayerRating(
 /** Рейтинг команды/участника для форы с учётом источника рейтинга турнира. */
 export function teamTournamentRating(
   team: TeamWithPlayers,
-  ratingSource: TournamentRatingSource = "CLUB",
+  ratingSource: TournamentRatingSource = "SYSTEM",
   clubPlayerRatings?: Record<string, number>,
 ): number {
   const r1 = effectiveTournamentPlayerRating(
@@ -59,7 +59,7 @@ export function teamTournamentRating(
 
 export function applyTournamentRatingsToTeam<T extends TeamWithPlayers>(
   team: T | null,
-  ratingSource: TournamentRatingSource = "CLUB",
+  ratingSource: TournamentRatingSource = "SYSTEM",
   clubPlayerRatings?: Record<string, number>,
 ): T | null {
   if (!team) return null;
@@ -91,7 +91,7 @@ export function applyTournamentRatingsToPlayers<
     ratingSource?: TournamentRatingSource;
   },
 >(tournament: T, clubPlayerRatings: Record<string, number> = {}): T {
-  const source = tournament.ratingSource ?? "CLUB";
+  const source = tournament.ratingSource ?? "SYSTEM";
   const mapPlayer = <P extends { id: string; rating: number }>(player: P): P => ({
     ...player,
     rating: effectiveTournamentPlayerRating(
@@ -123,7 +123,7 @@ export function playerExceedsTournamentRatingMax(
   systemRating: number,
   ratingMax: number | null | undefined,
   clubRating?: number | null,
-  source: TournamentRatingSource = "CLUB",
+  source: TournamentRatingSource = "SYSTEM",
 ): boolean {
   if (ratingMax == null) return false;
   return (
@@ -135,7 +135,7 @@ export function playerExceedsTournamentRatingMax(
 export function formatTournamentPlayerSelectLabel(
   player: PlayerSelectSource,
   clubRating: number | null | undefined,
-  source: TournamentRatingSource = "CLUB",
+  source: TournamentRatingSource = "SYSTEM",
 ): string {
   const effective = effectiveTournamentPlayerRating(
     player.rating,
@@ -165,7 +165,7 @@ export function formatTournamentRatingRulesSummary(tournament: {
   const parts: string[] = [];
   if (tournament.ratingMax != null) {
     parts.push(
-      `макс. ${tournamentRatingSourceLabel(tournament.ratingSource ?? "CLUB")} ${formatRating(tournament.ratingMax)}`,
+      `макс. ${tournamentRatingSourceLabel(tournament.ratingSource ?? "SYSTEM")} ${formatRating(tournament.ratingMax)}`,
     );
   } else {
     parts.push("без лимита по рейтингу");

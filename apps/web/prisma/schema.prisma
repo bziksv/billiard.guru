@@ -490,8 +490,8 @@ model Tournament {
   /// Макс. рейтинг для записи и рассылки (null — без лимита)
   ratingMax           Float?                   @map("rating_max")
   /// Источник рейтинга для лимита (по умолчанию — клубный)
-  ratingSource        TournamentRatingSource   @default(CLUB) @map("rating_source")
-  /// Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в нечётных)
+  ratingSource        TournamentRatingSource   @default(SYSTEM) @map("rating_source")
+  /// Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в чётных)
   handicapHalfStep    Boolean          @default(true) @map("handicap_half_step")
   /// Не слать Telegram по этому турниру (тестовые копии и отладка)
   suppressNotifications Boolean        @default(false) @map("suppress_notifications")
@@ -595,6 +595,7 @@ model RatingChange {
   matchId   String?  @map("match_id")
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([matchId])
   @@map("rating_changes")
 }
 
@@ -763,10 +764,51 @@ model TournamentDefaultsConfig {
   handicapHalfStep Boolean  @default(true) @map("handicap_half_step")
   limitByRating    Boolean                  @default(true) @map("limit_by_rating")
   ratingMax        Float?                   @map("rating_max")
-  ratingSource     TournamentRatingSource   @default(CLUB) @map("rating_source")
+  ratingSource     TournamentRatingSource   @default(SYSTEM) @map("rating_source")
   updatedAt        DateTime                 @updatedAt @map("updated_at")
 
   @@map("tournament_defaults_config")
+}
+
+/// Автопересчёт общего рейтинга (Player.rating) по выбранной формуле превью.
+model RatingAutoConfig {
+  id              String   @id @default("default")
+  /// Включено — считать рейтинг сразу после фиксации результата встречи
+  enabled         Boolean  @default(false)
+  /// soft | upset_only | upset_mild | mild_all | tiny_equal
+  formula         String   @default("tiny_equal")
+  minTournaments  Int      @default(3) @map("min_tournaments")
+  minH2hMatches   Int      @default(5) @map("min_h2h_matches")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("rating_auto_config")
+}
+
+/// Снимок общего рейтинга перед массовым прогоном (можно откатить и сравнить формулы).
+model PlayerRatingSnapshot {
+  id          String   @id @default(cuid())
+  label       String?
+  /// Формула, которой прогоняли сразу после этого снимка (если был прогон)
+  formula     String?
+  playerCount Int      @map("player_count")
+  matchCount  Int?     @map("match_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  createdById String?  @map("created_by_id")
+  rows        PlayerRatingSnapshotRow[]
+
+  @@index([createdAt])
+  @@map("player_rating_snapshots")
+}
+
+model PlayerRatingSnapshotRow {
+  snapshotId String               @map("snapshot_id")
+  snapshot   PlayerRatingSnapshot @relation(fields: [snapshotId], references: [id], onDelete: Cascade)
+  playerId   String               @map("player_id")
+  rating     Float
+
+  @@id([snapshotId, playerId])
+  @@index([playerId])
+  @@map("player_rating_snapshot_rows")
 }
 
 /// Настройки автобэкапа БД (одна строка, /admin/db-backups).

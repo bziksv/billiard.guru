@@ -1587,7 +1587,7 @@ export type $TournamentPayload<ExtArgs extends runtime.Types.Extensions.Internal
      */
     ratingSource: $Enums.TournamentRatingSource
     /**
-     * Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в нечётных)
+     * Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в чётных)
      */
     handicapHalfStep: boolean
     /**

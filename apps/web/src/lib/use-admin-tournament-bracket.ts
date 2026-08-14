@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { alertMatchRatingChanges } from "@/lib/match-rating-alert";
 import type { MatchResultPayload } from "@/components/bracket/match-result-modal";
 
 export function useAdminTournamentBracketActions(
@@ -37,6 +38,7 @@ export function useAdminTournamentBracketActions(
       if (!res.ok) {
         throw new Error(data.error ?? "Ошибка");
       }
+      alertMatchRatingChanges(data);
       await onReload();
     },
     [onReload],

@@ -111,7 +111,7 @@ export function TournamentParticipantRegistrationPanel({
         label: formatTournamentPlayerSelectLabel(
           p,
           clubPlayerRatings[p.id],
-          tournament.ratingSource ?? "CLUB",
+          tournament.ratingSource ?? "SYSTEM",
         ),
       })),
     [players, clubPlayerRatings, tournament.ratingSource],
@@ -128,7 +128,7 @@ export function TournamentParticipantRegistrationPanel({
         player.rating,
         ratingMax,
         clubPlayerRatings[player.id],
-        tournament.ratingSource ?? "CLUB",
+        tournament.ratingSource ?? "SYSTEM",
       );
     });
   }, [

@@ -15,7 +15,7 @@ export function TournamentRatingRulesSummary({
   };
   className?: string;
 }) {
-  const source = tournament.ratingSource ?? "CLUB";
+  const source = tournament.ratingSource ?? "SYSTEM";
   return (
     <p className={className}>
       <span className="text-zinc-400">Условия: </span>

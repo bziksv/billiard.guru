@@ -411,6 +411,9 @@ export const ModelName = {
   NotificationTypeConfig: 'NotificationTypeConfig',
   BracketFormatConfig: 'BracketFormatConfig',
   TournamentDefaultsConfig: 'TournamentDefaultsConfig',
+  RatingAutoConfig: 'RatingAutoConfig',
+  PlayerRatingSnapshot: 'PlayerRatingSnapshot',
+  PlayerRatingSnapshotRow: 'PlayerRatingSnapshotRow',
   DbBackupConfig: 'DbBackupConfig',
   TelegramDeliveryLog: 'TelegramDeliveryLog'
 } as const
@@ -428,7 +431,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "siteNews" | "player" | "sitePageView" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "dbBackupConfig" | "telegramDeliveryLog"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "siteNews" | "player" | "sitePageView" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "ratingAutoConfig" | "playerRatingSnapshot" | "playerRatingSnapshotRow" | "dbBackupConfig" | "telegramDeliveryLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2214,6 +2217,204 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    RatingAutoConfig: {
+      payload: Prisma.$RatingAutoConfigPayload<ExtArgs>
+      fields: Prisma.RatingAutoConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RatingAutoConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RatingAutoConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.RatingAutoConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RatingAutoConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload>
+        }
+        findMany: {
+          args: Prisma.RatingAutoConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload>[]
+        }
+        create: {
+          args: Prisma.RatingAutoConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload>
+        }
+        createMany: {
+          args: Prisma.RatingAutoConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.RatingAutoConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload>
+        }
+        update: {
+          args: Prisma.RatingAutoConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.RatingAutoConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RatingAutoConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.RatingAutoConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RatingAutoConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.RatingAutoConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRatingAutoConfig>
+        }
+        groupBy: {
+          args: Prisma.RatingAutoConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RatingAutoConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RatingAutoConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RatingAutoConfigCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlayerRatingSnapshot: {
+      payload: Prisma.$PlayerRatingSnapshotPayload<ExtArgs>
+      fields: Prisma.PlayerRatingSnapshotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayerRatingSnapshotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayerRatingSnapshotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload>
+        }
+        findFirst: {
+          args: Prisma.PlayerRatingSnapshotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayerRatingSnapshotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload>
+        }
+        findMany: {
+          args: Prisma.PlayerRatingSnapshotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload>[]
+        }
+        create: {
+          args: Prisma.PlayerRatingSnapshotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload>
+        }
+        createMany: {
+          args: Prisma.PlayerRatingSnapshotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.PlayerRatingSnapshotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload>
+        }
+        update: {
+          args: Prisma.PlayerRatingSnapshotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayerRatingSnapshotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayerRatingSnapshotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.PlayerRatingSnapshotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotPayload>
+        }
+        aggregate: {
+          args: Prisma.PlayerRatingSnapshotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayerRatingSnapshot>
+        }
+        groupBy: {
+          args: Prisma.PlayerRatingSnapshotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerRatingSnapshotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayerRatingSnapshotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerRatingSnapshotCountAggregateOutputType> | number
+        }
+      }
+    }
+    PlayerRatingSnapshotRow: {
+      payload: Prisma.$PlayerRatingSnapshotRowPayload<ExtArgs>
+      fields: Prisma.PlayerRatingSnapshotRowFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlayerRatingSnapshotRowFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlayerRatingSnapshotRowFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload>
+        }
+        findFirst: {
+          args: Prisma.PlayerRatingSnapshotRowFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlayerRatingSnapshotRowFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload>
+        }
+        findMany: {
+          args: Prisma.PlayerRatingSnapshotRowFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload>[]
+        }
+        create: {
+          args: Prisma.PlayerRatingSnapshotRowCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload>
+        }
+        createMany: {
+          args: Prisma.PlayerRatingSnapshotRowCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.PlayerRatingSnapshotRowDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload>
+        }
+        update: {
+          args: Prisma.PlayerRatingSnapshotRowUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlayerRatingSnapshotRowDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlayerRatingSnapshotRowUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.PlayerRatingSnapshotRowUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlayerRatingSnapshotRowPayload>
+        }
+        aggregate: {
+          args: Prisma.PlayerRatingSnapshotRowAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlayerRatingSnapshotRow>
+        }
+        groupBy: {
+          args: Prisma.PlayerRatingSnapshotRowGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerRatingSnapshotRowGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlayerRatingSnapshotRowCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlayerRatingSnapshotRowCountAggregateOutputType> | number
+        }
+      }
+    }
     DbBackupConfig: {
       payload: Prisma.$DbBackupConfigPayload<ExtArgs>
       fields: Prisma.DbBackupConfigFieldRefs
@@ -2852,6 +3053,40 @@ export const TournamentDefaultsConfigScalarFieldEnum = {
 export type TournamentDefaultsConfigScalarFieldEnum = (typeof TournamentDefaultsConfigScalarFieldEnum)[keyof typeof TournamentDefaultsConfigScalarFieldEnum]
 
 
+export const RatingAutoConfigScalarFieldEnum = {
+  id: 'id',
+  enabled: 'enabled',
+  formula: 'formula',
+  minTournaments: 'minTournaments',
+  minH2hMatches: 'minH2hMatches',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RatingAutoConfigScalarFieldEnum = (typeof RatingAutoConfigScalarFieldEnum)[keyof typeof RatingAutoConfigScalarFieldEnum]
+
+
+export const PlayerRatingSnapshotScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  formula: 'formula',
+  playerCount: 'playerCount',
+  matchCount: 'matchCount',
+  createdAt: 'createdAt',
+  createdById: 'createdById'
+} as const
+
+export type PlayerRatingSnapshotScalarFieldEnum = (typeof PlayerRatingSnapshotScalarFieldEnum)[keyof typeof PlayerRatingSnapshotScalarFieldEnum]
+
+
+export const PlayerRatingSnapshotRowScalarFieldEnum = {
+  snapshotId: 'snapshotId',
+  playerId: 'playerId',
+  rating: 'rating'
+} as const
+
+export type PlayerRatingSnapshotRowScalarFieldEnum = (typeof PlayerRatingSnapshotRowScalarFieldEnum)[keyof typeof PlayerRatingSnapshotRowScalarFieldEnum]
+
+
 export const DbBackupConfigScalarFieldEnum = {
   id: 'id',
   autoEnabled: 'autoEnabled',
@@ -3262,6 +3497,32 @@ export const TournamentDefaultsConfigOrderByRelevanceFieldEnum = {
 export type TournamentDefaultsConfigOrderByRelevanceFieldEnum = (typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum)[keyof typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum]
 
 
+export const RatingAutoConfigOrderByRelevanceFieldEnum = {
+  id: 'id',
+  formula: 'formula'
+} as const
+
+export type RatingAutoConfigOrderByRelevanceFieldEnum = (typeof RatingAutoConfigOrderByRelevanceFieldEnum)[keyof typeof RatingAutoConfigOrderByRelevanceFieldEnum]
+
+
+export const PlayerRatingSnapshotOrderByRelevanceFieldEnum = {
+  id: 'id',
+  label: 'label',
+  formula: 'formula',
+  createdById: 'createdById'
+} as const
+
+export type PlayerRatingSnapshotOrderByRelevanceFieldEnum = (typeof PlayerRatingSnapshotOrderByRelevanceFieldEnum)[keyof typeof PlayerRatingSnapshotOrderByRelevanceFieldEnum]
+
+
+export const PlayerRatingSnapshotRowOrderByRelevanceFieldEnum = {
+  snapshotId: 'snapshotId',
+  playerId: 'playerId'
+} as const
+
+export type PlayerRatingSnapshotRowOrderByRelevanceFieldEnum = (typeof PlayerRatingSnapshotRowOrderByRelevanceFieldEnum)[keyof typeof PlayerRatingSnapshotRowOrderByRelevanceFieldEnum]
+
+
 export const DbBackupConfigOrderByRelevanceFieldEnum = {
   id: 'id'
 } as const
@@ -3597,6 +3858,9 @@ export type GlobalOmitConfig = {
   notificationTypeConfig?: Prisma.NotificationTypeConfigOmit
   bracketFormatConfig?: Prisma.BracketFormatConfigOmit
   tournamentDefaultsConfig?: Prisma.TournamentDefaultsConfigOmit
+  ratingAutoConfig?: Prisma.RatingAutoConfigOmit
+  playerRatingSnapshot?: Prisma.PlayerRatingSnapshotOmit
+  playerRatingSnapshotRow?: Prisma.PlayerRatingSnapshotRowOmit
   dbBackupConfig?: Prisma.DbBackupConfigOmit
   telegramDeliveryLog?: Prisma.TelegramDeliveryLogOmit
 }

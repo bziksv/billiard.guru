@@ -690,7 +690,7 @@
       "participantsMatches": "{participants} participants · {matches} matches",
       "participantsLabel": "Participants: {range} (club rating first, then overall)",
       "handicapHalfStep": "Handicap: includes 0.5 rating steps",
-      "handicapInteger": "Handicap: integer rating difference only (no +1 in odd games)",
+      "handicapInteger": "Handicap: integer rating difference only (no +1 in even frames)",
       "signInToRegister": "Sign in",
       "signInSuffix": "to register for this tournament.",
       "pairParticipating": "You are playing as a pair {team}",

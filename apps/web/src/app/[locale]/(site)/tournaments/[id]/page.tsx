@@ -221,7 +221,7 @@ export default async function TournamentPage({
       player.id,
       tournament.clubId,
       player.rating,
-      tournament.ratingSource ?? "CLUB",
+      tournament.ratingSource ?? "SYSTEM",
     );
     if (playerRatingExceedsTournamentMax(effectiveRating, tournament.ratingMax)) {
       registrationBlockedByRating = t("detail.tournament.ratingBlocked", {

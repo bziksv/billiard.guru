@@ -78,6 +78,9 @@ export const ModelName = {
   NotificationTypeConfig: 'NotificationTypeConfig',
   BracketFormatConfig: 'BracketFormatConfig',
   TournamentDefaultsConfig: 'TournamentDefaultsConfig',
+  RatingAutoConfig: 'RatingAutoConfig',
+  PlayerRatingSnapshot: 'PlayerRatingSnapshot',
+  PlayerRatingSnapshotRow: 'PlayerRatingSnapshotRow',
   DbBackupConfig: 'DbBackupConfig',
   TelegramDeliveryLog: 'TelegramDeliveryLog'
 } as const
@@ -565,6 +568,40 @@ export const TournamentDefaultsConfigScalarFieldEnum = {
 export type TournamentDefaultsConfigScalarFieldEnum = (typeof TournamentDefaultsConfigScalarFieldEnum)[keyof typeof TournamentDefaultsConfigScalarFieldEnum]
 
 
+export const RatingAutoConfigScalarFieldEnum = {
+  id: 'id',
+  enabled: 'enabled',
+  formula: 'formula',
+  minTournaments: 'minTournaments',
+  minH2hMatches: 'minH2hMatches',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RatingAutoConfigScalarFieldEnum = (typeof RatingAutoConfigScalarFieldEnum)[keyof typeof RatingAutoConfigScalarFieldEnum]
+
+
+export const PlayerRatingSnapshotScalarFieldEnum = {
+  id: 'id',
+  label: 'label',
+  formula: 'formula',
+  playerCount: 'playerCount',
+  matchCount: 'matchCount',
+  createdAt: 'createdAt',
+  createdById: 'createdById'
+} as const
+
+export type PlayerRatingSnapshotScalarFieldEnum = (typeof PlayerRatingSnapshotScalarFieldEnum)[keyof typeof PlayerRatingSnapshotScalarFieldEnum]
+
+
+export const PlayerRatingSnapshotRowScalarFieldEnum = {
+  snapshotId: 'snapshotId',
+  playerId: 'playerId',
+  rating: 'rating'
+} as const
+
+export type PlayerRatingSnapshotRowScalarFieldEnum = (typeof PlayerRatingSnapshotRowScalarFieldEnum)[keyof typeof PlayerRatingSnapshotRowScalarFieldEnum]
+
+
 export const DbBackupConfigScalarFieldEnum = {
   id: 'id',
   autoEnabled: 'autoEnabled',
@@ -973,6 +1010,32 @@ export const TournamentDefaultsConfigOrderByRelevanceFieldEnum = {
 } as const
 
 export type TournamentDefaultsConfigOrderByRelevanceFieldEnum = (typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum)[keyof typeof TournamentDefaultsConfigOrderByRelevanceFieldEnum]
+
+
+export const RatingAutoConfigOrderByRelevanceFieldEnum = {
+  id: 'id',
+  formula: 'formula'
+} as const
+
+export type RatingAutoConfigOrderByRelevanceFieldEnum = (typeof RatingAutoConfigOrderByRelevanceFieldEnum)[keyof typeof RatingAutoConfigOrderByRelevanceFieldEnum]
+
+
+export const PlayerRatingSnapshotOrderByRelevanceFieldEnum = {
+  id: 'id',
+  label: 'label',
+  formula: 'formula',
+  createdById: 'createdById'
+} as const
+
+export type PlayerRatingSnapshotOrderByRelevanceFieldEnum = (typeof PlayerRatingSnapshotOrderByRelevanceFieldEnum)[keyof typeof PlayerRatingSnapshotOrderByRelevanceFieldEnum]
+
+
+export const PlayerRatingSnapshotRowOrderByRelevanceFieldEnum = {
+  snapshotId: 'snapshotId',
+  playerId: 'playerId'
+} as const
+
+export type PlayerRatingSnapshotRowOrderByRelevanceFieldEnum = (typeof PlayerRatingSnapshotRowOrderByRelevanceFieldEnum)[keyof typeof PlayerRatingSnapshotRowOrderByRelevanceFieldEnum]
 
 
 export const DbBackupConfigOrderByRelevanceFieldEnum = {

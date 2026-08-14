@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { SearchableSelect } from "@/components/ui/searchable-select";
+import { RatingPreviewPanel } from "@/components/admin/rating-preview-panel";
+import { TournamentRatingSourceSelect } from "@/components/tournament/tournament-rating-source-select";
 import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
 import { FALLBACK_TOURNAMENT_DEFAULTS } from "@/lib/tournament-defaults";
-import {
-  TOURNAMENT_RATING_SOURCE_OPTIONS,
-  tournamentRatingSourceHint,
-  type TournamentRatingSource,
-} from "@/lib/tournament-rating-display";
+import type { TournamentRatingSource } from "@/lib/tournament-rating-display";
 
 type HandicapResult = {
   ratingA: number;
@@ -31,7 +28,7 @@ export default function HandicapPage() {
   const [handicapHalfStep, setHandicapHalfStep] = useState(true);
   const [limitByRating, setLimitByRating] = useState(true);
   const [ratingMax, setRatingMax] = useState("8");
-  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("CLUB");
+  const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("SYSTEM");
   const [defaultsLoading, setDefaultsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -55,7 +52,7 @@ export default function HandicapPage() {
           if (data.limitByRating && data.ratingMax != null) {
             setRatingMax(String(data.ratingMax));
           }
-          setRatingSource(data.ratingSource ?? "CLUB");
+          setRatingSource(data.ratingSource ?? "SYSTEM");
         },
       )
       .finally(() => {
@@ -121,11 +118,12 @@ export default function HandicapPage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-5xl space-y-6">
       <div>
         <h1 className="admin-page-title mb-2">Управление форами и расчётом</h1>
         <p className="admin-page-lead text-sm">
-          Значения по умолчанию для новых турниров и калькулятор форы для проверки расчёта.
+          Значения по умолчанию для новых турниров, калькулятор форы и предварительный
+          пересчёт рейтинга по истории матчей (без записи в базу).
         </p>
       </div>
 
@@ -150,9 +148,9 @@ export default function HandicapPage() {
               <span>
                 <span className="font-medium">Учитывать рейтинг 0,5</span>
                 <span className="admin-muted mt-1 block text-xs">
-                  Включено: фора по шагу 0,5 (+1 шар в нечётных при дробной разнице). Выключено —
+                  Включено: фора по шагу 0,5 (+1 шар в чётных при дробной разнице). Выключено —
                   рейтинги для форы округляются вниз до целого (1,5 → 1), без доп. шара в
-                  нечётных (3 vs 1,5 → 2 шара; 3,5 vs 0 → 3 шара).
+                  чётных (3 vs 1,5 → 2 шара; 3,5 vs 0 → 3 шара).
                 </span>
               </span>
             </label>
@@ -169,13 +167,9 @@ export default function HandicapPage() {
 
             {limitByRating && (
               <div className="space-y-4">
-                <SearchableSelect
-                  label="Источник рейтинга для лимита"
-                  options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+                <TournamentRatingSourceSelect
                   value={ratingSource}
-                  onChange={(v) => setRatingSource(v as TournamentRatingSource)}
-                  placeholder="Источник рейтинга"
-                  searchPlaceholder="Рейтинг…"
+                  onChange={setRatingSource}
                 />
                 <div>
                   <label className="admin-label">Максимальный рейтинг ({ratingHint})</label>
@@ -189,8 +183,7 @@ export default function HandicapPage() {
                     className="admin-input w-full max-w-xs px-3 py-2"
                   />
                   <p className="admin-muted mt-1 text-xs">
-                    {tournamentRatingSourceHint(ratingSource)} Выше лимита — без записи и без
-                    уведомления «турнир рядом».
+                    Выше лимита — без записи и без уведомления «турнир рядом».
                   </p>
                 </div>
               </div>
@@ -298,6 +291,8 @@ export default function HandicapPage() {
           </div>
         )}
       </section>
+
+      <RatingPreviewPanel />
     </div>
   );
 }

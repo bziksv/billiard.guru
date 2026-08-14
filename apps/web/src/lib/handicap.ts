@@ -1,10 +1,11 @@
-/** Фора: при halfStep — шаг рейтинга 0,5 (полный шар в каждой партии, половинный — +1 в нечётных). */
+/** Фора: при halfStep — шаг рейтинга 0,5 (полный шар в каждой партии, половинный — +1 в чётных). */
 
 import type { AppLocale } from "@/i18n/routing";
 
 export interface HandicapBreakdown {
   ballsEveryGame: number;
-  extraBallOnOddGames: boolean;
+  /** +1 шар в чётных партиях (2, 4, 6…) при дробной разнице рейтинга. */
+  extraBallOnEvenGames: boolean;
   ratingDiff: number;
 }
 
@@ -29,8 +30,8 @@ function shortPerGameLabel(balls: number, locale: AppLocale): string {
   return `${balls} в каждой партии`;
 }
 
-function shortOddGameLabel(locale: AppLocale): string {
-  return locale === "en" ? "+1 in odd frames" : "+1 в нечётных";
+function shortEvenGameLabel(locale: AppLocale): string {
+  return locale === "en" ? "+1 in even frames" : "+1 в чётных";
 }
 
 function fullPerGameLabel(balls: number, locale: AppLocale): string {
@@ -40,8 +41,8 @@ function fullPerGameLabel(balls: number, locale: AppLocale): string {
   return `${balls} шар(а) в каждой партии`;
 }
 
-function fullOddGameLabel(locale: AppLocale): string {
-  return locale === "en" ? "1 ball in odd frames" : "1 шар в нечётных партиях";
+function fullEvenGameLabel(locale: AppLocale): string {
+  return locale === "en" ? "1 ball in even frames" : "1 шар в чётных партиях";
 }
 
 export function isNoHandicapLabel(value: string): boolean {
@@ -71,7 +72,7 @@ export function calculateHandicap(
     return {
       ratingDiff: diff,
       ballsEveryGame: fullBalls,
-      extraBallOnOddGames: hasHalfStep,
+      extraBallOnEvenGames: hasHalfStep,
     };
   }
 
@@ -83,7 +84,7 @@ export function calculateHandicap(
   return {
     ratingDiff: diff,
     ballsEveryGame: diff,
-    extraBallOnOddGames: false,
+    extraBallOnEvenGames: false,
   };
 }
 
@@ -94,13 +95,13 @@ export function getHandicapForGame(
   gameNumber: number,
   options?: HandicapOptions,
 ): number {
-  const { ballsEveryGame, extraBallOnOddGames } = calculateHandicap(
+  const { ballsEveryGame, extraBallOnEvenGames } = calculateHandicap(
     higherRating,
     lowerRating,
     options,
   );
   let balls = ballsEveryGame;
-  if (extraBallOnOddGames && gameNumber % 2 === 1) {
+  if (extraBallOnEvenGames && gameNumber % 2 === 0) {
     balls += 1;
   }
   return balls;
@@ -118,8 +119,8 @@ export function describeHandicap(
   if (h.ballsEveryGame > 0) {
     parts.push(fullPerGameLabel(h.ballsEveryGame, locale));
   }
-  if (h.extraBallOnOddGames) {
-    parts.push(fullOddGameLabel(locale));
+  if (h.extraBallOnEvenGames) {
+    parts.push(fullEvenGameLabel(locale));
   }
   return parts.join(", ");
 }
@@ -137,8 +138,8 @@ export function describeHandicapShort(
   if (h.ballsEveryGame > 0) {
     parts.push(shortPerGameLabel(h.ballsEveryGame, locale));
   }
-  if (h.extraBallOnOddGames) {
-    parts.push(shortOddGameLabel(locale));
+  if (h.extraBallOnEvenGames) {
+    parts.push(shortEvenGameLabel(locale));
   }
   return parts.join(", ");
 }

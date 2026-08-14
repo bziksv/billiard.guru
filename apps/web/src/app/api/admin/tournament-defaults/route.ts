@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest) {
       handicapHalfStep: body.handicapHalfStep,
       limitByRating: body.limitByRating,
       ratingMax: body.limitByRating ? (body.ratingMax ?? null) : null,
-      ratingSource: body.ratingSource ?? "CLUB",
+      ratingSource: body.ratingSource ?? "SYSTEM",
     });
     const defaults = await getTournamentDefaults();
     return NextResponse.json({ ok: true, ...defaults });

@@ -21,11 +21,11 @@ import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { describeHandicap } from "@/lib/handicap";
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
+import { TournamentRatingSourceSelect } from "@/components/tournament/tournament-rating-source-select";
 import { TournamentTablePicker } from "@/components/tournament/tournament-table-picker";
 import {
   applyTournamentRatingsToPlayers,
   applyTournamentRatingsToTeam,
-  TOURNAMENT_RATING_SOURCE_OPTIONS,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
 import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
@@ -457,7 +457,7 @@ export function TournamentManageView({
     t.ratingMax != null ? String(t.ratingMax) : "8",
   );
   const [editRatingSource, setEditRatingSource] = useState<TournamentRatingSource>(
-    t.ratingSource ?? "CLUB",
+    t.ratingSource ?? "SYSTEM",
   );
   const [editTableIds, setEditTableIds] = useState<string[]>(() =>
     parseTournamentTableIds(t.tableIds),
@@ -487,7 +487,7 @@ export function TournamentManageView({
     setEditHandicapHalfStep(t.handicapHalfStep !== false);
     setEditLimitByRating(t.ratingMax != null);
     setEditRatingMax(t.ratingMax != null ? String(t.ratingMax) : "8");
-    setEditRatingSource(t.ratingSource ?? "CLUB");
+    setEditRatingSource(t.ratingSource ?? "SYSTEM");
     setEditTableIds(parseTournamentTableIds(t.tableIds));
     setEditTableStreams(parseTournamentTableStreams(t.tableStreams));
     setEditError(null);
@@ -604,7 +604,7 @@ export function TournamentManageView({
     ? activeTeams.length
     : t.registrations.filter((r) => r.status !== "CANCELLED").length;
   const showSwissPoints = swiss && protocolRows.some((row) => row.points !== undefined);
-  const ratingSource = t.ratingSource ?? "CLUB";
+  const ratingSource = t.ratingSource ?? "SYSTEM";
   const handicapHalfStep = t.handicapHalfStep !== false;
   const bracketMatches = useMemo<BracketMatchView[]>(
     () =>
@@ -893,7 +893,7 @@ export function TournamentManageView({
             <span>
               <span className="font-medium text-[var(--admin-text)]">Учитывать рейтинг 0,5</span>
               <span className="admin-muted mt-1 block text-xs">
-                Включено: шаг 0,5 и +1 в нечётных. Выключено: 1,5 → 1 для форы (3 vs 1,5 → 2
+                Включено: шаг 0,5 и +1 в чётных. Выключено: 1,5 → 1 для форы (3 vs 1,5 → 2
                 шара).
               </span>
             </span>
@@ -909,13 +909,9 @@ export function TournamentManageView({
           </label>
           {editLimitByRating && (
             <>
-              <SearchableSelect
-                label="Источник рейтинга для лимита"
-                options={TOURNAMENT_RATING_SOURCE_OPTIONS}
+              <TournamentRatingSourceSelect
                 value={editRatingSource}
-                onChange={(v) => setEditRatingSource(v as TournamentRatingSource)}
-                placeholder="Источник рейтинга"
-                searchPlaceholder="Рейтинг…"
+                onChange={setEditRatingSource}
               />
               <label className="block text-sm">
                 <span className="admin-text-secondary mb-1 block text-xs">

@@ -135,7 +135,7 @@ export async function notifyNearbyPlayersAboutTournament(tournamentId: string) {
       players,
       tournament.clubId,
       tournament.ratingMax,
-      tournament.ratingSource ?? "CLUB",
+      tournament.ratingSource ?? "SYSTEM",
     );
   const ratingEligibleIds = new Set(ratingEligiblePlayers.map((p) => p.id));
 
@@ -430,7 +430,7 @@ export async function sendTournamentNearbyAnnounceToClubCity(
       players,
       tournament.clubId,
       tournament.ratingMax,
-      tournament.ratingSource ?? "CLUB",
+      tournament.ratingSource ?? "SYSTEM",
     );
   const ratingEligibleIds = new Set(ratingEligiblePlayers.map((p) => p.id));
 

@@ -316,7 +316,7 @@ export const tournamentSchema = z.object({
   gameType: z.string().min(1, "Выберите вид игры"),
   startsAt: z.string().optional(),
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
-  ratingSource: tournamentRatingSourceSchema.optional().default("CLUB"),
+  ratingSource: tournamentRatingSourceSchema.optional().default("SYSTEM"),
   handicapHalfStep: z.boolean().optional().default(true),
   suppressNotifications: z.boolean().optional().default(false),
   tableIds: z.array(z.string().min(1)).min(1, "Выберите хотя бы один стол"),

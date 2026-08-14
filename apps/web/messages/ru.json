@@ -690,7 +690,7 @@
       "participantsMatches": "{participants} участников · {matches} встреч",
       "participantsLabel": "Участники: {range} (сначала рейтинг в клубе, иначе общий)",
       "handicapHalfStep": "Фора: с учётом шага рейтинга 0,5",
-      "handicapInteger": "Фора: только целая часть разницы рейтингов (без +1 в нечётных)",
+      "handicapInteger": "Фора: только целая часть разницы рейтингов (без +1 в чётных)",
       "signInToRegister": "Войдите",
       "signInSuffix": ", чтобы записаться на турнир.",
       "pairParticipating": "Вы участвуете в паре {team}",
