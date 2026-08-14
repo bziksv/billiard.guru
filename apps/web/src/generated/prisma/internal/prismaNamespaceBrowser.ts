@@ -245,6 +245,7 @@ export const PlayerScalarFieldEnum = {
   telegramId: 'telegramId',
   telegramUsername: 'telegramUsername',
   rating: 'rating',
+  ratingBase: 'ratingBase',
   about: 'about',
   aboutEn: 'aboutEn',
   isCoach: 'isCoach',

@@ -212,3 +212,39 @@ export async function reverseAutoRatingForMatch(matchId: string): Promise<void> 
     payload: { count: changes.length },
   });
 }
+
+/**
+ * Откат авторейтинга по всем встречам турнира (перед удалением / сбросом сетки).
+ * Порядок: от новых к старым, чтобы цепочка схлопывалась корректно.
+ */
+export async function reverseAutoRatingForTournament(
+  tournamentId: string,
+): Promise<number> {
+  const matches = await prisma.tournamentMatch.findMany({
+    where: { tournamentId },
+    select: { id: true, finishedAt: true, createdAt: true },
+    orderBy: [{ finishedAt: "desc" }, { createdAt: "desc" }],
+  });
+  if (matches.length === 0) return 0;
+
+  let reversed = 0;
+  for (const m of matches) {
+    const before = await prisma.ratingChange.count({ where: { matchId: m.id } });
+    if (before === 0) continue;
+    await reverseAutoRatingForMatch(m.id);
+    reversed += 1;
+  }
+
+  if (reversed > 0) {
+    await writeAuditLog({
+      actorType: "system",
+      action: "rating.auto_tournament_reverse",
+      entityType: "tournament",
+      entityId: tournamentId,
+      summary: `Откат авторейтинга по ${reversed} встречам турнира`,
+      payload: { matchCount: reversed },
+    });
+  }
+
+  return reversed;
+}

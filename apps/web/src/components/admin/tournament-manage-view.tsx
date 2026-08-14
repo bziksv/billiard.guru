@@ -1556,7 +1556,7 @@ function ParticipantsTab({
                         ratingOverride={team.ratingOverride}
                         bracketLocked={bracketLocked}
                         onUpdated={onUpdated}
-                        resetHint={`сброс (${r.player.rating.toFixed(1)})`}
+                        resetHint={`к ${formatRating(r.player.rating)}`}
                       />
                     </div>
                   ) : null}

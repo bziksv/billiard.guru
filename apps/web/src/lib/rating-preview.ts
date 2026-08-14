@@ -6,6 +6,8 @@
  */
 import {
   MAX_PLAYER_RATING,
+  calculateRatingChangeElo,
+  calculateRatingChangeMicroEqual,
   calculateRatingChangeMildAll,
   calculateRatingChangeSoft,
   calculateRatingChangeTinyEqual,
@@ -21,14 +23,18 @@ import type { TournamentRatingSource } from "@/lib/tournament-rating-display";
  * upset_only — равные/апсет ±0,25, фаворит → 0;
  * upset_mild — равные ±0,1, апсет ±0,15, фаворит → 0;
  * mild_all — равные ±0,1, апсет ±0,15, фаворит ±0,1;
- * tiny_equal — равные ±0,05, апсет ±0,15, фаворит ±0,1.
+ * tiny_equal — равные ±0,05, апсет ±0,15, фаворит ±0,1;
+ * elo — Elo (K=0,2, D=1) на шкале 0…20;
+ * micro_equal — равные ±0,025, апсет ±0,15, фаворит ±0,1.
  */
 export type RatingPreviewFormula =
   | "soft"
   | "upset_only"
   | "upset_mild"
   | "mild_all"
-  | "tiny_equal";
+  | "tiny_equal"
+  | "elo"
+  | "micro_equal";
 
 export const DEFAULT_MIN_TOURNAMENTS = 3;
 export const DEFAULT_MIN_H2H_MATCHES = 5;
@@ -72,6 +78,8 @@ export type RatingPreviewMatchStep = {
   tournamentId: string;
   at: string;
   opponentId: string;
+  /** Все соперники стороны (для пар); если нет — [opponentId]. */
+  opponentIds?: string[];
   opponentName: string;
   won: boolean;
   isPair: boolean;
@@ -139,6 +147,8 @@ export type RatingPreviewBundle = {
   upsetMild: RatingPreviewResult;
   mildAll: RatingPreviewResult;
   tinyEqual: RatingPreviewResult;
+  elo: RatingPreviewResult;
+  microEqual: RatingPreviewResult;
 };
 
 export function ratingChangeForFormula(
@@ -158,7 +168,18 @@ export function ratingChangeForFormula(
   if (formula === "tiny_equal") {
     return calculateRatingChangeTinyEqual(winnerRating, loserRating);
   }
+  if (formula === "elo") {
+    return calculateRatingChangeElo(winnerRating, loserRating);
+  }
+  if (formula === "micro_equal") {
+    return calculateRatingChangeMicroEqual(winnerRating, loserRating);
+  }
   return calculateRatingChangeSoft(winnerRating, loserRating);
+}
+
+function avg(nums: number[]): number {
+  if (nums.length === 0) return 0;
+  return nums.reduce((a, b) => a + b, 0) / nums.length;
 }
 
 function playerName(p: {
@@ -171,11 +192,6 @@ function playerName(p: {
 
 function h2hKey(a: string, b: string): string {
   return a < b ? `${a}|${b}` : `${b}|${a}`;
-}
-
-function teamAvg(side: RatingPreviewSidePlayer[]): number {
-  if (side.length === 0) return 0;
-  return side.reduce((s, p) => s + p.ratingAtMatch, 0) / side.length;
 }
 
 function sideLabel(
@@ -292,8 +308,13 @@ export function simulateRatingPreview(input: {
       continue;
     }
 
-    const wTeam = teamAvg(m.winners);
-    const lTeam = teamAvg(m.losers);
+    // Сила сторон — по текущему симулированному рейтингу (как в прогоне/авто),
+    // а не по застывшему ratingAtMatch на все матчи подряд.
+    for (const p of [...m.winners, ...m.losers]) {
+      ensureSim(p.playerId, p.ratingAtMatch);
+    }
+    const wTeam = avg(m.winners.map((p) => ratings.get(p.playerId) ?? 0));
+    const lTeam = avg(m.losers.map((p) => ratings.get(p.playerId) ?? 0));
     if (input.usedHistoricalRatings && wTeam === 0 && lTeam === 0) {
       matchesSkippedUnrated++;
       continue;
@@ -315,10 +336,11 @@ export function simulateRatingPreview(input: {
         tournamentId: m.tournamentId,
         at,
         opponentId: m.losers[0]!.playerId,
+        opponentIds: m.losers.map((p) => p.playerId),
         opponentName: oppWLabel,
         won: true,
         isPair: m.isPair,
-        ratingBefore: wp.ratingAtMatch,
+        ratingBefore: before,
         ratingAfter: after,
         delta,
         opponentRatingBefore: lTeam,
@@ -336,10 +358,11 @@ export function simulateRatingPreview(input: {
         tournamentId: m.tournamentId,
         at,
         opponentId: m.winners[0]!.playerId,
+        opponentIds: m.winners.map((p) => p.playerId),
         opponentName: oppLLabel,
         won: false,
         isPair: m.isPair,
-        ratingBefore: lp.ratingAtMatch,
+        ratingBefore: before,
         ratingAfter: after,
         delta,
         opponentRatingBefore: wTeam,
@@ -440,16 +463,16 @@ export function simulateRatingPreview(input: {
     players,
     h2hSkew,
     note: usedHistoricalRatings
-      ? "Рейтинги на бой взяты из истории клуба на старт каждого турнира."
-      : "Истории клубного рейтинга нет — на каждый матч подставлен текущий рейтинг из базы.",
+      ? "Сила сторон в каждом матче — по накопительному превью; старт игрока — рейтинг клуба на дату турнира."
+      : "Сила сторон в каждом матче — по накопительному превью (как при прогоне); старт — текущий рейтинг из базы.",
   };
 }
 
-/** Превью: до сотых (0,25 / 0,1), без ложного toFixed(1) → 0,3. */
+/** Превью: до тысячных (0,025 / 0,05 / 0,1), без ложного toFixed(1). */
 export function formatPreviewRating(rating: number): string {
   const n = roundToPreviewGrid(rating);
   if (Number.isInteger(n)) return String(n);
-  return String(Number(n.toFixed(2)));
+  return String(Number(n.toFixed(3)));
 }
 
 export function formatPreviewDelta(delta: number): string {

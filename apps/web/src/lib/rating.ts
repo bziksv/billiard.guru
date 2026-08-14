@@ -1,8 +1,14 @@
 /** Рейтинг с шагом 0,5. После матча пересчитывается для обоих игроков. */
 
+/** Шаг форы / лимита «макс. рейтинг» (шары за каждые 0,5). */
 export const RATING_STEP = 0.5;
+/**
+ * Шаг ручного ввода рейтинга (общий, клубный, override в турнире).
+ * Автоформулы могут давать 0,025 — при ручном сохранении привязываем к 0,05.
+ */
+export const RATING_EDIT_STEP = 0.05;
 export const MIN_PLAYER_RATING = 0;
-/** Верхняя граница рейтинга в формах и лимите турнира (шаг 0,5). */
+/** Верхняя граница рейтинга в формах и лимите турнира. */
 export const MAX_PLAYER_RATING = 20;
 
 const STEP = RATING_STEP;
@@ -10,6 +16,16 @@ const MIN_RATING = MIN_PLAYER_RATING;
 
 function roundToHalf(value: number): number {
   return Math.round(value * 2) / 2;
+}
+
+/** Привязка к шагу ручного ввода (0,05). */
+export function snapToRatingEditStep(value: number): number {
+  const g = 1 / RATING_EDIT_STEP;
+  return Math.max(MIN_PLAYER_RATING, Math.round(value * g) / g);
+}
+
+export function isOnRatingEditStep(value: number): boolean {
+  return Math.abs(value - snapToRatingEditStep(value)) < 1e-9;
 }
 
 export interface RatingChangeResult {
@@ -58,14 +74,16 @@ export const PREVIEW_STEP_WEAKER = 0.1;
 export const PREVIEW_STEP_EQUAL_MILD = 0.1;
 /** Формула 5: шаг за равных. */
 export const PREVIEW_STEP_EQUAL_TINY = 0.05;
+/** Формула 7: шаг за равных. */
+export const PREVIEW_STEP_EQUAL_MICRO = 0.025;
 /** Формула 3–5: шаг за апсет. */
 export const PREVIEW_STEP_UPSET_MILD = 0.15;
 /** Формула 4–5: шаг за победу фаворита над слабее. */
 export const PREVIEW_STEP_FAVORITE_MILD = 0.1;
 /** |Δ рейтинга| меньше этого — считаем «тот же уровень» (формулы 1–2). */
 export const PREVIEW_EQUAL_BAND = 0.5;
-/** Сетка превью (0,05 — чтобы жили 0,1 / 0,15 / 0,25). */
-export const PREVIEW_RATING_GRID = 0.05;
+/** Сетка превью (0,025 — чтобы жили 0,025 / 0,05 / 0,1 / 0,15 / 0,25). */
+export const PREVIEW_RATING_GRID = 0.025;
 
 export function roundToPreviewGrid(value: number): number {
   const g = 1 / PREVIEW_RATING_GRID;
@@ -234,6 +252,76 @@ export function calculateRatingChangeTinyEqual(
   );
 }
 
+/**
+ * Формула 7 — как 5, но равные ещё мельче:
+ * — равные (|Δ| ≤ 0,5) → ±0,025;
+ * — слабее обыграл сильнее → ±0,15;
+ * — сильнее обыграл слабее → ±0,1.
+ */
+export function calculateRatingChangeMicroEqual(
+  winnerRating: number,
+  loserRating: number,
+): RatingChangeResult {
+  const diff = winnerRating - loserRating;
+  if (Math.abs(diff) <= PREVIEW_EQUAL_BAND) {
+    return previewChangeResult(
+      winnerRating,
+      loserRating,
+      PREVIEW_STEP_EQUAL_MICRO,
+      -PREVIEW_STEP_EQUAL_MICRO,
+    );
+  }
+  if (diff > PREVIEW_EQUAL_BAND) {
+    return previewChangeResult(
+      winnerRating,
+      loserRating,
+      PREVIEW_STEP_FAVORITE_MILD,
+      -PREVIEW_STEP_FAVORITE_MILD,
+    );
+  }
+  return previewChangeResult(
+    winnerRating,
+    loserRating,
+    PREVIEW_STEP_UPSET_MILD,
+    -PREVIEW_STEP_UPSET_MILD,
+  );
+}
+
+/**
+ * Формула 6 — Elo на шкале billiard.guru (0…20).
+ *
+ * Ожидаемая вероятность победы:
+ *   E = 1 / (1 + 10^((R_loser − R_winner) / D)), D = {@link ELO_SCALE}
+ * Дельта: K · (1 − E), K = {@link ELO_K}; проигравший −дельта (zero-sum).
+ * Округление на сетку 0,05.
+ *
+ * При D=1 и K=0,2: равные ≈ ±0,1; фаворит +0,5 ≈ ±0,05; апсет −0,5 ≈ ±0,15.
+ */
+export const ELO_SCALE = 1;
+export const ELO_K = 0.2;
+
+export function calculateRatingChangeElo(
+  winnerRating: number,
+  loserRating: number,
+): RatingChangeResult {
+  const expected =
+    1 / (1 + 10 ** ((loserRating - winnerRating) / ELO_SCALE));
+  const winnerDelta = roundToPreviewGrid(ELO_K * (1 - expected));
+  const loserDelta = -winnerDelta;
+  return previewChangeResult(
+    winnerRating,
+    loserRating,
+    winnerDelta,
+    loserDelta,
+  );
+}
+
 export function formatRating(rating: number): string {
-  return Number.isInteger(rating) ? String(rating) : rating.toFixed(1);
+  const n = Number(rating);
+  if (!Number.isFinite(n)) return "0";
+  if (Number.isInteger(n)) return String(n);
+  // Сетка до 0,025: не режем toFixed(1)/toFixed(2) вслепую
+  const rounded = roundToPreviewGrid(n);
+  if (Number.isInteger(rounded)) return String(rounded);
+  return String(Number(rounded.toFixed(3)));
 }

@@ -23,6 +23,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { AsyncTextButton } from "@/components/ui/async-text-button";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { PlayerRatingTracePanel } from "@/components/admin/player-rating-trace-panel";
 import { formatRating } from "@/lib/rating";
 import { formatPhoneDashed } from "@/lib/phone";
 import { USER_ROLE_LABELS } from "@/lib/validators";
@@ -39,6 +40,7 @@ interface Player {
   photoUrl: string | null;
   telegramUsername: string | null;
   rating: number;
+  ratingBase?: number;
   role: string;
   isVerified: boolean;
   createdAt: string;
@@ -232,7 +234,13 @@ export function PlayersAdminTable() {
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="admin-page-title">Игроки</h1>
+        <div>
+          <h1 className="admin-page-title">Игроки</h1>
+          <p className="admin-muted mt-1 text-xs">
+            Клик по строке или «Динамика / изменить» — цепочка рейтинга и форма
+            редактирования.
+          </p>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <SectionLogsButton section="admin_players" context="admin" />
           <Link
@@ -332,7 +340,14 @@ export function PlayersAdminTable() {
             <tbody>
               {sorted.map((player) => (
                 <Fragment key={player.id}>
-                  <tr className="admin-table-row">
+                  <tr
+                    className={`admin-table-row cursor-pointer ${
+                      editingId === player.id ? "bg-[var(--admin-row-hover)]" : ""
+                    }`}
+                    onClick={() =>
+                      setEditingId(editingId === player.id ? null : player.id)
+                    }
+                  >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {player.photoUrl ? (
@@ -347,7 +362,7 @@ export function PlayersAdminTable() {
                             {player.firstName[0]}
                           </div>
                         )}
-                        <span className="font-medium">
+                        <span className="font-medium text-[var(--admin-nav-active-text)] underline-offset-2 hover:underline">
                           {player.lastName} {player.firstName}
                           {player.middleName ? ` ${player.middleName}` : ""}
                         </span>
@@ -380,15 +395,18 @@ export function PlayersAdminTable() {
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <div className="flex gap-2">
+                      <div
+                        className="flex flex-wrap gap-2"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <button
                           type="button"
                           onClick={() =>
                             setEditingId(editingId === player.id ? null : player.id)
                           }
-                          className="text-xs text-emerald-400 hover:underline"
+                          className="text-xs font-medium text-[var(--admin-nav-active-text)] hover:underline"
                         >
-                          {editingId === player.id ? "Закрыть" : "Изменить"}
+                          {editingId === player.id ? "Закрыть" : "Динамика / изменить"}
                         </button>
                         <AsyncTextButton
                           variant="red"
@@ -401,16 +419,19 @@ export function PlayersAdminTable() {
                     </td>
                   </tr>
                   {editingId === player.id && (
-                    <tr className="border-t border-zinc-800 bg-zinc-900/50">
+                    <tr className="border-t border-[var(--admin-border)] bg-[var(--admin-inset-bg)]">
                       <td colSpan={9} className="px-4 py-4">
-                        <PlayerEditForm
-                          player={player}
-                          onSaved={() => {
-                            setEditingId(null);
-                            reload();
-                          }}
-                          onCancel={() => setEditingId(null)}
-                        />
+                        <div className="space-y-5" onClick={(e) => e.stopPropagation()}>
+                          <PlayerRatingTracePanel playerId={player.id} />
+                          <PlayerEditForm
+                            player={player}
+                            onSaved={() => {
+                              setEditingId(null);
+                              reload();
+                            }}
+                            onCancel={() => setEditingId(null)}
+                          />
+                        </div>
                       </td>
                     </tr>
                   )}
@@ -452,6 +473,9 @@ function PlayerEditForm({
     player.birthDate ? player.birthDate.slice(0, 10) : "",
   );
   const [rating, setRating] = useState(String(player.rating));
+  const [ratingBase, setRatingBase] = useState(
+    String(player.ratingBase ?? player.rating),
+  );
   const [isVerified, setIsVerified] = useState(player.isVerified);
   const [role, setRole] = useState(player.role);
   const [saving, setSaving] = useState(false);
@@ -476,6 +500,7 @@ function PlayerEditForm({
         email: email || null,
         birthDate: birthDate || null,
         rating: Number(rating),
+        ratingBase: Number(ratingBase),
         isVerified,
         role,
       }),
@@ -490,7 +515,10 @@ function PlayerEditForm({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 border-t border-[var(--admin-border)] pt-4">
+      <h4 className="text-sm font-semibold text-[var(--admin-text)]">
+        Данные игрока
+      </h4>
       <div className="grid gap-3 sm:grid-cols-3">
         <Field label="Фамилия" value={lastName} onChange={setLastName} />
         <Field label="Имя" value={firstName} onChange={setFirstName} />
@@ -518,15 +546,33 @@ function PlayerEditForm({
           type="date"
         />
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Field
-          label="Общий рейтинг"
-          value={rating}
-          onChange={setRating}
-          type="number"
-          step="0.5"
-          min="0"
-        />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <Field
+            label="Общий рейтинг (сейчас)"
+            value={rating}
+            onChange={setRating}
+            type="number"
+            step="0.05"
+            min="0"
+          />
+          <p className="admin-muted mt-1 text-[11px]">
+            Меняется прогоном и автопересчётом.
+          </p>
+        </div>
+        <div>
+          <Field
+            label="База рейтинга"
+            value={ratingBase}
+            onChange={setRatingBase}
+            type="number"
+            step="0.05"
+            min="0"
+          />
+          <p className="admin-muted mt-1 text-[11px]">
+            Старт для прогона/динамики. Прогон не затирает.
+          </p>
+        </div>
         <SearchableSelect
           label="Статус"
           options={VERIFIED_OPTIONS}
@@ -550,14 +596,14 @@ function PlayerEditForm({
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm hover:bg-emerald-500 disabled:opacity-50"
+          className="admin-btn admin-btn--primary px-4 py-2 text-sm"
         >
           {saving ? "Сохранение…" : "Сохранить"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="text-sm text-zinc-400 hover:text-zinc-200"
+          className="admin-btn admin-btn--outline px-4 py-2 text-sm"
         >
           Отмена
         </button>

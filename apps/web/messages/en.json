@@ -558,6 +558,28 @@
     "rivalsLose": "You lose to most often",
     "gamesShort": "{count} games"
   },
+  "playerRatingDynamics": {
+    "title": "Rating dynamics",
+    "base": "Base",
+    "now": "Current",
+    "change": "Change",
+    "peak": "Peak in chain",
+    "chartFrom": "How the rating moved",
+    "recentTitle": "Recent changes",
+    "colResult": "Result",
+    "colOpponent": "Opponent",
+    "colDelta": "Rating Δ",
+    "colRating": "Before → after",
+    "oppRating": "rating",
+    "win": "Win",
+    "loss": "Loss",
+    "pair": "pair",
+    "back": "Back",
+    "forward": "Forward",
+    "older": "Older",
+    "newer": "Newer",
+    "pageOf": "{from}–{to} of {total}"
+  },
   "playListing": {
     "kind": {
       "SPARRING": "Sparring",
@@ -662,6 +684,8 @@
       "tournaments": "Tournaments",
       "noTournaments": "No tournament entries yet.",
       "placeSuffix": "place",
+      "placeOf": "of {count}",
+      "dateTbd": "Date TBD",
       "reviewCount": "{count, plural, one {# review} other {# reviews}}",
       "noReviews": "No reviews yet"
     },

@@ -72,7 +72,7 @@ export default function NewPlayerPage() {
           <input
             name="rating"
             type="number"
-            step="0.5"
+            step="0.05"
             min="0"
             defaultValue="0"
             className="w-full rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"

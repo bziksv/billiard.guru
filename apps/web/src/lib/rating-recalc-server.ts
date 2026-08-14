@@ -207,8 +207,8 @@ async function loadFinishedMatchesForRecalc(): Promise<FinishedMatch[]> {
 }
 
 /**
- * Перед прогоном сохраняет снимок, затем прогоняет все завершённые встречи
- * от ТЕКУЩИХ рейтингов (не с нуля) выбранной формулой.
+ * Перед прогоном сохраняет снимок текущих рейтингов, затем прогоняет все
+ * завершённые встречи от ratingBase (фиксированная база), не от текущего rating.
  */
 export async function bulkRecalcSystemRating(options: {
   formula: RatingPreviewFormula;
@@ -221,7 +221,7 @@ export async function bulkRecalcSystemRating(options: {
   try {
     const matches = await loadFinishedMatchesForRecalc();
     const players = await prisma.player.findMany({
-      select: { id: true, rating: true },
+      select: { id: true, rating: true, ratingBase: true },
     });
 
     const snapshotId = await snapshotAllRatings({
@@ -231,8 +231,8 @@ export async function bulkRecalcSystemRating(options: {
       matchCount: matches.length,
     });
 
-    // Старт = текущие рейтинги (ручная база / прошлый результат), не ноль
-    const ratings = new Map(players.map((p) => [p.id, p.rating]));
+    // Старт = ratingBase (идемпотентно при повторном прогоне)
+    const ratings = new Map(players.map((p) => [p.id, p.ratingBase]));
     const changeRows: {
       playerId: string;
       oldRating: number;
@@ -301,7 +301,6 @@ export async function bulkRecalcSystemRating(options: {
       where: { matchId: { not: null } },
     });
 
-    // Пишем итог; кто без матчей — остаётся на своём рейтинге из Map
     const finalRows = [...ratings.entries()].map(([id, rating]) => ({
       id,
       rating,
@@ -328,7 +327,7 @@ export async function bulkRecalcSystemRating(options: {
       action: "rating.bulk_recalc",
       entityType: "rating_snapshot",
       entityId: snapshotId,
-      summary: `Прогон общего рейтинга от текущих (${options.formula}): ${matches.length} встреч`,
+      summary: `Прогон от ratingBase (${options.formula}): ${matches.length} встреч`,
       payload: {
         formula: options.formula,
         snapshotId,
@@ -336,7 +335,7 @@ export async function bulkRecalcSystemRating(options: {
         skippedMatches,
         playersTouched: touched.size,
         changeRows: changeRows.length,
-        seed: "current",
+        seed: "ratingBase",
       },
     });
 

@@ -558,6 +558,28 @@
     "rivalsLose": "Чаще проигрываешь",
     "gamesShort": "{count} встреч"
   },
+  "playerRatingDynamics": {
+    "title": "Динамика рейтинга",
+    "base": "База",
+    "now": "Сейчас",
+    "change": "Изменение",
+    "peak": "Пик в цепочке",
+    "chartFrom": "Как менялся рейтинг",
+    "recentTitle": "Последние изменения",
+    "colResult": "Итог",
+    "colOpponent": "Соперник",
+    "colDelta": "Δ рейтинга",
+    "colRating": "Было → стало",
+    "oppRating": "рейтинг",
+    "win": "Победа",
+    "loss": "Поражение",
+    "pair": "пара",
+    "back": "Назад",
+    "forward": "Вперёд",
+    "older": "Старее",
+    "newer": "Новее",
+    "pageOf": "{from}–{to} из {total}"
+  },
   "playListing": {
     "kind": {
       "SPARRING": "Спарринг",
@@ -662,6 +684,8 @@
       "tournaments": "Турниры",
       "noTournaments": "Участий пока нет.",
       "placeSuffix": "место",
+      "placeOf": "из {count}",
+      "dateTbd": "Дата уточняется",
       "reviewCount": "{count, plural, one {# оценка} few {# оценки} many {# оценок} other {# оценок}}",
       "noReviews": "Пока нет оценок"
     },

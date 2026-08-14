@@ -5,6 +5,7 @@ import { writeAuditLog } from "@/lib/audit";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
 import { normalizePlayerPair, teamLabel } from "@/lib/pair-tournament";
+import { snapToRatingEditStep } from "@/lib/rating";
 import {
   requireTournamentManageAccess,
   tournamentManageActorType,
@@ -148,8 +149,8 @@ export async function PATCH(request: NextRequest) {
           { status: 400 },
         );
       }
-      // Рейтинг и фора всегда кратны 0,5 — привязываем к шагу 0,5.
-      ratingOverride = Math.max(0, Math.round(value * 2) / 2);
+      // Рейтинг override — шаг 0,05 (как общий рейтинг после автоформул).
+      ratingOverride = snapToRatingEditStep(value);
     }
 
     const team = await prisma.tournamentTeam.findUnique({

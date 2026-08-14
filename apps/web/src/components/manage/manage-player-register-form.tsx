@@ -88,7 +88,7 @@ export function ManagePlayerRegisterForm({
           <input
             name="rating"
             type="number"
-            step="0.5"
+            step="0.05"
             min="0"
             defaultValue="0"
             className="site-input w-full max-w-[140px]"

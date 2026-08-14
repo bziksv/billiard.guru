@@ -12,7 +12,7 @@ import {
 } from "@/components/admin/admin-sort-header";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { AsyncTextButton } from "@/components/ui/async-text-button";
-import { formatRating } from "@/lib/rating";
+import { formatRating, isOnRatingEditStep } from "@/lib/rating";
 
 interface PlayerOption {
   id: string;
@@ -266,12 +266,12 @@ export function ClubPlayerRatingsPanel({
           />
           <input
             type="number"
-            step="0.5"
+            step="0.05"
             min="0"
             value={addRating}
             onChange={(e) => setAddRating(e.target.value)}
             placeholder="Рейтинг в клубе"
-            className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm"
+            className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 font-mono text-sm"
           />
           <button
             type="button"
@@ -372,8 +372,8 @@ function ClubRatingRow({
 
   async function save() {
     const value = Number(editRating);
-    if (Number.isNaN(value) || value < 0 || value % 0.5 !== 0) {
-      alert("Рейтинг — число от 0 с шагом 0,5");
+    if (Number.isNaN(value) || value < 0 || !isOnRatingEditStep(value)) {
+      alert("Рейтинг — число от 0 с шагом 0,05");
       return;
     }
     setSaving(true);
@@ -393,7 +393,7 @@ function ClubRatingRow({
       <td className="px-4 py-3">
         <input
           type="number"
-          step="0.5"
+          step="0.05"
           min="0"
           value={editRating}
           onChange={(e) => setEditRating(e.target.value)}

@@ -60,6 +60,7 @@ export async function registerPlayerFromFormData(formData: FormData) {
       email: data.email || null,
       birthDate: data.birthDate ? new Date(data.birthDate) : null,
       rating: data.rating,
+      ratingBase: data.rating,
       photoUrl,
       confirmToken,
     },

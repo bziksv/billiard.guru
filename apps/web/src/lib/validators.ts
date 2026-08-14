@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { getPhoneRule, normalizePhoneAuto } from "@/lib/phone";
-import { MAX_PLAYER_RATING } from "@/lib/rating";
+import { isOnRatingEditStep, MAX_PLAYER_RATING } from "@/lib/rating";
+
+const ratingEditStep = z.coerce
+  .number()
+  .min(0)
+  .refine(isOnRatingEditStep, { message: "Рейтинг с шагом 0,05" });
 import {
   CLUB_TABLE_FORMATS,
   parseClubTableCounts,
@@ -203,7 +208,7 @@ export const playerRegisterSchema = z.object({
       (v) => !v || /^\d{4}-\d{2}-\d{2}$/.test(v),
       "Некорректная дата",
     ),
-  rating: z.coerce.number().min(0).multipleOf(0.5).default(0),
+  rating: ratingEditStep.default(0),
   registerAsClubOwner: z.boolean().optional().default(false),
 });
 
@@ -222,14 +227,16 @@ export const playerUpdateSchema = z.object({
       (v) => v == null || v === "" || /^\d{4}-\d{2}-\d{2}$/.test(v),
       "Некорректная дата",
     ),
-  rating: z.coerce.number().min(0).multipleOf(0.5).optional(),
+  rating: ratingEditStep.optional(),
+  /** База для прогона формулы (не меняется автопересчётом). */
+  ratingBase: ratingEditStep.optional(),
   isVerified: z.boolean().optional(),
   role: z.enum(["PLAYER", "SUPERADMIN"]).optional(),
 });
 
 export const clubPlayerRatingSchema = z.object({
   playerId: z.string().min(1),
-  rating: z.coerce.number().min(0).multipleOf(0.5),
+  rating: ratingEditStep,
 });
 
 export const playerAboutUpdateSchema = z.object({
@@ -260,7 +267,7 @@ export const coachProfileUpdateSchema = z.object({
 });
 
 export const clubPlayerRatingUpdateSchema = z.object({
-  rating: z.coerce.number().min(0).multipleOf(0.5),
+  rating: ratingEditStep,
 });
 
 export const tournamentSchema = z.object({

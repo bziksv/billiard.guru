@@ -48,6 +48,16 @@ export const RATING_PREVIEW_FORMULA_OPTIONS: {
     label: "5. Равные ±0,05; апсет ±0,15; фаворит ±0,1",
     short: "Равные ±0,05 / апсет ±0,15 / фав. ±0,1",
   },
+  {
+    value: "elo",
+    label: "6. Elo — ожидаемая сила (K=0,2, D=1)",
+    short: "Elo (K=0,2)",
+  },
+  {
+    value: "micro_equal",
+    label: "7. Равные ±0,025; апсет ±0,15; фаворит ±0,1",
+    short: "Равные ±0,025 / апсет ±0,15 / фав. ±0,1",
+  },
 ];
 
 const FORMULA_SET = new Set(

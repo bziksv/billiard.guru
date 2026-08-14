@@ -17,6 +17,7 @@ import { resolveLocalizedField } from "@/lib/localized-db-text";
 import { formatRating } from "@/lib/rating";
 import { bookingFormatLabel, formatBookingRange } from "@/lib/table-booking";
 import { PlayerStatsCard } from "@/components/site/player-stats-card";
+import { PlayerRatingDynamicsCard } from "@/components/site/player-rating-dynamics-card";
 import { computePlayerMatchStats } from "@/lib/player-stats";
 import { prisma } from "@/lib/prisma";
 import { TOURNAMENT_FORMAT_LABELS } from "@/lib/validators";
@@ -152,6 +153,8 @@ export default async function CabinetPage() {
         </SiteCard>
 
         <PlayerStatsCard stats={stats} />
+
+        <PlayerRatingDynamicsCard playerId={player.id} />
 
         <PlayerCitySettings initialCityId={player.cityId} />
 

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { TournamentTeamRatingEditor } from "@/components/admin/tournament-team-rating-editor";
+import { formatRating } from "@/lib/rating";
 import type { AdminTournament } from "@/lib/tournament-admin";
 
 type PlayerLite = {
@@ -236,7 +237,7 @@ export function TournamentPairBuilder({
                       bracketLocked={bracketLocked}
                       onUpdated={onUpdated}
                       disabled={busy}
-                      resetHint={`сброс (Σ ${sumRating.toFixed(1)})`}
+                      resetHint={`к Σ ${formatRating(sumRating)}`}
                     />
                     {team.ratingOverride == null ? (
                       <span className="text-[10px] text-zinc-600">= сумма</span>

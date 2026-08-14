@@ -10,6 +10,7 @@ import {
 } from "@/lib/bracket-formats/settings-server";
 import { isPairFormat } from "@/lib/pair-tournament";
 import { prisma } from "@/lib/prisma";
+import { reverseAutoRatingForTournament } from "@/lib/rating-apply-match-server";
 import {
   isTournamentBracketComplete,
   tournamentAdminInclude,
@@ -286,6 +287,10 @@ export async function DELETE(
       return NextResponse.json({ error: "Турнир не найден" }, { status: 404 });
     }
 
+    // Сначала откатить авторейтинг по встречам — иначе RatingChange останутся
+    // сиротами (нет FK на матч), а Player.rating не вернётся.
+    const ratingMatchesReversed = await reverseAutoRatingForTournament(id);
+
     await prisma.tournament.delete({ where: { id } });
 
     await writeAuditLog({
@@ -294,10 +299,10 @@ export async function DELETE(
       action: "tournament.delete",
       entityType: "tournament",
       entityId: id,
-      payload: { name: tournament.name },
+      payload: { name: tournament.name, ratingMatchesReversed },
     });
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, ratingMatchesReversed });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

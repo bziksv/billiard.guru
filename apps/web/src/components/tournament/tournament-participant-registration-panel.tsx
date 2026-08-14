@@ -469,11 +469,11 @@ export function TournamentParticipantRegistrationPanel({
               <label className="admin-label mb-1 block text-xs">Начальный рейтинг</label>
               <input
                 type="number"
-                step="0.5"
+                step="0.05"
                 min="0"
                 value={newRating}
                 onChange={(e) => setNewRating(e.target.value)}
-                className="admin-input w-full px-3 py-2 text-sm"
+                className="admin-input w-full px-3 py-2 font-mono text-sm"
               />
             </div>
             <button

@@ -278,5 +278,7 @@ export async function buildRatingPreview(options: {
     upsetMild: simulateRatingPreview({ ...common, formula: "upset_mild" }),
     mildAll: simulateRatingPreview({ ...common, formula: "mild_all" }),
     tinyEqual: simulateRatingPreview({ ...common, formula: "tiny_equal" }),
+    elo: simulateRatingPreview({ ...common, formula: "elo" }),
+    microEqual: simulateRatingPreview({ ...common, formula: "micro_equal" }),
   };
 }

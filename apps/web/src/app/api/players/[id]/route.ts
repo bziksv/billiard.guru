@@ -87,6 +87,7 @@ export async function PATCH(
           birthDate: data.birthDate ? new Date(data.birthDate) : null,
         }),
         ...(data.rating !== undefined && { rating: data.rating }),
+        ...(data.ratingBase !== undefined && { ratingBase: data.ratingBase }),
         ...(data.isVerified !== undefined && { isVerified: data.isVerified }),
         ...(data.role !== undefined && { role: data.role }),
       },

@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import {
+  calculateRatingChangeElo,
+  calculateRatingChangeMicroEqual,
   calculateRatingChangeMildAll,
   calculateRatingChangeSoft,
   calculateRatingChangeTinyEqual,
@@ -214,5 +216,29 @@ assert.deepEqual(calculateRatingChangeTinyEqual(2.5, 2.5), {
 });
 assert.equal(calculateRatingChangeTinyEqual(3, 2).winnerDelta, 0.1);
 assert.equal(calculateRatingChangeTinyEqual(2, 2.6).winnerDelta, 0.15);
+
+// Elo: равные ≈ ±0,1; фаворит +0,5 ≈ ±0,05; апсет −0,5 ≈ ±0,15
+assert.deepEqual(calculateRatingChangeElo(2.5, 2.5), {
+  winnerDelta: 0.1,
+  loserDelta: -0.1,
+  winnerNew: 2.6,
+  loserNew: 2.4,
+});
+assert.equal(calculateRatingChangeElo(3, 2.5).winnerDelta, 0.05);
+assert.equal(calculateRatingChangeElo(2.5, 3).winnerDelta, 0.15);
+assert.equal(
+  calculateRatingChangeElo(3, 2).winnerDelta +
+    calculateRatingChangeElo(3, 2).loserDelta,
+  0,
+);
+
+assert.deepEqual(calculateRatingChangeMicroEqual(2.5, 2.5), {
+  winnerDelta: 0.025,
+  loserDelta: -0.025,
+  winnerNew: 2.525,
+  loserNew: 2.475,
+});
+assert.equal(calculateRatingChangeMicroEqual(3, 2).winnerDelta, 0.1);
+assert.equal(calculateRatingChangeMicroEqual(2, 2.6).winnerDelta, 0.15);
 
 console.log("rating-preview tests passed");
