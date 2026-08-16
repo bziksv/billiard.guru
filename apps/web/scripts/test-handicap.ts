@@ -27,12 +27,31 @@ assert.deepEqual(calculateHandicap(3, 1.5, { halfStep: true }), {
   ballsEveryGame: 1,
   extraBallOnEvenGames: true,
 });
-// Доп. шар в чётных: 1-я партия без +1, 2-я с +1
 assert.equal(getHandicapForGame(3, 1.5, 1, { halfStep: true }), 1);
 assert.equal(getHandicapForGame(3, 1.5, 2, { halfStep: true }), 2);
 assert.equal(
   describeHandicapShort(3, 1.5, { halfStep: true }),
   "1 в каждой партии, +1 в чётных",
 );
+
+// Без округления вверх: 2.35 − 1.9 = 0.45 → без форы
+assert.deepEqual(calculateHandicap(2.35, 1.9, { halfStep: true }), {
+  ratingDiff: 0,
+  ballsEveryGame: 0,
+  extraBallOnEvenGames: false,
+});
+assert.equal(
+  describeHandicapShort(2.35, 1.9, { halfStep: true }),
+  "Без форы",
+);
+
+// Ровно 0,5 → только +1 в чётных
+assert.deepEqual(calculateHandicap(2.4, 1.9, { halfStep: true }), {
+  ratingDiff: 0.5,
+  ballsEveryGame: 0,
+  extraBallOnEvenGames: true,
+});
+assert.equal(getHandicapForGame(2.4, 1.9, 1, { halfStep: true }), 0);
+assert.equal(getHandicapForGame(2.4, 1.9, 2, { halfStep: true }), 1);
 
 console.log("handicap tests passed");

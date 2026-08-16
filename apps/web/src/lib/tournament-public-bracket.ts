@@ -7,9 +7,15 @@ import {
 } from "@/lib/tournament-admin";
 import { isFixedSwissFormat } from "@/lib/pair-tournament";
 import { resolveMatchStreamUrl, resolveTableLabel } from "@/lib/tournament-stream";
+import {
+  applyMatchStartRatingsToTeam,
+  type MatchStartRatingsMap,
+  type TournamentRatingSource,
+} from "@/lib/tournament-rating-display";
 
 type BracketTournamentInput = {
   format: string;
+  ratingSource?: TournamentRatingSource;
   tableIds?: unknown;
   tableStreams?: unknown;
   club: {
@@ -25,7 +31,10 @@ function isoDate(value: string | Date | null | undefined): string | null {
   return value instanceof Date ? value.toISOString() : value;
 }
 
-export function buildPublicTournamentBracketView(tournament: BracketTournamentInput): {
+export function buildPublicTournamentBracketView(
+  tournament: BracketTournamentInput,
+  opts?: { matchStartRatings?: MatchStartRatingsMap },
+): {
   matches: BracketMatchView[];
   standings: SwissStandingView[];
 } {
@@ -34,6 +43,8 @@ export function buildPublicTournamentBracketView(tournament: BracketTournamentIn
     tableStreams: tournament.tableStreams,
   };
   const floorPlan = tournament.club.floorPlan;
+  const ratingSource = tournament.ratingSource ?? "SYSTEM";
+  const matchStartRatings = opts?.matchStartRatings;
 
   const matches: BracketMatchView[] = tournament.matches.map((m) => ({
     id: m.id,
@@ -48,8 +59,18 @@ export function buildPublicTournamentBracketView(tournament: BracketTournamentIn
     tableId: m.tableId ?? null,
     streamUrl: resolveMatchStreamUrl({ tableId: m.tableId ?? null }, streamContext, floorPlan),
     tableLabel: resolveTableLabel(m.tableId ?? null, floorPlan, tournament.club.tableCounts),
-    team1: m.team1,
-    team2: m.team2,
+    team1: applyMatchStartRatingsToTeam(
+      m.team1,
+      m.id,
+      matchStartRatings,
+      ratingSource,
+    ),
+    team2: applyMatchStartRatingsToTeam(
+      m.team2,
+      m.id,
+      matchStartRatings,
+      ratingSource,
+    ),
   }));
 
   const standings: SwissStandingView[] = (() => {

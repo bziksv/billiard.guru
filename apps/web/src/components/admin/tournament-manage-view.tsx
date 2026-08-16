@@ -26,6 +26,8 @@ import { TournamentTablePicker } from "@/components/tournament/tournament-table-
 import {
   applyTournamentRatingsToPlayers,
   applyTournamentRatingsToTeam,
+  applyMatchStartRatingsToTeam,
+  type MatchStartRatingsMap,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
 import { formatRating, MAX_PLAYER_RATING, RATING_STEP } from "@/lib/rating";
@@ -322,6 +324,7 @@ export function TournamentManageView({
   onPresentationOpenChange,
   showTabBarFullscreenButton = true,
   clubPlayerRatings,
+  matchStartRatings,
   registrationPlayers,
   onPlayerCreated,
 }: {
@@ -331,6 +334,8 @@ export function TournamentManageView({
   bracketLoading: boolean;
   /** Клубные рейтинги для форы (источник CLUB). */
   clubPlayerRatings?: Record<string, number>;
+  /** Рейтинг на старте встречи (для сетки). */
+  matchStartRatings?: MatchStartRatingsMap;
   /** Игроки для формы «Добавить игрока» на странице турнира. */
   registrationPlayers?: TournamentRegistrationPlayer[];
   onPlayerCreated?: (player: TournamentRegistrationPlayer) => void;
@@ -629,10 +634,29 @@ export function TournamentManageView({
           t.club.floorPlan,
           t.club.tableCounts,
         ),
-        team1: applyTournamentRatingsToTeam(m.team1, ratingSource, clubPlayerRatings),
-        team2: applyTournamentRatingsToTeam(m.team2, ratingSource, clubPlayerRatings),
+        team1: applyMatchStartRatingsToTeam(
+          applyTournamentRatingsToTeam(m.team1, ratingSource, clubPlayerRatings),
+          m.id,
+          matchStartRatings,
+          ratingSource,
+        ),
+        team2: applyMatchStartRatingsToTeam(
+          applyTournamentRatingsToTeam(m.team2, ratingSource, clubPlayerRatings),
+          m.id,
+          matchStartRatings,
+          ratingSource,
+        ),
       })),
-    [t.matches, t.tableIds, t.tableStreams, t.club.floorPlan, ratingSource, clubPlayerRatings],
+    [
+      t.matches,
+      t.tableIds,
+      t.tableStreams,
+      t.club.floorPlan,
+      t.club.tableCounts,
+      ratingSource,
+      clubPlayerRatings,
+      matchStartRatings,
+    ],
   );
   const tournamentTables = useMemo(
     () =>

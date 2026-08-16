@@ -713,7 +713,7 @@
     "tournament": {
       "participantsMatches": "{participants} участников · {matches} встреч",
       "participantsLabel": "Участники: {range} (сначала рейтинг в клубе, иначе общий)",
-      "handicapHalfStep": "Фора: с учётом шага рейтинга 0,5",
+      "handicapHalfStep": "Фора: шаг 0,5; при разнице меньше 0,5 — без форы",
       "handicapInteger": "Фора: только целая часть разницы рейтингов (без +1 в чётных)",
       "signInToRegister": "Войдите",
       "signInSuffix": ", чтобы записаться на турнир.",

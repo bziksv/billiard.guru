@@ -8,8 +8,8 @@ export const BILLIARD_GENERAL_SECTIONS_EN: GuideSection[] = [
     id: "handicap",
     title: "Handicap in tournaments",
     paragraphs: [
-      "On billiard.guru, handicap is calculated from the rating difference in 0.5 steps by default: one full ball per frame, plus an extra ball in even frames when the difference is not a whole number. The stronger player receives the minus.",
-      "Organizers can disable half-step rounding — then only whole ratings count (e.g. 3 vs 1.5 → a 2-ball difference, not 2.5).",
+      "On billiard.guru, handicap uses 0.5 rating steps with no rounding up: under 0.5 there is no handicap; from 0.5 — a full ball each frame and/or an extra ball in even frames. The stronger player receives the minus.",
+      "Organizers can disable half-steps — then only whole ratings count (e.g. 3 vs 1.5 → a 2-ball difference, not 2.5).",
       "Always check the tournament card for exact handicap rules before your match.",
     ],
   },

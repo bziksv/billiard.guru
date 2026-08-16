@@ -22,6 +22,7 @@ import { formatRatingRange } from "@/lib/play-listing-display";
 import {
   getEffectivePlayerRatingForTournament,
   loadClubPlayerRatingsMap,
+  loadMatchStartRatings,
   playerRatingExceedsTournamentMax,
 } from "@/lib/tournament-rating-limit-server";
 import { applyTournamentRatingsToPlayers } from "@/lib/tournament-rating-display";
@@ -196,6 +197,9 @@ export default async function TournamentPage({
   const formatDisplay = formatLabels[tournament.format] ?? tournament.format;
 
   const clubPlayerRatings = await loadClubPlayerRatingsMap(tournament.clubId);
+  const matchStartRatings = await loadMatchStartRatings(
+    tournament.matches.map((m) => m.id),
+  );
   const adminTournament = applyTournamentRatingsToPlayers(
     tournament as unknown as AdminTournament,
     clubPlayerRatings,
@@ -239,7 +243,9 @@ export default async function TournamentPage({
   const defaultTab = defaultPublicTournamentTab(standings, registrationOpen);
 
   const bracketView =
-    matchCount > 0 ? buildPublicTournamentBracketView(adminTournament) : null;
+    matchCount > 0
+      ? buildPublicTournamentBracketView(adminTournament, { matchStartRatings })
+      : null;
   const publicMatches = bracketView
     ? buildPublicMatchRows(bracketView.matches, tournament.format)
     : [];

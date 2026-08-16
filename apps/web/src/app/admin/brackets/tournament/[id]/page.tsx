@@ -12,6 +12,7 @@ import { useClubPlayerRatings } from "@/hooks/use-club-player-ratings";
 import { useAdminTournamentBracketActions } from "@/lib/use-admin-tournament-bracket";
 import { bracketAdminStatusLabel } from "@/lib/tournament-bracket-admin";
 import { tournamentFormatDisplayLabel } from "@/lib/tournament-format-display";
+import type { MatchStartRatingsMap } from "@/lib/tournament-rating-display";
 import { TOURNAMENT_STATUS_LABELS } from "@/lib/validators";
 
 interface Club {
@@ -19,10 +20,24 @@ interface Club {
   name: string;
 }
 
+type TournamentManagePayload = AdminTournament & {
+  clubPlayerRatings?: Record<string, number>;
+  matchStartRatings?: MatchStartRatingsMap;
+};
+
+function splitTournamentPayload(data: TournamentManagePayload) {
+  const { clubPlayerRatings: _club, matchStartRatings, ...tournament } = data;
+  return {
+    tournament,
+    matchStartRatings: matchStartRatings ?? {},
+  };
+}
+
 export default function AdminBracketTournamentPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [tournament, setTournament] = useState<AdminTournament | null>(null);
+  const [matchStartRatings, setMatchStartRatings] = useState<MatchStartRatingsMap>({});
   const [clubs, setClubs] = useState<Club[]>([]);
   const [loading, setLoading] = useState(true);
   const [presentationOpen, setPresentationOpen] = useState(false);
@@ -34,7 +49,10 @@ export default function AdminBracketTournamentPage() {
       return;
     }
     const data = await res.json();
-    setTournament(data);
+    const { tournament: nextTournament, matchStartRatings: nextMatchStart } =
+      splitTournamentPayload(data);
+    setTournament(nextTournament);
+    setMatchStartRatings(nextMatchStart);
   }, [id, router]);
 
   useEffect(() => {
@@ -46,7 +64,10 @@ export default function AdminBracketTournamentPage() {
         router.replace("/admin/brackets");
         return;
       }
-      setTournament(t);
+      const { tournament: nextTournament, matchStartRatings: nextMatchStart } =
+        splitTournamentPayload(t);
+      setTournament(nextTournament);
+      setMatchStartRatings(nextMatchStart);
       setClubs(Array.isArray(c) ? c : []);
       setLoading(false);
     });
@@ -167,6 +188,7 @@ export default function AdminBracketTournamentPage() {
           clubOptions={clubOptions}
           playerOptions={[]}
           clubPlayerRatings={clubPlayerRatings}
+          matchStartRatings={matchStartRatings}
           bracketLoading={bracketLoading}
           embedded
           initialTab="bracket"

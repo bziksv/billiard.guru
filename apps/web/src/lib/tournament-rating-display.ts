@@ -78,10 +78,39 @@ export function applyTournamentRatingsToTeam<T extends TeamWithPlayers>(
   };
 }
 
+/** matchId → playerId → рейтинг на старте встречи (RatingChange.oldRating). */
+export type MatchStartRatingsMap = Record<string, Record<string, number>>;
+
+/**
+ * Подставляет рейтинг на момент встречи (для сетки/форы по уже сыгранным матчам).
+ * Для CLUB не трогаем — авторейтинг пишет общий Player.rating, не клубный.
+ */
+export function applyMatchStartRatingsToTeam<T extends TeamWithPlayers>(
+  team: T | null,
+  matchId: string,
+  matchStartRatings?: MatchStartRatingsMap | null,
+  ratingSource: TournamentRatingSource = "SYSTEM",
+): T | null {
+  if (!team || !matchStartRatings || ratingSource === "CLUB") return team;
+  const byPlayer = matchStartRatings[matchId];
+  if (!byPlayer) return team;
+
+  const mapPlayer = <P extends TeamWithPlayers["player1"]>(player: P): P => {
+    const start = byPlayer[player.id];
+    return start == null ? player : { ...player, rating: start };
+  };
+
+  return {
+    ...team,
+    player1: mapPlayer(team.player1),
+    player2: team.player2 ? mapPlayer(team.player2) : team.player2,
+  };
+}
+
 /** Подставляет эффективный рейтинг турнира (клубный / общий) во всех игроках. */
 export function applyTournamentRatingsToPlayers<
   T extends {
-    registrations: { player: { id: string; rating: number } }[];
+    registrations?: { player: { id: string; rating: number } }[];
     teams: TeamWithPlayers[];
     matches: {
       team1: TeamWithPlayers | null;
@@ -105,7 +134,7 @@ export function applyTournamentRatingsToPlayers<
 
   return {
     ...tournament,
-    registrations: tournament.registrations.map((r) => ({
+    registrations: (tournament.registrations ?? []).map((r) => ({
       ...r,
       player: mapPlayer(r.player),
     })),

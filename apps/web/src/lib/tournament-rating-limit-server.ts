@@ -3,9 +3,27 @@ import { prisma } from "@/lib/prisma";
 import {
   applyTournamentRatingsToPlayers,
   effectiveTournamentPlayerRating,
+  type MatchStartRatingsMap,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
 import type { TeamWithPlayers } from "@/lib/pair-tournament";
+
+/** Рейтинги игроков на старте каждой встречи (из RatingChange). */
+export async function loadMatchStartRatings(
+  matchIds: string[],
+): Promise<MatchStartRatingsMap> {
+  if (matchIds.length === 0) return {};
+  const rows = await prisma.ratingChange.findMany({
+    where: { matchId: { in: matchIds } },
+    select: { matchId: true, playerId: true, oldRating: true },
+  });
+  const out: MatchStartRatingsMap = {};
+  for (const row of rows) {
+    if (!row.matchId) continue;
+    (out[row.matchId] ??= {})[row.playerId] = row.oldRating;
+  }
+  return out;
+}
 
 export function playerRatingExceedsTournamentMax(
   effectiveRating: number,
@@ -50,7 +68,7 @@ export async function loadClubPlayerRatingsMap(
   return Object.fromEntries(rows.map((r) => [r.playerId, r.rating]));
 }
 
-/** Для API управления турниром: эффективные рейтинги + карта клубных. */
+/** Для API управления турниром: эффективные рейтинги + карта клубных + старты матчей. */
 export async function withTournamentEffectiveRatings<
   T extends {
     clubId: string;
@@ -58,15 +76,26 @@ export async function withTournamentEffectiveRatings<
     registrations: { player: { id: string; rating: number } }[];
     teams: TeamWithPlayers[];
     matches: {
+      id: string;
       team1: TeamWithPlayers | null;
       team2: TeamWithPlayers | null;
       winnerTeam: TeamWithPlayers | null;
     }[];
   },
->(tournament: T): Promise<T & { clubPlayerRatings: Record<string, number> }> {
+>(
+  tournament: T,
+): Promise<
+  T & {
+    clubPlayerRatings: Record<string, number>;
+    matchStartRatings: MatchStartRatingsMap;
+  }
+> {
   const clubPlayerRatings = await loadClubPlayerRatingsMap(tournament.clubId);
   const rated = applyTournamentRatingsToPlayers(tournament, clubPlayerRatings);
-  return { ...rated, clubPlayerRatings };
+  const matchStartRatings = await loadMatchStartRatings(
+    tournament.matches.map((m) => m.id),
+  );
+  return { ...rated, clubPlayerRatings, matchStartRatings };
 }
 
 export async function assertPlayerEligibleForTournamentRating(

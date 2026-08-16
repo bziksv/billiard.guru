@@ -1,10 +1,12 @@
-/** Фора: при halfStep — шаг рейтинга 0,5 (полный шар в каждой партии, половинный — +1 в чётных). */
+/** Фора: при halfStep — шаг 0,5 (полный шар в каждой, половинный — +1 в чётных).
+ * Без округления вверх: при разнице < 0,5 форы нет.
+ */
 
 import type { AppLocale } from "@/i18n/routing";
 
 export interface HandicapBreakdown {
   ballsEveryGame: number;
-  /** +1 шар в чётных партиях (2, 4, 6…) при дробной разнице рейтинга. */
+  /** +1 шар в чётных партиях (2, 4, 6…) при дробной разнице рейтинга ≥ 0,5. */
   extraBallOnEvenGames: boolean;
   ratingDiff: number;
 }
@@ -50,13 +52,13 @@ export function isNoHandicapLabel(value: string): boolean {
   return trimmed === "Без форы" || trimmed === "No handicap";
 }
 
-function roundToHalf(value: number): number {
-  return Math.round(value * 2) / 2;
-}
-
 function resolveHalfStep(options?: HandicapOptions): boolean {
   return options?.halfStep !== false;
 }
+
+/** Порог форы и «половинки» — ровно 0,5 без округления вверх. */
+const HALF = 0.5;
+const EPS = 1e-9;
 
 export function calculateHandicap(
   higherRating: number,
@@ -64,13 +66,22 @@ export function calculateHandicap(
   options?: HandicapOptions,
 ): HandicapBreakdown {
   const halfStep = resolveHalfStep(options);
+  const raw = Math.max(0, higherRating - lowerRating);
 
   if (halfStep) {
-    const diff = roundToHalf(Math.max(0, higherRating - lowerRating));
-    const fullBalls = Math.floor(diff);
-    const hasHalfStep = diff - fullBalls >= 0.25;
+    // 2.35 vs 1.9 → 0.45 → без форы (раньше roundToHalf давал 0.5 и +1 в чётных)
+    if (raw + EPS < HALF) {
+      return {
+        ratingDiff: 0,
+        ballsEveryGame: 0,
+        extraBallOnEvenGames: false,
+      };
+    }
+    const fullBalls = Math.floor(raw + EPS);
+    const frac = raw - fullBalls;
+    const hasHalfStep = frac + EPS >= HALF;
     return {
-      ratingDiff: diff,
+      ratingDiff: raw,
       ballsEveryGame: fullBalls,
       extraBallOnEvenGames: hasHalfStep,
     };
@@ -107,6 +118,10 @@ export function getHandicapForGame(
   return balls;
 }
 
+function hasHandicap(h: HandicapBreakdown): boolean {
+  return h.ballsEveryGame > 0 || h.extraBallOnEvenGames;
+}
+
 export function describeHandicap(
   higherRating: number,
   lowerRating: number,
@@ -114,7 +129,7 @@ export function describeHandicap(
 ): string {
   const locale = resolveLocale(options);
   const h = calculateHandicap(higherRating, lowerRating, options);
-  if (h.ratingDiff === 0) return noHandicapLabel(locale);
+  if (!hasHandicap(h)) return noHandicapLabel(locale);
   const parts: string[] = [];
   if (h.ballsEveryGame > 0) {
     parts.push(fullPerGameLabel(h.ballsEveryGame, locale));
@@ -133,7 +148,7 @@ export function describeHandicapShort(
 ): string {
   const locale = resolveLocale(options);
   const h = calculateHandicap(higherRating, lowerRating, options);
-  if (h.ratingDiff === 0) return noHandicapLabel(locale);
+  if (!hasHandicap(h)) return noHandicapLabel(locale);
   const parts: string[] = [];
   if (h.ballsEveryGame > 0) {
     parts.push(shortPerGameLabel(h.ballsEveryGame, locale));

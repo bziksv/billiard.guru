@@ -13,7 +13,10 @@ import { getLocalizedBracketFormatLabels } from "@/lib/bracket-formats/settings-
 import type { AdminTournament } from "@/lib/tournament-admin";
 import { buildPublicTournamentBracketView } from "@/lib/tournament-public-bracket";
 import { applyTournamentRatingsToPlayers } from "@/lib/tournament-rating-display";
-import { loadClubPlayerRatingsMap } from "@/lib/tournament-rating-limit-server";
+import {
+  loadClubPlayerRatingsMap,
+  loadMatchStartRatings,
+} from "@/lib/tournament-rating-limit-server";
 import type { AppLocale } from "@/i18n/routing";
 import { localizedClubName } from "@/lib/latin-names";
 import { localizedGeoName } from "@/lib/geo-display";
@@ -85,11 +88,16 @@ export default async function TournamentBracketPage({
   const formatLabels = await getLocalizedBracketFormatLabels(locale);
   const formatDisplay = formatLabels[tournament.format] ?? tournament.format;
   const clubPlayerRatings = await loadClubPlayerRatingsMap(tournament.clubId);
+  const matchStartRatings = await loadMatchStartRatings(
+    tournament.matches.map((m) => m.id),
+  );
   const adminTournament = applyTournamentRatingsToPlayers(
     tournament as unknown as AdminTournament,
     clubPlayerRatings,
   );
-  const { matches, standings } = buildPublicTournamentBracketView(adminTournament);
+  const { matches, standings } = buildPublicTournamentBracketView(adminTournament, {
+    matchStartRatings,
+  });
   const tournamentName = resolveLocalizedField(locale, tournament.name, tournament.nameEn);
   const statusKey = TOURNAMENT_STATUSES.find((s) => s === tournament.status);
   const statusLabel = statusKey ? t(`tournamentStatus.${statusKey}`) : tournament.status;
