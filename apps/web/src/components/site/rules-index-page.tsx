@@ -11,9 +11,9 @@ import { rulesTableAccentColor, rulesTableGameCount } from "@/lib/billiard-rules
 import type { AppLocale } from "@/i18n/routing";
 
 function gameCountLabel(count: number, t: Awaited<ReturnType<typeof getTranslations>>) {
-  if (count === 1) return t("rules.index.gameOne");
-  if (count >= 2 && count <= 4) return t("rules.index.gameFew");
-  return t("rules.index.gameMany");
+  if (count === 1) return t("index.gameOne");
+  if (count >= 2 && count <= 4) return t("index.gameFew");
+  return t("index.gameMany");
 }
 
 function TableTypeCard({
@@ -60,7 +60,7 @@ function TableTypeCard({
             </li>
           ))}
         </ul>
-        <span className="rules-table-card-cta">{t("rules.index.pickDisciplines")}</span>
+        <span className="rules-table-card-cta">{t("index.pickDisciplines")}</span>
       </SiteCard>
     </Link>
   );
