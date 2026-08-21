@@ -53,8 +53,8 @@
     "desktopBeforeLink": "Dear friends, the project is in development and testing. You can already ",
     "register": "sign up",
     "desktopAfterLink": " and start using the features.",
-    "mobileBeforeLink": "Testing — ",
-    "mobileAfterLink": " open"
+    "mobileBeforeLink": "You can ",
+    "mobileAfterLink": ""
   },
   "cookie": {
     "footer": {
@@ -62,8 +62,8 @@
       "cookiesLink": "cookies",
       "and": " and ",
       "recommendationLink": "recommendation technologies",
-      "middle": " to improve functionality, tailor ads, and collect visit statistics. By continuing to use the site, you agree to personal data processing under our ",
-      "privacyLink": "privacy policy",
+      "middle": " to improve functionality, tailor ads, and collect visit statistics. By continuing to use the site, you agree to ",
+      "privacyLink": "personal data processing",
       "after": ". You can disable cookies in your browser settings."
     },
     "consent": {
@@ -954,13 +954,14 @@
   },
   "legal": {
     "consentCheckbox": {
-      "text": "By clicking this button, I consent to personal data processing and agree to the <privacy>privacy policy</privacy>."
+      "text": "By clicking this button, I give my <consent>consent</consent> to <privacy>personal data processing</privacy>."
     },
     "page": {
       "notFound": "Document not found",
       "updated": "Last updated: {date}",
       "stubLead": "The full text will be published on this page. You can place a file at",
       "stubOr": "or replace the page content in code.",
+      "docsNav": "Other legal documents",
       "backHome": "← Home"
     }
   },

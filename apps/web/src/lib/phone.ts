@@ -52,7 +52,6 @@ export const COUNTRY_PHONE_RULES: Record<string, CountryPhoneRule> = {
     example: "+7 (701) 234-56-78",
   },
   Беларусь: { dial: "375", localLength: 9, example: "+375 (29) 123-45-67" },
-  Украина: { dial: "380", localLength: 9, example: "+380 (50) 123-45-67" },
   Узбекистан: { dial: "998", localLength: 9, example: "+998 (90) 123-45-67" },
   Армения: { dial: "374", localLength: 8, example: "+374 (91) 12-34-56" },
   Грузия: { dial: "995", localLength: 9, example: "+995 (555) 12-34-56" },
@@ -202,12 +201,6 @@ function formatNationalDigits(local: string, rule: CountryPhoneRule): string {
   }
 
   if (rule.dial === "375" && d.length >= 1) {
-    if (d.length <= 2) return `(${d}`;
-    if (d.length <= 5) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
-    return `(${d.slice(0, 2)}) ${d.slice(2, 5)}-${d.slice(5, 7)}-${d.slice(7)}`;
-  }
-
-  if (rule.dial === "380" && d.length >= 1) {
     if (d.length <= 2) return `(${d}`;
     if (d.length <= 5) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
     return `(${d.slice(0, 2)}) ${d.slice(2, 5)}-${d.slice(5, 7)}-${d.slice(7)}`;

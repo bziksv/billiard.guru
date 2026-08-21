@@ -196,6 +196,11 @@ const LEGAL_KEYWORDS: Record<LegalDocSlug, string[]> = {
     "рекомендательные технологии",
     "персонализация billiard guru",
   ],
+  "personal-data-consent": [
+    "согласие на обработку персональных данных",
+    "согласие billiard guru",
+    "обработка ПДн согласие",
+  ],
 };
 
 export function legalDocMetadata(doc: LegalDocSlug): Metadata {

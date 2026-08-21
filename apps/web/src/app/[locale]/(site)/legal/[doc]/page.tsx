@@ -1,9 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { LegalDocContent } from "@/components/site/legal/legal-doc-content";
+import { LegalDocNav } from "@/components/site/legal/legal-doc-nav";
 import { PageHeader, PageMain } from "@/components/site/page-header";
 import { SiteCard } from "@/components/site/site-card";
+import { Link } from "@/i18n/navigation";
 import { getLegalDocBody } from "@/lib/legal-bodies";
 import { getAllLegalDocSlugs, getLegalDoc } from "@/lib/legal-content";
 import { buildLocalizedLegalMetadata } from "@/lib/seo-locale";
@@ -45,10 +46,17 @@ export default async function LegalDocumentPage({
   const entry = getLegalDoc(slug, locale as AppLocale);
   const body = getLegalDocBody(slug, locale as AppLocale);
 
+  const appLocale = locale as AppLocale;
+
   return (
     <>
       <PageHeader title={entry.title} lead={entry.description} />
       <PageMain className="pt-0">
+        <LegalDocNav
+          current={slug}
+          locale={appLocale}
+          ariaLabel={t("docsNav")}
+        />
         <SiteCard className="space-y-6">
           <p className="guide-body-text text-xs text-[var(--text-muted)]">
             {t("updated", { date: body.updatedAt })}

@@ -37,6 +37,16 @@ export function PersonalDataConsentCheckbox({
       />
       <span>
         {t.rich("text", {
+          consent: (chunks) => (
+            <Link
+              href={LEGAL_URLS.personalDataConsent}
+              className={linkClassName}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {chunks}
+            </Link>
+          ),
           privacy: (chunks) => (
             <Link
               href={LEGAL_URLS.privacy}

@@ -10,8 +10,9 @@ export type LegalDocEntry = {
 
 const LEGAL_DOCS_EN: Record<LegalDocSlug, LegalDocEntry> = {
   privacy: {
-    title: "Privacy and personal data protection policy",
-    description: "",
+    title: "Privacy and personal data processing policy",
+    description:
+      "Privacy policy of ООО «ПРАЙМ» for personal data on billiard.guru.",
     filePath: "/legal/privacy.odt",
     keywords: ["privacy policy", "billiard guru privacy", "personal data"],
   },
@@ -27,6 +28,17 @@ const LEGAL_DOCS_EN: Record<LegalDocSlug, LegalDocEntry> = {
     filePath: "/legal/recommendation-technologies.odt",
     keywords: ["recommendation technologies", "personalization billiard guru"],
   },
+  "personal-data-consent": {
+    title: "Consent to personal data processing, including cookies",
+    description:
+      "User consent to personal data and cookie processing when using billiard.guru.",
+    filePath: "",
+    keywords: [
+      "personal data consent",
+      "billiard guru consent",
+      "data processing consent",
+    ],
+  },
 };
 
 const LEGAL_KEYWORDS_RU: Record<LegalDocSlug, string[]> = {
@@ -35,6 +47,11 @@ const LEGAL_KEYWORDS_RU: Record<LegalDocSlug, string[]> = {
   "recommendation-technologies": [
     "рекомендательные технологии",
     "персонализация billiard guru",
+  ],
+  "personal-data-consent": [
+    "согласие на обработку персональных данных",
+    "согласие billiard guru",
+    "обработка ПДн согласие",
   ],
 };
 

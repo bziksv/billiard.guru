@@ -39,7 +39,6 @@ export const PHONE_COUNTRY_NAME_EN: Record<string, string> = {
   Россия: "Russia",
   Казахстан: "Kazakhstan",
   Беларусь: "Belarus",
-  Украина: "Ukraine",
   Узбекистан: "Uzbekistan",
   Армения: "Armenia",
   Грузия: "Georgia",
