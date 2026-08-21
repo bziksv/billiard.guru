@@ -29,51 +29,38 @@ export const LEGAL_BODIES_EN: Record<LegalDocSlug, LegalDocBody> = {
     ],
   },
   cookies: {
-    updatedAt: "2026-06-08",
+    updatedAt: "2026-08-21",
     sections: [
       {
         paragraphs: [
-          "billiard.guru uses cookies and similar technologies for authentication, saving preferences, and collecting anonymized usage statistics.",
+          "This document applies to https://billiard.guru/, https://billiard.guru/cabinet, and *.billiard.guru subdomains.",
+          "ООО «ПРАЙМ» (the Operator) uses cookies as described in the full Russian Cookie policy at https://billiard.guru/legal/cookies. The Russian version is controlling.",
         ],
       },
       {
-        title: "Cookies we use",
+        title: "Summary",
         paragraphs: [
-          "Essential — session, language choice (NEXT_LOCALE), cookie consent.",
-          "Analytics — page views to understand popular sections (no ad-network sharing through the Service).",
-        ],
-      },
-      {
-        title: "Managing cookies",
-        paragraphs: [
-          "You can delete or block cookies in your browser settings. Some features (sign-in, language memory) may stop working.",
-          "On first visit we show a cookie notice; by continuing to use the site you agree to cookies for the purposes described here.",
+          "Cookies help the site work (session, preferences), improve the Service, and — where applicable — analytics and marketing. Blocking cookies may limit site features.",
+          "You can refuse non-essential cookies in your browser settings; only essential cookies will then be used.",
+          "Questions: info@billiard.guru.",
         ],
       },
     ],
   },
   "recommendation-technologies": {
-    updatedAt: "2026-06-08",
+    updatedAt: "2026-08-21",
     sections: [
       {
         paragraphs: [
-          "billiard.guru uses recommendation technologies — algorithms that suggest content based on your actions and region.",
+          "This document applies to https://billiard.guru/, https://billiard.guru/cabinet, and *.billiard.guru subdomains.",
+          "ООО «ПРАЙМ» uses recommendation technologies as described in the full Russian rules at https://billiard.guru/legal/recommendation-technologies. The Russian version is controlling.",
         ],
       },
       {
-        title: "What we recommend",
+        title: "Summary",
         paragraphs: [
-          "Tournaments and clubs in your region — on the home page and in lists.",
-          "Nearby events and Play a match listings based on selected city.",
-          "Card order may consider start date, tournament status, and geographic proximity.",
-        ],
-      },
-      {
-        title: "How it works",
-        paragraphs: [
-          "Recommendations are not third-party advertising and are not based on paid placement.",
-          "Change the region filter — recommendations will update.",
-          "See the privacy policy for more on data use.",
+          "We may use actions on the Site, region/city, cookies, and technical data to recommend tournaments, clubs, Play a match listings, and related content, and to improve the Service.",
+          "Questions: info@billiard.guru.",
         ],
       },
     ],

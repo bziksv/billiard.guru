@@ -1,9 +1,10 @@
 import type { AppLocale } from "@/i18n/routing";
 import type { LegalDocSlug } from "@/lib/legal";
 import { LEGAL_BODIES_EN } from "@/lib/legal/en/bodies";
-import { LEGAL_BODIES_RU_GENERATED } from "@/lib/legal/ru/bodies.generated";
+import { COOKIES_BODY_RU } from "@/lib/legal/ru/cookies";
 import { PERSONAL_DATA_CONSENT_BODY_RU } from "@/lib/legal/ru/personal-data-consent";
 import { PRIVACY_BODY_RU } from "@/lib/legal/ru/privacy";
+import { RECOMMENDATION_TECHNOLOGIES_BODY_RU } from "@/lib/legal/ru/recommendation-technologies";
 
 export type LegalDocTable = {
   headers: string[];
@@ -23,9 +24,8 @@ export type LegalDocBody = {
 
 const LEGAL_BODIES_RU: Record<LegalDocSlug, LegalDocBody> = {
   privacy: PRIVACY_BODY_RU,
-  cookies: LEGAL_BODIES_RU_GENERATED.cookies!,
-  "recommendation-technologies":
-    LEGAL_BODIES_RU_GENERATED["recommendation-technologies"]!,
+  cookies: COOKIES_BODY_RU,
+  "recommendation-technologies": RECOMMENDATION_TECHNOLOGIES_BODY_RU,
   "personal-data-consent": PERSONAL_DATA_CONSENT_BODY_RU,
 };
 
