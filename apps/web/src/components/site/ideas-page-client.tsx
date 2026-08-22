@@ -21,6 +21,8 @@ interface IdeaView {
   likesCount: number;
   dislikesCount: number;
   rejectReason: string | null;
+  adminReply: string | null;
+  repliedAt: string | null;
   createdAt: string;
   myVote: "LIKE" | "DISLIKE" | null;
   author: { id: string; firstName: string; lastName: string };
@@ -181,6 +183,9 @@ export function IdeasPageClient({
                     </>
                   )}
                 </p>
+                {idea.adminReply && (
+                  <IdeaAdminReply label={t("adminReply", { reply: idea.adminReply })} />
+                )}
                 <div className="mt-4 flex flex-wrap items-center gap-3">
                   <VoteButton
                     active={idea.myVote === "LIKE"}
@@ -289,11 +294,22 @@ export function IdeasPageClient({
                     {t("rejectReason", { reason: idea.rejectReason })}
                   </p>
                 )}
+                {idea.adminReply && (
+                  <IdeaAdminReply label={t("adminReply", { reply: idea.adminReply })} />
+                )}
               </SiteCard>
             ))
           )}
         </section>
       )}
+    </div>
+  );
+}
+
+function IdeaAdminReply({ label }: { label: string }) {
+  return (
+    <div className="mt-3 rounded-lg border border-emerald-800/50 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-100/95">
+      {label}
     </div>
   );
 }

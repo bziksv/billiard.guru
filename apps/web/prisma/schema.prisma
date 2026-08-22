@@ -638,6 +638,9 @@ model Idea {
   moderatedAt     DateTime?  @map("moderated_at")
   moderatedById   String?    @map("moderated_by_id")
   rejectReason    String?    @map("reject_reason") @db.Text
+  adminReply      String?    @map("admin_reply") @db.Text
+  repliedAt       DateTime?  @map("replied_at")
+  repliedById     String?    @map("replied_by_id")
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 

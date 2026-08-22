@@ -50,31 +50,35 @@ async function main() {
     throw new Error("Город Воронеж не найден — сначала выполните seed geo");
   }
 
-  for (let i = 1; i <= 300; i++) {
-    const phone = testPlayerPhone(i);
-    const rating = randomTestPlayerRating();
-    await prisma.player.upsert({
-      where: { phone },
-      update: {
-        firstName: "Игрок",
-        lastName: `Тест${i}`,
-        cityId: voronezh.id,
-        isVerified: true,
-        rating,
-        confirmToken: null,
-      },
-      create: {
-        firstName: "Игрок",
-        lastName: `Тест${i}`,
-        cityId: voronezh.id,
-        phone,
-        isVerified: true,
-        rating,
-        telegramUsername: `test_player_${i}`,
-      },
-    });
+  if (process.env.SEED_TEST_PLAYERS === "1") {
+    for (let i = 1; i <= 300; i++) {
+      const phone = testPlayerPhone(i);
+      const rating = randomTestPlayerRating();
+      await prisma.player.upsert({
+        where: { phone },
+        update: {
+          firstName: "Игрок",
+          lastName: `Тест${i}`,
+          cityId: voronezh.id,
+          isVerified: true,
+          rating,
+          confirmToken: null,
+        },
+        create: {
+          firstName: "Игрок",
+          lastName: `Тест${i}`,
+          cityId: voronezh.id,
+          phone,
+          isVerified: true,
+          rating,
+          telegramUsername: `test_player_${i}`,
+        },
+      });
+    }
+    console.log("Test players: Тест1 … Тест300 (+79000000001 … +79000000300)");
+  } else {
+    console.log("Тестовые игроки пропущены (SEED_TEST_PLAYERS=1 для локальной разработки)");
   }
-  console.log("Test players: Тест1 … Тест300 (+79000000001 … +79000000300)");
 }
 
 main()

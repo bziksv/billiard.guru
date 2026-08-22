@@ -51,6 +51,9 @@ export type IdeaMinAggregateOutputType = {
   moderatedAt: Date | null
   moderatedById: string | null
   rejectReason: string | null
+  adminReply: string | null
+  repliedAt: Date | null
+  repliedById: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -70,6 +73,9 @@ export type IdeaMaxAggregateOutputType = {
   moderatedAt: Date | null
   moderatedById: string | null
   rejectReason: string | null
+  adminReply: string | null
+  repliedAt: Date | null
+  repliedById: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -89,6 +95,9 @@ export type IdeaCountAggregateOutputType = {
   moderatedAt: number
   moderatedById: number
   rejectReason: number
+  adminReply: number
+  repliedAt: number
+  repliedById: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -120,6 +129,9 @@ export type IdeaMinAggregateInputType = {
   moderatedAt?: true
   moderatedById?: true
   rejectReason?: true
+  adminReply?: true
+  repliedAt?: true
+  repliedById?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -139,6 +151,9 @@ export type IdeaMaxAggregateInputType = {
   moderatedAt?: true
   moderatedById?: true
   rejectReason?: true
+  adminReply?: true
+  repliedAt?: true
+  repliedById?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -158,6 +173,9 @@ export type IdeaCountAggregateInputType = {
   moderatedAt?: true
   moderatedById?: true
   rejectReason?: true
+  adminReply?: true
+  repliedAt?: true
+  repliedById?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -264,6 +282,9 @@ export type IdeaGroupByOutputType = {
   moderatedAt: Date | null
   moderatedById: string | null
   rejectReason: string | null
+  adminReply: string | null
+  repliedAt: Date | null
+  repliedById: string | null
   createdAt: Date
   updatedAt: Date
   _count: IdeaCountAggregateOutputType | null
@@ -306,6 +327,9 @@ export type IdeaWhereInput = {
   moderatedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
   moderatedById?: Prisma.StringNullableFilter<"Idea"> | string | null
   rejectReason?: Prisma.StringNullableFilter<"Idea"> | string | null
+  adminReply?: Prisma.StringNullableFilter<"Idea"> | string | null
+  repliedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
+  repliedById?: Prisma.StringNullableFilter<"Idea"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   author?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
@@ -328,6 +352,9 @@ export type IdeaOrderByWithRelationInput = {
   moderatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedById?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  adminReply?: Prisma.SortOrderInput | Prisma.SortOrder
+  repliedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  repliedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   author?: Prisma.PlayerOrderByWithRelationInput
@@ -354,6 +381,9 @@ export type IdeaWhereUniqueInput = Prisma.AtLeast<{
   moderatedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
   moderatedById?: Prisma.StringNullableFilter<"Idea"> | string | null
   rejectReason?: Prisma.StringNullableFilter<"Idea"> | string | null
+  adminReply?: Prisma.StringNullableFilter<"Idea"> | string | null
+  repliedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
+  repliedById?: Prisma.StringNullableFilter<"Idea"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   author?: Prisma.XOR<Prisma.PlayerScalarRelationFilter, Prisma.PlayerWhereInput>
@@ -376,6 +406,9 @@ export type IdeaOrderByWithAggregationInput = {
   moderatedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   moderatedById?: Prisma.SortOrderInput | Prisma.SortOrder
   rejectReason?: Prisma.SortOrderInput | Prisma.SortOrder
+  adminReply?: Prisma.SortOrderInput | Prisma.SortOrder
+  repliedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  repliedById?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.IdeaCountOrderByAggregateInput
@@ -403,6 +436,9 @@ export type IdeaScalarWhereWithAggregatesInput = {
   moderatedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Idea"> | Date | string | null
   moderatedById?: Prisma.StringNullableWithAggregatesFilter<"Idea"> | string | null
   rejectReason?: Prisma.StringNullableWithAggregatesFilter<"Idea"> | string | null
+  adminReply?: Prisma.StringNullableWithAggregatesFilter<"Idea"> | string | null
+  repliedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Idea"> | Date | string | null
+  repliedById?: Prisma.StringNullableWithAggregatesFilter<"Idea"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Idea"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Idea"> | Date | string
 }
@@ -420,6 +456,9 @@ export type IdeaCreateInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.PlayerCreateNestedOneWithoutIdeasInput
@@ -442,6 +481,9 @@ export type IdeaUncheckedCreateInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   votes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutIdeaInput
@@ -460,6 +502,9 @@ export type IdeaUpdateInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.PlayerUpdateOneRequiredWithoutIdeasNestedInput
@@ -482,6 +527,9 @@ export type IdeaUncheckedUpdateInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutIdeaNestedInput
@@ -502,6 +550,9 @@ export type IdeaCreateManyInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -519,6 +570,9 @@ export type IdeaUpdateManyMutationInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -538,6 +592,9 @@ export type IdeaUncheckedUpdateManyInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -573,6 +630,9 @@ export type IdeaCountOrderByAggregateInput = {
   moderatedAt?: Prisma.SortOrder
   moderatedById?: Prisma.SortOrder
   rejectReason?: Prisma.SortOrder
+  adminReply?: Prisma.SortOrder
+  repliedAt?: Prisma.SortOrder
+  repliedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -597,6 +657,9 @@ export type IdeaMaxOrderByAggregateInput = {
   moderatedAt?: Prisma.SortOrder
   moderatedById?: Prisma.SortOrder
   rejectReason?: Prisma.SortOrder
+  adminReply?: Prisma.SortOrder
+  repliedAt?: Prisma.SortOrder
+  repliedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -616,6 +679,9 @@ export type IdeaMinOrderByAggregateInput = {
   moderatedAt?: Prisma.SortOrder
   moderatedById?: Prisma.SortOrder
   rejectReason?: Prisma.SortOrder
+  adminReply?: Prisma.SortOrder
+  repliedAt?: Prisma.SortOrder
+  repliedById?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -741,6 +807,9 @@ export type IdeaCreateWithoutClubInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.PlayerCreateNestedOneWithoutIdeasInput
@@ -761,6 +830,9 @@ export type IdeaUncheckedCreateWithoutClubInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   votes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutIdeaInput
@@ -810,6 +882,9 @@ export type IdeaScalarWhereInput = {
   moderatedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
   moderatedById?: Prisma.StringNullableFilter<"Idea"> | string | null
   rejectReason?: Prisma.StringNullableFilter<"Idea"> | string | null
+  adminReply?: Prisma.StringNullableFilter<"Idea"> | string | null
+  repliedAt?: Prisma.DateTimeNullableFilter<"Idea"> | Date | string | null
+  repliedById?: Prisma.StringNullableFilter<"Idea"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Idea"> | Date | string
 }
@@ -827,6 +902,9 @@ export type IdeaCreateWithoutAuthorInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   club?: Prisma.ClubCreateNestedOneWithoutIdeasInput
@@ -847,6 +925,9 @@ export type IdeaUncheckedCreateWithoutAuthorInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   votes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutIdeaInput
@@ -891,6 +972,9 @@ export type IdeaCreateWithoutVotesInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   author: Prisma.PlayerCreateNestedOneWithoutIdeasInput
@@ -912,6 +996,9 @@ export type IdeaUncheckedCreateWithoutVotesInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -945,6 +1032,9 @@ export type IdeaUpdateWithoutVotesInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.PlayerUpdateOneRequiredWithoutIdeasNestedInput
@@ -966,6 +1056,9 @@ export type IdeaUncheckedUpdateWithoutVotesInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -984,6 +1077,9 @@ export type IdeaCreateManyClubInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1001,6 +1097,9 @@ export type IdeaUpdateWithoutClubInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   author?: Prisma.PlayerUpdateOneRequiredWithoutIdeasNestedInput
@@ -1021,6 +1120,9 @@ export type IdeaUncheckedUpdateWithoutClubInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutIdeaNestedInput
@@ -1040,6 +1142,9 @@ export type IdeaUncheckedUpdateManyWithoutClubInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1058,6 +1163,9 @@ export type IdeaCreateManyAuthorInput = {
   moderatedAt?: Date | string | null
   moderatedById?: string | null
   rejectReason?: string | null
+  adminReply?: string | null
+  repliedAt?: Date | string | null
+  repliedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1075,6 +1183,9 @@ export type IdeaUpdateWithoutAuthorInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   club?: Prisma.ClubUpdateOneWithoutIdeasNestedInput
@@ -1095,6 +1206,9 @@ export type IdeaUncheckedUpdateWithoutAuthorInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   votes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutIdeaNestedInput
@@ -1114,6 +1228,9 @@ export type IdeaUncheckedUpdateManyWithoutAuthorInput = {
   moderatedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   moderatedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminReply?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  repliedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  repliedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1164,6 +1281,9 @@ export type IdeaSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   moderatedAt?: boolean
   moderatedById?: boolean
   rejectReason?: boolean
+  adminReply?: boolean
+  repliedAt?: boolean
+  repliedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   author?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
@@ -1189,11 +1309,14 @@ export type IdeaSelectScalar = {
   moderatedAt?: boolean
   moderatedById?: boolean
   rejectReason?: boolean
+  adminReply?: boolean
+  repliedAt?: boolean
+  repliedById?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type IdeaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "clubId" | "title" | "body" | "titleEn" | "bodyEn" | "status" | "moderationToken" | "likesCount" | "dislikesCount" | "moderatedAt" | "moderatedById" | "rejectReason" | "createdAt" | "updatedAt", ExtArgs["result"]["idea"]>
+export type IdeaOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "authorId" | "clubId" | "title" | "body" | "titleEn" | "bodyEn" | "status" | "moderationToken" | "likesCount" | "dislikesCount" | "moderatedAt" | "moderatedById" | "rejectReason" | "adminReply" | "repliedAt" | "repliedById" | "createdAt" | "updatedAt", ExtArgs["result"]["idea"]>
 export type IdeaInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
   club?: boolean | Prisma.Idea$clubArgs<ExtArgs>
@@ -1223,6 +1346,9 @@ export type $IdeaPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     moderatedAt: Date | null
     moderatedById: string | null
     rejectReason: string | null
+    adminReply: string | null
+    repliedAt: Date | null
+    repliedById: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["idea"]>
@@ -1611,6 +1737,9 @@ export interface IdeaFieldRefs {
   readonly moderatedAt: Prisma.FieldRef<"Idea", 'DateTime'>
   readonly moderatedById: Prisma.FieldRef<"Idea", 'String'>
   readonly rejectReason: Prisma.FieldRef<"Idea", 'String'>
+  readonly adminReply: Prisma.FieldRef<"Idea", 'String'>
+  readonly repliedAt: Prisma.FieldRef<"Idea", 'DateTime'>
+  readonly repliedById: Prisma.FieldRef<"Idea", 'String'>
   readonly createdAt: Prisma.FieldRef<"Idea", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Idea", 'DateTime'>
 }

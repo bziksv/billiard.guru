@@ -19,6 +19,8 @@ function serializeIdea(
     likesCount: number;
     dislikesCount: number;
     rejectReason: string | null;
+    adminReply: string | null;
+    repliedAt: Date | null;
     createdAt: Date;
     moderatedAt: Date | null;
     author: { id: string; firstName: string; lastName: string };
@@ -38,6 +40,8 @@ function serializeIdea(
     likesCount: idea.likesCount,
     dislikesCount: idea.dislikesCount,
     rejectReason: idea.rejectReason,
+    adminReply: idea.adminReply,
+    repliedAt: idea.repliedAt?.toISOString() ?? null,
     createdAt: idea.createdAt.toISOString(),
     moderatedAt: idea.moderatedAt?.toISOString() ?? null,
     author: {

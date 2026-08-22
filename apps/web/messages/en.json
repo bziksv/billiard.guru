@@ -409,6 +409,7 @@
         "submitting": "Submitting…",
         "mineEmpty": "You have not suggested any ideas yet.",
         "rejectReason": "Reason: {reason}",
+        "adminReply": "Admin reply: {reply}",
         "status": {
           "PENDING": "Under review",
           "APPROVED": "Published",
@@ -529,6 +530,10 @@
         "idea-author-rejected": {
           "title": "Idea rejected",
           "description": "When your idea is rejected (with reason if provided)."
+        },
+        "idea-author-reply": {
+          "title": "Reply to your idea",
+          "description": "When an administrator replies to your idea."
         },
         "idea-broadcast": {
           "title": "New idea on the site",

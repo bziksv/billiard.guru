@@ -23,12 +23,17 @@ interface IdeaRow {
   likesCount: number;
   dislikesCount: number;
   rejectReason: string | null;
+  adminReply: string | null;
+  repliedAt: string | null;
   createdAt: string;
   moderatedAt: string | null;
   author: {
     id: string;
     firstName: string;
     lastName: string;
+    isVerified: boolean;
+    telegramUsername: string | null;
+    hasTelegram: boolean;
     city: { nameRu: string };
   };
 }
@@ -45,6 +50,8 @@ export function IdeasAdminTable() {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [replyId, setReplyId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
   const [actingId, setActingId] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
@@ -113,6 +120,32 @@ export function IdeasAdminTable() {
     await reload();
   }
 
+  async function sendReply(id: string) {
+    const text = replyText.trim();
+    if (!text) return;
+    setActingId(id);
+    const res = await fetch(`/api/admin/ideas/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "reply", adminReply: text }),
+    });
+    const data = await res.json();
+    setActingId(null);
+    if (!res.ok) {
+      alert(data.error ?? "Не удалось отправить ответ");
+      return;
+    }
+    setReplyId(null);
+    setReplyText("");
+    if (data.message) alert(data.message);
+    await reload();
+  }
+
+  function openReply(row: IdeaRow) {
+    setReplyId(row.id);
+    setReplyText(row.adminReply ?? "");
+  }
+
   if (loading) {
     return <p className="admin-muted text-sm">Загрузка…</p>;
   }
@@ -145,8 +178,8 @@ export function IdeasAdminTable() {
       </AdminTableToolbar>
 
       <div className="admin-table-wrap admin-table-wrap--scroll">
-          <table className="w-full min-w-[900px] text-left text-sm">
-            <thead className="admin-thead">
+        <table className="w-full min-w-[900px] text-left text-sm">
+          <thead className="admin-thead">
             <tr>
               <AdminSortHeader
                 label="Идея"
@@ -156,6 +189,7 @@ export function IdeasAdminTable() {
                 onSort={toggleSort}
               />
               <th className="px-4 py-3 font-medium">Автор</th>
+              <th className="px-4 py-3 font-medium">Telegram</th>
               <AdminSortHeader
                 label="Статус"
                 sortKey="status"
@@ -177,7 +211,6 @@ export function IdeasAdminTable() {
                 dir={sortDir}
                 onSort={toggleSort}
               />
-              <th className="px-4 py-3 font-medium" />
             </tr>
           </thead>
           <tbody>
@@ -187,30 +220,24 @@ export function IdeasAdminTable() {
                   <p className="font-medium">{row.title}</p>
                   <p className="mt-1 line-clamp-3 text-xs text-zinc-500">{row.body}</p>
                   {row.rejectReason && (
-                    <p className="mt-1 text-xs text-red-400/90">{row.rejectReason}</p>
+                    <p className="mt-1 text-xs text-red-400/90">
+                      Отклонение: {row.rejectReason}
+                    </p>
                   )}
-                </td>
-                <td className="px-4 py-3 text-zinc-400">
-                  {row.author.lastName} {row.author.firstName}
-                  <br />
-                  <span className="text-xs">{row.author.city.nameRu}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <StatusBadge
-                    status={row.status}
-                    label={IDEA_STATUS_LABELS[row.status] ?? row.status}
-                  />
-                </td>
-                <td className="px-4 py-3 font-mono text-zinc-400">
-                  {row.likesCount} / {row.dislikesCount}
-                </td>
-                <td className="px-4 py-3 text-zinc-400">
-                  {formatAdminDate(row.createdAt)}
-                </td>
-                <td className="px-4 py-3">
-                  {row.status === "PENDING" && (
-                    <div className="flex flex-col items-end gap-2">
-                      <div className="flex gap-2">
+                  {row.adminReply && (
+                    <p className="mt-1 text-xs text-emerald-400/90">
+                      Ответ: {row.adminReply}
+                      {row.repliedAt && (
+                        <span className="text-zinc-500">
+                          {" "}
+                          · {formatAdminDate(row.repliedAt)}
+                        </span>
+                      )}
+                    </p>
+                  )}
+                  <div className="mt-3 space-y-2 border-t border-zinc-800/80 pt-3">
+                    {row.status === "PENDING" && (
+                      <div className="flex flex-wrap gap-2">
                         <AsyncTextButton
                           variant="emerald"
                           loadingLabel="…"
@@ -228,25 +255,100 @@ export function IdeasAdminTable() {
                           Отклонить
                         </AsyncTextButton>
                       </div>
-                      {rejectId === row.id && (
-                        <div className="w-48 space-y-2">
-                          <input
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder="Причина (необяз.)"
-                            className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-xs"
-                          />
+                    )}
+                    {rejectId === row.id && (
+                      <div className="space-y-2">
+                        <input
+                          value={rejectReason}
+                          onChange={(e) => setRejectReason(e.target.value)}
+                          placeholder="Причина (необяз.)"
+                          className="admin-input w-full px-2 py-1 text-xs"
+                        />
+                        <AsyncTextButton
+                          variant="red"
+                          loadingLabel="…"
+                          onClick={() => moderate(row.id, "reject", rejectReason)}
+                        >
+                          Подтвердить отклонение
+                        </AsyncTextButton>
+                      </div>
+                    )}
+                    {replyId === row.id ? (
+                      <div className="space-y-2">
+                        <textarea
+                          value={replyText}
+                          onChange={(e) => setReplyText(e.target.value)}
+                          placeholder="Ответ автору…"
+                          rows={3}
+                          className="admin-input w-full resize-y px-2 py-1 text-xs"
+                        />
+                        <div className="flex flex-wrap gap-2">
                           <AsyncTextButton
-                            variant="red"
+                            variant="emerald"
                             loadingLabel="…"
-                            onClick={() => moderate(row.id, "reject", rejectReason)}
+                            disabled={!replyText.trim() || actingId === row.id}
+                            onClick={() => sendReply(row.id)}
                           >
-                            Подтвердить отклонение
+                            Отправить ответ
                           </AsyncTextButton>
+                          <button
+                            type="button"
+                            className="text-xs text-zinc-500 hover:text-zinc-300"
+                            onClick={() => {
+                              setReplyId(null);
+                              setReplyText("");
+                            }}
+                          >
+                            Отмена
+                          </button>
                         </div>
-                      )}
-                    </div>
-                  )}
+                        {!row.author.isVerified && (
+                          <p className="text-xs text-amber-400/90">
+                            Telegram не подтверждён — ответ только на сайте.
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <AsyncTextButton
+                        variant="emerald"
+                        loadingLabel="…"
+                        disabled={actingId !== null && actingId !== row.id}
+                        onClick={() => openReply(row)}
+                      >
+                        {row.adminReply ? "Изменить ответ" : "Ответить"}
+                      </AsyncTextButton>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-zinc-400">
+                  {row.author.lastName} {row.author.firstName}
+                  <br />
+                  <span className="text-xs">{row.author.city.nameRu}</span>
+                </td>
+                <td className="px-4 py-3">
+                  <StatusBadge
+                    status={row.author.isVerified ? "CONFIRMED" : "PENDING"}
+                    label={row.author.isVerified ? "Подтверждён" : "Не подтверждён"}
+                  />
+                  <p className="mt-1 text-xs text-zinc-500">
+                    {row.author.telegramUsername
+                      ? `@${row.author.telegramUsername}`
+                      : row.author.hasTelegram
+                        ? "TG без username"
+                        : "нет Telegram"}
+                  </p>
+                </td>
+                <td className="px-4 py-3">
+                  <StatusBadge
+                    status={row.status}
+                    label={IDEA_STATUS_LABELS[row.status] ?? row.status}
+                  />
+                </td>
+                <td className="px-4 py-3 font-mono text-zinc-400">
+                  {row.likesCount} / {row.dislikesCount}
+                </td>
+                <td className="px-4 py-3 text-zinc-400">
+                  {formatAdminDate(row.createdAt)}
                 </td>
               </tr>
             ))}

@@ -126,4 +126,5 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   "player.create": "Создан игрок",
   "idea.approve": "Идея одобрена",
   "idea.reject": "Идея отклонена",
+  "idea.reply": "Ответ по идее",
 };

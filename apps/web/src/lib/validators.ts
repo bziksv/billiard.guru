@@ -512,10 +512,21 @@ export const ideaCreateSchema = z.object({
   clubId: z.string().min(1).optional(),
 });
 
-export const ideaModerateSchema = z.object({
-  action: z.enum(["approve", "reject"]),
-  rejectReason: z.string().max(500).optional(),
-});
+export const ideaModerateSchema = z
+  .object({
+    action: z.enum(["approve", "reject", "reply"]),
+    rejectReason: z.string().max(500).optional(),
+    adminReply: z.string().max(2000).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.action === "reply" && !data.adminReply?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Введите текст ответа",
+        path: ["adminReply"],
+      });
+    }
+  });
 
 export const clubNewsModerateSchema = z.object({
   action: z.enum(["approve", "reject", "unpublish"]),

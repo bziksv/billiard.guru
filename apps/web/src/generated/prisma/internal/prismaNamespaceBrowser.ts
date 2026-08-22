@@ -460,6 +460,9 @@ export const IdeaScalarFieldEnum = {
   moderatedAt: 'moderatedAt',
   moderatedById: 'moderatedById',
   rejectReason: 'rejectReason',
+  adminReply: 'adminReply',
+  repliedAt: 'repliedAt',
+  repliedById: 'repliedById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -939,7 +942,9 @@ export const IdeaOrderByRelevanceFieldEnum = {
   bodyEn: 'bodyEn',
   moderationToken: 'moderationToken',
   moderatedById: 'moderatedById',
-  rejectReason: 'rejectReason'
+  rejectReason: 'rejectReason',
+  adminReply: 'adminReply',
+  repliedById: 'repliedById'
 } as const
 
 export type IdeaOrderByRelevanceFieldEnum = (typeof IdeaOrderByRelevanceFieldEnum)[keyof typeof IdeaOrderByRelevanceFieldEnum]

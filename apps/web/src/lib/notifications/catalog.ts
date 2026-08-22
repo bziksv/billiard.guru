@@ -377,6 +377,23 @@ export const NOTIFICATION_CATALOG = [
     examplePreview: "❌ Идея не прошла модерацию…",
   },
   {
+    id: "idea-author-reply",
+    title: "Ответ администратора по идее",
+    description:
+      "Автору идеи после ответа в /admin/ideas. Только если Telegram подтверждён (isVerified + telegramId).",
+    category: "ideas",
+    kind: "outbound",
+    channel: "telegram",
+    recipient: "Автор идеи",
+    trigger: "Ответ администратора (replyToIdeaByAdmin)",
+    implementation: "idea-moderation.ts → replyToIdeaByAdmin()",
+    hasButtons: false,
+    auditAction: "idea.reply",
+    examplePreview: "💬 Ответ по вашей идее…",
+    manageable: true,
+    templatePlaceholders: ["title", "reply", "link"],
+  },
+  {
     id: "idea-broadcast",
     title: "Новая идея на сайте",
     description:

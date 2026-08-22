@@ -3,6 +3,7 @@ import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
 import {
   approveIdeaByAdmin,
   rejectIdeaByAdmin,
+  replyToIdeaByAdmin,
 } from "@/lib/idea-moderation";
 import { ideaModerateSchema } from "@/lib/validators";
 
@@ -17,13 +18,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const result =
       data.action === "approve"
         ? await approveIdeaByAdmin(id, session.playerId)
-        : await rejectIdeaByAdmin(id, session.playerId, data.rejectReason);
+        : data.action === "reject"
+          ? await rejectIdeaByAdmin(id, session.playerId, data.rejectReason)
+          : await replyToIdeaByAdmin(id, session.playerId, data.adminReply!);
 
     if (!result.ok) {
       return NextResponse.json({ error: result.message }, { status: 400 });
     }
 
-    return NextResponse.json({ ok: true, message: result.message });
+    return NextResponse.json({
+      ok: true,
+      message: result.message,
+      telegramSent: "telegramSent" in result ? result.telegramSent : undefined,
+    });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

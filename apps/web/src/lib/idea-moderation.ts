@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { writeAuditLog } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
+import { dispatchNotification } from "@/lib/notifications/dispatch";
 import { getNotificationLinkBase } from "@/lib/canonical-site-url";
 import { syncLocalizedTitleBody } from "@/lib/translation";
 import {
@@ -119,7 +120,7 @@ export async function createIdea(
 }
 
 async function notifyAuthorApproved(idea: Awaited<ReturnType<typeof loadIdea>>) {
-  if (!idea?.author.telegramId) return;
+  if (!idea?.author.telegramId || !idea.author.isVerified) return;
   await sendTelegramMessage(
     idea.author.telegramId,
     `✅ <b>Ваша идея прошла модерацию</b>\n\n` +
@@ -132,7 +133,7 @@ async function notifyAuthorRejected(
   idea: Awaited<ReturnType<typeof loadIdea>>,
   reason?: string | null,
 ) {
-  if (!idea?.author.telegramId) return;
+  if (!idea?.author.telegramId || !idea.author.isVerified) return;
   const reasonBlock = reason?.trim()
     ? `\n\nПричина: ${truncate(reason.trim(), 300)}`
     : "";
@@ -322,6 +323,83 @@ export async function rejectIdeaByAdmin(
     throw new Error("Идея не найдена или уже обработана");
   }
   return rejectIdea(idea.moderationToken, moderatorId, rejectReason);
+}
+
+export async function replyToIdeaByAdmin(
+  ideaId: string,
+  moderatorId: string,
+  adminReply: string,
+): Promise<{ ok: boolean; message: string; telegramSent: boolean }> {
+  const reply = adminReply.trim();
+  if (!reply) {
+    return { ok: false, message: "Введите текст ответа", telegramSent: false };
+  }
+
+  const idea = await prisma.idea.findUnique({
+    where: { id: ideaId },
+    include: { author: true },
+  });
+  if (!idea) {
+    return { ok: false, message: "Идея не найдена", telegramSent: false };
+  }
+
+  await prisma.idea.update({
+    where: { id: ideaId },
+    data: {
+      adminReply: reply,
+      repliedAt: new Date(),
+      repliedById: moderatorId,
+    },
+  });
+
+  await writeAuditLog({
+    actorType: "admin",
+    actorId: moderatorId,
+    action: "idea.reply",
+    entityType: "idea",
+    entityId: ideaId,
+    payload: { adminReply: truncate(reply, 200) },
+  });
+
+  const fullIdea = await loadIdea(ideaId);
+  let telegramSent = false;
+  if (fullIdea?.author.isVerified && fullIdea.author.telegramId) {
+    try {
+      telegramSent = await dispatchNotification(
+        "idea-author-reply",
+        fullIdea.author.telegramId,
+        `💬 <b>Ответ по вашей идее</b>\n\n` +
+          `«<b>${fullIdea.title}</b>»\n\n` +
+          `${truncate(reply, 800)}\n\n` +
+          `Мои идеи: ${appUrl("/ideas")}`,
+        undefined,
+        {
+          playerId: fullIdea.authorId,
+          entityType: "idea",
+          entityId: fullIdea.id,
+          templateVars: {
+            title: fullIdea.title,
+            reply: truncate(reply, 800),
+            link: appUrl("/ideas"),
+          },
+        },
+      );
+    } catch (error) {
+      logger.error({ error, ideaId }, "Idea author reply notify failed");
+    }
+  }
+
+  const tgNote = telegramSent
+    ? " Автор уведомлён в Telegram."
+    : fullIdea?.author.isVerified
+      ? " Telegram не доставлен (отключено или ошибка)."
+      : " Telegram не привязан — ответ только на сайте.";
+
+  return {
+    ok: true,
+    message: `Ответ сохранён.${tgNote}`,
+    telegramSent,
+  };
 }
 
 export async function castIdeaVote(

@@ -409,6 +409,7 @@
         "submitting": "Отправка…",
         "mineEmpty": "Вы ещё не предлагали идей",
         "rejectReason": "Причина: {reason}",
+        "adminReply": "Ответ администратора: {reply}",
         "status": {
           "PENDING": "На модерации",
           "APPROVED": "Опубликована",
@@ -529,6 +530,10 @@
         "idea-author-rejected": {
           "title": "Идея отклонена",
           "description": "Когда ваша идея отклонена (с причиной, если указали)."
+        },
+        "idea-author-reply": {
+          "title": "Ответ по идее",
+          "description": "Когда администратор отвечает на вашу идею."
         },
         "idea-broadcast": {
           "title": "Новая идея на сайте",
