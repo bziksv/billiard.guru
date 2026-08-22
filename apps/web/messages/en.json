@@ -410,6 +410,9 @@
         "mineEmpty": "You have not suggested any ideas yet.",
         "rejectReason": "Reason: {reason}",
         "adminReply": "Admin reply: {reply}",
+        "adminReplyLabel": "Official administration reply",
+        "adminReplyBrand": "billiard.guru",
+        "adminReplyRole": "Administration",
         "status": {
           "PENDING": "Under review",
           "APPROVED": "Published",

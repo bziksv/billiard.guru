@@ -410,6 +410,9 @@
         "mineEmpty": "Вы ещё не предлагали идей",
         "rejectReason": "Причина: {reason}",
         "adminReply": "Ответ администратора: {reply}",
+        "adminReplyLabel": "Официальный ответ администрации",
+        "adminReplyBrand": "billiard.guru",
+        "adminReplyRole": "Администрация",
         "status": {
           "PENDING": "На модерации",
           "APPROVED": "Опубликована",

@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { PersonalDataConsentCheckbox } from "@/components/site/legal/personal-data-consent-checkbox";
 import { LocalizedUserText } from "@/components/site/localized-user-text";
 import { EmptyState, SiteCard } from "@/components/site/site-card";
+import { IdeaAdminReply } from "@/components/site/idea-admin-reply";
 import type { AppLocale } from "@/i18n/routing";
 import { resolveLocalizedField } from "@/lib/localized-db-text";
 
@@ -163,30 +164,32 @@ export function IdeasPageClient({
             <EmptyState title={t("emptyTitle")} description={t("emptyDescription")} />
           ) : (
             approved.map((idea) => (
-              <SiteCard key={idea.id}>
-                <h2 className="text-lg font-semibold text-zinc-100">
-                  {resolveLocalizedField(locale, idea.title, idea.titleEn)}
-                </h2>
-                <div className="mt-2 text-sm text-zinc-300">
-                  <LocalizedUserText text={idea.body} textEn={idea.bodyEn} />
+              <SiteCard key={idea.id} className="overflow-hidden !p-0">
+                <div className="p-5">
+                  <h2 className="home-card-title text-lg font-semibold">
+                    {resolveLocalizedField(locale, idea.title, idea.titleEn)}
+                  </h2>
+                  <div className="home-card-body mt-2 text-sm">
+                    <LocalizedUserText text={idea.body} textEn={idea.bodyEn} />
+                  </div>
+                  <p className="home-card-muted mt-3 text-xs">
+                    {idea.clubName ? (
+                      <>
+                        <span className="text-amber-600 dark:text-amber-400/90">
+                          {t("clubAuthor", { club: idea.clubName })}
+                        </span>
+                        {" · "}
+                        {idea.author.lastName} {idea.author.firstName}
+                      </>
+                    ) : (
+                      <>
+                        {idea.author.lastName} {idea.author.firstName}
+                      </>
+                    )}
+                  </p>
                 </div>
-                <p className="mt-3 text-xs text-zinc-500">
-                  {idea.clubName ? (
-                    <>
-                      <span className="text-amber-400/90">{t("clubAuthor", { club: idea.clubName })}</span>
-                      {" · "}
-                      {idea.author.lastName} {idea.author.firstName}
-                    </>
-                  ) : (
-                    <>
-                      {idea.author.lastName} {idea.author.firstName}
-                    </>
-                  )}
-                </p>
-                {idea.adminReply && (
-                  <IdeaAdminReply label={t("adminReply", { reply: idea.adminReply })} />
-                )}
-                <div className="mt-4 flex flex-wrap items-center gap-3">
+                {idea.adminReply && <IdeaAdminReply reply={idea.adminReply} />}
+                <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border-subtle)] px-5 py-4">
                   <VoteButton
                     active={idea.myVote === "LIKE"}
                     disabled={!isLoggedIn || votingId === idea.id}
@@ -272,44 +275,36 @@ export function IdeasPageClient({
             <EmptyState title={t("mineEmpty")} />
           ) : (
             mine.map((idea) => (
-              <SiteCard key={idea.id}>
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h2 className="font-semibold text-zinc-100">
-                    {resolveLocalizedField(locale, idea.title, idea.titleEn)}
-                  </h2>
-                  <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-400">
-                    {ideaStatusLabel(idea.status, t)}
-                  </span>
+              <SiteCard key={idea.id} className="overflow-hidden !p-0">
+                <div className="p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <h2 className="home-card-title font-semibold">
+                      {resolveLocalizedField(locale, idea.title, idea.titleEn)}
+                    </h2>
+                    <span className="site-badge site-badge--muted">
+                      {ideaStatusLabel(idea.status, t)}
+                    </span>
+                  </div>
+                  <div className="home-card-body mt-2 text-sm">
+                    <LocalizedUserText text={idea.body} textEn={idea.bodyEn} />
+                  </div>
+                  {idea.status === "APPROVED" && (
+                    <p className="home-card-muted mt-3 text-xs">
+                      👍 {idea.likesCount} · 👎 {idea.dislikesCount}
+                    </p>
+                  )}
+                  {idea.status === "REJECTED" && idea.rejectReason && (
+                    <p className="mt-2 text-sm text-red-600 dark:text-red-400/90">
+                      {t("rejectReason", { reason: idea.rejectReason })}
+                    </p>
+                  )}
                 </div>
-                <div className="mt-2 text-sm text-zinc-300">
-                  <LocalizedUserText text={idea.body} textEn={idea.bodyEn} />
-                </div>
-                {idea.status === "APPROVED" && (
-                  <p className="mt-3 text-xs text-zinc-500">
-                    👍 {idea.likesCount} · 👎 {idea.dislikesCount}
-                  </p>
-                )}
-                {idea.status === "REJECTED" && idea.rejectReason && (
-                  <p className="mt-2 text-xs text-red-400/90">
-                    {t("rejectReason", { reason: idea.rejectReason })}
-                  </p>
-                )}
-                {idea.adminReply && (
-                  <IdeaAdminReply label={t("adminReply", { reply: idea.adminReply })} />
-                )}
+                {idea.adminReply && <IdeaAdminReply reply={idea.adminReply} />}
               </SiteCard>
             ))
           )}
         </section>
       )}
-    </div>
-  );
-}
-
-function IdeaAdminReply({ label }: { label: string }) {
-  return (
-    <div className="mt-3 rounded-lg border border-emerald-800/50 bg-emerald-950/30 px-3 py-2 text-sm text-emerald-100/95">
-      {label}
     </div>
   );
 }
