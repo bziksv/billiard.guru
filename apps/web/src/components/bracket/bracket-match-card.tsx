@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
 import { bracketTeamLabel } from "@/lib/bracket-display";
-import { teamRating, type TeamPlayer } from "@/lib/pair-tournament";
+import { formatTeamRating, teamRating, type TeamPlayer } from "@/lib/pair-tournament";
 import {
   isActiveBracketMatch,
   isMatchReadyForResult,
@@ -113,7 +113,7 @@ function TeamLine({
           </span>
         )}
         <span className="bracket-match-rating mt-0.5 block font-mono text-[10px] leading-none tabular-nums">
-          {labels.ratingPrefix} {teamRating(team)}
+          {labels.ratingPrefix} {formatTeamRating(team)}
         </span>
       </div>
       {showScoreColumn && (

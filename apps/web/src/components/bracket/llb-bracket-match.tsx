@@ -12,7 +12,12 @@ import {
   type BracketUILabels,
 } from "@/lib/bracket-view-labels";
 import type { AppLocale } from "@/i18n/routing";
-import { teamRating, type TeamWithPlayers } from "@/lib/pair-tournament";
+import {
+  formatTeamRating,
+  teamRating,
+  type TeamWithPlayers,
+} from "@/lib/pair-tournament";
+import { formatRating } from "@/lib/rating";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { BracketMatchNumberRow } from "@/components/bracket/bracket-match-number-row";
@@ -159,7 +164,7 @@ function TeamRow({
       )}
       {rating !== undefined && !empty && (
         <span className="bracket-match-rating shrink-0 font-mono text-[10px] tabular-nums">
-          {labels.ratingPrefix} {rating}
+          {labels.ratingPrefix} {formatRating(rating)}
         </span>
       )}
       {onMatchClick ? (
@@ -249,7 +254,7 @@ function PairTeamRow({
         {team.player2 ? bracketPlayerLabel(team.player2) : "—"}
       </button>
       <span className="bracket-match-rating shrink-0 font-mono text-[10px] tabular-nums">
-        {teamRating(team)}
+        {formatTeamRating(team)}
       </span>
       {onMatchClick ? (
         <button

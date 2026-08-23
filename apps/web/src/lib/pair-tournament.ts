@@ -1,3 +1,5 @@
+import { formatRating, roundToPreviewGrid } from "@/lib/rating";
+
 export interface TeamPlayer {
   id: string;
   firstName: string;
@@ -207,8 +209,12 @@ export function normalizePlayerPair(id1: string, id2: string): [string, string] 
 
 export function teamRating(team: TeamWithPlayers): number {
   if (team.ratingOverride != null) return team.ratingOverride;
-  if (!team.player2) return team.player1.rating;
-  return team.player1.rating + team.player2.rating;
+  if (!team.player2) return roundToPreviewGrid(team.player1.rating);
+  return roundToPreviewGrid(team.player1.rating + team.player2.rating);
+}
+
+export function formatTeamRating(team: TeamWithPlayers): string {
+  return formatRating(teamRating(team));
 }
 
 export function teamLabel(team: TeamWithPlayers): string {
