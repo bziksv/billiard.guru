@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView, SwissStandingView } from "@/lib/bracket-view";
@@ -20,10 +20,17 @@ import type {
   PublicTournamentStandings,
 } from "@/lib/tournament-public-standings";
 import type { PublicMatchRow, PublicMatchStatus } from "@/lib/tournament-public-matches";
+import { useTabHash } from "@/hooks/use-tab-hash";
 
 export type { PublicParticipantRow };
 
 type TabId = "results" | "participants" | "matches" | "bracket";
+
+const PUBLIC_TAB_IDS = ["results", "participants", "matches", "bracket"] as const;
+
+function isPublicTabId(value: string): value is TabId {
+  return (PUBLIC_TAB_IDS as readonly string[]).includes(value);
+}
 
 export type PublicBracketPanelProps = {
   tournamentId: string;
@@ -595,7 +602,19 @@ export function TournamentPublicView({
 }: Props) {
   const t = useTranslations("tournamentView");
   const tBracket = useTranslations("tournamentView.bracket");
-  const [tab, setTab] = useState<TabId>(defaultTab);
+  const isAllowedTab = useCallback(
+    (value: string): value is TabId => {
+      if (!isPublicTabId(value)) return false;
+      if (value === "results") return standings.hasMatches;
+      if (value === "matches") return matchCount > 0;
+      return true;
+    },
+    [standings.hasMatches, matchCount],
+  );
+  const resolvedDefault = isAllowedTab(defaultTab) ? defaultTab : "participants";
+  const [tab, setTab] = useTabHash(resolvedDefault, isAllowedTab, {
+    scrollToId: "tournament-tabs",
+  });
   const [presentationOpen, setPresentationOpen] = useState(false);
   const [display, setDisplay] = useState<BracketCardDisplayPrefs>(() =>
     bracket ? readBracketDisplayPrefs(bracket.tournamentId) : DEFAULT_BRACKET_CARD_DISPLAY,
@@ -628,7 +647,7 @@ export function TournamentPublicView({
 
   return (
     <>
-      <section className="space-y-4">
+      <section id="tournament-tabs" className="scroll-mt-24 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="site-section-title">{t("title")}</h2>
           <TournamentTabBar {...tabBarProps} />

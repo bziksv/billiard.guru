@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import { useTabHash } from "@/hooks/use-tab-hash";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { PlayerContactLinks } from "@/components/admin/player-contact-links";
 import { TournamentParticipantInfo } from "@/components/admin/tournament-participant-info";
@@ -121,6 +129,15 @@ type ManageTab =
   | "upcoming-matches"
   | "completed-matches"
   | "protocol";
+
+const MANAGE_TAB_IDS: readonly ManageTab[] = [
+  "participants",
+  "bracket",
+  "current-matches",
+  "upcoming-matches",
+  "completed-matches",
+  "protocol",
+];
 
 function ManageTabButtons({
   tab,
@@ -364,8 +381,21 @@ export function TournamentManageView({
 }) {
   const effectiveViewMode: TournamentManageViewMode =
     initialTab === "bracket" ? "bracket" : viewMode;
-  const [tab, setTab] = useState<ManageTab>(() =>
+  const showParticipants = effectiveViewMode !== "bracket";
+  const showBracketSection = effectiveViewMode !== "tournament";
+  const isAllowedManageTab = useCallback(
+    (value: string): value is ManageTab => {
+      if (!(MANAGE_TAB_IDS as readonly string[]).includes(value)) return false;
+      if (value === "participants") return showParticipants;
+      if (value === "protocol") return true;
+      return showBracketSection;
+    },
+    [showParticipants, showBracketSection],
+  );
+  const [tab, setTab] = useTabHash(
     defaultManageTab(t, effectiveViewMode),
+    isAllowedManageTab,
+    { scrollToId: "tournament-manage-tabs" },
   );
   const prevMatchCountRef = useRef(t.matches.length);
   const [bracketDisplay, setBracketDisplay] = useState<BracketCardDisplayPrefs>(() =>
@@ -382,8 +412,6 @@ export function TournamentManageView({
       setPresentationOpenInternal(open);
     }
   };
-  const showParticipants = effectiveViewMode !== "bracket";
-  const showBracketSection = effectiveViewMode !== "tournament";
 
   useEffect(() => {
     const hadMatches = prevMatchCountRef.current > 0;
@@ -397,7 +425,7 @@ export function TournamentManageView({
     ) {
       setTab("bracket");
     }
-  }, [t.matches.length, showBracketSection, tab]);
+  }, [t.matches.length, showBracketSection, tab, setTab]);
 
   useEffect(() => {
     localStorage.setItem(
@@ -780,7 +808,12 @@ export function TournamentManageView({
   const manageTabStrip = (
     <AdminHorizontalScroll className="min-w-0 w-full">
       <div className="flex w-max items-center gap-2 pb-0.5">
-        <div className="admin-tab-bar admin-tab-bar--nowrap">{manageTabButtons}</div>
+        <div
+          id="tournament-manage-tabs"
+          className="admin-tab-bar admin-tab-bar--nowrap scroll-mt-4"
+        >
+          {manageTabButtons}
+        </div>
         {bracketDisplayToggles}
         {bracketPlayerHighlightFilter}
       </div>
