@@ -3,26 +3,109 @@ import { prisma } from "@/lib/prisma";
 import {
   applyTournamentRatingsToPlayers,
   effectiveTournamentPlayerRating,
+  fillMissingMatchStartRatings,
   type MatchStartRatingsMap,
   type TournamentRatingSource,
 } from "@/lib/tournament-rating-display";
 import type { TeamWithPlayers } from "@/lib/pair-tournament";
 
-/** Рейтинги игроков на старте каждой встречи (из RatingChange). */
+function teamPlayerIds(
+  team: {
+    player1Id?: string | null;
+    player2Id?: string | null;
+    player1?: { id: string } | null;
+    player2?: { id: string } | null;
+  } | null,
+): string[] {
+  if (!team) return [];
+  const ids: string[] = [];
+  const p1 = team.player1Id ?? team.player1?.id;
+  const p2 = team.player2Id ?? team.player2?.id;
+  if (p1) ids.push(p1);
+  if (p2) ids.push(p2);
+  return ids;
+}
+
+/**
+ * Рейтинги на старте встреч: из RatingChange, а для автопроходов/bye без записи —
+ * восстановление по истории изменений в том же турнире.
+ */
 export async function loadMatchStartRatings(
   matchIds: string[],
 ): Promise<MatchStartRatingsMap> {
   if (matchIds.length === 0) return {};
-  const rows = await prisma.ratingChange.findMany({
-    where: { matchId: { in: matchIds } },
-    select: { matchId: true, playerId: true, oldRating: true },
+
+  const seedMatches = await prisma.tournamentMatch.findMany({
+    where: { id: { in: matchIds } },
+    select: { id: true, tournamentId: true },
   });
-  const out: MatchStartRatingsMap = {};
+  if (seedMatches.length === 0) return {};
+
+  const tournamentIds = [...new Set(seedMatches.map((m) => m.tournamentId))];
+  const allMatches = await prisma.tournamentMatch.findMany({
+    where: { tournamentId: { in: tournamentIds } },
+    select: {
+      id: true,
+      round: true,
+      slot: true,
+      finishedAt: true,
+      createdAt: true,
+      team1: { select: { player1Id: true, player2Id: true } },
+      team2: { select: { player1Id: true, player2Id: true } },
+    },
+  });
+
+  const allMatchIds = allMatches.map((m) => m.id);
+  /**
+   * Порядок для восстановления рейтинга на bye/автопроходах.
+   * У таких встреч часто нет finishedAt, а createdAt у всех слотов один
+   * (момент создания сетки) — из‑за этого ошибочно брался стартовый рейтинг
+   * турнира. Сортируем строго по туру/слоту сетки (для одного игрока этого достаточно).
+   */
+  const matchAtMs = new Map(
+    allMatches.map((m) => [m.id, m.round * 1_000_000 + m.slot]),
+  );
+
+  const rows = await prisma.ratingChange.findMany({
+    where: { matchId: { in: allMatchIds } },
+    select: {
+      matchId: true,
+      playerId: true,
+      oldRating: true,
+      newRating: true,
+      createdAt: true,
+    },
+  });
+
+  const direct: MatchStartRatingsMap = {};
+  const changeRows = [];
   for (const row of rows) {
     if (!row.matchId) continue;
-    (out[row.matchId] ??= {})[row.playerId] = row.oldRating;
+    (direct[row.matchId] ??= {})[row.playerId] = row.oldRating;
+    changeRows.push({
+      matchId: row.matchId,
+      playerId: row.playerId,
+      oldRating: row.oldRating,
+      newRating: row.newRating,
+      atMs: matchAtMs.get(row.matchId) ?? row.createdAt.getTime(),
+    });
   }
-  return out;
+
+  const requested = new Set(matchIds);
+  return fillMissingMatchStartRatings(
+    allMatches
+      .filter((m) => requested.has(m.id))
+      .map((m) => ({
+        id: m.id,
+        atMs: matchAtMs.get(m.id) ?? m.createdAt.getTime(),
+        playerIds: [
+          ...teamPlayerIds(m.team1),
+          ...teamPlayerIds(m.team2),
+        ],
+      })),
+    changeRows,
+    direct,
+  );
 }
 
 export function playerRatingExceedsTournamentMax(

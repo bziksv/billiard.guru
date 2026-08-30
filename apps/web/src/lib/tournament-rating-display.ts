@@ -81,6 +81,71 @@ export function applyTournamentRatingsToTeam<T extends TeamWithPlayers>(
 /** matchId → playerId → рейтинг на старте встречи (RatingChange.oldRating). */
 export type MatchStartRatingsMap = Record<string, Record<string, number>>;
 
+export type MatchStartRatingChangeRow = {
+  matchId: string;
+  playerId: string;
+  oldRating: number;
+  newRating: number;
+  /** Время завершения/создания матча, по которому идёт запись. */
+  atMs: number;
+};
+
+export type MatchPlayersForStartRating = {
+  id: string;
+  atMs: number;
+  playerIds: string[];
+};
+
+/**
+ * Для встреч без RatingChange (автопроход / bye) восстанавливает рейтинг
+ * на момент слота из истории изменений в том же турнире.
+ *
+ * — если до этой встречи уже были rated-матчи → берём newRating последнего;
+ * — иначе → oldRating первой rated-встречи игрока в турнире (как на старте).
+ */
+export function fillMissingMatchStartRatings(
+  matches: MatchPlayersForStartRating[],
+  changes: MatchStartRatingChangeRow[],
+  existing: MatchStartRatingsMap = {},
+): MatchStartRatingsMap {
+  const out: MatchStartRatingsMap = {};
+  for (const [matchId, byPlayer] of Object.entries(existing)) {
+    out[matchId] = { ...byPlayer };
+  }
+
+  const byPlayer = new Map<string, MatchStartRatingChangeRow[]>();
+  for (const row of changes) {
+    const list = byPlayer.get(row.playerId);
+    if (list) list.push(row);
+    else byPlayer.set(row.playerId, [row]);
+  }
+  for (const list of byPlayer.values()) {
+    list.sort((a, b) => a.atMs - b.atMs || a.matchId.localeCompare(b.matchId));
+  }
+
+  for (const match of matches) {
+    const slot = (out[match.id] ??= {});
+    for (const playerId of match.playerIds) {
+      if (slot[playerId] != null) continue;
+      const history = byPlayer.get(playerId);
+      if (!history?.length) continue;
+
+      let prior: MatchStartRatingChangeRow | undefined;
+      for (const row of history) {
+        if (row.matchId === match.id) continue;
+        if (row.atMs < match.atMs) prior = row;
+      }
+      if (prior) {
+        slot[playerId] = prior.newRating;
+      } else {
+        slot[playerId] = history[0]!.oldRating;
+      }
+    }
+  }
+
+  return out;
+}
+
 /**
  * Подставляет рейтинг на момент встречи (для сетки/форы по уже сыгранным матчам).
  * Для CLUB не трогаем — авторейтинг пишет общий Player.rating, не клубный.
