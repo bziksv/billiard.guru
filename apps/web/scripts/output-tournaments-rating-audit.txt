@@ -1,0 +1,157 @@
+=== АУДИТ РЕЙТИНГОВ ПО ВСЕМ ТУРНИРАМ ===
+Дата: 2026-08-30T22:00:08.428Z
+
+Турниров всего: 12
+
+## Глобально: RatingChange по reason
+  match_win: 409
+  match_loss: 409
+  без matchId: 0
+
+## По каждому турниру
+name | status | source | teams | matches | ratingChanges | overrides_now | pair_override_edits | nonstandard_reasons
+Абрилок московская пирамида - 30-08-2026 | ACTIVE | SYSTEM | teams=21 | matches=60 | RC=72 | ovNow=0 | ovEdits=0 | weird=0
+Абрилок. Парный. 23.08 | FINISHED | SYSTEM | teams=16 | matches=30 | RC=120 | ovNow=0 | ovEdits=0 | weird=0
+Абрилок московская пирамида - 16-08-2026 | FINISHED | SYSTEM | teams=16 | matches=30 | RC=60 | ovNow=0 | ovEdits=0 | weird=0
+Абрилок московская пирамида - 09-08-2026 | FINISHED | CLUB | teams=16 | matches=30 | RC=60 | ovNow=0 | ovEdits=0 | weird=0
+Абрилок московская пирамида - 02-08-2026 | FINISHED | CLUB | teams=18 | matches=60 | RC=64 | ovNow=9 | ovEdits=12 | weird=0
+Абрилок. Московка. Личный 26.07.26 | FINISHED | CLUB | teams=21 | matches=59 | RC=74 | ovNow=1 | ovEdits=1 | weird=0
+СУББОТНИЙ ЛЮБИТЕЛЬСКИЙ ТУРНИР В «ДУБРАВЕ»! | DID_NOT_TAKE_PLACE | CLUB | teams=0 | matches=0 | RC=0 | ovNow=0 | ovEdits=0 | weird=0
+Московская пирамида (личный). - 05.07.26 | FINISHED | CLUB | teams=16 | matches=30 | RC=60 | ovNow=1 | ovEdits=1 | weird=0
+🔔 СУББОТНИЙ ТУРНИР 🔔 04.06.2026 | FINISHED | CLUB | teams=16 | matches=28 | RC=56 | ovNow=1 | ovEdits=2 | weird=0
+Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00 | FINISHED | CLUB | teams=15 | matches=30 | RC=112 | ovNow=7 | ovEdits=16 | weird=0
+Московская пирамида до 2х побед. Турнир личка 21 июня, рейтинг 0-3 | FINISHED | CLUB | teams=16 | matches=30 | RC=60 | ovNow=0 | ovEdits=0 | weird=0
+Абрилок московская пирамида - 07-06-2026 | FINISHED | CLUB | teams=22 | matches=60 | RC=80 | ovNow=0 | ovEdits=0 | weird=0
+
+## Турниры с override (сейчас или в истории аудита): 5
+
+### Абрилок московская пирамида - 02-08-2026 [FINISHED] source=CLUB
+  overrides сейчас (9):
+    Китаев Александр=2.5 (sys p1=2.1)
+    Разживин Юрий=1.5 (sys p1=1)
+    Виленский Станислав=2.5 (sys p1=2.55)
+    Кислов Иван=1.5 (sys p1=1.1)
+    Бородкин Дмитрий=2.5 (sys p1=2.1)
+    Бутко Максим=2.5 (sys p1=2.05)
+    Ярославцев Игорь=1 (sys p1=1.4)
+    Куклин Дмитрий=2.5 (sys p1=2.6)
+    Бондаренко Артем=1.5 (sys p1=1)
+  правки в аудите (12):
+    2026-08-02T11:01 Сарин Игорь → 1.5 (by Разживин Юрий)
+    2026-08-02T11:04 Сарин Игорь → 1 (by Разживин Юрий)
+    2026-08-02T11:04 Сарин Игорь → null (by Разживин Юрий)
+    2026-08-02T11:23 Виленский Станислав → 2.5 (by Разживин Юрий)
+    2026-08-02T11:23 Разживин Юрий → 1.5 (by Разживин Юрий)
+    2026-08-02T11:23 Бородкин Дмитрий → 2.5 (by Разживин Юрий)
+    2026-08-02T11:23 Куклин Дмитрий → 2.5 (by Разживин Юрий)
+    2026-08-02T11:23 Бутко Максим → 2.5 (by Разживин Юрий)
+    2026-08-02T11:23 Бондаренко Артем → 1.5 (by Разживин Юрий)
+    2026-08-02T11:24 Китаев Александр → 2.5 (by Разживин Юрий)
+    2026-08-02T11:24 Кислов Иван → 1.5 (by Разживин Юрий)
+    2026-08-02T11:24 Ярославцев Игорь → 1 (by Разживин Юрий)
+
+### Абрилок. Московка. Личный 26.07.26 [FINISHED] source=CLUB
+  overrides сейчас (1):
+    Колганов Александр=1 (sys p1=0)
+  правки в аудите (1):
+    2026-07-26T13:26 Колганов Александр → 1 (by Разживин Юрий)
+
+### Московская пирамида (личный). - 05.07.26 [FINISHED] source=CLUB
+  overrides сейчас (1):
+    Разживин Юрий=1.5 (sys p1=1)
+  правки в аудите (1):
+    2026-07-05T11:48 Разживин Юрий → 1.5 (by Разживин Юрий)
+
+### 🔔 СУББОТНИЙ ТУРНИР 🔔                 04.06.2026 [FINISHED] source=CLUB
+  overrides сейчас (1):
+    Куклин Дмитрий=2 (sys p1=2.6)
+  правки в аудите (2):
+    2026-07-04T11:58 Куклин Дмитрий → 2.5 (by Виленский Станислав)
+    2026-07-04T11:58 Куклин Дмитрий → 2 (by Виленский Станислав)
+
+### Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED] source=CLUB
+  overrides сейчас (7):
+    Виленский/Куклин=5 (sys p1=2.55)
+    Файницкий/Лысенко=5 (sys p1=3.35)
+    Воронцов/Сарин=3 (sys p1=1.15)
+    Аветикян/Попов=4 (sys p1=1.6)
+    Разживин/Ильенко=5 (sys p1=1)
+    Бутко/Агарков=5 (sys p1=2.05)
+    Карякин/Карякин=5 (sys p1=5.05)
+  правки в аудите (16):
+    2026-06-28T08:54 Файницкий/Лысенко → 5 (by Виленский Станислав)
+    2026-06-28T08:55 Разживин/Ильенко → 5 (by Разживин Юрий)
+    2026-06-28T08:55 Разживин/Ильенко → 5 (by Виленский Станислав)
+    2026-06-28T09:32 Карякин/Карякин → 0.5 (by Разживин Юрий)
+    2026-06-28T09:33 Карякин/Карякин → 1 (by Разживин Юрий)
+    2026-06-28T09:33 Карякин/Карякин → 6 (by Разживин Юрий)
+    2026-06-28T09:33 Бутко/Агарков → 5 (by Разживин Юрий)
+    2026-06-28T09:43 Воронцов/Сарин → 2.5 (by Разживин Юрий)
+    2026-06-28T09:43 Воронцов/Сарин → 3 (by Разживин Юрий)
+    2026-06-28T09:44 Аветикян/Попов → 4 (by Разживин Юрий)
+    2026-06-28T09:54 Карякин/Карякин → 5.5 (by Разживин Юрий)
+    2026-06-28T09:54 Карякин/Карякин → 5 (by Разживин Юрий)
+    2026-06-28T09:55 Виленский/Куклин → 4.5 (by Разживин Юрий)
+    2026-06-28T09:55 Виленский/Куклин → 4 (by Разживин Юрий)
+    2026-06-28T10:00 Виленский/Куклин → 4.5 (by Разживин Юрий)
+    2026-06-28T10:00 Виленский/Куклин → 5 (by Разживин Юрий)
+
+## Турниры с нестандартными RatingChange: 0
+
+## Глобальные ручные/служебные операции с рейтингом: 80
+  rating.bulk_recalc: 21
+  rating.snapshot_restore: 20
+  tournament.rating_source_fix: 1
+  rating.manual_base_fix: 1
+  club.player_rating.set: 33
+  club.player_rating.update: 4
+
+### rating.manual_base_fix (все)
+  2026-08-14T21:02:51.862Z | База Сухова 5→4, рейтинг 5.25→4.25 (tiny_equal) | payload={"formula":"tiny_equal","newBase":4,"oldBase":5,"newRating":4.25,"oldRating":5.25}
+
+### club.player_rating.set/update (сводка по игрокам)
+  2026-07-26T13:39 | club.player_rating.set | cms1uhb5t008jky9wlpd8y816 | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cms1q0fx1002cky9w2dgz6p6j"}
+  2026-07-26T13:26 | club.player_rating.set | cms1u10dt0086ky9wt2245m6u | Рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmq5ihqkf00009t9wy90wm9jj"}
+  2026-07-04T10:02 | club.player_rating.update | cmr671j3m003pvh9wivovse7v | Рейтинг → 2 | {"rating":2}
+  2026-07-04T10:02 | club.player_rating.set | cmr671j3m003pvh9wivovse7v | Рейтинг 3 | {"clubId":"cmr66a69m0007vh9wea5mvz73","rating":3,"playerId":"cmr66sz2n002bvh9wg2etzmuz"}
+  2026-06-21T11:29 | club.player_rating.set | cmqnpfqu90039669w0m152xyd | Игрок добавлен в клуб при регистрации, рейтинг 6 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":6,"playerId":"cmqnpfqtv0037669wadswi29e"}
+  2026-06-21T11:29 | club.player_rating.set | cmqnpeowr0034669wiyi7n4uf | Игрок добавлен в клуб при регистрации, рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmqnpeowc0032669w6gd7t3up"}
+  2026-06-21T11:28 | club.player_rating.set | cmqnpe6dy002z669whjm7umxt | Игрок добавлен в клуб при регистрации, рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmqnpe6dn002x669wqvs8e2es"}
+  2026-06-21T11:28 | club.player_rating.set | cmqnpdhzt002u669wmo55p7px | Игрок добавлен в клуб при регистрации, рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmqnpdhzi002s669wdk2ymswc"}
+  2026-06-21T11:27 | club.player_rating.set | cmqnpcu3a002p669wn6j01ms3 | Игрок добавлен в клуб при регистрации, рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmqnpcu2w002n669wzwzy7w5a"}
+  2026-06-21T11:26 | club.player_rating.set | cmqnpbv8l002h669wxb59feq2 | Игрок добавлен в клуб при регистрации, рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmqnpbv87002f669ww7k0hp7h"}
+  2026-06-07T12:41 | club.player_rating.set | cmq3ru5m6009l2g9wxa45e0on | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cmq3pz44o00542g9wro1d1bkz"}
+  2026-06-07T11:47 | club.player_rating.set | cmq3pwi3k003k2g9we2qwziqo | Рейтинг 3 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":3,"playerId":"cmq3pw9f0003i2g9wihs7bw27"}
+  2026-06-07T11:45 | club.player_rating.set | cmq3ptsey003g2g9wf98h81hb | Рейтинг 1.5 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1.5,"playerId":"cmq3ptkod003e2g9w63kb2y3f"}
+  2026-06-07T11:37 | club.player_rating.update | cmq3on3iu00092g9wgf0b4yf9 | Рейтинг → 2 | {"rating":2}
+  2026-06-07T11:37 | club.player_rating.update | cmq3p09yk00182g9wgbgbctx9 | Рейтинг → 2.5 | {"rating":2.5}
+  2026-06-07T11:37 | club.player_rating.set | cmq3pj9lo002k2g9wvvav8vs6 | Рейтинг 0.5 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":0.5,"playerId":"cmq3pj2n6002i2g9w0okglou7"}
+  2026-06-07T11:36 | club.player_rating.set | cmq3phtdj002g2g9wik5755y0 | Рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmq3phn7l002e2g9wva9s25yo"}
+  2026-06-07T11:32 | club.player_rating.set | cmq3pd8ly002c2g9wl9x0m15p | Рейтинг 3 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":3,"playerId":"cmq3pd46b002a2g9w9imn9rmc"}
+  2026-06-07T11:31 | club.player_rating.set | cmq3pbpyq00282g9wjq334u52 | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cmq3pbk9v00262g9wkx473trc"}
+  2026-06-07T11:30 | club.player_rating.set | cmq3pa52o00242g9wqsrgar5j | Рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmq3p9zoh00222g9welc4hkrb"}
+  2026-06-07T11:29 | club.player_rating.set | cmq3p9200001z2g9w6jcz2dvu | Рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmq3p8xvw001x2g9w8m27ku4f"}
+  2026-06-07T11:28 | club.player_rating.set | cmq3p86ed001u2g9wn6znwaeg | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cmq3p7z6v001s2g9wsplpjxkr"}
+  2026-06-07T11:27 | club.player_rating.set | cmq3p611h001p2g9w0b4yotrn | Рейтинг 3 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":3,"playerId":"cmq3p5r7c001m2g9w6i9hlk1v"}
+  2026-06-07T11:24 | club.player_rating.set | cmq3p37dp001j2g9w8nz2biyn | Рейтинг 3 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":3,"playerId":"cmq3p30nb001h2g9w1vu6z49x"}
+  2026-06-07T11:23 | club.player_rating.set | cmq3p1j8r001f2g9w8t0urt86 | Рейтинг 2.5 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2.5,"playerId":"cmq3p1drx001d2g9wojhhkara"}
+  2026-06-07T11:22 | club.player_rating.set | cmq3p09yk00182g9wgbgbctx9 | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cmq3ozeyr00112g9wmmbtau4c"}
+  2026-06-07T11:22 | club.player_rating.set | cmq3ozwkz00152g9wqfzlhsg9 | Рейтинг 3 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":3,"playerId":"cmq3ozrw400132g9weojj8uxm"}
+  2026-06-07T11:21 | club.player_rating.set | cmq3oyvrf000z2g9wh07s5ta1 | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cmq3oymi7000x2g9wneegt471"}
+  2026-06-07T11:20 | club.player_rating.set | cmq3oxi89000t2g9wgiiyz59t | Рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmq3ot4q4000j2g9w8qa4qriw"}
+  2026-06-07T11:20 | club.player_rating.set | cmq3oxfdj000r2g9wgw0ouk63 | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cmq3owyce000p2g9w3d3ef6g3"}
+  2026-06-07T11:14 | club.player_rating.set | cmq3ophso000g2g9webj0a6v9 | Рейтинг 1 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1,"playerId":"cmq3ookm6000e2g9wijhujh9m"}
+  2026-06-07T11:12 | club.player_rating.update | cmq3on912000b2g9wmy55mpuk | Рейтинг → 1 | {"rating":1}
+  2026-06-07T11:12 | club.player_rating.set | cmq3on912000b2g9wmy55mpuk | Рейтинг 2 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2,"playerId":"cmpswacam0002463k7y5mr9eg"}
+  2026-06-07T11:12 | club.player_rating.set | cmq3on3iu00092g9wgf0b4yf9 | Рейтинг 2.5 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":2.5,"playerId":"cmpsvqdj90000hn3kep9hohuh"}
+  2026-06-07T11:12 | club.player_rating.set | cmq3on0m400072g9wwvxzk1jt | Рейтинг 1.5 | {"clubId":"cmpsw78io0000463k8ywfe29g","rating":1.5,"playerId":"cmpswelgl0004463kwm5xda17"}
+  2026-06-01T13:52 | club.player_rating.set | cmpv9ql1l00057h3k54eo8ijm |  | {"clubId":"cmptedqkj0000an3kwtnwt6yz","rating":3.5,"playerId":"cmpt0yqqf0006ic3kibkoqv1t"}
+  2026-06-01T13:52 | club.player_rating.set | cmpv9qe8f00037h3k5cn31nc4 |  | {"clubId":"cmptedqkj0000an3kwtnwt6yz","rating":4,"playerId":"cmpt0yqxq0007ic3kimwyboyv"}
+
+## ИТОГ (коротко)
+  Турниров: 12
+  С ratingOverride сейчас: 5
+  Где когда-либо правили pair override: 5
+  С нестандартными RatingChange: 0
+  Ручных правок базы игрока: 1
+  Турниры БЕЗ любых override/ручных следов: 7

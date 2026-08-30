@@ -66,6 +66,8 @@ function previewForFormula(
       return bundle.elo;
     case "micro_equal":
       return bundle.microEqual;
+    case "tiny_upset_only":
+      return bundle.tinyUpsetOnly;
     default:
       return bundle.soft;
   }
@@ -534,6 +536,11 @@ export function RatingPreviewPanel() {
                 "micro_equal",
                 "7. Равные ещё мельче",
                 "Равные → ±0,025. Апсет → ±0,15. Фаворит → ±0,1.",
+              ],
+              [
+                "tiny_upset_only",
+                "8. Подтверждение статуса",
+                "Равные → ±0,05. Апсет → ±0,1. Фаворит → 0.",
               ],
             ] as const
           ).map(([key, title, subtitle]) => (

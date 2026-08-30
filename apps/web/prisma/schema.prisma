@@ -780,7 +780,7 @@ model RatingAutoConfig {
   id              String   @id @default("default")
   /// Включено — считать рейтинг сразу после фиксации результата встречи
   enabled         Boolean  @default(false)
-  /// soft | upset_only | upset_mild | mild_all | tiny_equal | elo | micro_equal
+  /// soft | upset_only | upset_mild | mild_all | tiny_equal | elo | micro_equal | tiny_upset_only
   formula         String   @default("tiny_equal")
   minTournaments  Int      @default(3) @map("min_tournaments")
   minH2hMatches   Int      @default(5) @map("min_h2h_matches")

@@ -58,6 +58,11 @@ export const RATING_PREVIEW_FORMULA_OPTIONS: {
     label: "7. Равные ±0,025; апсет ±0,15; фаворит ±0,1",
     short: "Равные ±0,025 / апсет ±0,15 / фав. ±0,1",
   },
+  {
+    value: "tiny_upset_only",
+    label: "8. Равные ±0,05; апсет ±0,1; фаворит → 0",
+    short: "Равные ±0,05 / апсет ±0,1 / фав. 0",
+  },
 ];
 
 const FORMULA_SET = new Set(

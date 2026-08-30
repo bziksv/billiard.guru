@@ -13,7 +13,9 @@ import type { RatingPreviewFormula } from "@/lib/rating-preview";
 import { ratingChangeForFormula } from "@/lib/rating-preview";
 
 const SNAPSHOT_RETAIN = 10;
-const CHUNK = 200;
+/** Сколько updateMany в одной $transaction — на удалённой БД 200 легко > 5 с. */
+const CHUNK = 40;
+const TX_OPTS = { maxWait: 15_000, timeout: 60_000 } as const;
 
 export type RatingSnapshotListItem = {
   id: string;
@@ -314,6 +316,7 @@ export async function bulkRecalcSystemRating(options: {
             data: { rating: row.rating },
           }),
         ),
+        TX_OPTS,
       );
     }
 
@@ -390,6 +393,7 @@ export async function restoreRatingSnapshot(options: {
           data: { rating: r.rating },
         }),
       ),
+      TX_OPTS,
     );
   }
 

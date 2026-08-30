@@ -11,6 +11,7 @@ import {
   calculateRatingChangeMildAll,
   calculateRatingChangeSoft,
   calculateRatingChangeTinyEqual,
+  calculateRatingChangeTinyUpsetOnly,
   calculateRatingChangeUpsetMild,
   calculateRatingChangeUpsetOnly,
   roundToPreviewGrid,
@@ -25,7 +26,8 @@ import type { TournamentRatingSource } from "@/lib/tournament-rating-display";
  * mild_all — равные ±0,1, апсет ±0,15, фаворит ±0,1;
  * tiny_equal — равные ±0,05, апсет ±0,15, фаворит ±0,1;
  * elo — Elo (K=0,2, D=1) на шкале 0…20;
- * micro_equal — равные ±0,025, апсет ±0,15, фаворит ±0,1.
+ * micro_equal — равные ±0,025, апсет ±0,15, фаворит ±0,1;
+ * tiny_upset_only — равные ±0,05, апсет ±0,1, фаворит → 0.
  */
 export type RatingPreviewFormula =
   | "soft"
@@ -34,7 +36,8 @@ export type RatingPreviewFormula =
   | "mild_all"
   | "tiny_equal"
   | "elo"
-  | "micro_equal";
+  | "micro_equal"
+  | "tiny_upset_only";
 
 export const DEFAULT_MIN_TOURNAMENTS = 3;
 export const DEFAULT_MIN_H2H_MATCHES = 5;
@@ -149,6 +152,7 @@ export type RatingPreviewBundle = {
   tinyEqual: RatingPreviewResult;
   elo: RatingPreviewResult;
   microEqual: RatingPreviewResult;
+  tinyUpsetOnly: RatingPreviewResult;
 };
 
 export function ratingChangeForFormula(
@@ -173,6 +177,9 @@ export function ratingChangeForFormula(
   }
   if (formula === "micro_equal") {
     return calculateRatingChangeMicroEqual(winnerRating, loserRating);
+  }
+  if (formula === "tiny_upset_only") {
+    return calculateRatingChangeTinyUpsetOnly(winnerRating, loserRating);
   }
   return calculateRatingChangeSoft(winnerRating, loserRating);
 }

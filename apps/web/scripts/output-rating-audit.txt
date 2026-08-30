@@ -1,0 +1,156 @@
+=== АУДИТ РЕЙТИНГОВ: ВСЕ ИГРОКИ ===
+Дата: 2026-08-30T21:55:23.614Z
+
+## 1. Типы RatingChange (все время)
+  match_win: 409
+  match_loss: 409
+
+## 2. RatingChange без matchId: 0
+
+## 3. RatingChange с reason ≠ match_win/match_loss: 0
+
+## 4. AuditLog по рейтингу — сводка
+  rating.auto_match: 99
+  tournament.pair.rating: 44
+  club.player_rating.set: 33
+  rating.bulk_recalc: 21
+  rating.snapshot_restore: 20
+  club.player_rating.update: 4
+  rating.auto_match_reverse: 3
+  tournament.rating_source_fix: 1
+  rating.manual_base_fix: 1
+  site.news.republish: 1
+  tournament.notifications.enabled: 1
+  tournament.create: 1
+
+## 4b. Ручные/подозрительные audit (45)
+  2026-08-14T21:02:51.862Z | rating.manual_base_fix | База Сухова 5→4, рейтинг 5.25→4.25 (tiny_equal) | entity=Сухов Никита | actor=system | payload={"formula":"tiny_equal","newBase":4,"oldBase":5,"newRating":4.25,"oldRating":5.25}
+  2026-08-14T20:48:52.877Z | tournament.pair.rating |  | entity=cmsteh0490011593k55nh59mx | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":null}
+  2026-08-14T20:48:46.813Z | tournament.pair.rating |  | entity=cmsteh0490011593k55nh59mx | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":2.25}
+  2026-08-14T20:31:17.300Z | tournament.pair.rating |  | entity=cmsteh0490011593k55nh59mx | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":null}
+  2026-08-14T20:30:23.597Z | tournament.pair.rating |  | entity=cmsteh0490011593k55nh59mx | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":2}
+  2026-08-14T20:30:07.152Z | tournament.pair.rating |  | entity=cmsteh0490011593k55nh59mx | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":3}
+  2026-08-14T20:30:02.164Z | tournament.pair.rating |  | entity=cmsteh0490011593k55nh59mx | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":2.5}
+  2026-08-02T11:24:29.357Z | tournament.pair.rating |  | entity=cmsbplxkj0047iz9wm1amkgey | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1}
+  2026-08-02T11:24:27.529Z | tournament.pair.rating |  | entity=cmsbp8egb002ciz9wriuorgzf | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1.5}
+  2026-08-02T11:24:22.617Z | tournament.pair.rating |  | entity=cmsbp02r4001miz9wmamuoltk | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":2.5}
+  2026-08-02T11:23:54.073Z | tournament.pair.rating |  | entity=cmsbpn713004hiz9wqf2w198l | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1.5}
+  2026-08-02T11:23:52.660Z | tournament.pair.rating |  | entity=cmsbphisg003giz9wdop7mc0l | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":2.5}
+  2026-08-02T11:23:51.643Z | tournament.pair.rating |  | entity=cmsbpmto3004ciz9wu7t5tktm | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":2.5}
+  2026-08-02T11:23:50.241Z | tournament.pair.rating |  | entity=cmsbp8okw002eiz9wqnzs6wiu | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":2.5}
+  2026-08-02T11:23:44.522Z | tournament.pair.rating |  | entity=cmsbp0hmj001oiz9wprbp4cqb | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1.5}
+  2026-08-02T11:23:43.553Z | tournament.pair.rating |  | entity=cmsbp1rsf001uiz9wf29619q2 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":2.5}
+  2026-08-02T11:04:52.514Z | tournament.pair.rating |  | entity=cmsbowg58001fiz9w5nyrzdnw | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":null}
+  2026-08-02T11:04:49.234Z | tournament.pair.rating |  | entity=cmsbowg58001fiz9w5nyrzdnw | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1}
+  2026-08-02T11:01:39.543Z | tournament.pair.rating |  | entity=cmsbowg58001fiz9w5nyrzdnw | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1.5}
+  2026-07-26T13:26:31.812Z | tournament.pair.rating |  | entity=cms1q0zdu003gky9weax38py4 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1}
+  2026-07-05T11:48:43.282Z | tournament.pair.rating |  | entity=cmr7pi4bk002z2q9wl0il5dwq | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1.5}
+  2026-07-04T11:58:26.416Z | tournament.pair.rating |  | entity=cmr67o6610001uv3k209aafzg | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":2}
+  2026-07-04T11:58:05.553Z | tournament.pair.rating |  | entity=cmr67o6610001uv3k209aafzg | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":2.5}
+  2026-06-28T10:00:09.946Z | tournament.pair.rating |  | entity=cmqwx0oc50026d69wya5j0x3g | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":5}
+  2026-06-28T10:00:09.046Z | tournament.pair.rating |  | entity=cmqwx0oc50026d69wya5j0x3g | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":4.5}
+  2026-06-28T09:55:14.355Z | tournament.pair.rating |  | entity=cmqwx0oc50026d69wya5j0x3g | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":4}
+  2026-06-28T09:55:13.033Z | tournament.pair.rating |  | entity=cmqwx0oc50026d69wya5j0x3g | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":4.5}
+  2026-06-28T09:54:49.479Z | tournament.pair.rating |  | entity=cmqxlbtws004jau9wtc2lz1l8 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":5}
+  2026-06-28T09:54:48.531Z | tournament.pair.rating |  | entity=cmqxlbtws004jau9wtc2lz1l8 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":5.5}
+  2026-06-28T09:44:36.889Z | tournament.pair.rating |  | entity=cmqxjxvuw003dau9wbte2wxkt | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":4}
+  2026-06-28T09:43:36.064Z | tournament.pair.rating |  | entity=cmqxjkmvb0027au9w6o88whc0 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":3}
+  2026-06-28T09:43:34.805Z | tournament.pair.rating |  | entity=cmqxjkmvb0027au9w6o88whc0 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":2.5}
+  2026-06-28T09:33:21.309Z | tournament.pair.rating |  | entity=cmqxk6xs40042au9w2xd0zamg | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":5}
+  2026-06-28T09:33:16.629Z | tournament.pair.rating |  | entity=cmqxlbtws004jau9wtc2lz1l8 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":6}
+  2026-06-28T09:33:10.954Z | tournament.pair.rating |  | entity=cmqxlbtws004jau9wtc2lz1l8 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":1}
+  2026-06-28T09:32:53.435Z | tournament.pair.rating |  | entity=cmqxlbtws004jau9wtc2lz1l8 | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":0.5}
+  2026-06-28T08:55:47.598Z | tournament.pair.rating |  | entity=cmqxjzmbc003rau9wuw21vrkl | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":5}
+  2026-06-28T08:55:35.460Z | tournament.pair.rating |  | entity=cmqxjzmbc003rau9wuw21vrkl | actor=cmpswacam0002463k7y5mr9eg | payload={"ratingOverride":5}
+  2026-06-28T08:54:12.077Z | tournament.pair.rating |  | entity=cmqwx174i0028d69wx5sm5g79 | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":5}
+  2026-06-27T18:43:38.295Z | tournament.pair.rating |  | entity=cmqwnysc7001y253kk77jxr44 | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":13}
+  2026-06-27T18:43:32.083Z | tournament.pair.rating |  | entity=cmqwnysc7001y253kk77jxr44 | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":12.5}
+  2026-06-27T18:29:52.745Z | tournament.pair.rating |  | entity=cmqwnz7xm0026253kbh3vf6jk | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":0}
+  2026-06-27T18:29:42.495Z | tournament.pair.rating |  | entity=cmqwnz7xm0026253kbh3vf6jk | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":0.5}
+  2026-06-27T18:27:52.845Z | tournament.pair.rating |  | entity=cmqwnwzuj001k253k3p2wikc8 | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":13}
+  2026-06-27T18:27:41.433Z | tournament.pair.rating |  | entity=cmqwnwzuj001k253k3p2wikc8 | actor=cmpsvqdj90000hn3kep9hohuh | payload={"ratingOverride":12.5}
+
+## 5. Активные ratingOverride у команд СЕЙЧАС: 19
+  override=1.5 | Бондаренко Артем (p1=1) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=2.5 | Куклин Дмитрий (p1=2.6) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=1 | Ярославцев Игорь (p1=1.4) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=2.5 | Бутко Максим (p1=2.05) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=2.5 | Бородкин Дмитрий (p1=2.1) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=1.5 | Кислов Иван (p1=1.1) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=2.5 | Виленский Станислав (p1=2.55) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=1.5 | Разживин Юрий (p1=1) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=2.5 | Китаев Александр (p1=2.1) | Абрилок московская пирамида - 02-08-2026 [FINISHED]
+  override=1 | Колганов Александр (p1=0) | Абрилок. Московка. Личный 26.07.26 [FINISHED]
+  override=1.5 | Разживин Юрий (p1=1) | Московская пирамида (личный). - 05.07.26 [FINISHED]
+  override=2 | Куклин Дмитрий (p1=2.6) | 🔔 СУББОТНИЙ ТУРНИР 🔔                 04.06.2026 [FINISHED]
+  override=5 | Карякин/Карякин (p1=5.05) | Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED]
+  override=5 | Бутко/Агарков (p1=2.05) | Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED]
+  override=5 | Разживин/Ильенко (p1=1) | Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED]
+  override=4 | Аветикян/Попов (p1=1.6) | Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED]
+  override=3 | Воронцов/Сарин (p1=1.15) | Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED]
+  override=5 | Файницкий/Лысенко (p1=3.35) | Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED]
+  override=5 | Виленский/Куклин (p1=2.55) | Парный турнир🔥воскресенье, 28 июня. Регистрация с 11.30, начало 12.00. Московская пирамида до 2х побед,. [FINISHED]
+
+## 6. Игроки по ролям
+  PLAYER: 87
+  SUPERADMIN: 1
+
+## 6b. Не-PLAYER (1)
+  SUPERADMIN | Виленский Станислав | rating=2.55
+
+## 7. Турнир «Абрилок московская пирамида - 30-08-2026» — все участники
+  Участников: 21
+  ratingOverride сейчас: 0
+  name | role | now | changes_in_t | nonstandard_ever | reasons_in_t
+  Боев Александр | PLAYER | 2.1 | 5 | 0 | match_loss,match_win
+  Бородкин Дмитрий | PLAYER | 2.1 | 5 | 0 | match_win,match_loss
+  Быковский Алексей | PLAYER | 1.9 | 3 | 0 | match_win,match_loss
+  Виленский Станислав | SUPERADMIN | 2.55 | 5 | 0 | match_loss,match_win
+  Воронцов Артем | PLAYER | 1.15 | 2 | 0 | match_loss
+  Галустов Артур | PLAYER | 3.25 | 3 | 0 | match_win,match_loss
+  Зехов Роман | PLAYER | 1.55 | 2 | 0 | match_loss
+  Ильенко Даниил | PLAYER | 2.9 | 2 | 0 | match_loss
+  Ильинский Владимир | PLAYER | 2.4 | 3 | 0 | match_win,match_loss
+  Киселев Никита | PLAYER | 2 | 4 | 0 | match_win,match_loss
+  Колганов Александр | PLAYER | 0 | 2 | 0 | match_loss
+  Куклин Дмитрий | PLAYER | 2.6 | 6 | 0 | match_loss,match_win
+  Лысенко Игорь | PLAYER | 1.9 | 3 | 0 | match_win,match_loss
+  Муковнин Роман | PLAYER | 1 | 2 | 0 | match_loss
+  Попов Дмитрий | PLAYER | 3.55 | 3 | 0 | match_win,match_loss
+  Разживин Юрий | PLAYER | 1 | 2 | 0 | match_loss
+  Сбоев Виктор | PLAYER | 2.15 | 5 | 0 | match_win,match_loss
+  Тимофеев Даниил | PLAYER | 2.15 | 4 | 0 | match_win,match_loss
+  Тищенко Станислав | PLAYER | 1.15 | 4 | 0 | match_win,match_loss
+  Ульянцев Дмитрий | PLAYER | 2.4 | 4 | 0 | match_loss,match_win
+  Хрячков Никита | PLAYER | 1.5 | 3 | 0 | match_win,match_loss
+
+  Участники с нестандартными RatingChange за всё время: 0
+
+## 8. Player.rating ≠ последний RatingChange.newRating
+  Расхождений: 23
+  Рогатнев Максим (PLAYER): player=1.55 lastChange=1.65 (match_win, 2026-08-16T14:59:30.550Z, match=cmr7qb4mm004p2q9wvkwlod57)
+  Данцев Дмитрий (PLAYER): player=3 lastChange=2.85 (match_loss, 2026-08-16T14:59:30.312Z, match=cmq3ssvl8001z1h3ke9y512ih)
+  Бондаренко Артем (PLAYER): player=1 lastChange=1.15 (match_loss, 2026-08-16T14:59:30.763Z, match=cms1q569g005dky9w4n9wepvs)
+  Подшивалов Владислав (PLAYER): player=1.85 lastChange=2.05 (match_win, 2026-08-16T14:59:30.312Z, match=cmq3ssvl8001e1h3k2g4ryy96)
+  Кислов Иван (PLAYER): player=1.1 lastChange=1.35 (match_win, 2026-08-16T14:59:30.763Z, match=cms1q569g005eky9wqpj4d2y9)
+  Сухов Никита (PLAYER): player=4.25 lastChange=4.1 (match_win, 2026-08-16T14:59:30.312Z, match=cmqnt7utc0001ew3ku02bepmi)
+  Карякин Илья (PLAYER): player=5.05 lastChange=5.25 (match_win, 2026-08-16T14:59:30.550Z, match=cmqxlukkl0028sj9wrnondtr2)
+  Карякин Никита (PLAYER): player=1.05 lastChange=1.25 (match_win, 2026-08-16T14:59:30.550Z, match=cmqxlukkl0028sj9wrnondtr2)
+  Аветикян Арут (PLAYER): player=1.6 lastChange=1.7 (match_win, 2026-08-16T14:59:30.550Z, match=cmqxlukkl0027sj9wmclix9g2)
+  Полупанов Александр (PLAYER): player=3.35 lastChange=3.3 (match_win, 2026-08-16T14:59:30.550Z, match=cmqxlukkl002fsj9w5ejab2mi)
+  Колесниченко Николай (PLAYER): player=1.7 lastChange=1.85 (match_loss, 2026-08-16T14:59:30.550Z, match=cmr7qb4mm004l2q9wm8qyomef)
+  Агарков Павел (PLAYER): player=2.3 lastChange=2.45 (match_loss, 2026-08-16T14:59:30.312Z, match=cmqxlukkl001vsj9wntp98h09)
+  Борзов Умед (PLAYER): player=2.25 lastChange=2.1 (match_win, 2026-08-16T14:59:30.550Z, match=cmr67pwwx0004jd3k3rni3i68)
+  Гоборов Константин (PLAYER): player=1 lastChange=1.05 (match_win, 2026-08-16T14:59:30.550Z, match=cmr67pwwx0007jd3krqx8b62s)
+  Емельянов Андрей (PLAYER): player=1.05 lastChange=1 (match_loss, 2026-08-16T14:59:30.550Z, match=cmr67pwwx0004jd3k3rni3i68)
+  Курьязович Азис (PLAYER): player=1.35 lastChange=1.1 (match_win, 2026-08-16T14:59:30.550Z, match=cmr67pwwx0005jd3k1bgx0tv5)
+  Тепляков Виктор (PLAYER): player=3.15 lastChange=3.1 (match_win, 2026-08-16T14:59:30.763Z, match=cms1q569g005kky9wzlxadnxs)
+  Шаймарданов Рамис (PLAYER): player=1 lastChange=1.15 (match_win, 2026-08-16T14:59:30.550Z, match=cmr67pwwx0002jd3ky1mdice5)
+  Ходяков Олег (PLAYER): player=1 lastChange=1.05 (match_loss, 2026-08-16T14:59:30.763Z, match=cms1q569f004xky9wqx57tor7)
+  Григорий Обласов (PLAYER): player=1.2 lastChange=1.4 (match_loss, 2026-08-16T14:59:30.763Z, match=cmsbpnbac005eiz9wplqjb5qa)
+  Подкуйко Роман (PLAYER): player=2.9 lastChange=3.1 (match_win, 2026-08-16T14:59:30.763Z, match=cmsbpnbab0059iz9w2y00s9d0)
+  Ярославцев Игорь (PLAYER): player=1.4 lastChange=1.45 (match_loss, 2026-08-16T14:59:30.763Z, match=cmsbpnbac005giz9wz5qb0v4r)
+  Даниелян Гор (PLAYER): player=2.15 lastChange=2.1 (match_win, 2026-08-16T14:59:30.763Z, match=cmsluzvcz0005sv3k6t9ygsoi)
+
+## 9. ВСЕ игроки с нестандартными RatingChange (за всё время)
+  Игроков: 0

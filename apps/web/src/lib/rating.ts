@@ -76,9 +76,11 @@ export const PREVIEW_STEP_EQUAL_MILD = 0.1;
 export const PREVIEW_STEP_EQUAL_TINY = 0.05;
 /** Формула 7: шаг за равных. */
 export const PREVIEW_STEP_EQUAL_MICRO = 0.025;
-/** Формула 3–5: шаг за апсет. */
+/** Формула 3–5, 7: шаг за апсет. */
 export const PREVIEW_STEP_UPSET_MILD = 0.15;
-/** Формула 4–5: шаг за победу фаворита над слабее. */
+/** Формула 8: шаг за апсет (медленное подтверждение статуса). */
+export const PREVIEW_STEP_UPSET_CONFIRM = 0.1;
+/** Формула 4–5, 7: шаг за победу фаворита над слабее. */
 export const PREVIEW_STEP_FAVORITE_MILD = 0.1;
 /** |Δ рейтинга| меньше этого — считаем «тот же уровень» (формулы 1–2). */
 export const PREVIEW_EQUAL_BAND = 0.5;
@@ -249,6 +251,36 @@ export function calculateRatingChangeTinyEqual(
     loserRating,
     PREVIEW_STEP_UPSET_MILD,
     -PREVIEW_STEP_UPSET_MILD,
+  );
+}
+
+/**
+ * Формула 8 — медленное подтверждение статуса:
+ * — равные (|Δ| ≤ 0,5) → ±0,05;
+ * — слабее обыграл сильнее → ±0,1;
+ * — сильнее обыграл слабее → 0 / 0 (оба подтвердили статус).
+ */
+export function calculateRatingChangeTinyUpsetOnly(
+  winnerRating: number,
+  loserRating: number,
+): RatingChangeResult {
+  const diff = winnerRating - loserRating;
+  if (Math.abs(diff) <= PREVIEW_EQUAL_BAND) {
+    return previewChangeResult(
+      winnerRating,
+      loserRating,
+      PREVIEW_STEP_EQUAL_TINY,
+      -PREVIEW_STEP_EQUAL_TINY,
+    );
+  }
+  if (diff > PREVIEW_EQUAL_BAND) {
+    return previewChangeResult(winnerRating, loserRating, 0, 0);
+  }
+  return previewChangeResult(
+    winnerRating,
+    loserRating,
+    PREVIEW_STEP_UPSET_CONFIRM,
+    -PREVIEW_STEP_UPSET_CONFIRM,
   );
 }
 
