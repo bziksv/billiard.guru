@@ -530,7 +530,12 @@ assert.equal(
   assert.equal(
     isFixedSwissWinLinkFooterOnly(win12to13!, 14, 5),
     true,
-    "8R2: #12 → #13 footer-only",
+    "8R2: #12 → #13 без SVG-линии",
+  );
+  assert.equal(
+    shouldAutoAdvanceFixedSwissLink(win12to13!, 14, 5),
+    true,
+    "8R2: победитель #12 всё равно встаёт в #13",
   );
   assert.equal(
     shouldDrawFixedSwissWinEdge(3, 3, 5, 5, "win", 2, 1, 14, 5),

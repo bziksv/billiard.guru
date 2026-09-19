@@ -5980,6 +5980,18 @@ export function shouldAutoAdvanceFixedSwissLink(
     return false;
   }
   if (link.kind === "loss") return true;
+  if (
+    isFixedSwissTs8R2LowerFinalToBronzeWinEdge(
+      link.fromRound,
+      link.fromSlot,
+      link.toRound,
+      link.toSlot,
+      matchCount,
+      maxRound,
+    )
+  ) {
+    return true;
+  }
   return !isFixedSwissWinLinkFooterOnly(link, matchCount, maxRound);
 }
 
