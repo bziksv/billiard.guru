@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Сравнение формул рейтинга — billiard.guru</title>
+    <style>
+      :root {
+        --bg: #f6f4ef;
+        --ink: #1a1a1a;
+        --muted: #5c5a55;
+        --line: #d9d4c8;
+        --card: #fffdf8;
+        --good: #e7f3ec;
+        --warn: #fff3e0;
+        --bad: #fce8e6;
+        --info: #e8f0f8;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      main {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+      }
+      h1 {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-weight: 600;
+        font-size: 1.75rem;
+        margin: 0 0 8px;
+        letter-spacing: -0.02em;
+      }
+      h2 {
+        font-size: 1.15rem;
+        margin: 36px 0 12px;
+      }
+      h3 {
+        font-size: 1rem;
+        margin: 0 0 6px;
+      }
+      .note {
+        background: var(--warn);
+        border: 1px solid #efd2a8;
+        border-radius: 8px;
+        padding: 12px 14px;
+        margin: 0 0 24px;
+        color: #5a3d12;
+        font-size: 0.95rem;
+      }
+      .lead {
+        color: var(--muted);
+        margin: 0 0 20px;
+        max-width: 54rem;
+      }
+      .how {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .how strong {
+        color: var(--ink);
+      }
+      .wrap {
+        overflow-x: auto;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+        min-width: 720px;
+      }
+      th,
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        text-align: right;
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      th {
+        background: #efeae0;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      #summary th:nth-child(2),
+      #summary th:nth-child(3),
+      #summary td:nth-child(2),
+      #summary td:nth-child(3),
+      .band-block th:nth-child(1),
+      .band-block th:nth-child(2),
+      .band-block td:nth-child(1),
+      .band-block td:nth-child(2) {
+        text-align: left;
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: #f3efe6;
+      }
+      tr.rec td {
+        background: var(--good);
+      }
+      tr.alt td {
+        background: var(--info);
+      }
+      tr.prod td {
+        background: var(--bad);
+      }
+      .tag {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 1px 6px;
+        border-radius: 999px;
+        margin-left: 6px;
+        vertical-align: middle;
+      }
+      .tag-rec {
+        background: #1f4d3a;
+        color: #fff;
+      }
+      .tag-prod {
+        background: #8b2e2e;
+        color: #fff;
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 18px;
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .legend span::before {
+        content: "";
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+      .lg-rec::before {
+        background: #b7d9c5;
+      }
+      .lg-alt::before {
+        background: #b9d0e8;
+      }
+      .lg-prod::before {
+        background: #e8b4ae;
+      }
+      .band-block {
+        margin: 0 0 20px;
+      }
+      .band-block .band-lead {
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin: 0 0 10px;
+      }
+      .band-block.band-critical {
+        border: 1px solid #efd2a8;
+        background: #fffaf0;
+        border-radius: 10px;
+        padding: 14px 14px 4px;
+      }
+      .band-block.band-critical h3 {
+        color: #5a3d12;
+      }
+      .up {
+        color: #1f4d3a;
+        font-weight: 600;
+      }
+      .down {
+        color: #8b2e2e;
+        font-weight: 600;
+      }
+      .flat {
+        color: var(--muted);
+      }
+      .mean-pos {
+        color: #1f4d3a;
+      }
+      .mean-neg {
+        color: #8b2e2e;
+      }
+      .verdict {
+        text-align: left !important;
+        white-space: normal !important;
+        max-width: 300px;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+      [data-tip] {
+        cursor: help;
+        border-bottom: 1px dotted rgba(26, 26, 26, 0.4);
+      }
+      #tip-balloon {
+        position: fixed;
+        z-index: 9999;
+        max-width: min(300px, calc(100vw - 24px));
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: #1a1a1a;
+        color: #f6f4ef;
+        font-size: 0.75rem;
+        line-height: 1.35;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(4px);
+        transition: opacity 0.12s ease, transform 0.12s ease;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      }
+      #tip-balloon.is-on {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      footer {
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+      }
+      code {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 0.85em;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Сравнение формул рейтинга</h1>
+      <p class="lead">
+        Прогон 349 матчей от <code>ratingBase</code>, без записи в БД.
+        <strong>Выборка: все 81 игрок с ≥1 матчем</strong> (из 88 в базе; 7 не
+        сыграли ни одного завершённого матча). Скор с приоритетом без резких
+        скачков (50% — плавность).
+      </p>
+
+      <div class="note">
+        ★ <strong>tiny_upset_only</strong> — сейчас в проде. В группе старта
+        2.5–3.4 падает <strong>80%</strong> игроков; у №4/№5 в той же группе
+        растут около половины, падений заметно меньше.
+      </div>
+
+      <h2>1. Сводная</h2>
+      <div class="wrap">
+        <table id="summary">
+          <thead>
+            <tr>
+              <th data-tip="Место при приоритете без резких скачков">Место</th>
+              <th data-tip="Номер формулы в админке">№</th>
+              <th data-tip="Внутренний id формулы">Формула</th>
+              <th data-tip="Шаги: равные / апсет / фаворит">Шаги</th>
+              <th data-tip="Итоговый балл 0–100 (50% плавность + 18% Spearman + 12% антипарадокс + 12% net гриндеров + 8% разделение)">Скор</th>
+              <th data-tip="Насколько мало резких скачков. Выше = спокойнее">Плавн.</th>
+              <th data-tip="Насколько порядок по % побед совпадает с порядком по рейтингу. 1.0 = идеально">Spearman</th>
+              <th data-tip="Доля пар «выше WR ≥5 п.п., но ниже рейтинг»">Парадокс</th>
+              <th data-tip="Средний прирост у игроков с WR≥60%">Net гринд.</th>
+              <th data-tip="Средний |Δ| за матч">vol</th>
+              <th data-tip="Максимальный шаг за матч">max</th>
+              <th data-tip="Доля игроков выше стартовой базы">↑</th>
+              <th data-tip="Доля игроков ниже стартовой базы">↓</th>
+              <th data-tip="Доля без изменения">=</th>
+              <th data-tip="Средний сдвиг по всем учтённым">ср.Δ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="rec">
+              <td>1</td>
+              <td>4</td>
+              <td>
+                mild_all
+                <span class="tag tag-rec">реком.</span>
+              </td>
+              <td>±0,1 / ±0,15 / фав±0,1</td>
+              <td>68</td>
+              <td>73</td>
+              <td>0.61</td>
+              <td>22%</td>
+              <td>+0.40</td>
+              <td>0.10</td>
+              <td>0.15</td>
+              <td>47%</td>
+              <td>30%</td>
+              <td>24%</td>
+              <td>+0.08</td>
+            </tr>
+            <tr class="alt">
+              <td>2</td>
+              <td>5</td>
+              <td>tiny_equal</td>
+              <td>±0,05 / ±0,15 / фав±0,1</td>
+              <td>64</td>
+              <td>78</td>
+              <td>0.59</td>
+              <td>23%</td>
+              <td>+0.35</td>
+              <td>0.075</td>
+              <td>0.15</td>
+              <td>43%</td>
+              <td>26%</td>
+              <td>31%</td>
+              <td>+0.08</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>7</td>
+              <td>micro_equal</td>
+              <td>±0,025 / ±0,15 / фав±0,1</td>
+              <td>60</td>
+              <td>78</td>
+              <td>0.57</td>
+              <td>24%</td>
+              <td>+0.33</td>
+              <td>0.075</td>
+              <td>0.15</td>
+              <td>44%</td>
+              <td>32%</td>
+              <td>24%</td>
+              <td>+0.08</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>3</td>
+              <td>upset_mild</td>
+              <td>±0,1 / ±0,15 / фав 0</td>
+              <td>50</td>
+              <td>77</td>
+              <td>0.56</td>
+              <td>25%</td>
+              <td>+0.15</td>
+              <td>0.075</td>
+              <td>0.15</td>
+              <td>41%</td>
+              <td>38%</td>
+              <td>21%</td>
+              <td>+0.03</td>
+            </tr>
+            <tr class="prod">
+              <td>5</td>
+              <td>8</td>
+              <td>
+                tiny_upset_only
+                <span class="tag tag-prod">прод ★</span>
+              </td>
+              <td>±0,05 / ±0,1 / фав 0</td>
+              <td>50</td>
+              <td>100</td>
+              <td>0.52</td>
+              <td>26%</td>
+              <td>+0.08</td>
+              <td>0.05</td>
+              <td>0.10</td>
+              <td>42%</td>
+              <td>38%</td>
+              <td>20%</td>
+              <td>+0.03</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>1</td>
+              <td>soft</td>
+              <td>±0,25 / фав±0,1</td>
+              <td>49</td>
+              <td>0</td>
+              <td>0.66</td>
+              <td>19%</td>
+              <td>+0.53</td>
+              <td>0.175</td>
+              <td>0.25</td>
+              <td>47%</td>
+              <td>33%</td>
+              <td>20%</td>
+              <td>+0.10</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>6</td>
+              <td>elo</td>
+              <td>K=0,2</td>
+              <td>43</td>
+              <td>63</td>
+              <td>0.57</td>
+              <td>24%</td>
+              <td>+0.13</td>
+              <td>0.075</td>
+              <td>0.20</td>
+              <td>44%</td>
+              <td>40%</td>
+              <td>16%</td>
+              <td>+0.03</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>2</td>
+              <td>upset_only</td>
+              <td>±0,25 / фав 0</td>
+              <td>38</td>
+              <td>4</td>
+              <td>0.64</td>
+              <td>18%</td>
+              <td>+0.28</td>
+              <td>0.15</td>
+              <td>0.25</td>
+              <td>37%</td>
+              <td>33%</td>
+              <td>30%</td>
+              <td>+0.05</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <span class="lg-rec">№4 — рекомендация</span>
+        <span class="lg-alt">№5 — более плавный вариант №4</span>
+        <span class="lg-prod">№8 — сейчас в проде</span>
+      </div>
+
+      <h2>2. Что происходит с игроками по стартовому рейтингу</h2>
+      <div class="how">
+        <p style="margin: 0 0 10px">
+          <strong>Зачем.</strong> Сводная сравнивает формулы «в среднем». Здесь —
+          разрез по людям: с какого <code>ratingBase</code> стартовали и куда
+          уехала формула после всех матчей.
+        </p>
+        <p style="margin: 0 0 10px">
+          <strong>Как читать строку.</strong> Пример №8 в группе C:
+          <span class="up">20% выросли</span>,
+          <span class="down">80% упали</span>, сдвиг
+          <span class="mean-neg">−0.18</span> → 4 из 5 середняков ниже базы. У
+          №4 там же: <span class="up">50% выросли</span>,
+          <span class="down">45% упали</span>.
+        </p>
+        <p style="margin: 0">
+          <strong>Выборка:</strong> 81 игрок с ≥1 завершённым матчем. Группа =
+          стартовый рейтинг, не текущий.
+        </p>
+      </div>
+
+      <!-- A -->
+      <div class="band-block">
+        <h3>Группа A — старт 0…1.4 · 26 игроков</h3>
+        <p class="band-lead">
+          Новички и слабые. Вопрос: формула даёт вырасти или «залипают»?
+        </p>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Формула</th>
+                <th data-tip="Доля, у кого итог выше старта">Выросли</th>
+                <th data-tip="Доля, у кого итог ниже старта">Упали</th>
+                <th>Без изм.</th>
+                <th>Средний сдвиг</th>
+                <th>Вывод</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="rec">
+                <td>4</td>
+                <td>mild_all</td>
+                <td class="up">31%</td>
+                <td class="down">0%</td>
+                <td class="flat">69%</td>
+                <td class="mean-pos">+0.05</td>
+                <td class="verdict">Падений нет, многие без сдвига</td>
+              </tr>
+              <tr class="alt">
+                <td>5</td>
+                <td>tiny_equal</td>
+                <td class="up">23%</td>
+                <td class="down">0%</td>
+                <td class="flat">77%</td>
+                <td class="mean-pos">+0.03</td>
+                <td class="verdict">Ещё тише, падений нет</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>micro_equal</td>
+                <td class="up">27%</td>
+                <td class="down">4%</td>
+                <td class="flat">69%</td>
+                <td class="mean-pos">+0.03</td>
+                <td class="verdict">Почти как №5</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>upset_mild</td>
+                <td class="up">54%</td>
+                <td class="down">4%</td>
+                <td class="flat">42%</td>
+                <td class="mean-pos">+0.15</td>
+                <td class="verdict">Сильнее поднимает слабых</td>
+              </tr>
+              <tr class="prod">
+                <td>8</td>
+                <td>tiny_upset_only ★</td>
+                <td class="up">54%</td>
+                <td class="down">4%</td>
+                <td class="flat">42%</td>
+                <td class="mean-pos">+0.10</td>
+                <td class="verdict">Слабым ок — проблема не здесь</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>soft</td>
+                <td class="up">42%</td>
+                <td class="down">0%</td>
+                <td class="flat">58%</td>
+                <td class="mean-pos">+0.18</td>
+                <td class="verdict">Падений нет, сдвиг больше</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>elo</td>
+                <td class="up">54%</td>
+                <td class="down">4%</td>
+                <td class="flat">42%</td>
+                <td class="mean-pos">+0.15</td>
+                <td class="verdict">Как №3</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>upset_only</td>
+                <td class="up">42%</td>
+                <td class="down">0%</td>
+                <td class="flat">58%</td>
+                <td class="mean-pos">+0.20</td>
+                <td class="verdict">Самый большой плюс у слабых</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- B -->
+      <div class="band-block">
+        <h3>Группа B — старт 1.5…2.4 · 29 игроков</h3>
+        <p class="band-lead">Ниже среднего. Вопрос: продолжают ли расти?</p>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Формула</th>
+                <th>Выросли</th>
+                <th>Упали</th>
+                <th>Без изм.</th>
+                <th>Средний сдвиг</th>
+                <th>Вывод</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="rec">
+                <td>4</td>
+                <td>mild_all</td>
+                <td class="up">55%</td>
+                <td class="down">45%</td>
+                <td class="flat">0%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">Чуть чаще растут, чем падают</td>
+              </tr>
+              <tr class="alt">
+                <td>5</td>
+                <td>tiny_equal</td>
+                <td class="up">55%</td>
+                <td class="down">38%</td>
+                <td class="flat">7%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">Меньше падений, чем у №4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>micro_equal</td>
+                <td class="up">55%</td>
+                <td class="down">41%</td>
+                <td class="flat">3%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">Близко к №5</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>upset_mild</td>
+                <td class="up">48%</td>
+                <td class="down">38%</td>
+                <td class="flat">14%</td>
+                <td class="mean-pos">+0.10</td>
+                <td class="verdict">Приемлемо</td>
+              </tr>
+              <tr class="prod">
+                <td>8</td>
+                <td>tiny_upset_only ★</td>
+                <td class="up">55%</td>
+                <td class="down">31%</td>
+                <td class="flat">14%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">Здесь ещё выглядит нормально</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>soft</td>
+                <td class="up">52%</td>
+                <td class="down">45%</td>
+                <td class="flat">3%</td>
+                <td class="mean-pos">+0.15</td>
+                <td class="verdict">Плюс больше, но скачет</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>elo</td>
+                <td class="up">59%</td>
+                <td class="down">35%</td>
+                <td class="flat">7%</td>
+                <td class="mean-pos">+0.13</td>
+                <td class="verdict">Чаще рост</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>upset_only</td>
+                <td class="up">55%</td>
+                <td class="down">38%</td>
+                <td class="flat">7%</td>
+                <td class="mean-pos">+0.18</td>
+                <td class="verdict">Сильный плюс, скачки ±0,25</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- C -->
+      <div class="band-block band-critical">
+        <h3>Группа C — старт 2.5…3.4 · 20 игроков ← смотреть сюда</h3>
+        <p class="band-lead">
+          Середняки клуба (Галустов и похожие). Здесь видно, «съедает» ли
+          формула тех, кто уже не новичок.
+        </p>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Формула</th>
+                <th>Выросли</th>
+                <th>Упали</th>
+                <th>Без изм.</th>
+                <th>Средний сдвиг</th>
+                <th>Вывод</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="rec">
+                <td>4</td>
+                <td>mild_all</td>
+                <td class="up">50%</td>
+                <td class="down">45%</td>
+                <td class="flat">5%</td>
+                <td class="mean-pos">+0.10</td>
+                <td class="verdict">Почти баланс, чуть в плюс</td>
+              </tr>
+              <tr class="alt">
+                <td>5</td>
+                <td>tiny_equal</td>
+                <td class="up">50%</td>
+                <td class="down">40%</td>
+                <td class="flat">10%</td>
+                <td class="mean-pos">+0.10</td>
+                <td class="verdict">Чуть меньше падений, чем у №4</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>micro_equal</td>
+                <td class="up">50%</td>
+                <td class="down">50%</td>
+                <td class="flat">0%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">Ровно пополам</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>upset_mild</td>
+                <td class="up">25%</td>
+                <td class="down">75%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.20</td>
+                <td class="verdict">Фаворит→0 съедает середняков</td>
+              </tr>
+              <tr class="prod">
+                <td>8</td>
+                <td>tiny_upset_only ★</td>
+                <td class="up">20%</td>
+                <td class="down">80%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.18</td>
+                <td class="verdict">
+                  Проблема прода: 4 из 5 середняков падают
+                </td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>soft</td>
+                <td class="up">40%</td>
+                <td class="down">60%</td>
+                <td class="flat">0%</td>
+                <td>0</td>
+                <td class="verdict">Чаще падают, средний сдвиг ~0</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>elo</td>
+                <td class="up">25%</td>
+                <td class="down">75%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.20</td>
+                <td class="verdict">Как «фаворит→0»</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>upset_only</td>
+                <td class="up">15%</td>
+                <td class="down">65%</td>
+                <td class="flat">20%</td>
+                <td class="mean-neg">−0.25</td>
+                <td class="verdict">Сильно режет середняков</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- D -->
+      <div class="band-block">
+        <h3>Группа D — старт 3.5…4.4 · 3 игрока</h3>
+        <p class="band-lead">Мало данных — проценты шумные.</p>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Формула</th>
+                <th>Выросли</th>
+                <th>Упали</th>
+                <th>Без изм.</th>
+                <th>Средний сдвиг</th>
+                <th>Вывод</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="rec">
+                <td>4</td>
+                <td>mild_all</td>
+                <td class="up">67%</td>
+                <td class="down">33%</td>
+                <td class="flat">0%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">2 из 3 выше базы</td>
+              </tr>
+              <tr class="alt">
+                <td>5</td>
+                <td>tiny_equal</td>
+                <td class="up">67%</td>
+                <td class="down">33%</td>
+                <td class="flat">0%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">То же</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>micro_equal</td>
+                <td class="up">67%</td>
+                <td class="down">33%</td>
+                <td class="flat">0%</td>
+                <td class="mean-pos">+0.08</td>
+                <td class="verdict">То же</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>upset_mild</td>
+                <td class="up">0%</td>
+                <td class="down">67%</td>
+                <td class="flat">33%</td>
+                <td class="mean-neg">−0.13</td>
+                <td class="verdict">Чаще вниз</td>
+              </tr>
+              <tr class="prod">
+                <td>8</td>
+                <td>tiny_upset_only ★</td>
+                <td class="up">0%</td>
+                <td class="down">100%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.13</td>
+                <td class="verdict">Все трое ниже базы</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>soft</td>
+                <td class="up">67%</td>
+                <td class="down">33%</td>
+                <td class="flat">0%</td>
+                <td class="mean-pos">+0.03</td>
+                <td class="verdict">Чаще вверх</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>elo</td>
+                <td class="up">0%</td>
+                <td class="down">100%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.18</td>
+                <td class="verdict">Все ниже</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>upset_only</td>
+                <td class="up">0%</td>
+                <td class="down">67%</td>
+                <td class="flat">33%</td>
+                <td class="mean-neg">−0.25</td>
+                <td class="verdict">Сильный минус</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- E -->
+      <div class="band-block">
+        <h3>Группа E — старт 4.5+ · 3 игрока</h3>
+        <p class="band-lead">Тоже мало данных.</p>
+        <div class="wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Формула</th>
+                <th>Выросли</th>
+                <th>Упали</th>
+                <th>Без изм.</th>
+                <th>Средний сдвиг</th>
+                <th>Вывод</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="rec">
+                <td>4</td>
+                <td>mild_all</td>
+                <td class="up">67%</td>
+                <td class="down">33%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.03</td>
+                <td class="verdict">Почти ноль в среднем</td>
+              </tr>
+              <tr class="alt">
+                <td>5</td>
+                <td>tiny_equal</td>
+                <td class="up">33%</td>
+                <td class="down">33%</td>
+                <td class="flat">33%</td>
+                <td class="mean-neg">−0.05</td>
+                <td class="verdict">Разброс</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>micro_equal</td>
+                <td class="up">33%</td>
+                <td class="down">67%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.05</td>
+                <td class="verdict">Чаще вниз</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>upset_mild</td>
+                <td class="up">0%</td>
+                <td class="down">67%</td>
+                <td class="flat">33%</td>
+                <td class="mean-neg">−0.20</td>
+                <td class="verdict">Вниз</td>
+              </tr>
+              <tr class="prod">
+                <td>8</td>
+                <td>tiny_upset_only ★</td>
+                <td class="up">0%</td>
+                <td class="down">67%</td>
+                <td class="flat">33%</td>
+                <td class="mean-neg">−0.13</td>
+                <td class="verdict">Вниз</td>
+              </tr>
+              <tr>
+                <td>1</td>
+                <td>soft</td>
+                <td class="up">67%</td>
+                <td class="down">33%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.18</td>
+                <td class="verdict">Средний минус из‑за крупных шагов</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>elo</td>
+                <td class="up">0%</td>
+                <td class="down">100%</td>
+                <td class="flat">0%</td>
+                <td class="mean-neg">−0.28</td>
+                <td class="verdict">Все ниже</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>upset_only</td>
+                <td class="up">0%</td>
+                <td class="down">33%</td>
+                <td class="flat">67%</td>
+                <td class="mean-neg">−0.33</td>
+                <td class="verdict">Сильный минус у упавших</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <footer>
+        Наведите на заголовок или пунктир — подсказка. 7 игроков из 88 не
+        попали в выборку (0 завершённых матчей).
+      </footer>
+    </main>
+
+    <div id="tip-balloon" role="tooltip" hidden></div>
+    <script>
+      (function () {
+        const balloon = document.getElementById("tip-balloon");
+        if (!balloon) return;
+        function place(el) {
+          const tip = el.getAttribute("data-tip");
+          if (!tip) return;
+          balloon.hidden = false;
+          balloon.textContent = tip;
+          balloon.classList.remove("is-on");
+          const r = el.getBoundingClientRect();
+          const pad = 8;
+          const bw = balloon.offsetWidth || 240;
+          const bh = balloon.offsetHeight || 48;
+          let left = r.left + r.width / 2 - bw / 2;
+          left = Math.max(pad, Math.min(left, window.innerWidth - bw - pad));
+          let top = r.top - bh - 10;
+          if (top < pad) top = r.bottom + 10;
+          balloon.style.left = left + "px";
+          balloon.style.top = top + "px";
+          requestAnimationFrame(() => balloon.classList.add("is-on"));
+        }
+        function hide() {
+          balloon.classList.remove("is-on");
+          balloon.hidden = true;
+        }
+        document.addEventListener(
+          "pointerover",
+          (e) => {
+            const el = e.target.closest("[data-tip]");
+            if (el) place(el);
+          },
+          true,
+        );
+        document.addEventListener(
+          "pointerout",
+          (e) => {
+            const el = e.target.closest("[data-tip]");
+            if (!el) return;
+            const to =
+              e.relatedTarget && e.relatedTarget.closest
+                ? e.relatedTarget.closest("[data-tip]")
+                : null;
+            if (to === el) return;
+            hide();
+          },
+          true,
+        );
+        window.addEventListener("scroll", hide, true);
+      })();
+    </script>
+  </body>
+</html>

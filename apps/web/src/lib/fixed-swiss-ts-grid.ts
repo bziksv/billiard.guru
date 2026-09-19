@@ -504,7 +504,9 @@ function buildFixedSwissTs8R2ElimAtSemiBronzeCore(): FixedSwissTemplate {
       kind: "win",
       toRound: 3,
       toSlot: slot,
-      toTeam: 2,
+      // Как в 16→8: нечётный слот — сторона 1, чётный — 2.
+      // Иначе победитель #5 и проигравший #7 оба попадают в позицию 2 (#9).
+      toTeam: slot % 2 === 1 ? 1 : 2,
     });
   }
 

@@ -434,6 +434,26 @@ assert.equal(
   );
   assert.equal(loss7?.toRound, 3);
   assert.equal(loss7?.toSlot, 1);
+  assert.equal(loss7?.toTeam, 2, "8R2: проигравший #7 → #9 сторона 2");
+  const win5 = r2Links.find(
+    (l) => l.fromRound === 2 && l.fromSlot === 1 && l.kind === "win",
+  );
+  assert.equal(win5?.toRound, 3);
+  assert.equal(win5?.toSlot, 1);
+  assert.equal(win5?.toTeam, 1, "8R2: победитель #5 → #9 сторона 1");
+  assert.notEqual(win5?.toTeam, loss7?.toTeam, "8R2: #5 и #7 не делят одну позицию #9");
+  const occupied = new Map<string, string>();
+  for (const link of r2Links) {
+    if (!shouldAutoAdvanceFixedSwissLink(link, 14, 5)) continue;
+    const key = `${link.toRound}:${link.toSlot}:${link.toTeam}`;
+    const prev = occupied.get(key);
+    assert.equal(
+      prev,
+      undefined,
+      `8R2: два перехода в ${key}: ${prev} и ${link.fromRound}/${link.fromSlot} ${link.kind}`,
+    );
+    occupied.set(key, `${link.fromRound}/${link.fromSlot} ${link.kind}`);
+  }
   assert.equal(
     fixedSwissMatchNo(loss7!.fromRound, loss7!.fromSlot, 14, 5, tpl8R2.matches),
     7,

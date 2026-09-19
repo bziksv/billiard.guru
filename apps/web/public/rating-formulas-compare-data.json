@@ -1,0 +1,442 @@
+{
+  "meta": {
+    "matches": 349,
+    "playersTotal": 88,
+    "eligibleMinMatches": 1,
+    "eligible": 81
+  },
+  "ranking": [
+    {
+      "place": 1,
+      "n": 4,
+      "formula": "mild_all",
+      "short": "±0,1 / ±0,15 / фав±0,1",
+      "overall": 68,
+      "smooth": 73,
+      "spearman": 0.61,
+      "paradoxPct": 22,
+      "grind": 0.4,
+      "vol": 0.1,
+      "maxStep": 0.15,
+      "upPct": 46.9,
+      "downPct": 29.6,
+      "flatPct": 23.5,
+      "meanNet": 0.075,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 30.8,
+          "downPct": 0,
+          "flatPct": 69.2,
+          "meanNet": 0.05
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 55.2,
+          "downPct": 44.8,
+          "flatPct": 0,
+          "meanNet": 0.075
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 50,
+          "downPct": 45,
+          "flatPct": 5,
+          "meanNet": 0.1
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 66.7,
+          "downPct": 33.3,
+          "flatPct": 0,
+          "meanNet": 0.075
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 66.7,
+          "downPct": 33.3,
+          "flatPct": 0,
+          "meanNet": -0.025
+        }
+      }
+    },
+    {
+      "place": 2,
+      "n": 5,
+      "formula": "tiny_equal",
+      "short": "±0,05 / ±0,15 / фав±0,1",
+      "overall": 64,
+      "smooth": 78,
+      "spearman": 0.586,
+      "paradoxPct": 23,
+      "grind": 0.35,
+      "vol": 0.075,
+      "maxStep": 0.15,
+      "upPct": 43.2,
+      "downPct": 25.9,
+      "flatPct": 30.9,
+      "meanNet": 0.075,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 23.1,
+          "downPct": 0,
+          "flatPct": 76.9,
+          "meanNet": 0.025
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 55.2,
+          "downPct": 37.9,
+          "flatPct": 6.9,
+          "meanNet": 0.075
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 50,
+          "downPct": 40,
+          "flatPct": 10,
+          "meanNet": 0.1
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 66.7,
+          "downPct": 33.3,
+          "flatPct": 0,
+          "meanNet": 0.075
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 33.3,
+          "downPct": 33.3,
+          "flatPct": 33.3,
+          "meanNet": -0.05
+        }
+      }
+    },
+    {
+      "place": 3,
+      "n": 7,
+      "formula": "micro_equal",
+      "short": "±0,025 / ±0,15 / фав±0,1",
+      "overall": 60,
+      "smooth": 78,
+      "spearman": 0.574,
+      "paradoxPct": 23.9,
+      "grind": 0.325,
+      "vol": 0.075,
+      "maxStep": 0.15,
+      "upPct": 44.4,
+      "downPct": 32.1,
+      "flatPct": 23.5,
+      "meanNet": 0.075,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 26.9,
+          "downPct": 3.8,
+          "flatPct": 69.2,
+          "meanNet": 0.025
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 55.2,
+          "downPct": 41.4,
+          "flatPct": 3.4,
+          "meanNet": 0.075
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 50,
+          "downPct": 50,
+          "flatPct": 0,
+          "meanNet": 0.075
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 66.7,
+          "downPct": 33.3,
+          "flatPct": 0,
+          "meanNet": 0.075
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 33.3,
+          "downPct": 66.7,
+          "flatPct": 0,
+          "meanNet": -0.05
+        }
+      }
+    },
+    {
+      "place": 4,
+      "n": 3,
+      "formula": "upset_mild",
+      "short": "±0,1 / ±0,15 / фав 0",
+      "overall": 50,
+      "smooth": 77,
+      "spearman": 0.562,
+      "paradoxPct": 24.6,
+      "grind": 0.15,
+      "vol": 0.075,
+      "maxStep": 0.15,
+      "upPct": 40.7,
+      "downPct": 38.3,
+      "flatPct": 21,
+      "meanNet": 0.025,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 53.8,
+          "downPct": 3.8,
+          "flatPct": 42.3,
+          "meanNet": 0.15
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 48.3,
+          "downPct": 37.9,
+          "flatPct": 13.8,
+          "meanNet": 0.1
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 25,
+          "downPct": 75,
+          "flatPct": 0,
+          "meanNet": -0.2
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 66.7,
+          "flatPct": 33.3,
+          "meanNet": -0.125
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 66.7,
+          "flatPct": 33.3,
+          "meanNet": -0.2
+        }
+      }
+    },
+    {
+      "place": 5,
+      "n": 8,
+      "formula": "tiny_upset_only",
+      "short": "±0,05 / ±0,1 / фав 0",
+      "overall": 50,
+      "smooth": 100,
+      "spearman": 0.523,
+      "paradoxPct": 26.4,
+      "grind": 0.075,
+      "vol": 0.05,
+      "maxStep": 0.1,
+      "upPct": 42,
+      "downPct": 38.3,
+      "flatPct": 19.8,
+      "meanNet": 0.025,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 53.8,
+          "downPct": 3.8,
+          "flatPct": 42.3,
+          "meanNet": 0.1
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 55.2,
+          "downPct": 31,
+          "flatPct": 13.8,
+          "meanNet": 0.075
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 20,
+          "downPct": 80,
+          "flatPct": 0,
+          "meanNet": -0.175
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 100,
+          "flatPct": 0,
+          "meanNet": -0.125
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 66.7,
+          "flatPct": 33.3,
+          "meanNet": -0.125
+        }
+      }
+    },
+    {
+      "place": 6,
+      "n": 1,
+      "formula": "soft",
+      "short": "±0,25 / фав±0,1",
+      "overall": 49,
+      "smooth": 0,
+      "spearman": 0.663,
+      "paradoxPct": 19.2,
+      "grind": 0.525,
+      "vol": 0.175,
+      "maxStep": 0.25,
+      "upPct": 46.9,
+      "downPct": 33.3,
+      "flatPct": 19.8,
+      "meanNet": 0.1,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 42.3,
+          "downPct": 0,
+          "flatPct": 57.7,
+          "meanNet": 0.175
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 51.7,
+          "downPct": 44.8,
+          "flatPct": 3.4,
+          "meanNet": 0.15
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 40,
+          "downPct": 60,
+          "flatPct": 0,
+          "meanNet": 0
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 66.7,
+          "downPct": 33.3,
+          "flatPct": 0,
+          "meanNet": 0.025
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 66.7,
+          "downPct": 33.3,
+          "flatPct": 0,
+          "meanNet": -0.175
+        }
+      }
+    },
+    {
+      "place": 7,
+      "n": 6,
+      "formula": "elo",
+      "short": "K=0,2",
+      "overall": 43,
+      "smooth": 63,
+      "spearman": 0.57,
+      "paradoxPct": 24.4,
+      "grind": 0.125,
+      "vol": 0.075,
+      "maxStep": 0.2,
+      "upPct": 44.4,
+      "downPct": 39.5,
+      "flatPct": 16,
+      "meanNet": 0.025,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 53.8,
+          "downPct": 3.8,
+          "flatPct": 42.3,
+          "meanNet": 0.15
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 58.6,
+          "downPct": 34.5,
+          "flatPct": 6.9,
+          "meanNet": 0.125
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 25,
+          "downPct": 75,
+          "flatPct": 0,
+          "meanNet": -0.2
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 100,
+          "flatPct": 0,
+          "meanNet": -0.175
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 100,
+          "flatPct": 0,
+          "meanNet": -0.275
+        }
+      }
+    },
+    {
+      "place": 8,
+      "n": 2,
+      "formula": "upset_only",
+      "short": "±0,25 / фав 0",
+      "overall": 38,
+      "smooth": 4,
+      "spearman": 0.635,
+      "paradoxPct": 18.4,
+      "grind": 0.275,
+      "vol": 0.15,
+      "maxStep": 0.25,
+      "upPct": 37,
+      "downPct": 33.3,
+      "flatPct": 29.6,
+      "meanNet": 0.05,
+      "bands": {
+        "0–1.4": {
+          "n": 26,
+          "upPct": 42.3,
+          "downPct": 0,
+          "flatPct": 57.7,
+          "meanNet": 0.2
+        },
+        "1.5–2.4": {
+          "n": 29,
+          "upPct": 55.2,
+          "downPct": 37.9,
+          "flatPct": 6.9,
+          "meanNet": 0.175
+        },
+        "2.5–3.4": {
+          "n": 20,
+          "upPct": 15,
+          "downPct": 65,
+          "flatPct": 20,
+          "meanNet": -0.25
+        },
+        "3.5–4.4": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 66.7,
+          "flatPct": 33.3,
+          "meanNet": -0.25
+        },
+        "4.5+": {
+          "n": 3,
+          "upPct": 0,
+          "downPct": 33.3,
+          "flatPct": 66.7,
+          "meanNet": -0.325
+        }
+      }
+    }
+  ]
+}
