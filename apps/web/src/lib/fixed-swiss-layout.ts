@@ -2399,7 +2399,7 @@ export function isFixedSwissTs8R2SemiToFinalWinEdge(
   return fromRound === 3 && toRound === 5 && fromSlot === 3 && toSlot === 1;
 }
 
-/** 8R2: нижний финал #12 → бронза #13 — только подпись, без SVG (длинная «шина» через сетку). */
+/** 8R2: нижний полуфинал #12 → финал #14 — линия не рисуется (длинная «шина» через сетку), игрока ставим. */
 export function isFixedSwissTs8R2LowerFinalToBronzeWinEdge(
   fromRound: number,
   fromSlot: number,
@@ -2411,22 +2411,7 @@ export function isFixedSwissTs8R2LowerFinalToBronzeWinEdge(
   if (!isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount ?? 0, maxRound)) {
     return false;
   }
-  return fromRound === 4 && toRound === 5 && fromSlot === 1 && toSlot === 2;
-}
-
-/** 8R2: победитель #13 → финал #14 (вертикаль в одной колонке). */
-export function isFixedSwissTs8R2BronzeToFinalWinEdge(
-  fromRound: number,
-  fromSlot: number,
-  toRound: number,
-  toSlot: number,
-  matchCount?: number,
-  maxRound?: number,
-): boolean {
-  if (!isFixedSwissTs8R2ElimAtSemiBronzeMatchCount(matchCount ?? 0, maxRound)) {
-    return false;
-  }
-  return fromRound === 5 && toRound === 5 && fromSlot === 2 && toSlot === 1;
+  return fromRound === 4 && toRound === 5 && fromSlot === 1 && toSlot === 1;
 }
 
 /** @deprecated — используйте buildTsPositionsBronzeForHalf2(..., 8). */
@@ -5192,6 +5177,20 @@ export function shouldDrawFixedSwissWinEdge(
     return false;
   }
   if (
+    fromSlot != null &&
+    toSlot != null &&
+    isFixedSwissTs8R2LowerFinalToBronzeWinEdge(
+      fromRound,
+      fromSlot,
+      toRound,
+      toSlot,
+      matchCount,
+      maxRound,
+    )
+  ) {
+    return false;
+  }
+  if (
     isFixedSwissRound12Edge(fromRound, toRound) &&
     fromCol === 0 &&
     toCol === 1
@@ -5728,22 +5727,6 @@ export function shouldDrawFixedSwissWinEdge(
       maxRound,
     ) &&
     fromCol === 2 &&
-    toCol === 3
-  ) {
-    return true;
-  }
-  if (
-    fromSlot != null &&
-    toSlot != null &&
-    isFixedSwissTs8R2BronzeToFinalWinEdge(
-      fromRound,
-      fromSlot,
-      toRound,
-      toSlot,
-      matchCount,
-      maxRound,
-    ) &&
-    fromCol === 3 &&
     toCol === 3
   ) {
     return true;
@@ -6319,7 +6302,6 @@ export function fixedSwissTs8R2ElimPlacementByMatchNo(no: number): string | null
   if (no === 7 || no === 8) return "полуфинал";
   if (no === 5 || no === 6) return "место 7–8";
   if (no === 9 || no === 10) return "место 5–6";
-  if (no === 12) return "место 4";
   return null;
 }
 

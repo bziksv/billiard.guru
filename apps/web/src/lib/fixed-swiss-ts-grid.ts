@@ -535,8 +535,10 @@ function buildFixedSwissTs8R2ElimAtSemiBronzeCore(): FixedSwissTemplate {
   links.push({ fromRound: 3, fromSlot: 2, kind: "win", toRound: 4, toSlot: 1, toTeam: 2 });
   links.push({ fromRound: 3, fromSlot: 3, kind: "win", toRound: 5, toSlot: 1, toTeam: 1 });
   links.push({ fromRound: 3, fromSlot: 3, kind: "loss", toRound: 5, toSlot: 2, toTeam: 1 });
-  links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 5, toSlot: 2, toTeam: 2 });
-  links.push({ fromRound: 5, fromSlot: 2, kind: "win", toRound: 5, toSlot: 1, toTeam: 2 });
+  // #12 — полуфинал нижней сетки: победитель в финал #14, проигравший в матч за 3–4 (#13).
+  // Места 1–2 только в #14, места 3–4 только в #13. Из #12 никого на место не сажаем.
+  links.push({ fromRound: 4, fromSlot: 1, kind: "win", toRound: 5, toSlot: 1, toTeam: 2 });
+  links.push({ fromRound: 4, fromSlot: 1, kind: "loss", toRound: 5, toSlot: 2, toTeam: 2 });
 
   return {
     gridSize: 8,

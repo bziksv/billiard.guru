@@ -1425,13 +1425,13 @@ function fixedSwissProtocolPlace8R2Elim(
 ): FixedSwissProtocolPlaceResult | null {
   if (role === "winner") {
     if (matchNo === 14) return protocolExact(1);
+    if (matchNo === 13) return protocolExact(3);
     return null;
   }
 
   if (matchNo === 14) return protocolExact(2);
-  if (matchNo === 13) return protocolExact(3);
-  if (matchNo === 11) return null;
-  if (matchNo === 12) return protocolExact(4);
+  if (matchNo === 13) return protocolExact(4);
+  if (matchNo === 11 || matchNo === 12) return null;
   if (matchNo === 5) return protocolExact(7);
   if (matchNo === 6) return protocolExact(8);
   if (matchNo === 9) return protocolExact(5);

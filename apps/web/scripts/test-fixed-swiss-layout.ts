@@ -464,27 +464,44 @@ assert.equal(
   );
   assert.equal(loss11?.toRound, 5);
   assert.equal(loss11?.toSlot, 2);
-  const win13 = tpl8R2.links.find(
-    (l) =>
-      l.fromRound === 5 &&
-      l.fromSlot === 2 &&
-      l.toRound === 5 &&
-      l.toSlot === 1 &&
-      l.kind === "win",
+  assert.equal(loss11?.toTeam, 1, "8R2: проигравший #11 → #13 сторона 1");
+  const win12 = r2Links.find(
+    (l) => l.fromRound === 4 && l.fromSlot === 1 && l.kind === "win",
   );
-  assert.ok(win13, "8R2: победитель #13 → #14");
-  assert.equal(win13?.toTeam, 2, "8R2: #13 winner → #14 team2");
+  const loss12 = r2Links.find(
+    (l) => l.fromRound === 4 && l.fromSlot === 1 && l.kind === "loss",
+  );
+  assert.equal(win12?.toRound, 5);
+  assert.equal(win12?.toSlot, 1);
+  assert.equal(win12?.toTeam, 2, "8R2: победитель #12 → #14 сторона 2");
+  assert.equal(loss12?.toRound, 5);
+  assert.equal(loss12?.toSlot, 2);
+  assert.equal(loss12?.toTeam, 2, "8R2: проигравший #12 → #13 сторона 2");
+  assert.equal(
+    r2Links.some(
+      (l) =>
+        l.fromRound === 5 &&
+        l.fromSlot === 2 &&
+        l.toRound === 5 &&
+        l.toSlot === 1 &&
+        l.kind === "win",
+    ),
+    false,
+    "8R2: победитель #13 не идёт в #14",
+  );
   assertProtocolPlace(14, "winner", 14, { place: 1 }, 5);
   assertProtocolPlace(14, "loser", 14, { place: 2 }, 5);
-  assertProtocolPlace(13, "winner", 14, null, 5);
-  assertProtocolPlace(13, "loser", 14, { place: 3 }, 5);
-  assertProtocolPlace(12, "loser", 14, { place: 4 }, 5);
+  assertProtocolPlace(13, "winner", 14, { place: 3 }, 5);
+  assertProtocolPlace(13, "loser", 14, { place: 4 }, 5);
+  assertProtocolPlace(12, "loser", 14, null, 5);
+  assertProtocolPlace(12, "winner", 14, null, 5);
   assertProtocolPlace(9, "loser", 14, { place: 5 }, 5);
   assertProtocolPlace(10, "loser", 14, { place: 6 }, 5);
   assertProtocolPlace(5, "loser", 14, { place: 7 }, 5);
   assertProtocolPlace(6, "loser", 14, { place: 8 }, 5);
   assert.equal(fixedSwissTs8R2ElimPlacementByMatchNo(7), "полуфинал");
   assert.equal(fixedSwissTs8R2ElimPlacementByMatchNo(13), "матч за 3–4 место");
+  assert.equal(fixedSwissTs8R2ElimPlacementByMatchNo(12), null);
   const mk8R2 = tpl8R2.matches.map((m) => ({
     id: `r${m.round}s${m.slot}`,
     round: m.round,
@@ -514,33 +531,29 @@ assert.equal(
     "8R2 SVG: #11 → #14",
   );
   assert.equal(
-    shouldDrawFixedSwissWinEdge(-3, 3, 4, 5, "win", 1, 2, 14, 5),
+    shouldDrawFixedSwissWinEdge(-3, 3, 4, 5, "win", 1, 1, 14, 5),
     false,
-    "8R2 SVG: #12 → #13 без линии (только подпись)",
-  );
-  const win12to13 = r2Links.find(
-    (l) =>
-      l.fromRound === 4 &&
-      l.fromSlot === 1 &&
-      l.toRound === 5 &&
-      l.toSlot === 2 &&
-      l.kind === "win",
-  );
-  assert.ok(win12to13, "8R2: link #12 → #13");
-  assert.equal(
-    isFixedSwissWinLinkFooterOnly(win12to13!, 14, 5),
-    true,
-    "8R2: #12 → #13 без SVG-линии",
+    "8R2 SVG: #12 → #14 без линии (только подпись)",
   );
   assert.equal(
-    shouldAutoAdvanceFixedSwissLink(win12to13!, 14, 5),
+    isFixedSwissWinLinkFooterOnly(win12!, 14, 5),
     true,
-    "8R2: победитель #12 всё равно встаёт в #13",
+    "8R2: #12 → #14 без SVG-линии",
+  );
+  assert.equal(
+    shouldAutoAdvanceFixedSwissLink(win12!, 14, 5),
+    true,
+    "8R2: победитель #12 встаёт в #14",
+  );
+  assert.equal(
+    shouldAutoAdvanceFixedSwissLink(loss12!, 14, 5),
+    true,
+    "8R2: проигравший #12 встаёт в #13",
   );
   assert.equal(
     shouldDrawFixedSwissWinEdge(3, 3, 5, 5, "win", 2, 1, 14, 5),
-    true,
-    "8R2 SVG: #13 → #14",
+    false,
+    "8R2 SVG: из #13 в #14 линии нет",
   );
 }
 assert.equal(inferFixedSwissGridSize(14), 8);
