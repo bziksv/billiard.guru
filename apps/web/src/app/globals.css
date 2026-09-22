@@ -5239,6 +5239,15 @@ html.light {
   border-color: var(--bracket-card-border-hover);
 }
 
+.bracket-match-card--substituted {
+  border-color: color-mix(in srgb, var(--bracket-card-border) 40%, #f59e0b);
+  background-color: color-mix(in srgb, var(--bracket-card-bg) 86%, #fbbf24);
+}
+
+.bracket-match-meta--substituted {
+  color: color-mix(in srgb, var(--bracket-meta-text) 55%, #b45309);
+}
+
 .bracket-match-row {
   display: flex;
   align-items: flex-start;

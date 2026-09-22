@@ -514,6 +514,26 @@ export function MatchResultModal({
               />
             )}
 
+          {(match.substitutions?.length ?? 0) > 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950 dark:border-amber-800/50 dark:bg-amber-950/30 dark:text-amber-100">
+              <p className="font-medium">Замена игрока</p>
+              <ul className="mt-1.5 list-disc space-y-1 pl-5 text-xs leading-relaxed">
+                {match.substitutions!.map((s) => (
+                  <li key={s.id}>
+                    {s.outgoingLabel} заменён на {s.incomingLabel}
+                    {s.matchId === match.id
+                      ? matchNumber != null
+                        ? ` (во встрече №${matchNumber})`
+                        : " (в этой встрече)"
+                      : " (замена затронула эту встречу)"}
+                    . Уже сыгранные матчи до замены не меняются; рейтинг дальше считается у
+                    вошедшего.
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {tournamentTables.length > 0 && (
             <label className="block text-sm">
               <span className="admin-label-xs mb-1.5 block">Стол</span>

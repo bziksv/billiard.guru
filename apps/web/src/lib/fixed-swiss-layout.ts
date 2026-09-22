@@ -123,11 +123,15 @@ export function fixedSwissMatchCardHeight(
   hasHandicap: boolean,
   footerRowCount: number,
   hasMatchNumber = true,
+  /** Отдельная строка «Замена», если форы нет (при форе текст в той же строке). */
+  hasSubstitutionMetaRow = false,
 ): number {
+  const metaRows =
+    (hasHandicap ? 1 : 0) + (!hasHandicap && hasSubstitutionMetaRow ? 1 : 0);
   return (
     (hasMatchNumber ? GRID_META_H : 0) +
     GRID_ROW_H * 2 +
-    (hasHandicap ? FIXED_SWISS_COMPACT_ROW_H : 0) +
+    metaRows * FIXED_SWISS_COMPACT_ROW_H +
     footerRowCount * FIXED_SWISS_COMPACT_ROW_H +
     CARD_LAYOUT_BUFFER
   );
@@ -265,6 +269,7 @@ export function estimateFixedSwissCardHeight(
       opts?.handicapEvenExtraCancelOnFirstLoss === true,
     );
   const hasMatchNumber = opts?.showCardMatchNumber !== false;
+  const hasSubstitutionMetaRow = (match.substitutions?.length ?? 0) > 0;
   return fixedSwissMatchCardHeight(
     hasHandicap,
     estimateFixedSwissFooterRowCount(match, edges, {
@@ -272,6 +277,7 @@ export function estimateFixedSwissCardHeight(
       matchesPerRound,
     }),
     hasMatchNumber,
+    hasSubstitutionMetaRow,
   );
 }
 

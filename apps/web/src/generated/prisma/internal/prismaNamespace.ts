@@ -400,6 +400,7 @@ export const ModelName = {
   Tournament: 'Tournament',
   TournamentTeam: 'TournamentTeam',
   TournamentMatch: 'TournamentMatch',
+  TournamentPlayerSubstitution: 'TournamentPlayerSubstitution',
   TournamentRegistration: 'TournamentRegistration',
   RatingChange: 'RatingChange',
   AuditLog: 'AuditLog',
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "siteNews" | "player" | "sitePageView" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "ratingAutoConfig" | "playerRatingSnapshot" | "playerRatingSnapshotRow" | "dbBackupConfig" | "telegramDeliveryLog"
+    modelProps: "country" | "city" | "club" | "clubStaff" | "tableBooking" | "clubNews" | "siteNews" | "player" | "sitePageView" | "playerNotificationPreference" | "coachRating" | "clubPlayerRating" | "loginChallenge" | "tournament" | "tournamentTeam" | "tournamentMatch" | "tournamentPlayerSubstitution" | "tournamentRegistration" | "ratingChange" | "auditLog" | "idea" | "ideaVote" | "playListing" | "playListingResponse" | "notificationGlobalConfig" | "notificationTypeConfig" | "bracketFormatConfig" | "tournamentDefaultsConfig" | "ratingAutoConfig" | "playerRatingSnapshot" | "playerRatingSnapshotRow" | "dbBackupConfig" | "telegramDeliveryLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1488,6 +1489,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TournamentMatchCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TournamentMatchCountAggregateOutputType> | number
+        }
+      }
+    }
+    TournamentPlayerSubstitution: {
+      payload: Prisma.$TournamentPlayerSubstitutionPayload<ExtArgs>
+      fields: Prisma.TournamentPlayerSubstitutionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TournamentPlayerSubstitutionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TournamentPlayerSubstitutionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload>
+        }
+        findFirst: {
+          args: Prisma.TournamentPlayerSubstitutionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TournamentPlayerSubstitutionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload>
+        }
+        findMany: {
+          args: Prisma.TournamentPlayerSubstitutionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload>[]
+        }
+        create: {
+          args: Prisma.TournamentPlayerSubstitutionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload>
+        }
+        createMany: {
+          args: Prisma.TournamentPlayerSubstitutionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.TournamentPlayerSubstitutionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload>
+        }
+        update: {
+          args: Prisma.TournamentPlayerSubstitutionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload>
+        }
+        deleteMany: {
+          args: Prisma.TournamentPlayerSubstitutionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TournamentPlayerSubstitutionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.TournamentPlayerSubstitutionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TournamentPlayerSubstitutionPayload>
+        }
+        aggregate: {
+          args: Prisma.TournamentPlayerSubstitutionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTournamentPlayerSubstitution>
+        }
+        groupBy: {
+          args: Prisma.TournamentPlayerSubstitutionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TournamentPlayerSubstitutionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TournamentPlayerSubstitutionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TournamentPlayerSubstitutionCountAggregateOutputType> | number
         }
       }
     }
@@ -2885,6 +2952,22 @@ export const TournamentMatchScalarFieldEnum = {
 export type TournamentMatchScalarFieldEnum = (typeof TournamentMatchScalarFieldEnum)[keyof typeof TournamentMatchScalarFieldEnum]
 
 
+export const TournamentPlayerSubstitutionScalarFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  matchId: 'matchId',
+  side: 'side',
+  outgoingTeamId: 'outgoingTeamId',
+  incomingTeamId: 'incomingTeamId',
+  outgoingPlayerId: 'outgoingPlayerId',
+  incomingPlayerId: 'incomingPlayerId',
+  rewrittenMatchIds: 'rewrittenMatchIds',
+  createdAt: 'createdAt'
+} as const
+
+export type TournamentPlayerSubstitutionScalarFieldEnum = (typeof TournamentPlayerSubstitutionScalarFieldEnum)[keyof typeof TournamentPlayerSubstitutionScalarFieldEnum]
+
+
 export const TournamentRegistrationScalarFieldEnum = {
   id: 'id',
   tournamentId: 'tournamentId',
@@ -3385,6 +3468,19 @@ export const TournamentMatchOrderByRelevanceFieldEnum = {
 export type TournamentMatchOrderByRelevanceFieldEnum = (typeof TournamentMatchOrderByRelevanceFieldEnum)[keyof typeof TournamentMatchOrderByRelevanceFieldEnum]
 
 
+export const TournamentPlayerSubstitutionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  matchId: 'matchId',
+  outgoingTeamId: 'outgoingTeamId',
+  incomingTeamId: 'incomingTeamId',
+  outgoingPlayerId: 'outgoingPlayerId',
+  incomingPlayerId: 'incomingPlayerId'
+} as const
+
+export type TournamentPlayerSubstitutionOrderByRelevanceFieldEnum = (typeof TournamentPlayerSubstitutionOrderByRelevanceFieldEnum)[keyof typeof TournamentPlayerSubstitutionOrderByRelevanceFieldEnum]
+
+
 export const TournamentRegistrationOrderByRelevanceFieldEnum = {
   id: 'id',
   tournamentId: 'tournamentId',
@@ -3857,6 +3953,7 @@ export type GlobalOmitConfig = {
   tournament?: Prisma.TournamentOmit
   tournamentTeam?: Prisma.TournamentTeamOmit
   tournamentMatch?: Prisma.TournamentMatchOmit
+  tournamentPlayerSubstitution?: Prisma.TournamentPlayerSubstitutionOmit
   tournamentRegistration?: Prisma.TournamentRegistrationOmit
   ratingChange?: Prisma.RatingChangeOmit
   auditLog?: Prisma.AuditLogOmit

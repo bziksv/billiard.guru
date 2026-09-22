@@ -382,6 +382,8 @@ model Player {
   coachReviewsGiven    CoachRating[] @relation("CoachReviewsGiven")
   notificationPreferences PlayerNotificationPreference[]
   pageViews              SitePageView[]
+  substitutionsOutgoing  TournamentPlayerSubstitution[] @relation("SubstitutionOutgoing")
+  substitutionsIncoming  TournamentPlayerSubstitution[] @relation("SubstitutionIncoming")
 
   @@map("players")
 }
@@ -512,6 +514,7 @@ model Tournament {
   registrations TournamentRegistration[]
   teams         TournamentTeam[]
   matches       TournamentMatch[]
+  substitutions TournamentPlayerSubstitution[]
 
   @@map("tournaments")
 }
@@ -568,8 +571,34 @@ model TournamentMatch {
   status       MatchStatus     @default(SCHEDULED)
   createdAt    DateTime        @default(now()) @map("created_at")
 
+  substitutions TournamentPlayerSubstitution[]
+
   @@unique([tournamentId, round, slot])
   @@map("tournament_matches")
+}
+
+/** Замена игрока mid-bracket (solo): кто вышел / кто зашёл, на какой встрече. */
+model TournamentPlayerSubstitution {
+  id               String          @id @default(cuid())
+  tournamentId     String          @map("tournament_id")
+  tournament       Tournament      @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  matchId          String          @map("match_id")
+  match            TournamentMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  /// Сторона слота 1|2 на момент замены
+  side             Int
+  outgoingTeamId   String          @map("outgoing_team_id")
+  incomingTeamId   String          @map("incoming_team_id")
+  outgoingPlayerId String          @map("outgoing_player_id")
+  outgoingPlayer   Player          @relation("SubstitutionOutgoing", fields: [outgoingPlayerId], references: [id])
+  incomingPlayerId String          @map("incoming_player_id")
+  incomingPlayer   Player          @relation("SubstitutionIncoming", fields: [incomingPlayerId], references: [id])
+  /// id незавершённых матчей, где переписали teamId
+  rewrittenMatchIds Json           @map("rewritten_match_ids")
+  createdAt        DateTime        @default(now()) @map("created_at")
+
+  @@index([tournamentId, createdAt])
+  @@index([matchId])
+  @@map("tournament_player_substitutions")
 }
 
 model TournamentRegistration {

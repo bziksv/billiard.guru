@@ -35,6 +35,11 @@ import {
 } from "@/lib/tournament-public-standings";
 import { buildPublicTournamentBracketView } from "@/lib/tournament-public-bracket";
 import { buildPublicMatchRows } from "@/lib/tournament-public-matches";
+import {
+  attachSubstitutionsToMatches,
+  listTournamentSubstitutions,
+} from "@/lib/bracket-substitute";
+import { buildBracketMatchNumbers } from "@/lib/tournament-match-schedule";
 import { buildLocalizedTournamentDetailMetadata } from "@/lib/seo-locale";
 import { prisma } from "@/lib/prisma";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -242,13 +247,23 @@ export default async function TournamentPage({
 
   const defaultTab = defaultPublicTournamentTab(standings, registrationOpen);
 
+  const substitutions = await listTournamentSubstitutions(tournament.id);
   const bracketView =
     matchCount > 0
       ? buildPublicTournamentBracketView(adminTournament, { matchStartRatings })
       : null;
+  if (bracketView && substitutions.length > 0) {
+    bracketView.matches = attachSubstitutionsToMatches(
+      bracketView.matches,
+      substitutions,
+    );
+  }
   const publicMatches = bracketView
     ? buildPublicMatchRows(bracketView.matches, tournament.format)
     : [];
+  const matchNumbers = bracketView
+    ? buildBracketMatchNumbers(bracketView.matches, tournament.format)
+    : new Map<string, number>();
 
   const bracketPanel = bracketView
     ? {
@@ -261,6 +276,8 @@ export default async function TournamentPage({
         handicapEvenExtraCancelOnFirstLoss:
           tournament.handicapHalfStep &&
           tournament.handicapEvenExtraCancelOnFirstLoss,
+        substitutions,
+        matchNumbers: Object.fromEntries(matchNumbers),
       }
     : null;
 

@@ -58,17 +58,26 @@
   },
   "cookie": {
     "footer": {
-      "beforeCookies": "This site uses ",
+      "beforeCookies": "We use ",
       "cookiesLink": "cookies",
-      "and": " and ",
-      "recommendationLink": "recommendation technologies",
-      "middle": " to improve functionality, tailor ads, and collect visit statistics. By continuing to use the site, you agree to ",
-      "privacyLink": "personal data processing",
+      "afterCookies": " for ad personalization and traffic analysis. By continuing to use the site, you give ",
+      "consentLink": "consent to personal data processing",
+      "midConfirm": " and confirm that you have read the ",
+      "privacyLink": "personal data processing policy",
+      "and": " and the ",
+      "recommendationLink": "recommendation technologies rules",
       "after": ". You can disable cookies in your browser settings."
     },
     "consent": {
-      "beforeLink": "This site uses cookies for ad settings and statistics. By staying on the site, you agree to personal data processing under our ",
-      "link": "cookie policy",
+      "beforeCookies": "We use ",
+      "cookiesLink": "cookies",
+      "afterCookies": " for ad personalization and traffic analysis. By continuing to use the site, you give ",
+      "consentLink": "consent to personal data processing",
+      "midConfirm": " and confirm that you have read the ",
+      "privacyLink": "personal data processing policy",
+      "and": " and the ",
+      "recommendationLink": "recommendation technologies rules",
+      "after": ". You can disable cookies in your browser settings.",
       "accept": "Accept"
     }
   },
@@ -754,6 +763,7 @@
       "emptyNoParticipants": "No confirmed participants yet.",
       "finished": "Tournament finished — final standings.",
       "preliminary": "Places are preliminary and will update as the tournament progresses.",
+      "substitutionsTitle": "Player substitutions",
       "place": "Place",
       "participant": "Participant",
       "team": "Team",
@@ -963,7 +973,7 @@
   },
   "legal": {
     "consentCheckbox": {
-      "text": "By clicking this button, I give my <consent>consent</consent> to <privacy>personal data processing</privacy>."
+      "text": "By clicking this button, I give my <consent>consent to personal data processing</consent> and confirm that I have read the <privacy>personal data processing policy</privacy>."
     },
     "page": {
       "notFound": "Document not found",

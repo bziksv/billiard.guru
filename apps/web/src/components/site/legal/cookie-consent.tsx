@@ -67,11 +67,29 @@ export function CookieConsentPopup() {
     >
       <SiteContainer className="cookie-consent-bar-inner">
         <p id="cookie-consent-desc" className="cookie-consent-bar-text">
-          {t("beforeLink")}
+          {t("beforeCookies")}
           <Link href={LEGAL_URLS.cookies} className="cookie-consent-bar-link">
-            {t("link")}
+            {t("cookiesLink")}
           </Link>
-          .
+          {t("afterCookies")}
+          <Link
+            href={LEGAL_URLS.personalDataConsent}
+            className="cookie-consent-bar-link"
+          >
+            {t("consentLink")}
+          </Link>
+          {t("midConfirm")}
+          <Link href={LEGAL_URLS.privacy} className="cookie-consent-bar-link">
+            {t("privacyLink")}
+          </Link>
+          {t("and")}
+          <Link
+            href={LEGAL_URLS.recommendationTechnologies}
+            className="cookie-consent-bar-link"
+          >
+            {t("recommendationLink")}
+          </Link>
+          {t("after")}
         </p>
         <button type="button" onClick={accept} className="cookie-consent-bar-accept">
           {t("accept")}

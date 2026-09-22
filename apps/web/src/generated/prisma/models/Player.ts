@@ -443,6 +443,8 @@ export type PlayerWhereInput = {
   coachReviewsGiven?: Prisma.CoachRatingListRelationFilter
   notificationPreferences?: Prisma.PlayerNotificationPreferenceListRelationFilter
   pageViews?: Prisma.SitePageViewListRelationFilter
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionListRelationFilter
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionListRelationFilter
 }
 
 export type PlayerOrderByWithRelationInput = {
@@ -495,6 +497,8 @@ export type PlayerOrderByWithRelationInput = {
   coachReviewsGiven?: Prisma.CoachRatingOrderByRelationAggregateInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceOrderByRelationAggregateInput
   pageViews?: Prisma.SitePageViewOrderByRelationAggregateInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionOrderByRelationAggregateInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionOrderByRelationAggregateInput
   _relevance?: Prisma.PlayerOrderByRelevanceInput
 }
 
@@ -551,6 +555,8 @@ export type PlayerWhereUniqueInput = Prisma.AtLeast<{
   coachReviewsGiven?: Prisma.CoachRatingListRelationFilter
   notificationPreferences?: Prisma.PlayerNotificationPreferenceListRelationFilter
   pageViews?: Prisma.SitePageViewListRelationFilter
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionListRelationFilter
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionListRelationFilter
 }, "id" | "phone" | "telegramId" | "confirmToken">
 
 export type PlayerOrderByWithAggregationInput = {
@@ -676,6 +682,8 @@ export type PlayerCreateInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateInput = {
@@ -727,6 +735,8 @@ export type PlayerUncheckedCreateInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUpdateInput = {
@@ -778,6 +788,8 @@ export type PlayerUpdateInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateInput = {
@@ -829,6 +841,8 @@ export type PlayerUncheckedUpdateInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateManyInput = {
@@ -1298,6 +1312,34 @@ export type PlayerUpdateOneWithoutTeamsAsPlayer2NestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutTeamsAsPlayer2Input, Prisma.PlayerUpdateWithoutTeamsAsPlayer2Input>, Prisma.PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input>
 }
 
+export type PlayerCreateNestedOneWithoutSubstitutionsOutgoingInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsOutgoingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsOutgoingInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutSubstitutionsOutgoingInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerCreateNestedOneWithoutSubstitutionsIncomingInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsIncomingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsIncomingInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutSubstitutionsIncomingInput
+  connect?: Prisma.PlayerWhereUniqueInput
+}
+
+export type PlayerUpdateOneRequiredWithoutSubstitutionsOutgoingNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsOutgoingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsOutgoingInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutSubstitutionsOutgoingInput
+  upsert?: Prisma.PlayerUpsertWithoutSubstitutionsOutgoingInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutSubstitutionsOutgoingInput, Prisma.PlayerUpdateWithoutSubstitutionsOutgoingInput>, Prisma.PlayerUncheckedUpdateWithoutSubstitutionsOutgoingInput>
+}
+
+export type PlayerUpdateOneRequiredWithoutSubstitutionsIncomingNestedInput = {
+  create?: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsIncomingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsIncomingInput>
+  connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutSubstitutionsIncomingInput
+  upsert?: Prisma.PlayerUpsertWithoutSubstitutionsIncomingInput
+  connect?: Prisma.PlayerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PlayerUpdateToOneWithWhereWithoutSubstitutionsIncomingInput, Prisma.PlayerUpdateWithoutSubstitutionsIncomingInput>, Prisma.PlayerUncheckedUpdateWithoutSubstitutionsIncomingInput>
+}
+
 export type PlayerCreateNestedOneWithoutRegistrationsInput = {
   create?: Prisma.XOR<Prisma.PlayerCreateWithoutRegistrationsInput, Prisma.PlayerUncheckedCreateWithoutRegistrationsInput>
   connectOrCreate?: Prisma.PlayerCreateOrConnectWithoutRegistrationsInput
@@ -1430,6 +1472,8 @@ export type PlayerCreateWithoutCityInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutCityInput = {
@@ -1480,6 +1524,8 @@ export type PlayerUncheckedCreateWithoutCityInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutCityInput = {
@@ -1592,6 +1638,8 @@ export type PlayerCreateWithoutClubStaffInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutClubStaffInput = {
@@ -1642,6 +1690,8 @@ export type PlayerUncheckedCreateWithoutClubStaffInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutClubStaffInput = {
@@ -1708,6 +1758,8 @@ export type PlayerUpdateWithoutClubStaffInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubStaffInput = {
@@ -1758,6 +1810,8 @@ export type PlayerUncheckedUpdateWithoutClubStaffInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutTableBookingsInput = {
@@ -1808,6 +1862,8 @@ export type PlayerCreateWithoutTableBookingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTableBookingsInput = {
@@ -1858,6 +1914,8 @@ export type PlayerUncheckedCreateWithoutTableBookingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTableBookingsInput = {
@@ -1924,6 +1982,8 @@ export type PlayerUpdateWithoutTableBookingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
@@ -1974,6 +2034,8 @@ export type PlayerUncheckedUpdateWithoutTableBookingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutClubNewsAuthoredInput = {
@@ -2024,6 +2086,8 @@ export type PlayerCreateWithoutClubNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutClubNewsAuthoredInput = {
@@ -2074,6 +2138,8 @@ export type PlayerUncheckedCreateWithoutClubNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutClubNewsAuthoredInput = {
@@ -2140,6 +2206,8 @@ export type PlayerUpdateWithoutClubNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubNewsAuthoredInput = {
@@ -2190,6 +2258,8 @@ export type PlayerUncheckedUpdateWithoutClubNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutSiteNewsAuthoredInput = {
@@ -2240,6 +2310,8 @@ export type PlayerCreateWithoutSiteNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutSiteNewsAuthoredInput = {
@@ -2290,6 +2362,8 @@ export type PlayerUncheckedCreateWithoutSiteNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutSiteNewsAuthoredInput = {
@@ -2356,6 +2430,8 @@ export type PlayerUpdateWithoutSiteNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput = {
@@ -2406,6 +2482,8 @@ export type PlayerUncheckedUpdateWithoutSiteNewsAuthoredInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutPageViewsInput = {
@@ -2456,6 +2534,8 @@ export type PlayerCreateWithoutPageViewsInput = {
   coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutPageViewsInput = {
@@ -2506,6 +2586,8 @@ export type PlayerUncheckedCreateWithoutPageViewsInput = {
   coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutPageViewsInput = {
@@ -2572,6 +2654,8 @@ export type PlayerUpdateWithoutPageViewsInput = {
   coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutPageViewsInput = {
@@ -2622,6 +2706,8 @@ export type PlayerUncheckedUpdateWithoutPageViewsInput = {
   coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutNotificationPreferencesInput = {
@@ -2672,6 +2758,8 @@ export type PlayerCreateWithoutNotificationPreferencesInput = {
   coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutNotificationPreferencesInput = {
@@ -2722,6 +2810,8 @@ export type PlayerUncheckedCreateWithoutNotificationPreferencesInput = {
   coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutNotificationPreferencesInput = {
@@ -2788,6 +2878,8 @@ export type PlayerUpdateWithoutNotificationPreferencesInput = {
   coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutNotificationPreferencesInput = {
@@ -2838,6 +2930,8 @@ export type PlayerUncheckedUpdateWithoutNotificationPreferencesInput = {
   coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutCoachReviewsReceivedInput = {
@@ -2888,6 +2982,8 @@ export type PlayerCreateWithoutCoachReviewsReceivedInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutCoachReviewsReceivedInput = {
@@ -2938,6 +3034,8 @@ export type PlayerUncheckedCreateWithoutCoachReviewsReceivedInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutCoachReviewsReceivedInput = {
@@ -2993,6 +3091,8 @@ export type PlayerCreateWithoutCoachReviewsGivenInput = {
   coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutCoachReviewsGivenInput = {
@@ -3043,6 +3143,8 @@ export type PlayerUncheckedCreateWithoutCoachReviewsGivenInput = {
   coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutCoachReviewsGivenInput = {
@@ -3109,6 +3211,8 @@ export type PlayerUpdateWithoutCoachReviewsReceivedInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput = {
@@ -3159,6 +3263,8 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsReceivedInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutCoachReviewsGivenInput = {
@@ -3220,6 +3326,8 @@ export type PlayerUpdateWithoutCoachReviewsGivenInput = {
   coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutCoachReviewsGivenInput = {
@@ -3270,6 +3378,8 @@ export type PlayerUncheckedUpdateWithoutCoachReviewsGivenInput = {
   coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutClubRatingsInput = {
@@ -3320,6 +3430,8 @@ export type PlayerCreateWithoutClubRatingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutClubRatingsInput = {
@@ -3370,6 +3482,8 @@ export type PlayerUncheckedCreateWithoutClubRatingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutClubRatingsInput = {
@@ -3436,6 +3550,8 @@ export type PlayerUpdateWithoutClubRatingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
@@ -3486,6 +3602,8 @@ export type PlayerUncheckedUpdateWithoutClubRatingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutLoginChallengesInput = {
@@ -3536,6 +3654,8 @@ export type PlayerCreateWithoutLoginChallengesInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
@@ -3586,6 +3706,8 @@ export type PlayerUncheckedCreateWithoutLoginChallengesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutLoginChallengesInput = {
@@ -3652,6 +3774,8 @@ export type PlayerUpdateWithoutLoginChallengesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
@@ -3702,6 +3826,8 @@ export type PlayerUncheckedUpdateWithoutLoginChallengesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutTeamsAsPlayer1Input = {
@@ -3752,6 +3878,8 @@ export type PlayerCreateWithoutTeamsAsPlayer1Input = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
@@ -3802,6 +3930,8 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer1Input = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTeamsAsPlayer1Input = {
@@ -3857,6 +3987,8 @@ export type PlayerCreateWithoutTeamsAsPlayer2Input = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
@@ -3907,6 +4039,8 @@ export type PlayerUncheckedCreateWithoutTeamsAsPlayer2Input = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutTeamsAsPlayer2Input = {
@@ -3973,6 +4107,8 @@ export type PlayerUpdateWithoutTeamsAsPlayer1Input = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
@@ -4023,6 +4159,8 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer1Input = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUpsertWithoutTeamsAsPlayer2Input = {
@@ -4084,6 +4222,8 @@ export type PlayerUpdateWithoutTeamsAsPlayer2Input = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
@@ -4134,6 +4274,456 @@ export type PlayerUncheckedUpdateWithoutTeamsAsPlayer2Input = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
+}
+
+export type PlayerCreateWithoutSubstitutionsOutgoingInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  ratingBase?: number
+  about?: string | null
+  aboutEn?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachBioEn?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  registerAsClubOwner?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+  clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
+  playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
+  pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutSubstitutionsOutgoingInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  ratingBase?: number
+  about?: string | null
+  aboutEn?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachBioEn?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  registerAsClubOwner?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+  clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
+  playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
+  pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutSubstitutionsOutgoingInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsOutgoingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsOutgoingInput>
+}
+
+export type PlayerCreateWithoutSubstitutionsIncomingInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  ratingBase?: number
+  about?: string | null
+  aboutEn?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachBioEn?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  registerAsClubOwner?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  city: Prisma.CityCreateNestedOneWithoutPlayersInput
+  registrations?: Prisma.TournamentRegistrationCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteCreateNestedManyWithoutPlayerInput
+  clubNewsAuthored?: Prisma.ClubNewsCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsCreateNestedManyWithoutAuthorInput
+  playListings?: Prisma.PlayListingCreateNestedManyWithoutAuthorInput
+  playListingResponses?: Prisma.PlayListingResponseCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
+  pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+}
+
+export type PlayerUncheckedCreateWithoutSubstitutionsIncomingInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  middleName?: string | null
+  firstNameLatin?: string | null
+  lastNameLatin?: string | null
+  middleNameLatin?: string | null
+  cityId: string
+  phone: string
+  email?: string | null
+  birthDate?: Date | string | null
+  photoUrl?: string | null
+  telegramId?: string | null
+  telegramUsername?: string | null
+  rating?: number
+  ratingBase?: number
+  about?: string | null
+  aboutEn?: string | null
+  isCoach?: boolean
+  coachBio?: string | null
+  coachBioEn?: string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: number | null
+  coachReviewCount?: number
+  role?: $Enums.UserRole
+  isVerified?: boolean
+  registerAsClubOwner?: boolean
+  confirmToken?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedCreateNestedManyWithoutPlayerInput
+  ratingHistory?: Prisma.RatingChangeUncheckedCreateNestedManyWithoutPlayerInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedCreateNestedManyWithoutPlayerInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer1Input
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedCreateNestedManyWithoutPlayer2Input
+  loginChallenges?: Prisma.LoginChallengeUncheckedCreateNestedManyWithoutPlayerInput
+  ideas?: Prisma.IdeaUncheckedCreateNestedManyWithoutAuthorInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedCreateNestedManyWithoutPlayerInput
+  clubNewsAuthored?: Prisma.ClubNewsUncheckedCreateNestedManyWithoutAuthorInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedCreateNestedManyWithoutAuthorInput
+  playListings?: Prisma.PlayListingUncheckedCreateNestedManyWithoutAuthorInput
+  playListingResponses?: Prisma.PlayListingResponseUncheckedCreateNestedManyWithoutPlayerInput
+  tableBookings?: Prisma.TableBookingUncheckedCreateNestedManyWithoutPlayerInput
+  clubStaff?: Prisma.ClubStaffUncheckedCreateNestedManyWithoutPlayerInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutCoachInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
+  pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+}
+
+export type PlayerCreateOrConnectWithoutSubstitutionsIncomingInput = {
+  where: Prisma.PlayerWhereUniqueInput
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsIncomingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsIncomingInput>
+}
+
+export type PlayerUpsertWithoutSubstitutionsOutgoingInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutSubstitutionsOutgoingInput, Prisma.PlayerUncheckedUpdateWithoutSubstitutionsOutgoingInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsOutgoingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsOutgoingInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutSubstitutionsOutgoingInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutSubstitutionsOutgoingInput, Prisma.PlayerUncheckedUpdateWithoutSubstitutionsOutgoingInput>
+}
+
+export type PlayerUpdateWithoutSubstitutionsOutgoingInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  ratingBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+  clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
+  playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
+  pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutSubstitutionsOutgoingInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  ratingBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+  clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
+  playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
+  pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
+}
+
+export type PlayerUpsertWithoutSubstitutionsIncomingInput = {
+  update: Prisma.XOR<Prisma.PlayerUpdateWithoutSubstitutionsIncomingInput, Prisma.PlayerUncheckedUpdateWithoutSubstitutionsIncomingInput>
+  create: Prisma.XOR<Prisma.PlayerCreateWithoutSubstitutionsIncomingInput, Prisma.PlayerUncheckedCreateWithoutSubstitutionsIncomingInput>
+  where?: Prisma.PlayerWhereInput
+}
+
+export type PlayerUpdateToOneWithWhereWithoutSubstitutionsIncomingInput = {
+  where?: Prisma.PlayerWhereInput
+  data: Prisma.XOR<Prisma.PlayerUpdateWithoutSubstitutionsIncomingInput, Prisma.PlayerUncheckedUpdateWithoutSubstitutionsIncomingInput>
+}
+
+export type PlayerUpdateWithoutSubstitutionsIncomingInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  ratingBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  city?: Prisma.CityUpdateOneRequiredWithoutPlayersNestedInput
+  registrations?: Prisma.TournamentRegistrationUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUpdateManyWithoutPlayerNestedInput
+  clubNewsAuthored?: Prisma.ClubNewsUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUpdateManyWithoutAuthorNestedInput
+  playListings?: Prisma.PlayListingUpdateManyWithoutAuthorNestedInput
+  playListingResponses?: Prisma.PlayListingResponseUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
+  pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+}
+
+export type PlayerUncheckedUpdateWithoutSubstitutionsIncomingInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  middleName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  firstNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  middleNameLatin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cityId?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  ratingBase?: Prisma.FloatFieldUpdateOperationsInput | number
+  about?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  aboutEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isCoach?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  coachBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachBioEn?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coachGalleryUrls?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  coachReviewAvg?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  coachReviewCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerAsClubOwner?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  confirmToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  registrations?: Prisma.TournamentRegistrationUncheckedUpdateManyWithoutPlayerNestedInput
+  ratingHistory?: Prisma.RatingChangeUncheckedUpdateManyWithoutPlayerNestedInput
+  clubRatings?: Prisma.ClubPlayerRatingUncheckedUpdateManyWithoutPlayerNestedInput
+  teamsAsPlayer1?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer1NestedInput
+  teamsAsPlayer2?: Prisma.TournamentTeamUncheckedUpdateManyWithoutPlayer2NestedInput
+  loginChallenges?: Prisma.LoginChallengeUncheckedUpdateManyWithoutPlayerNestedInput
+  ideas?: Prisma.IdeaUncheckedUpdateManyWithoutAuthorNestedInput
+  ideaVotes?: Prisma.IdeaVoteUncheckedUpdateManyWithoutPlayerNestedInput
+  clubNewsAuthored?: Prisma.ClubNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  siteNewsAuthored?: Prisma.SiteNewsUncheckedUpdateManyWithoutAuthorNestedInput
+  playListings?: Prisma.PlayListingUncheckedUpdateManyWithoutAuthorNestedInput
+  playListingResponses?: Prisma.PlayListingResponseUncheckedUpdateManyWithoutPlayerNestedInput
+  tableBookings?: Prisma.TableBookingUncheckedUpdateManyWithoutPlayerNestedInput
+  clubStaff?: Prisma.ClubStaffUncheckedUpdateManyWithoutPlayerNestedInput
+  coachReviewsReceived?: Prisma.CoachRatingUncheckedUpdateManyWithoutCoachNestedInput
+  coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
+  notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
+  pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutRegistrationsInput = {
@@ -4184,6 +4774,8 @@ export type PlayerCreateWithoutRegistrationsInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutRegistrationsInput = {
@@ -4234,6 +4826,8 @@ export type PlayerUncheckedCreateWithoutRegistrationsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutRegistrationsInput = {
@@ -4300,6 +4894,8 @@ export type PlayerUpdateWithoutRegistrationsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
@@ -4350,6 +4946,8 @@ export type PlayerUncheckedUpdateWithoutRegistrationsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutRatingHistoryInput = {
@@ -4400,6 +4998,8 @@ export type PlayerCreateWithoutRatingHistoryInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
@@ -4450,6 +5050,8 @@ export type PlayerUncheckedCreateWithoutRatingHistoryInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutRatingHistoryInput = {
@@ -4516,6 +5118,8 @@ export type PlayerUpdateWithoutRatingHistoryInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
@@ -4566,6 +5170,8 @@ export type PlayerUncheckedUpdateWithoutRatingHistoryInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutIdeasInput = {
@@ -4616,6 +5222,8 @@ export type PlayerCreateWithoutIdeasInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutIdeasInput = {
@@ -4666,6 +5274,8 @@ export type PlayerUncheckedCreateWithoutIdeasInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutIdeasInput = {
@@ -4732,6 +5342,8 @@ export type PlayerUpdateWithoutIdeasInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutIdeasInput = {
@@ -4782,6 +5394,8 @@ export type PlayerUncheckedUpdateWithoutIdeasInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutIdeaVotesInput = {
@@ -4832,6 +5446,8 @@ export type PlayerCreateWithoutIdeaVotesInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
@@ -4882,6 +5498,8 @@ export type PlayerUncheckedCreateWithoutIdeaVotesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutIdeaVotesInput = {
@@ -4948,6 +5566,8 @@ export type PlayerUpdateWithoutIdeaVotesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
@@ -4998,6 +5618,8 @@ export type PlayerUncheckedUpdateWithoutIdeaVotesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutPlayListingsInput = {
@@ -5048,6 +5670,8 @@ export type PlayerCreateWithoutPlayListingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutPlayListingsInput = {
@@ -5098,6 +5722,8 @@ export type PlayerUncheckedCreateWithoutPlayListingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutPlayListingsInput = {
@@ -5164,6 +5790,8 @@ export type PlayerUpdateWithoutPlayListingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutPlayListingsInput = {
@@ -5214,6 +5842,8 @@ export type PlayerUncheckedUpdateWithoutPlayListingsInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateWithoutPlayListingResponsesInput = {
@@ -5264,6 +5894,8 @@ export type PlayerCreateWithoutPlayListingResponsesInput = {
   coachReviewsGiven?: Prisma.CoachRatingCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerUncheckedCreateWithoutPlayListingResponsesInput = {
@@ -5314,6 +5946,8 @@ export type PlayerUncheckedCreateWithoutPlayListingResponsesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedCreateNestedManyWithoutRaterInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedCreateNestedManyWithoutPlayerInput
   pageViews?: Prisma.SitePageViewUncheckedCreateNestedManyWithoutPlayerInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutOutgoingPlayerInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedCreateNestedManyWithoutIncomingPlayerInput
 }
 
 export type PlayerCreateOrConnectWithoutPlayListingResponsesInput = {
@@ -5380,6 +6014,8 @@ export type PlayerUpdateWithoutPlayListingResponsesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutPlayListingResponsesInput = {
@@ -5430,6 +6066,8 @@ export type PlayerUncheckedUpdateWithoutPlayListingResponsesInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerCreateManyCityInput = {
@@ -5512,6 +6150,8 @@ export type PlayerUpdateWithoutCityInput = {
   coachReviewsGiven?: Prisma.CoachRatingUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateWithoutCityInput = {
@@ -5562,6 +6202,8 @@ export type PlayerUncheckedUpdateWithoutCityInput = {
   coachReviewsGiven?: Prisma.CoachRatingUncheckedUpdateManyWithoutRaterNestedInput
   notificationPreferences?: Prisma.PlayerNotificationPreferenceUncheckedUpdateManyWithoutPlayerNestedInput
   pageViews?: Prisma.SitePageViewUncheckedUpdateManyWithoutPlayerNestedInput
+  substitutionsOutgoing?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutOutgoingPlayerNestedInput
+  substitutionsIncoming?: Prisma.TournamentPlayerSubstitutionUncheckedUpdateManyWithoutIncomingPlayerNestedInput
 }
 
 export type PlayerUncheckedUpdateManyWithoutCityInput = {
@@ -5620,6 +6262,8 @@ export type PlayerCountOutputType = {
   coachReviewsGiven: number
   notificationPreferences: number
   pageViews: number
+  substitutionsOutgoing: number
+  substitutionsIncoming: number
 }
 
 export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -5641,6 +6285,8 @@ export type PlayerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   coachReviewsGiven?: boolean | PlayerCountOutputTypeCountCoachReviewsGivenArgs
   notificationPreferences?: boolean | PlayerCountOutputTypeCountNotificationPreferencesArgs
   pageViews?: boolean | PlayerCountOutputTypeCountPageViewsArgs
+  substitutionsOutgoing?: boolean | PlayerCountOutputTypeCountSubstitutionsOutgoingArgs
+  substitutionsIncoming?: boolean | PlayerCountOutputTypeCountSubstitutionsIncomingArgs
 }
 
 /**
@@ -5779,6 +6425,20 @@ export type PlayerCountOutputTypeCountPageViewsArgs<ExtArgs extends runtime.Type
   where?: Prisma.SitePageViewWhereInput
 }
 
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountSubstitutionsOutgoingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TournamentPlayerSubstitutionWhereInput
+}
+
+/**
+ * PlayerCountOutputType without action
+ */
+export type PlayerCountOutputTypeCountSubstitutionsIncomingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TournamentPlayerSubstitutionWhereInput
+}
+
 
 export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -5830,6 +6490,8 @@ export type PlayerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   coachReviewsGiven?: boolean | Prisma.Player$coachReviewsGivenArgs<ExtArgs>
   notificationPreferences?: boolean | Prisma.Player$notificationPreferencesArgs<ExtArgs>
   pageViews?: boolean | Prisma.Player$pageViewsArgs<ExtArgs>
+  substitutionsOutgoing?: boolean | Prisma.Player$substitutionsOutgoingArgs<ExtArgs>
+  substitutionsIncoming?: boolean | Prisma.Player$substitutionsIncomingArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["player"]>
 
@@ -5889,6 +6551,8 @@ export type PlayerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   coachReviewsGiven?: boolean | Prisma.Player$coachReviewsGivenArgs<ExtArgs>
   notificationPreferences?: boolean | Prisma.Player$notificationPreferencesArgs<ExtArgs>
   pageViews?: boolean | Prisma.Player$pageViewsArgs<ExtArgs>
+  substitutionsOutgoing?: boolean | Prisma.Player$substitutionsOutgoingArgs<ExtArgs>
+  substitutionsIncoming?: boolean | Prisma.Player$substitutionsIncomingArgs<ExtArgs>
   _count?: boolean | Prisma.PlayerCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -5914,6 +6578,8 @@ export type $PlayerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     coachReviewsGiven: Prisma.$CoachRatingPayload<ExtArgs>[]
     notificationPreferences: Prisma.$PlayerNotificationPreferencePayload<ExtArgs>[]
     pageViews: Prisma.$SitePageViewPayload<ExtArgs>[]
+    substitutionsOutgoing: Prisma.$TournamentPlayerSubstitutionPayload<ExtArgs>[]
+    substitutionsIncoming: Prisma.$TournamentPlayerSubstitutionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -6311,6 +6977,8 @@ export interface Prisma__PlayerClient<T, Null = never, ExtArgs extends runtime.T
   coachReviewsGiven<T extends Prisma.Player$coachReviewsGivenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$coachReviewsGivenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CoachRatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationPreferences<T extends Prisma.Player$notificationPreferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$notificationPreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlayerNotificationPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   pageViews<T extends Prisma.Player$pageViewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$pageViewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SitePageViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  substitutionsOutgoing<T extends Prisma.Player$substitutionsOutgoingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$substitutionsOutgoingArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentPlayerSubstitutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  substitutionsIncoming<T extends Prisma.Player$substitutionsIncomingArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Player$substitutionsIncomingArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TournamentPlayerSubstitutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7147,6 +7815,54 @@ export type Player$pageViewsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.SitePageViewScalarFieldEnum | Prisma.SitePageViewScalarFieldEnum[]
+}
+
+/**
+ * Player.substitutionsOutgoing
+ */
+export type Player$substitutionsOutgoingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TournamentPlayerSubstitution
+   */
+  select?: Prisma.TournamentPlayerSubstitutionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TournamentPlayerSubstitution
+   */
+  omit?: Prisma.TournamentPlayerSubstitutionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TournamentPlayerSubstitutionInclude<ExtArgs> | null
+  where?: Prisma.TournamentPlayerSubstitutionWhereInput
+  orderBy?: Prisma.TournamentPlayerSubstitutionOrderByWithRelationInput | Prisma.TournamentPlayerSubstitutionOrderByWithRelationInput[]
+  cursor?: Prisma.TournamentPlayerSubstitutionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TournamentPlayerSubstitutionScalarFieldEnum | Prisma.TournamentPlayerSubstitutionScalarFieldEnum[]
+}
+
+/**
+ * Player.substitutionsIncoming
+ */
+export type Player$substitutionsIncomingArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TournamentPlayerSubstitution
+   */
+  select?: Prisma.TournamentPlayerSubstitutionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TournamentPlayerSubstitution
+   */
+  omit?: Prisma.TournamentPlayerSubstitutionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TournamentPlayerSubstitutionInclude<ExtArgs> | null
+  where?: Prisma.TournamentPlayerSubstitutionWhereInput
+  orderBy?: Prisma.TournamentPlayerSubstitutionOrderByWithRelationInput | Prisma.TournamentPlayerSubstitutionOrderByWithRelationInput[]
+  cursor?: Prisma.TournamentPlayerSubstitutionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TournamentPlayerSubstitutionScalarFieldEnum | Prisma.TournamentPlayerSubstitutionScalarFieldEnum[]
 }
 
 /**

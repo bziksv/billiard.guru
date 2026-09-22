@@ -14,6 +14,10 @@ import type { AdminTournament } from "@/lib/tournament-admin";
 import { buildPublicTournamentBracketView } from "@/lib/tournament-public-bracket";
 import { applyTournamentRatingsToPlayers } from "@/lib/tournament-rating-display";
 import {
+  attachSubstitutionsToMatches,
+  listTournamentSubstitutions,
+} from "@/lib/bracket-substitute";
+import {
   loadClubPlayerRatingsMap,
   loadMatchStartRatings,
 } from "@/lib/tournament-rating-limit-server";
@@ -95,9 +99,17 @@ export default async function TournamentBracketPage({
     tournament as unknown as AdminTournament,
     clubPlayerRatings,
   );
-  const { matches, standings } = buildPublicTournamentBracketView(adminTournament, {
-    matchStartRatings,
-  });
+  const { matches: rawMatches, standings } = buildPublicTournamentBracketView(
+    adminTournament,
+    {
+      matchStartRatings,
+    },
+  );
+  const substitutions = await listTournamentSubstitutions(tournament.id);
+  const matches =
+    substitutions.length > 0
+      ? attachSubstitutionsToMatches(rawMatches, substitutions)
+      : rawMatches;
   const tournamentName = resolveLocalizedField(locale, tournament.name, tournament.nameEn);
   const statusKey = TOURNAMENT_STATUSES.find((s) => s === tournament.status);
   const statusLabel = statusKey ? t(`tournamentStatus.${statusKey}`) : tournament.status;

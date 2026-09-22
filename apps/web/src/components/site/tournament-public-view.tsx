@@ -20,6 +20,8 @@ import type {
   PublicTournamentStandings,
 } from "@/lib/tournament-public-standings";
 import type { PublicMatchRow, PublicMatchStatus } from "@/lib/tournament-public-matches";
+import type { TournamentSubstitutionView } from "@/lib/bracket-substitute-display";
+import { formatSubstitutionNotice } from "@/lib/bracket-substitute-display";
 import { useTabHash } from "@/hooks/use-tab-hash";
 
 export type { PublicParticipantRow };
@@ -40,6 +42,8 @@ export type PublicBracketPanelProps = {
   standings: SwissStandingView[];
   handicapHalfStep: boolean;
   handicapEvenExtraCancelOnFirstLoss?: boolean;
+  substitutions?: TournamentSubstitutionView[];
+  matchNumbers?: Record<string, number>;
 };
 
 type Props = {
@@ -225,14 +229,18 @@ function Podium({
 function ResultsTab({
   standings,
   pair,
+  substitutions = [],
+  matchNumbers = {},
 }: {
   standings: PublicTournamentStandings;
   pair: boolean;
+  substitutions?: TournamentSubstitutionView[];
+  matchNumbers?: Record<string, number>;
 }) {
   const t = useTranslations("tournamentView.results");
   const { rows, finished, preliminary, hasMatches } = standings;
 
-  if (rows.length === 0) {
+  if (rows.length === 0 && substitutions.length === 0) {
     return (
       <p className="text-sm text-[var(--text-muted)]">
         {hasMatches ? t("emptyWithMatches") : t("emptyNoParticipants")}
@@ -245,51 +253,72 @@ function ResultsTab({
 
   return (
     <div className="space-y-4">
-      {finished && (
-        <p className="text-sm text-emerald-700 dark:text-emerald-400/90">{t("finished")}</p>
-      )}
-      {preliminary && (
-        <p className="text-sm text-[var(--text-muted)]">{t("preliminary")}</p>
-      )}
-
-      {showPodium && <Podium rows={rows} t={t} />}
-
-      <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
-        <table className="w-full min-w-[520px] text-left text-sm">
-          <thead className="border-b border-[var(--border-subtle)] bg-[var(--surface-card-solid)]">
-            <tr>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("place")}</th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">
-                {pair ? t("team") : t("participant")}
-              </th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("city")}</th>
-              <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("rating")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableRows.map((row) => (
-              <tr
-                key={row.key}
-                className="border-t border-[var(--border-subtle)] hover:bg-[var(--surface-card-solid)]/60"
-              >
-                <td className="px-4 py-3 font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
-                  {row.placeLabel}
-                </td>
-                <td className="px-4 py-3">
-                  <PlayerLinks row={row} />
-                  {row.note && (
-                    <span className="mt-0.5 block text-xs text-[var(--text-muted)]">{row.note}</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-[var(--text-secondary)]">{row.city}</td>
-                <td className="px-4 py-3 font-mono tabular-nums text-[var(--text-secondary)]">
-                  {row.ratingLabel}
-                </td>
-              </tr>
+      {substitutions.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/50 dark:bg-amber-950/30 dark:text-amber-100">
+          <p className="font-medium">{t("substitutionsTitle")}</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            {substitutions.map((s) => (
+              <li key={s.id}>
+                {formatSubstitutionNotice(s, matchNumbers[s.matchId] ?? null)}
+              </li>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </ul>
+        </div>
+      )}
+
+      {rows.length === 0 ? (
+        <p className="text-sm text-[var(--text-muted)]">
+          {hasMatches ? t("emptyWithMatches") : t("emptyNoParticipants")}
+        </p>
+      ) : (
+        <>
+          {finished && (
+            <p className="text-sm text-emerald-700 dark:text-emerald-400/90">{t("finished")}</p>
+          )}
+          {preliminary && (
+            <p className="text-sm text-[var(--text-muted)]">{t("preliminary")}</p>
+          )}
+
+          {showPodium && <Podium rows={rows} t={t} />}
+
+          <div className="overflow-x-auto rounded-xl border border-[var(--border-subtle)]">
+            <table className="w-full min-w-[520px] text-left text-sm">
+              <thead className="border-b border-[var(--border-subtle)] bg-[var(--surface-card-solid)]">
+                <tr>
+                  <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("place")}</th>
+                  <th className="px-4 py-3 font-medium text-[var(--text-muted)]">
+                    {pair ? t("team") : t("participant")}
+                  </th>
+                  <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("city")}</th>
+                  <th className="px-4 py-3 font-medium text-[var(--text-muted)]">{t("rating")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableRows.map((row) => (
+                  <tr
+                    key={row.key}
+                    className="border-t border-[var(--border-subtle)] hover:bg-[var(--surface-card-solid)]/60"
+                  >
+                    <td className="px-4 py-3 font-mono tabular-nums text-emerald-700 dark:text-emerald-400">
+                      {row.placeLabel}
+                    </td>
+                    <td className="px-4 py-3">
+                      <PlayerLinks row={row} />
+                      {row.note && (
+                        <span className="mt-0.5 block text-xs text-[var(--text-muted)]">{row.note}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-[var(--text-secondary)]">{row.city}</td>
+                    <td className="px-4 py-3 font-mono tabular-nums text-[var(--text-secondary)]">
+                      {row.ratingLabel}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -438,7 +467,14 @@ function renderTabPanel({
 
   switch (tab) {
     case "results":
-      return <ResultsTab standings={standings} pair={pair} />;
+      return (
+        <ResultsTab
+          standings={standings}
+          pair={pair}
+          substitutions={bracket?.substitutions}
+          matchNumbers={bracket?.matchNumbers}
+        />
+      );
     case "participants":
       return (
         <ParticipantsTab

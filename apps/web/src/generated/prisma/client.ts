@@ -122,6 +122,11 @@ export type TournamentTeam = Prisma.TournamentTeamModel
  */
 export type TournamentMatch = Prisma.TournamentMatchModel
 /**
+ * Model TournamentPlayerSubstitution
+ * * Замена игрока mid-bracket (solo): кто вышел / кто зашёл, на какой встрече.
+ */
+export type TournamentPlayerSubstitution = Prisma.TournamentPlayerSubstitutionModel
+/**
  * Model TournamentRegistration
  * 
  */

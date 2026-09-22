@@ -103,6 +103,8 @@ export interface AdminTournament {
   handicapHalfStep?: boolean;
   handicapEvenExtraCancelOnFirstLoss?: boolean;
   suppressNotifications?: boolean;
+  /** Замены игроков mid-bracket (solo). */
+  substitutions?: import("@/lib/bracket-substitute-display").TournamentSubstitutionView[];
   tableIds?: unknown;
   tableStreams?: unknown;
   startsAt?: string | null;

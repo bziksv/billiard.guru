@@ -14,7 +14,7 @@ export const LEGAL_DOCS = {
   privacy: {
     title: "Политика обработки персональных данных",
     description:
-      "Политика ООО «ПРАЙМ» об обработке и защите персональных данных пользователей billiard.guru.",
+      "Политика ООО «ПРАЙМ» об обработке и защите персональных данных пользователей сервиса billiard.guru.",
     filePath: "/legal/privacy.odt",
   },
   cookies: {
@@ -28,9 +28,9 @@ export const LEGAL_DOCS = {
     filePath: "/legal/recommendation-technologies.odt",
   },
   "personal-data-consent": {
-    title: "Согласие на обработку персональных данных, включая cookie",
+    title: "Согласие на обработку персональных данных",
     description:
-      "Согласие субъекта персональных данных на обработку данных и cookie при использовании billiard.guru.",
+      "Согласие субъекта персональных данных на обработку данных при использовании сервиса billiard.guru.",
     filePath: "",
   },
 } as const;

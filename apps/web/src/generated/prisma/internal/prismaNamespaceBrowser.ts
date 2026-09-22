@@ -67,6 +67,7 @@ export const ModelName = {
   Tournament: 'Tournament',
   TournamentTeam: 'TournamentTeam',
   TournamentMatch: 'TournamentMatch',
+  TournamentPlayerSubstitution: 'TournamentPlayerSubstitution',
   TournamentRegistration: 'TournamentRegistration',
   RatingChange: 'RatingChange',
   AuditLog: 'AuditLog',
@@ -398,6 +399,22 @@ export const TournamentMatchScalarFieldEnum = {
 } as const
 
 export type TournamentMatchScalarFieldEnum = (typeof TournamentMatchScalarFieldEnum)[keyof typeof TournamentMatchScalarFieldEnum]
+
+
+export const TournamentPlayerSubstitutionScalarFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  matchId: 'matchId',
+  side: 'side',
+  outgoingTeamId: 'outgoingTeamId',
+  incomingTeamId: 'incomingTeamId',
+  outgoingPlayerId: 'outgoingPlayerId',
+  incomingPlayerId: 'incomingPlayerId',
+  rewrittenMatchIds: 'rewrittenMatchIds',
+  createdAt: 'createdAt'
+} as const
+
+export type TournamentPlayerSubstitutionScalarFieldEnum = (typeof TournamentPlayerSubstitutionScalarFieldEnum)[keyof typeof TournamentPlayerSubstitutionScalarFieldEnum]
 
 
 export const TournamentRegistrationScalarFieldEnum = {
@@ -898,6 +915,19 @@ export const TournamentMatchOrderByRelevanceFieldEnum = {
 } as const
 
 export type TournamentMatchOrderByRelevanceFieldEnum = (typeof TournamentMatchOrderByRelevanceFieldEnum)[keyof typeof TournamentMatchOrderByRelevanceFieldEnum]
+
+
+export const TournamentPlayerSubstitutionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tournamentId: 'tournamentId',
+  matchId: 'matchId',
+  outgoingTeamId: 'outgoingTeamId',
+  incomingTeamId: 'incomingTeamId',
+  outgoingPlayerId: 'outgoingPlayerId',
+  incomingPlayerId: 'incomingPlayerId'
+} as const
+
+export type TournamentPlayerSubstitutionOrderByRelevanceFieldEnum = (typeof TournamentPlayerSubstitutionOrderByRelevanceFieldEnum)[keyof typeof TournamentPlayerSubstitutionOrderByRelevanceFieldEnum]
 
 
 export const TournamentRegistrationOrderByRelevanceFieldEnum = {

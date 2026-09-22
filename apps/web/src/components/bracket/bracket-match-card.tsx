@@ -309,6 +309,7 @@ export function BracketMatchCard({
         finished && winnerId && "bracket-match-card--finished",
         active && "bracket-match-card--active",
         interactiveAdmin && onMatchClick && "bracket-match-card--interactive",
+        (match.substitutions?.length ?? 0) > 0 && "bracket-match-card--substituted",
         className,
       )}
       style={style}
@@ -366,15 +367,70 @@ export function BracketMatchCard({
             data-bracket-interactive
             onClick={openMatch}
             className="bracket-match-meta bracket-match-meta--clickable"
-            title={labels.handicapTitle(handicap!)}
+            title={
+              (match.substitutions?.length ?? 0) > 0
+                ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
+                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .join("\n")}`
+                : labels.handicapTitle(handicap!)
+            }
           >
             <span className="bracket-match-meta-label">{labels.handicap}</span>
-            <span className="bracket-match-meta-value">{handicapShort}</span>
+            <span className="bracket-match-meta-value">
+              {handicapShort}
+              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
+            </span>
           </button>
         ) : (
-          <div className="bracket-match-meta" title={labels.handicapTitle(handicap!)}>
+          <div
+            className="bracket-match-meta"
+            title={
+              (match.substitutions?.length ?? 0) > 0
+                ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
+                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .join("\n")}`
+                : labels.handicapTitle(handicap!)
+            }
+          >
             <span className="bracket-match-meta-label">{labels.handicap}</span>
-            <span className="bracket-match-meta-value">{handicapShort}</span>
+            <span className="bracket-match-meta-value">
+              {handicapShort}
+              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
+            </span>
+          </div>
+        )
+      )}
+      {!showHandicapBlock && (match.substitutions?.length ?? 0) > 0 && (
+        openMatch ? (
+          <button
+            type="button"
+            data-bracket-interactive
+            onClick={openMatch}
+            className="bracket-match-meta bracket-match-meta--clickable bracket-match-meta--substituted"
+            title={match.substitutions!
+              .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
+              .join("; ")}
+          >
+            <span className="bracket-match-meta-label">Замена</span>
+            <span className="bracket-match-meta-value truncate">
+              {match.substitutions!
+                .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
+                .join("; ")}
+            </span>
+          </button>
+        ) : (
+          <div
+            className="bracket-match-meta bracket-match-meta--substituted"
+            title={match.substitutions!
+              .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
+              .join("; ")}
+          >
+            <span className="bracket-match-meta-label">Замена</span>
+            <span className="bracket-match-meta-value truncate">
+              {match.substitutions!
+                .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
+                .join("; ")}
+            </span>
           </div>
         )
       )}

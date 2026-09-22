@@ -27,6 +27,10 @@ import { DisciplinePicker } from "@/components/admin/discipline-picker";
 import { AsyncButton } from "@/components/ui/async-text-button";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
+import {
+  attachSubstitutionsToMatches,
+  formatSubstitutionNotice,
+} from "@/lib/bracket-substitute-display";
 import { describeHandicap } from "@/lib/handicap";
 import { TournamentRatingRulesSummary } from "@/components/tournament/tournament-rating-rules-summary";
 import { TournamentRatingSourceSelect } from "@/components/tournament/tournament-rating-source-select";
@@ -716,42 +720,46 @@ export function TournamentManageView({
     handicapHalfStep && t.handicapEvenExtraCancelOnFirstLoss === true;
   const bracketMatches = useMemo<BracketMatchView[]>(
     () =>
-      t.matches.map((m) => ({
-        id: m.id,
-        round: m.round,
-        slot: m.slot,
-        status: m.status,
-        winnerTeamId: m.winnerTeam?.id ?? null,
-        team1Score: m.team1Score,
-        team2Score: m.team2Score,
-        startedAt: m.startedAt,
-        finishedAt: m.finishedAt,
-        tableId: m.tableId ?? null,
-        streamUrl: resolveMatchStreamUrl(
-          { tableId: m.tableId ?? null },
-          { tableIds: t.tableIds, tableStreams: t.tableStreams },
-          t.club.floorPlan,
-        ),
-        tableLabel: resolveTableLabel(
-          m.tableId ?? null,
-          t.club.floorPlan,
-          t.club.tableCounts,
-        ),
-        team1: applyMatchStartRatingsToTeam(
-          applyTournamentRatingsToTeam(m.team1, ratingSource, clubPlayerRatings),
-          m.id,
-          matchStartRatings,
-          ratingSource,
-        ),
-        team2: applyMatchStartRatingsToTeam(
-          applyTournamentRatingsToTeam(m.team2, ratingSource, clubPlayerRatings),
-          m.id,
-          matchStartRatings,
-          ratingSource,
-        ),
-      })),
+      attachSubstitutionsToMatches(
+        t.matches.map((m) => ({
+          id: m.id,
+          round: m.round,
+          slot: m.slot,
+          status: m.status,
+          winnerTeamId: m.winnerTeam?.id ?? null,
+          team1Score: m.team1Score,
+          team2Score: m.team2Score,
+          startedAt: m.startedAt,
+          finishedAt: m.finishedAt,
+          tableId: m.tableId ?? null,
+          streamUrl: resolveMatchStreamUrl(
+            { tableId: m.tableId ?? null },
+            { tableIds: t.tableIds, tableStreams: t.tableStreams },
+            t.club.floorPlan,
+          ),
+          tableLabel: resolveTableLabel(
+            m.tableId ?? null,
+            t.club.floorPlan,
+            t.club.tableCounts,
+          ),
+          team1: applyMatchStartRatingsToTeam(
+            applyTournamentRatingsToTeam(m.team1, ratingSource, clubPlayerRatings),
+            m.id,
+            matchStartRatings,
+            ratingSource,
+          ),
+          team2: applyMatchStartRatingsToTeam(
+            applyTournamentRatingsToTeam(m.team2, ratingSource, clubPlayerRatings),
+            m.id,
+            matchStartRatings,
+            ratingSource,
+          ),
+        })),
+        t.substitutions ?? [],
+      ),
     [
       t.matches,
+      t.substitutions,
       t.tableIds,
       t.tableStreams,
       t.club.floorPlan,
@@ -1293,6 +1301,8 @@ export function TournamentManageView({
           rows={protocolRows}
           showSwissPoints={showSwissPoints}
           hasMatches={t.matches.length > 0}
+          substitutions={t.substitutions ?? []}
+          matchNumbers={bracketMatchNumbers}
         />
       )}
 
@@ -1422,6 +1432,8 @@ export function TournamentManageView({
             rows={protocolRows}
             showSwissPoints={showSwissPoints}
             hasMatches={t.matches.length > 0}
+            substitutions={t.substitutions ?? []}
+            matchNumbers={bracketMatchNumbers}
           />
         )}
       </BracketPresentationShell>
@@ -1459,20 +1471,45 @@ function PlaceIntoBracketButton({
   vacantByeSlots: ReturnType<typeof vacantRoundOneSlotsFromMatches>;
   onUpdated: () => void;
 }) {
-  const [matchId, setMatchId] = useState(vacantByeSlots[0]?.matchId ?? "");
+  const RANDOM_VALUE = "__random__";
+  const [matchId, setMatchId] = useState(() =>
+    vacantByeSlots.length > 1
+      ? RANDOM_VALUE
+      : (vacantByeSlots[0]?.matchId ?? ""),
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (matchId === RANDOM_VALUE) {
+      if (vacantByeSlots.length <= 1) {
+        setMatchId(vacantByeSlots[0]?.matchId ?? "");
+      }
+      return;
+    }
     if (!vacantByeSlots.some((s) => s.matchId === matchId)) {
-      setMatchId(vacantByeSlots[0]?.matchId ?? "");
+      setMatchId(
+        vacantByeSlots.length > 1
+          ? RANDOM_VALUE
+          : (vacantByeSlots[0]?.matchId ?? ""),
+      );
     }
   }, [vacantByeSlots, matchId]);
 
   if (vacantByeSlots.length === 0) return null;
 
+  function resolveMatchId(): string | null {
+    if (matchId === RANDOM_VALUE) {
+      const pick =
+        vacantByeSlots[Math.floor(Math.random() * vacantByeSlots.length)];
+      return pick?.matchId ?? null;
+    }
+    return matchId || null;
+  }
+
   async function place() {
-    if (!matchId) return;
+    const resolved = resolveMatchId();
+    if (!resolved) return;
     setLoading(true);
     setError(null);
     try {
@@ -1481,7 +1518,7 @@ function PlaceIntoBracketButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tournamentId,
-          matchId,
+          matchId: resolved,
           ...(teamId ? { teamId } : {}),
           ...(playerId ? { playerId } : {}),
         }),
@@ -1507,6 +1544,9 @@ function PlaceIntoBracketButton({
           onChange={(e) => setMatchId(e.target.value)}
           className="rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-1.5 text-sm text-zinc-100"
         >
+          {vacantByeSlots.length > 1 && (
+            <option value={RANDOM_VALUE}>Определить рандомно</option>
+          )}
           {vacantByeSlots.map((s) => (
             <option key={s.matchId} value={s.matchId}>
               vs {s.opponentLabel}
@@ -1521,7 +1561,11 @@ function PlaceIntoBracketButton({
         onClick={() => void place()}
         className="admin-btn admin-btn--primary px-3 py-1.5 text-xs disabled:opacity-50"
       >
-        {loading ? "Сажаем…" : "Поставить в сетку"}
+        {loading
+          ? "Сажаем…"
+          : matchId === RANDOM_VALUE
+            ? "Поставить случайно"
+            : "Поставить в сетку"}
       </button>
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
@@ -2923,12 +2967,16 @@ function ProtocolTab({
   rows,
   showSwissPoints,
   hasMatches,
+  substitutions = [],
+  matchNumbers = new Map(),
 }: {
   t: AdminTournament;
   swiss: boolean;
   rows: ReturnType<typeof computeTournamentStandings>;
   showSwissPoints: boolean;
   hasMatches: boolean;
+  substitutions?: import("@/lib/bracket-substitute-display").TournamentSubstitutionView[];
+  matchNumbers?: Map<string, number>;
 }) {
   const preliminary = rows.some((row) => row.note);
   const finished = t.status === "FINISHED";
@@ -2958,6 +3006,19 @@ function ProtocolTab({
           <p className="mt-1 text-xs text-emerald-400/90">Турнир завершён — итоговый протокол.</p>
         )}
       </div>
+
+      {substitutions.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-800/50 dark:bg-amber-950/30 dark:text-amber-100">
+          <p className="font-medium">Замены игроков</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            {substitutions.map((s) => (
+              <li key={s.id}>
+                {formatSubstitutionNotice(s, matchNumbers.get(s.matchId) ?? null)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {rows.length === 0 ? (
         <p className="tournament-hint text-sm">

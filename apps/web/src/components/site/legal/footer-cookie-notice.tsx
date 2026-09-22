@@ -11,13 +11,20 @@ export async function FooterCookieNotice() {
       <Link href={LEGAL_URLS.cookies} className="site-footer-legal-link">
         {t("cookiesLink")}
       </Link>
-      {t("and")}
-      <Link href={LEGAL_URLS.recommendationTechnologies} className="site-footer-legal-link">
-        {t("recommendationLink")}
+      {t("afterCookies")}
+      <Link href={LEGAL_URLS.personalDataConsent} className="site-footer-legal-link">
+        {t("consentLink")}
       </Link>
-      {t("middle")}
+      {t("midConfirm")}
       <Link href={LEGAL_URLS.privacy} className="site-footer-legal-link">
         {t("privacyLink")}
+      </Link>
+      {t("and")}
+      <Link
+        href={LEGAL_URLS.recommendationTechnologies}
+        className="site-footer-legal-link"
+      >
+        {t("recommendationLink")}
       </Link>
       {t("after")}
     </p>

@@ -16,6 +16,7 @@ import {
   tournamentAdminInclude,
   type AdminTournament,
 } from "@/lib/tournament-admin";
+import { listTournamentSubstitutions } from "@/lib/bracket-substitute";
 import {
   requireTournamentManageAccess,
   tournamentManageActorType,
@@ -54,9 +55,14 @@ export async function GET(
 
     const participantRules = await getResolvedParticipantRules(tournament.format);
     const rated = await withTournamentEffectiveRatings(tournament);
+    const substitutions = await listTournamentSubstitutions(id);
 
     return NextResponse.json(
-      await withTournamentFormatLabel({ ...rated, participantRules }),
+      await withTournamentFormatLabel({
+        ...rated,
+        participantRules,
+        substitutions,
+      }),
     );
   } catch (error) {
     const authResp = authErrorResponse(error);
@@ -267,6 +273,7 @@ export async function PATCH(
       await withTournamentFormatLabel({
         ...tournament,
         participantRules: await getResolvedParticipantRules(tournament.format),
+        substitutions: await listTournamentSubstitutions(id),
       }),
     );
   } catch (error) {

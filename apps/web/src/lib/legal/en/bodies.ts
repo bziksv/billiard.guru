@@ -3,12 +3,13 @@ import type { LegalDocBody } from "@/lib/legal-bodies";
 
 export const LEGAL_BODIES_EN: Record<LegalDocSlug, LegalDocBody> = {
   privacy: {
-    updatedAt: "2026-08-21",
+    updatedAt: "2026-09-22",
     sections: [
       {
         paragraphs: [
           "Operator: ООО «ПРАЙМ», INN 3665107119. Address: 394026, Voronezh, Moskovsky prospect, 19, office 19. E-mail: info@billiard.guru. Website: https://billiard.guru/.",
-          "This Privacy and personal data processing policy (the Policy) describes how the Operator processes personal data of users of billiard.guru (the Service), including registration, tournaments, ratings, table bookings, Play a match listings, the Telegram bot, and related channels.",
+          "This Privacy and personal data processing policy (the Policy) describes how the Operator processes personal data of users of the billiard.guru service (tournaments, ratings, clubs, table bookings, Play a match, Telegram bot, and related channels).",
+          "Related documents: Consent to personal data processing (https://billiard.guru/legal/personal-data-consent); Cookie policy (https://billiard.guru/legal/cookies); Recommendation technologies rules (https://billiard.guru/legal/recommendation-technologies).",
           "The full Russian text of the Policy is the controlling version and is published at https://billiard.guru/legal/privacy.",
         ],
       },
@@ -66,24 +67,24 @@ export const LEGAL_BODIES_EN: Record<LegalDocSlug, LegalDocBody> = {
     ],
   },
   "personal-data-consent": {
-    updatedAt: "2026-08-21",
+    updatedAt: "2026-09-22",
     sections: [
       {
         paragraphs: [
-          "This document applies to https://billiard.guru/, the account area https://billiard.guru/cabinet, and related *.billiard.guru subdomains.",
-          "By giving this consent, I freely agree that ООО «ПРАЙМ» (INN 3665107119; the Operator) may process my personal data, including cookies, as described in the full Russian consent text at https://billiard.guru/legal/personal-data-consent and in the Privacy policy at https://billiard.guru/legal/privacy.",
+          "Related: Privacy policy (https://billiard.guru/legal/privacy), Cookie policy (https://billiard.guru/legal/cookies), Recommendation technologies (https://billiard.guru/legal/recommendation-technologies).",
+          "By giving this consent, I freely agree that ООО «ПРАЙМ» (INN 3665107119; the Operator) may process my personal data, including cookies, when I use the billiard.guru service. The full Russian consent text at https://billiard.guru/legal/personal-data-consent is controlling.",
         ],
       },
       {
         title: "Scope",
         paragraphs: [
-          "Processing covers visitors, registered users, club representatives, partners, and persons contacting support — for operating the Service (registration, tournaments, ratings, bookings, Play a match, Telegram notifications), analytics, security, and legal compliance.",
+          "Processing covers visitors, registered users, tournament players, club organizers, partners, and persons contacting support — for operating the Service (registration, tournaments, ratings, bookings, Play a match, Telegram notifications), analytics, security, and legal compliance.",
         ],
       },
       {
         title: "Withdrawal",
         paragraphs: [
-          "Consent may be withdrawn by signed notice to 394026, Voronezh, Moskovsky prospect, 19, office 19, or by qualified electronic signature to info@billiard.guru, as detailed in the Russian text.",
+          "Consent may be withdrawn by e-mail to info@billiard.guru or by post to 394026, Voronezh, Moskovsky prospect, 19, office 19, stating your name, contacts, and clear intent to withdraw.",
           "The Russian version is controlling.",
         ],
       },

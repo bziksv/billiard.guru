@@ -29,9 +29,9 @@ const LEGAL_DOCS_EN: Record<LegalDocSlug, LegalDocEntry> = {
     keywords: ["recommendation technologies", "personalization billiard guru"],
   },
   "personal-data-consent": {
-    title: "Consent to personal data processing, including cookies",
+    title: "Consent to personal data processing",
     description:
-      "User consent to personal data and cookie processing when using billiard.guru.",
+      "User consent to personal data processing when using the billiard.guru service.",
     filePath: "",
     keywords: [
       "personal data consent",

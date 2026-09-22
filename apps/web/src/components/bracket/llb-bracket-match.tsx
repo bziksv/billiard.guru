@@ -611,6 +611,7 @@ export function LlbBracketMatch({
         finished && winnerId && "bracket-match-card--finished",
         active && "bracket-match-card--active",
         openResult && "bracket-match-card--interactive",
+        (match.substitutions?.length ?? 0) > 0 && "bracket-match-card--substituted",
       )}
       style={{
         width: isFixedSwissGrid ? FIXED_SWISS_CARD_W : GRID_CARD_W,
@@ -743,29 +744,60 @@ export function LlbBracketMatch({
             onClick={openResult}
             className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-left text-[9px] leading-[18px] text-[var(--bracket-meta-text)] transition-colors hover:bg-emerald-950/25"
             style={{ height: FIXED_SWISS_COMPACT_ROW_H, maxHeight: FIXED_SWISS_COMPACT_ROW_H }}
-            title={labels.handicapTitle(handicap!)}
+            title={
+              (match.substitutions?.length ?? 0) > 0
+                ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
+                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .join("\n")}`
+                : labels.handicapTitle(handicap!)
+            }
           >
             <span className="block truncate">
               <span className="font-semibold uppercase tracking-wide opacity-85">
                 {labels.handicap}{" "}
               </span>
               {handicapShort}
+              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
             </span>
           </button>
         ) : (
           <div
             className="shrink-0 overflow-hidden border-t border-[var(--bracket-row-border)] px-2 text-[9px] leading-[18px] text-[var(--bracket-meta-text)]"
             style={{ height: FIXED_SWISS_COMPACT_ROW_H, maxHeight: FIXED_SWISS_COMPACT_ROW_H }}
-            title={labels.handicapTitle(handicap!)}
+            title={
+              (match.substitutions?.length ?? 0) > 0
+                ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
+                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .join("\n")}`
+                : labels.handicapTitle(handicap!)
+            }
           >
             <span className="block truncate">
               <span className="font-semibold uppercase tracking-wide opacity-85">
                 {labels.handicap}{" "}
               </span>
               {handicapShort}
+              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
             </span>
           </div>
         )
+      )}
+
+      {!showHandicapRow && (match.substitutions?.length ?? 0) > 0 && (
+        <div
+          className="shrink-0 overflow-hidden border-t border-amber-500/40 px-2 text-[9px] leading-[18px] text-amber-800 dark:text-amber-200"
+          style={{ height: FIXED_SWISS_COMPACT_ROW_H, maxHeight: FIXED_SWISS_COMPACT_ROW_H }}
+          title={match.substitutions!
+            .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
+            .join("; ")}
+        >
+          <span className="block truncate">
+            Замена:{" "}
+            {match.substitutions!
+              .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
+              .join("; ")}
+          </span>
+        </div>
       )}
 
       {footerRows.length > 0 ? (

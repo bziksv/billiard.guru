@@ -1,5 +1,6 @@
 import { isMatchResolved } from "@/lib/match-result";
 import type { TeamWithPlayers } from "@/lib/pair-tournament";
+import type { TournamentSubstitutionView } from "@/lib/bracket-substitute-display";
 
 export type BracketTeamView = TeamWithPlayers & { id: string };
 
@@ -18,6 +19,8 @@ export type BracketMatchView = {
   tableId?: string | null;
   streamUrl?: string | null;
   tableLabel?: string | null;
+  /** Замены игроков, затронувшие эту встречу. */
+  substitutions?: TournamentSubstitutionView[];
 };
 
 export type SwissStandingView = BracketTeamView & {
@@ -113,7 +116,11 @@ function olympicCardMinHeight(
       opts.handicapHalfStep !== false,
       opts.handicapEvenExtraCancelOnFirstLoss === true,
     );
-  if (!showMeta && !showHandicap) return OLYMPIC_CARD_COMPACT_MIN_H;
+  const showSubstitutionMeta =
+    !showHandicap && (match.substitutions?.length ?? 0) > 0;
+  if (!showMeta && !showHandicap && !showSubstitutionMeta) {
+    return OLYMPIC_CARD_COMPACT_MIN_H;
+  }
   return OLYMPIC_CARD_MIN_H;
 }
 
@@ -221,6 +228,8 @@ export function estimateOlympicCardHeight(
       opts.handicapEvenExtraCancelOnFirstLoss === true,
     )
   ) {
+    h += OLYMPIC_HANDICAP_H;
+  } else if ((match.substitutions?.length ?? 0) > 0) {
     h += OLYMPIC_HANDICAP_H;
   }
   if (footerRowCount > 0) {

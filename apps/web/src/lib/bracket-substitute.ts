@@ -1,10 +1,26 @@
 /**
  * Замена игрока mid-bracket (solo): переписываем teamId в незавершённых матчах.
  * Сыгранные матчи и RatingChange ушедшего не трогаем.
+ * Факт замены пишем в TournamentPlayerSubstitution для отображения.
  */
 import type { PrismaClient } from "@/generated/prisma/client";
 import { syncSoloTeamsForTournament } from "@/lib/bracket-service";
 import { isPairFormat } from "@/lib/pair-tournament";
+import { prisma } from "@/lib/prisma";
+import {
+  parseRewrittenIds,
+  type TournamentSubstitutionView,
+} from "@/lib/bracket-substitute-display";
+
+export type {
+  TournamentSubstitutionView,
+} from "@/lib/bracket-substitute-display";
+export {
+  attachSubstitutionsToMatches,
+  formatSubstitutionNotice,
+  matchIdsAffectedBySubstitutions,
+  substitutionsForMatch,
+} from "@/lib/bracket-substitute-display";
 
 type Db = Pick<
   PrismaClient,
@@ -14,6 +30,7 @@ type Db = Pick<
   | "tournamentRegistration"
   | "player"
   | "clubPlayerRating"
+  | "tournamentPlayerSubstitution"
 >;
 
 export type SubstituteCandidate = {
@@ -184,6 +201,7 @@ export async function substituteTeamInMatch(
   outgoingTeamId: string;
   incomingTeamId: string;
   rewrittenMatchIds: string[];
+  substitutionId: string;
 }> {
   const match = await db.tournamentMatch.findUnique({
     where: { id: params.matchId },
@@ -210,16 +228,20 @@ export async function substituteTeamInMatch(
     throw new Error("Игрок уже стоит в этом слоте");
   }
 
-  const incoming = await db.tournamentTeam.findUnique({
-    where: { id: params.incomingTeamId },
-  });
+  const [outgoing, incoming] = await Promise.all([
+    db.tournamentTeam.findUnique({ where: { id: outgoingTeamId } }),
+    db.tournamentTeam.findUnique({ where: { id: params.incomingTeamId } }),
+  ]);
+  if (!outgoing || outgoing.tournamentId !== match.tournamentId) {
+    throw new Error("Уходящая команда не найдена");
+  }
   if (!incoming || incoming.tournamentId !== match.tournamentId) {
     throw new Error("Команда не найдена в этом турнире");
   }
   if (incoming.status !== "CONFIRMED") {
     throw new Error("Команда входящего должна быть подтверждена");
   }
-  if (incoming.player2Id) {
+  if (incoming.player2Id || outgoing.player2Id) {
     throw new Error("Замена доступна только для одиночных команд");
   }
 
@@ -275,10 +297,119 @@ export async function substituteTeamInMatch(
     throw new Error("Не удалось обновить слот");
   }
 
+  const row = await db.tournamentPlayerSubstitution.create({
+    data: {
+      tournamentId: match.tournamentId,
+      matchId: match.id,
+      side: params.side,
+      outgoingTeamId,
+      incomingTeamId: params.incomingTeamId,
+      outgoingPlayerId: outgoing.player1Id,
+      incomingPlayerId: incoming.player1Id,
+      rewrittenMatchIds,
+    },
+  });
+
   return {
     matchId: match.id,
     outgoingTeamId,
     incomingTeamId: params.incomingTeamId,
     rewrittenMatchIds,
+    substitutionId: row.id,
   };
+}
+
+/** Подтянуть старые замены из audit_logs (до появления таблицы). */
+export async function backfillSubstitutionsFromAudit(
+  tournamentId: string,
+): Promise<number> {
+  const existing = await prisma.tournamentPlayerSubstitution.count({
+    where: { tournamentId },
+  });
+  if (existing > 0) return 0;
+
+  const matchIds = (
+    await prisma.tournamentMatch.findMany({
+      where: { tournamentId },
+      select: { id: true },
+    })
+  ).map((m) => m.id);
+  if (matchIds.length === 0) return 0;
+
+  const logs = await prisma.auditLog.findMany({
+    where: {
+      action: "tournament.bracket.substitute",
+      entityType: "tournament_match",
+      entityId: { in: matchIds },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  let created = 0;
+  for (const log of logs) {
+    const payload = log.payload as Record<string, unknown> | null;
+    if (!payload || !log.entityId) continue;
+    const side = payload.side === 2 ? 2 : payload.side === 1 ? 1 : null;
+    const outgoingTeamId =
+      typeof payload.outgoingTeamId === "string" ? payload.outgoingTeamId : null;
+    const incomingTeamId =
+      typeof payload.incomingTeamId === "string" ? payload.incomingTeamId : null;
+    if (!side || !outgoingTeamId || !incomingTeamId) continue;
+
+    const [outgoing, incoming] = await Promise.all([
+      prisma.tournamentTeam.findUnique({
+        where: { id: outgoingTeamId },
+        select: { player1Id: true },
+      }),
+      prisma.tournamentTeam.findUnique({
+        where: { id: incomingTeamId },
+        select: { player1Id: true },
+      }),
+    ]);
+    if (!outgoing || !incoming) continue;
+
+    const rewritten = parseRewrittenIds(payload.rewrittenMatchIds);
+    await prisma.tournamentPlayerSubstitution.create({
+      data: {
+        tournamentId,
+        matchId: log.entityId,
+        side,
+        outgoingTeamId,
+        incomingTeamId,
+        outgoingPlayerId: outgoing.player1Id,
+        incomingPlayerId: incoming.player1Id,
+        rewrittenMatchIds: rewritten.length > 0 ? rewritten : [log.entityId],
+        createdAt: log.createdAt,
+      },
+    });
+    created += 1;
+  }
+  return created;
+}
+
+export async function listTournamentSubstitutions(
+  tournamentId: string,
+): Promise<TournamentSubstitutionView[]> {
+  await backfillSubstitutionsFromAudit(tournamentId).catch(() => 0);
+
+  const rows = await prisma.tournamentPlayerSubstitution.findMany({
+    where: { tournamentId },
+    include: {
+      outgoingPlayer: { select: { firstName: true, lastName: true } },
+      incomingPlayer: { select: { firstName: true, lastName: true } },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+
+  return rows.map((r) => ({
+    id: r.id,
+    matchId: r.matchId,
+    side: r.side === 2 ? 2 : 1,
+    outgoingPlayerId: r.outgoingPlayerId,
+    outgoingLabel: playerLabel(r.outgoingPlayer),
+    incomingPlayerId: r.incomingPlayerId,
+    incomingLabel: playerLabel(r.incomingPlayer),
+    rewrittenMatchIds: parseRewrittenIds(r.rewrittenMatchIds),
+    createdAt: r.createdAt.toISOString(),
+  }));
 }
