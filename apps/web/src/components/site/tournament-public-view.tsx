@@ -188,50 +188,53 @@ function Podium({
   rows: PublicStandingRow[];
   t: ReturnType<typeof useTranslations<"tournamentView.results">>;
 }) {
-  const top = rows.filter((r) => r.placeSort <= 3 && r.placeSort > 0);
-  if (top.length === 0) return null;
+  const first = rows.find((r) => r.placeSort === 1);
+  const second = rows.find((r) => r.placeSort === 2);
+  const thirds = rows.filter((r) => r.placeSort === 3);
+  if (!first && !second && thirds.length === 0) return null;
 
-  const first = top.find((r) => r.placeSort === 1);
-  const second = top.find((r) => r.placeSort === 2);
-  const thirds = top.filter((r) => r.placeSort === 3);
+  const ordered: PublicStandingRow[] = [];
+  if (second) ordered.push(second);
+  if (first) ordered.push(first);
+  ordered.push(...thirds);
+  if (ordered.length === 0) return null;
 
-  function MedalCard({ row }: { row: PublicStandingRow }) {
-    const medal =
-      row.placeSort === 1 ? "🥇" : row.placeSort === 2 ? "🥈" : "🥉";
-    return (
-      <div
-        className={cn(
-          "home-content-card rounded-xl px-4 py-4 text-center",
-          row.placeSort === 1 && "ring-1 ring-amber-500/30",
-        )}
-      >
-        <div className="text-2xl">{medal}</div>
-        <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-          {row.placeLabel} {t("placeSuffix")}
-        </div>
-        <div className="mt-2 text-sm leading-snug">
-          <PlayerLinks row={row} />
-        </div>
-        <div className="mt-1 text-xs text-[var(--text-muted)]">{row.city}</div>
-      </div>
-    );
-  }
+  const cols =
+    ordered.length >= 4
+      ? "sm:grid-cols-4"
+      : ordered.length === 3
+        ? "sm:grid-cols-3"
+        : ordered.length === 2
+          ? "sm:grid-cols-2"
+          : "sm:grid-cols-1";
 
   return (
-    <div className="mb-6 grid gap-3 sm:grid-cols-3 sm:items-end">
-      <div className="order-2 sm:order-none">
-        {second ? <MedalCard row={second} /> : <div className="hidden sm:block" />}
-      </div>
-      <div className="order-1 sm:order-none sm:-mt-2">
-        {first ? <MedalCard row={first} /> : <div className="hidden sm:block" />}
-      </div>
-      <div className="order-3 flex flex-col gap-3 sm:order-none">
-        {thirds.length > 0 ? (
-          thirds.map((row) => <MedalCard key={row.key} row={row} />)
-        ) : (
-          <div className="hidden sm:block" />
-        )}
-      </div>
+    <div className={cn("mb-6 grid gap-3 sm:items-end", cols)}>
+      {ordered.map((row) => {
+        const medal =
+          row.placeSort === 1 ? "🥇" : row.placeSort === 2 ? "🥈" : "🥉";
+        const isFirst = row.placeSort === 1;
+        return (
+          <div
+            key={row.key}
+            className={cn(
+              "home-content-card rounded-xl px-3 py-4 text-center sm:px-4",
+              isFirst && "order-first sm:order-none sm:-mt-2 ring-1 ring-amber-500/30",
+              row.placeSort === 2 && "order-2 sm:order-none",
+              row.placeSort === 3 && "order-3 sm:order-none",
+            )}
+          >
+            <div className="text-2xl">{medal}</div>
+            <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+              {row.placeLabel} {t("placeSuffix")}
+            </div>
+            <div className="mt-2 text-sm leading-snug">
+              <PlayerLinks row={row} />
+            </div>
+            <div className="mt-1 text-xs text-[var(--text-muted)]">{row.city}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -258,8 +261,14 @@ function ResultsTab({
     );
   }
 
-  const showPodium = finished && rows.some((r) => r.placeSort <= 3);
-  const tableRows = showPodium ? rows.filter((r) => r.placeSort > 3 || r.placeSort === 9999) : rows;
+  const showPodium =
+    finished &&
+    (rows.some((r) => r.placeSort === 1) ||
+      rows.some((r) => r.placeSort === 2) ||
+      rows.some((r) => r.placeSort === 3));
+  const tableRows = showPodium
+    ? rows.filter((r) => r.placeSort > 3 || r.placeSort === 9999)
+    : rows;
 
   return (
     <div className="space-y-4">
