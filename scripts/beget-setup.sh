@@ -3,8 +3,11 @@
 # Atomic releases: сборка в .next/standalone, prod — ~/billiard.guru/current.
 #
 #   cd ~/billiard.guru/setka
+#   export PATH="$HOME/.local/bin:$PATH"
 #   ./scripts/beget-setup.sh
-#   # или: ./scripts/beget-deploy.sh   (git pull + setup)
+#
+# Скрипт сам делает fetch + reset на origin/main перед сборкой.
+# Не нужен отдельный git pull. Отключить sync: BEGET_SKIP_GIT=1.
 #
 # Пока идёт npm run build, Next.js может удалить .next — сайт продолжает работать
 # на предыдущем релизе в ~/billiard.guru/current.
@@ -32,19 +35,7 @@ on_deploy_exit() {
 
 trap on_deploy_exit EXIT
 
-if command -v git >/dev/null && git -C "$REPO_ROOT" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  if ! git -C "$REPO_ROOT" diff --quiet apps/web/.env.example 2>/dev/null; then
-    echo "⚠ Изменён apps/web/.env.example — git pull может быть заблокирован."
-    echo "  git stash push apps/web/.env.example   # или: git checkout -- apps/web/.env.example"
-    echo ""
-  fi
-  git -C "$REPO_ROOT" fetch origin main --quiet 2>/dev/null || true
-  behind="$(git -C "$REPO_ROOT" rev-list --count HEAD..origin/main 2>/dev/null || echo "")"
-  if [ -n "$behind" ] && [ "$behind" != "0" ]; then
-    echo "⚠ main отстаёт от origin/main на $behind коммит(ов). Сначала: git pull"
-    echo ""
-  fi
-fi
+beget_sync_origin_main "$REPO_ROOT" || exit 1
 
 NODE_BIN="$(beget_find_working_node)" || {
   echo "Node.js не найден или не запускается."

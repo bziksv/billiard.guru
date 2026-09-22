@@ -11,7 +11,7 @@ alwaysApply: true
 
 Live-трафик: `~/billiard.guru/current` → `releases/<id>`. Сборка — в `setka/apps/web/.next/standalone` (staging). **Passenger не должен указывать на `.next/standalone`** — Next.js удаляет `.next/` при каждом build.
 
-Деплой: `./scripts/beget-deploy.sh` (git pull + beget-setup). Откат: `./scripts/beget-rollback.sh`.
+Деплой: `./scripts/beget-setup.sh` (сам `fetch` + `reset --hard origin/main`, потом сборка). Алиас: `./scripts/beget-deploy.sh`. Откат: `./scripts/beget-rollback.sh`.
 
 ## Обязательно для агента
 
@@ -21,8 +21,9 @@ Live-трафик: `~/billiard.guru/current` → `releases/<id>`. Сборка �
 2. `scripts/` **не** должны ломать `next build` — в `apps/web/tsconfig.json` они в `exclude`
 3. После деплоя (или 403/5xx): на сервере:
    ```bash
-   cd ~/billiard.guru/setka && git pull && ./scripts/beget-deploy.sh
+   cd ~/billiard.guru/setka && export PATH="$HOME/.local/bin:$PATH" && ./scripts/beget-setup.sh
    ```
+   В конце live-релиз должен совпадать с `git rev-parse --short origin/main` (после push).
    При 5xx после деплоя: `./scripts/beget-rollback.sh`, затем `./scripts/beget-diagnose.sh`.
 
 4. Проверка prod (агент **сам**):

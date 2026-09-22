@@ -57,6 +57,63 @@ beget_release_id() {
   date -u +"%Y%m%d-%H%M%S-${short_sha}" 2>/dev/null || date +"%Y%m%d-%H%M%S-${short_sha}"
 }
 
+# Перед сборкой: всегда origin/main. Локальные правки tracked-файлов на сервере сбрасываются.
+# .env и прочий untracked не трогаем. Отключить: BEGET_SKIP_GIT=1.
+beget_sync_origin_main() {
+  local repo="${1:-$BEGET_REPO_ROOT}"
+  local head origin_sha
+
+  if [ "${BEGET_SKIP_GIT:-0}" = "1" ]; then
+    echo "→ git sync пропущен (BEGET_SKIP_GIT=1), HEAD=$(git -C "$repo" rev-parse --short HEAD 2>/dev/null || echo '?')"
+    return 0
+  fi
+  if ! command -v git >/dev/null; then
+    echo "⚠ git не найден — собираем как есть"
+    return 0
+  fi
+  if ! git -C "$repo" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "⚠ не git-репозиторий — собираем как есть"
+    return 0
+  fi
+
+  echo "→ git fetch origin main…"
+  if ! git -C "$repo" fetch origin main; then
+    echo "✗ git fetch origin main не удался — сборку не начинаем"
+    return 1
+  fi
+
+  if ! git -C "$repo" rev-parse --verify origin/main >/dev/null 2>&1; then
+    echo "✗ нет origin/main после fetch"
+    return 1
+  fi
+
+  origin_sha="$(git -C "$repo" rev-parse --short origin/main)"
+  head="$(git -C "$repo" rev-parse --short HEAD)"
+
+  if [ "$head" != "$origin_sha" ]; then
+    echo "→ git: HEAD $head → origin/main $origin_sha (сброс локальных правок tracked)"
+  elif ! git -C "$repo" diff --quiet || ! git -C "$repo" diff --cached --quiet; then
+    echo "→ git: сброс локальных правок tracked (иначе pull/сборка врёт)"
+  else
+    echo "→ git: уже origin/main ($head)"
+    return 0
+  fi
+
+  # Деплой-машина: код только с GitHub. Untracked (.env, data/) не трогаем.
+  git -C "$repo" checkout -B main origin/main >/dev/null 2>&1 || true
+  if ! git -C "$repo" reset --hard origin/main; then
+    echo "✗ git reset --hard origin/main не удался"
+    return 1
+  fi
+
+  head="$(git -C "$repo" rev-parse --short HEAD)"
+  if [ "$head" != "$(git -C "$repo" rev-parse --short origin/main)" ]; then
+    echo "✗ после sync HEAD=$head, а origin/main=$(git -C "$repo" rev-parse --short origin/main)"
+    return 1
+  fi
+  echo "→ git HEAD: $head (сборка пойдёт из этого коммита)"
+}
+
 beget_current_release_dir() {
   if [ -L "$BEGET_CURRENT" ]; then
     readlink -f "$BEGET_CURRENT" 2>/dev/null || readlink "$BEGET_CURRENT"

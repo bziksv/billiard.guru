@@ -107,20 +107,20 @@ cd apps/web && npm run telegram:webhook
 
 ## Обновление после git push
 
-Рекомендуемый способ (pull + atomic deploy):
+Одна команда (сама подтянет `origin/main` и соберёт; локальные правки tracked на сервере сбросит):
 
 ```bash
 cd ~/billiard.guru/setka
-./scripts/beget-deploy.sh
-```
-
-Или вручную:
-
-```bash
-cd ~/billiard.guru/setka
-git pull
+export PATH="$HOME/.local/bin:$PATH"
 ./scripts/beget-setup.sh
 ```
+
+Алиас: `./scripts/beget-deploy.sh` — то же самое.
+
+В логе в начале должно быть `→ git HEAD: <sha>`, в конце live-релиз `…-<тот же sha>`.  
+Если SHA старый — на GitHub ещё нет push, или fetch на сервере не прошёл.
+
+Отключить sync (редко): `BEGET_SKIP_GIT=1 ./scripts/beget-setup.sh`
 
 Быстрый повторный деплой без `npm install` (если зависимости не менялись):
 
