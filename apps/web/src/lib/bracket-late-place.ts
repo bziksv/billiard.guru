@@ -20,7 +20,11 @@ export { vacantRoundOneSlotsFromMatches } from "@/lib/bracket-late-place-display
 
 type Db = Pick<
   PrismaClient,
-  "tournamentMatch" | "tournamentTeam" | "tournament" | "tournamentRegistration"
+  | "tournamentMatch"
+  | "tournamentTeam"
+  | "tournament"
+  | "tournamentRegistration"
+  | "clubPlayerRating"
 >;
 
 /** R1-слоты с ровно одной занятой стороной (bye / ×). */
