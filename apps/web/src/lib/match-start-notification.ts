@@ -104,7 +104,10 @@ export async function notifyMatchStartScheduled(
     },
   });
 
-  if (!match?.team1 && !match?.team2) return;
+  if (!match?.team1 || !match?.team2) return;
+  if (match.winnerTeamId || match.status === "FINISHED" || match.status === "WALKOVER") {
+    return;
+  }
   if (match.tournament.suppressNotifications) return;
 
   const allMatches = await prisma.tournamentMatch.findMany({

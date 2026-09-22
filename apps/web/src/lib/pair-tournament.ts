@@ -1,4 +1,4 @@
-import { formatRating, roundToPreviewGrid } from "@/lib/rating";
+import { formatRatingBracket, roundToPreviewGrid } from "@/lib/rating";
 
 export interface TeamPlayer {
   id: string;
@@ -214,7 +214,7 @@ export function teamRating(team: TeamWithPlayers): number {
 }
 
 export function formatTeamRating(team: TeamWithPlayers): string {
-  return formatRating(teamRating(team));
+  return formatRatingBracket(teamRating(team));
 }
 
 export function teamLabel(team: TeamWithPlayers): string {

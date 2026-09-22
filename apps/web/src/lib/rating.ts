@@ -357,3 +357,10 @@ export function formatRating(rating: number): string {
   if (Number.isInteger(rounded)) return String(rounded);
   return String(Number(rounded.toFixed(3)));
 }
+
+/** Рейтинг на карточке сетки: всегда два знака (3.80, 4.00). */
+export function formatRatingBracket(rating: number): string {
+  const n = Number(rating);
+  if (!Number.isFinite(n)) return "0.00";
+  return roundToPreviewGrid(n).toFixed(2);
+}

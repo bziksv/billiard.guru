@@ -17,7 +17,7 @@ import {
   teamRating,
   type TeamWithPlayers,
 } from "@/lib/pair-tournament";
-import { formatRating } from "@/lib/rating";
+import { formatRatingBracket } from "@/lib/rating";
 import { cn } from "@/lib/cn";
 import type { BracketMatchView } from "@/lib/bracket-view";
 import { BracketMatchNumberRow } from "@/components/bracket/bracket-match-number-row";
@@ -164,7 +164,7 @@ function TeamRow({
       )}
       {rating !== undefined && !empty && (
         <span className="bracket-match-rating shrink-0 font-mono text-[10px] tabular-nums">
-          {labels.ratingPrefix} {formatRating(rating)}
+          {labels.ratingPrefix} {formatRatingBracket(rating)}
         </span>
       )}
       {onMatchClick ? (

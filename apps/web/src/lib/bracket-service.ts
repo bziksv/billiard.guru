@@ -176,7 +176,9 @@ async function maybeNotifyMatchStartScheduled(
   startedAt: Date | null | undefined,
 ) {
   if (input.startedAt === undefined || startedAt == null) return;
-  if (previousStartedAt?.getTime() === startedAt.getTime()) return;
+  // Только первое назначение старта. Правка времени у уже начатой/сыгранной
+  // встречи иначе снова шлёт «Соперник: …» — игрок видит чужую пару из прошлого матча.
+  if (previousStartedAt != null) return;
   try {
     await notifyMatchStartScheduled(input.matchId, startedAt);
   } catch (err) {
