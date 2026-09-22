@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, getCurrentPlayer, requireWritablePlayer } from "@/lib/auth";
 import {
   getPlayerNotificationPreferencesForCabinet,
   setPlayerNotificationEnabled,
@@ -37,47 +37,50 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const player = await getCurrentPlayer();
-  if (!player) {
-    return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
-  }
-
-  let body: unknown;
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Некорректный JSON" }, { status: 400 });
-  }
+    const player = await requireWritablePlayer();
 
-  const single = patchSchema.safeParse(body);
-  if (single.success) {
+    let body: unknown;
     try {
-      await setPlayerNotificationEnabled(
-        player.id,
-        single.data.notificationId,
-        single.data.enabled,
-      );
-    } catch (e) {
-      const message = e instanceof Error ? e.message : "Ошибка сохранения";
-      return NextResponse.json({ error: message }, { status: 400 });
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Некорректный JSON" }, { status: 400 });
     }
-    const data = await getPlayerNotificationPreferencesForCabinet(player.id);
-    return NextResponse.json(data);
-  }
 
-  const bulk = patchBulkSchema.safeParse(body);
-  if (bulk.success) {
-    for (const item of bulk.data.preferences) {
-      if (!isPlayerSubscriptionNotification(item.notificationId)) continue;
-      await setPlayerNotificationEnabled(
-        player.id,
-        item.notificationId,
-        item.enabled,
-      );
+    const single = patchSchema.safeParse(body);
+    if (single.success) {
+      try {
+        await setPlayerNotificationEnabled(
+          player.id,
+          single.data.notificationId,
+          single.data.enabled,
+        );
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Ошибка сохранения";
+        return NextResponse.json({ error: message }, { status: 400 });
+      }
+      const data = await getPlayerNotificationPreferencesForCabinet(player.id);
+      return NextResponse.json(data);
     }
-    const data = await getPlayerNotificationPreferencesForCabinet(player.id);
-    return NextResponse.json(data);
-  }
 
-  return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });
+    const bulk = patchBulkSchema.safeParse(body);
+    if (bulk.success) {
+      for (const item of bulk.data.preferences) {
+        if (!isPlayerSubscriptionNotification(item.notificationId)) continue;
+        await setPlayerNotificationEnabled(
+          player.id,
+          item.notificationId,
+          item.enabled,
+        );
+      }
+      const data = await getPlayerNotificationPreferencesForCabinet(player.id);
+      return NextResponse.json(data);
+    }
+
+    return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });
+  } catch (error) {
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
+    return NextResponse.json({ error: "Не удалось сохранить" }, { status: 500 });
+  }
 }

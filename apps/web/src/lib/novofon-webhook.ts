@@ -73,6 +73,14 @@ export function verifyNovofonWebhookRequest(options: {
   clientIp?: string | null;
 }): { ok: true } | { ok: false; status: number; message: string } {
   const expectedSecret = getNovofonWebhookSecret();
+  const requireSecret =
+    process.env.NODE_ENV === "production" ||
+    process.env.REQUIRE_WEBHOOK_SECRETS === "1";
+
+  if (requireSecret && !expectedSecret) {
+    return { ok: false, status: 503, message: "Webhook misconfigured" };
+  }
+
   if (expectedSecret) {
     if (options.secretParam !== expectedSecret) {
       return { ok: false, status: 401, message: "Invalid webhook secret" };

@@ -9,14 +9,14 @@ import { prisma } from "@/lib/prisma";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-async function authorizeClubTables(clubId: string) {
+async function authorizeClubTables(clubId: string, options?: { readOnly?: boolean }) {
   try {
     await requireSuperAdmin();
     return;
   } catch (adminError) {
     const adminAuth = authErrorResponse(adminError);
     if (adminAuth?.status === 401) throw adminError;
-    const { player } = await requireClubManageAccess(clubId);
+    const { player } = await requireClubManageAccess(clubId, options);
     if (!player) {
       throw new Error("UNAUTHORIZED");
     }
@@ -26,7 +26,7 @@ async function authorizeClubTables(clubId: string) {
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
-    await authorizeClubTables(id);
+    await authorizeClubTables(id, { readOnly: true });
 
     const club = await prisma.club.findUnique({
       where: { id },

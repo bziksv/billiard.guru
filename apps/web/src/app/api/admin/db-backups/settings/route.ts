@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { getDbBackupSettings, saveDbBackupSettings } from "@/lib/db-backup-server";
 import { INTERVAL_MINUTE_OPTIONS } from "@/lib/db-backup-types";
 
@@ -22,7 +22,7 @@ const patchSchema = z.object({
 
 export async function PATCH(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const body = patchSchema.parse(await request.json());
     const settings = await saveDbBackupSettings(body);
     return NextResponse.json({ ok: true, settings });

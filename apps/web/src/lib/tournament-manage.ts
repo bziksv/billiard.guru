@@ -3,7 +3,10 @@ import { requireClubManageAccess } from "@/lib/club-manage";
 import { prisma } from "@/lib/prisma";
 import type { SessionPayload } from "@/lib/session";
 
-export async function requireTournamentManageAccess(tournamentId: string) {
+export async function requireTournamentManageAccess(
+  tournamentId: string,
+  options?: { readOnly?: boolean },
+) {
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
     include: { club: { include: { city: { include: { country: true } } } } },
@@ -12,7 +15,7 @@ export async function requireTournamentManageAccess(tournamentId: string) {
     throw new AuthError("Турнир не найден", 404);
   }
 
-  const { player } = await requireClubManageAccess(tournament.clubId);
+  const { player } = await requireClubManageAccess(tournament.clubId, options);
   const session = await getSession();
   if (!session) {
     throw new AuthError("Требуется вход", 401);
@@ -20,7 +23,10 @@ export async function requireTournamentManageAccess(tournamentId: string) {
   return { tournament, player, session };
 }
 
-export async function requireMatchManageAccess(matchId: string) {
+export async function requireMatchManageAccess(
+  matchId: string,
+  options?: { readOnly?: boolean },
+) {
   const match = await prisma.tournamentMatch.findUnique({
     where: { id: matchId },
     select: { tournamentId: true },
@@ -28,7 +34,7 @@ export async function requireMatchManageAccess(matchId: string) {
   if (!match) {
     throw new AuthError("Матч не найден", 404);
   }
-  return requireTournamentManageAccess(match.tournamentId);
+  return requireTournamentManageAccess(match.tournamentId, options);
 }
 
 export function tournamentManageActorType(session: SessionPayload) {

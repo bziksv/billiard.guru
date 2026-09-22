@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import {
   getTournamentDefaults,
   saveTournamentDefaults,
@@ -37,7 +37,7 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const body = patchSchema.parse(await request.json());
     await saveTournamentDefaults({
       handicapHalfStep: body.handicapHalfStep,

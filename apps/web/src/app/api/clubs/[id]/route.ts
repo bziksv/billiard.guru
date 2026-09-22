@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getSession, requireSuperAdmin } from "@/lib/auth";
+import { sanitizeClubForManager, toPublicClubDetail } from "@/lib/api-sanitize";
+import { authErrorResponse, assertNotPreviewWrite, getRealPlayer, getSession, requireSuperAdmin } from "@/lib/auth";
 import { buildClubUpdateSummary, enrichClubAuditChanges } from "@/lib/audit-club-diff";
 import { writeAuditLog } from "@/lib/audit";
 import type { AuditSectionId } from "@/lib/audit-sections";
+import { clubOwnedByPlayer } from "@/lib/club-access";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import { clubCoordsIfAddressChanged } from "@/lib/club-geocode";
 import { saveClubPhotoFile } from "@/lib/club-photo-upload";
@@ -102,7 +104,24 @@ export async function GET(
   if (!club) {
     return NextResponse.json({ error: "Клуб не найден" }, { status: 404 });
   }
-  return NextResponse.json(club);
+
+  try {
+    const { player: actor } = await requireClubManageAccess(id, { readOnly: true });
+    const real = await getRealPlayer();
+    const isOwnerOrSa =
+      real?.role === "SUPERADMIN" || clubOwnedByPlayer(club, actor);
+    return NextResponse.json(
+      sanitizeClubForManager(club as unknown as Record<string, unknown>, {
+        isOwnerOrSa,
+      }),
+    );
+  } catch {
+    return NextResponse.json(
+      toPublicClubDetail(club as unknown as Record<string, unknown> & {
+        news?: Array<Record<string, unknown> & { status?: string }>;
+      }),
+    );
+  }
 }
 
 export async function PATCH(
@@ -121,6 +140,10 @@ export async function PATCH(
     if (!existing) {
       return NextResponse.json({ error: "Клуб не найден" }, { status: 404 });
     }
+
+    const real = await getRealPlayer();
+    const isOwnerOrSa =
+      real?.role === "SUPERADMIN" || clubOwnedByPlayer(existing, actor);
 
     const contentType = request.headers.get("content-type") ?? "";
     let photoUrl = existing.photoUrl;
@@ -147,6 +170,19 @@ export async function PATCH(
         bookingAdvanceDays: formData.get("bookingAdvanceDays") ?? "14",
         displayPhone: String(formData.get("displayPhone") ?? ""),
       };
+
+      if (
+        !isOwnerOrSa &&
+        (raw.name !== existing.name ||
+          raw.cityId !== existing.cityId ||
+          (raw.email || null) !== (existing.email ?? "") ||
+          (raw.displayPhone || null) !== (existing.displayPhone ?? ""))
+      ) {
+        return NextResponse.json(
+          { error: "Только владелец клуба может менять название, город, email и телефон" },
+          { status: 403 },
+        );
+      }
 
       const data = clubUpdateSchema.parse({
         name: raw.name,
@@ -269,10 +305,29 @@ export async function PATCH(
         "club",
       );
 
-      return NextResponse.json(club);
+      return NextResponse.json(
+        sanitizeClubForManager(club as unknown as Record<string, unknown>, {
+          isOwnerOrSa,
+        }),
+      );
     }
 
     const body = await request.json();
+    const data = clubUpdateSchema.parse(body);
+
+    if (
+      !isOwnerOrSa &&
+      (data.name !== undefined ||
+        data.cityId !== undefined ||
+        data.email !== undefined ||
+        data.displayPhone !== undefined)
+    ) {
+      return NextResponse.json(
+        { error: "Только владелец клуба может менять название, город, email и телефон" },
+        { status: 403 },
+      );
+    }
+
     const parsedCounts = parseClubTableCounts(body.tableCounts);
     const tableCountsJson = tableCountsToJson(parsedCounts);
     const weeklyHoursParsed = parseWeeklyHours(body.weeklyHours);
@@ -285,7 +340,6 @@ export async function PATCH(
         : body.floorPlan === null
           ? null
           : floorPlanToJson(floorPlanParsed);
-    const data = clubUpdateSchema.parse(body);
 
     let displayPhone: string | null | undefined = undefined;
     if (data.displayPhone !== undefined) {
@@ -380,7 +434,11 @@ export async function PATCH(
       section,
     );
 
-    return NextResponse.json(club);
+    return NextResponse.json(
+      sanitizeClubForManager(club as unknown as Record<string, unknown>, {
+        isOwnerOrSa,
+      }),
+    );
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
@@ -399,6 +457,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    await assertNotPreviewWrite();
     const session = await requireSuperAdmin();
     const { id } = await params;
 

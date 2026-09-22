@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePlayerDeep } from "@/lib/api-sanitize";
 import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import { createRequestLogger } from "@/lib/logger";
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
     });
 
     log.info({ teamId: team.id }, "Pair assembled");
-    return NextResponse.json(team, { status: 201 });
+    return NextResponse.json(sanitizePlayerDeep(team), { status: 201 });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
@@ -180,7 +181,7 @@ export async function PATCH(request: NextRequest) {
       payload: { ratingOverride },
     });
 
-    return NextResponse.json(updated);
+    return NextResponse.json(sanitizePlayerDeep(updated));
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

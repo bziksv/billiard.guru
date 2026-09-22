@@ -258,7 +258,7 @@ export const coachProfileUpdateSchema = z.object({
         .string()
         .min(1)
         .max(500)
-        .refine((u) => u.startsWith("http://") || u.startsWith("https://") || u.startsWith("/uploads/"), {
+        .refine((u) => u.startsWith("/uploads/coaches/"), {
           message: "Некорректный URL фото",
         }),
     )

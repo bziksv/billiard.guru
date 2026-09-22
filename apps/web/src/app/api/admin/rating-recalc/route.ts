@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { parseRatingPreviewFormula } from "@/lib/rating-auto-config";
 import {
   bulkRecalcSystemRating,
@@ -29,7 +29,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await requireSuperAdmin();
+    const session = await requireWritableSuperAdmin();
     const body = recalcSchema.parse(await request.json());
     const formula = parseRatingPreviewFormula(body.formula);
     const result = await bulkRecalcSystemRating({
@@ -47,9 +47,7 @@ export async function POST(request: NextRequest) {
     }
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
-    const message =
-      error instanceof Error ? error.message : "Не удалось прогнать рейтинг";
     console.error("[rating-recalc]", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Не удалось прогнать рейтинг" }, { status: 500 });
   }
 }

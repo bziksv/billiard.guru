@@ -17,25 +17,30 @@ export function TournamentRegisterButton({
   async function apply() {
     setLoading(true);
     setError(null);
-    const res = await fetch("/api/tournaments/self-register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tournamentId }),
-    });
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setError(data.error ?? t("error"));
-      return;
+    try {
+      const res = await fetch("/api/tournaments/self-register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tournamentId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("error"));
+        return;
+      }
+      router.refresh();
+    } catch {
+      setError(t("error"));
+    } finally {
+      setLoading(false);
     }
-    router.refresh();
   }
 
   return (
     <div>
       <button
         type="button"
-        onClick={apply}
+        onClick={() => void apply()}
         disabled={loading}
         className="site-btn-primary disabled:opacity-50"
       >

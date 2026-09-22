@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, getCurrentPlayer, requireWritablePlayer } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { translateText } from "@/lib/translation";
 import { playerAboutUpdateSchema } from "@/lib/validators";
@@ -21,10 +21,7 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const player = await getCurrentPlayer();
-    if (!player) {
-      return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
-    }
+    const player = await requireWritablePlayer();
 
     const data = playerAboutUpdateSchema.parse(await request.json());
 

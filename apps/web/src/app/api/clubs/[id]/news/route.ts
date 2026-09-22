@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getCurrentPlayer, getSession } from "@/lib/auth";
+import { assertNotPreviewWrite, authErrorResponse, getCurrentPlayer, getSession } from "@/lib/auth";
 import { submitClubNewsForModeration } from "@/lib/club-news-moderation";
 import { writeAuditLog } from "@/lib/audit";
 import { playerCanManageClub } from "@/lib/club-staff";
@@ -70,6 +70,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    await assertNotPreviewWrite();
     const { id } = await params;
     const session = await getSession();
     if (!session) {

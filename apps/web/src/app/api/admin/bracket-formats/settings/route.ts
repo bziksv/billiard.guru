@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { validateParticipantOverrides } from "@/lib/bracket-participant-rules";
 import { isBracketFormatCode } from "@/lib/bracket-formats/catalog";
 import {
@@ -52,7 +52,7 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const body = patchSchema.parse(await request.json());
     if (!isBracketFormatCode(body.formatCode)) {
       return NextResponse.json({ error: "Неизвестный формат сетки" }, { status: 400 });
@@ -113,7 +113,7 @@ const deleteSchema = z.object({
 
 export async function DELETE(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const body = deleteSchema.parse(await request.json());
     if (!isBracketFormatCode(body.formatCode)) {
       return NextResponse.json({ error: "Неизвестный формат сетки" }, { status: 400 });

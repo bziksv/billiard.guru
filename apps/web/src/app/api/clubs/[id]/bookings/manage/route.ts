@@ -7,6 +7,7 @@ import { requireClubManageAccess } from "@/lib/club-manage";
 import { parseFloorPlan } from "@/lib/club-floor-plan";
 import { prisma } from "@/lib/prisma";
 import { normalizePhoneForCity } from "@/lib/phone-server";
+import { checkRateLimit, clientIpFromRequest } from "@/lib/rate-limit";
 import {
   ACTIVE_BOOKING_STATUSES,
   type ClubBookingContext,
@@ -53,7 +54,23 @@ export async function GET(
 ) {
   try {
     const { id: clubId } = await params;
-    await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId, { readOnly: true });
+
+    const ip = clientIpFromRequest(request);
+    const limited = checkRateLimit(`club:booking-phone:${clubId}:${ip}`, {
+      limit: 30,
+      windowMs: 60_000,
+    });
+    if (!limited.ok) {
+      return NextResponse.json(
+        { error: "Слишком много запросов. Подождите немного." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(limited.retryAfterSec) },
+        },
+      );
+    }
+
     const phone = request.nextUrl.searchParams.get("phone")?.trim();
     if (!phone || phone.length < 6) {
       return NextResponse.json({ players: [] });
@@ -72,13 +89,9 @@ export async function GET(
       return NextResponse.json({ players: [] });
     }
 
+    // Exact E.164 only — no fuzzy contains (enumeration).
     const players = await prisma.player.findMany({
-      where: {
-        OR: [
-          { phone: normalized.e164 },
-          { phone: { contains: phone.replace(/\D/g, "").slice(-10) } },
-        ],
-      },
+      where: { phone: normalized.e164 },
       select: { id: true, firstName: true, lastName: true, phone: true },
       take: 8,
     });

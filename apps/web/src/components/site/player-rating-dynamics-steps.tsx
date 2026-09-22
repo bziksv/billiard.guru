@@ -84,8 +84,7 @@ export function PlayerRatingDynamicsSteps({
         )}
       </div>
 
-      {/* Заголовки колонок — десктоп */}
-      <div className="mb-2 hidden grid-cols-[7rem_minmax(0,1fr)_5.5rem_7.5rem] gap-3 px-3 text-[11px] font-medium uppercase tracking-wide text-[var(--text-muted)] sm:grid">
+      <div className="rating-dynamics-head">
         <span>{t("colResult")}</span>
         <span>{t("colOpponent")}</span>
         <span className="text-right">{t("colDelta")}</span>
@@ -112,12 +111,11 @@ export function PlayerRatingDynamicsSteps({
           return (
             <li
               key={`${s.matchId}-${s.won ? "w" : "l"}`}
-              className="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-muted)]/50 px-3 py-3 sm:grid sm:grid-cols-[7rem_minmax(0,1fr)_5.5rem_7.5rem] sm:items-center sm:gap-3 sm:py-2.5"
+              className="rating-dynamics-row"
             >
-              {/* Результат */}
-              <div className="mb-2 flex items-center gap-2 sm:mb-0">
+              <div className="flex items-center gap-2">
                 <span
-                  className={`inline-flex min-w-[4.5rem] items-center justify-center rounded-lg px-2 py-1 text-xs font-semibold ${
+                  className={`inline-flex min-w-[4.5rem] items-center justify-center rounded-lg px-2 py-0.5 text-xs font-semibold ${
                     s.won
                       ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
                       : "bg-rose-500/12 text-rose-700 dark:text-rose-300"
@@ -125,25 +123,27 @@ export function PlayerRatingDynamicsSteps({
                 >
                   {s.won ? t("win") : t("loss")}
                 </span>
-                <span className="text-xs text-[var(--text-muted)] sm:hidden">
+                <span className="rating-dynamics-row__mobile-date text-xs text-[var(--text-muted)]">
                   {date}
                   {s.isPair ? ` · ${t("pair")}` : ""}
                 </span>
               </div>
 
-              {/* Соперник */}
               <div className="min-w-0">
-                <div className="truncate font-medium leading-tight">
+                <div className="truncate font-medium leading-snug">
                   <OpponentNameLinks
                     name={s.opponentName}
                     ids={opponentIds}
                   />
                 </div>
-                <div className="mt-0.5 text-xs text-[var(--text-muted)]">
-                  <span className="hidden sm:inline">{date}</span>
+                <div className="mt-0.5 text-xs leading-snug text-[var(--text-muted)]">
+                  <span className="rating-dynamics-row__desktop-date">{date}</span>
                   {s.opponentRatingBefore != null ? (
                     <>
-                      <span className="hidden sm:inline"> · </span>
+                      <span className="rating-dynamics-row__desktop-date">
+                        {" "}
+                        ·{" "}
+                      </span>
                       <span>
                         {t("oppRating")}:{" "}
                         <span className="font-mono tabular-nums">
@@ -153,36 +153,37 @@ export function PlayerRatingDynamicsSteps({
                     </>
                   ) : null}
                   {s.isPair ? (
-                    <span className="hidden sm:inline"> · {t("pair")}</span>
+                    <span className="rating-dynamics-row__desktop-date">
+                      {" "}
+                      · {t("pair")}
+                    </span>
                   ) : null}
                 </div>
               </div>
 
-              {/* Мобильная строка цифр */}
-              <div className="mt-2 flex items-center justify-between gap-3 sm:contents">
-                <div className="sm:text-right">
-                  <div className="text-[10px] uppercase tracking-wide text-[var(--text-muted)] sm:hidden">
-                    {t("colDelta")}
-                  </div>
-                  <span
-                    className={`inline-flex min-w-[3.75rem] justify-center rounded-lg px-2 py-1 font-mono text-sm font-bold tabular-nums ${deltaClass}`}
-                  >
-                    {formatPreviewDelta(s.delta)}
+              <div className="rating-dynamics-row__stat">
+                <span className="rating-dynamics-row__mobile-label text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
+                  {t("colDelta")}
+                </span>
+                <span
+                  className={`inline-flex min-w-[3.5rem] justify-center rounded-lg px-2 py-0.5 font-mono text-sm font-bold tabular-nums ${deltaClass}`}
+                >
+                  {formatPreviewDelta(s.delta)}
+                </span>
+              </div>
+
+              <div className="rating-dynamics-row__stat">
+                <span className="rating-dynamics-row__mobile-label text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
+                  {t("colRating")}
+                </span>
+                <div className="font-mono text-sm tabular-nums leading-snug">
+                  <span className="text-[var(--text-muted)]">
+                    {formatPreviewRating(s.ratingBefore)}
                   </span>
-                </div>
-                <div className="text-right">
-                  <div className="text-[10px] uppercase tracking-wide text-[var(--text-muted)] sm:hidden">
-                    {t("colRating")}
-                  </div>
-                  <div className="font-mono text-sm tabular-nums leading-tight">
-                    <span className="text-[var(--text-muted)]">
-                      {formatPreviewRating(s.ratingBefore)}
-                    </span>
-                    <span className="mx-1 text-[var(--text-muted)]">→</span>
-                    <span className="font-semibold">
-                      {formatPreviewRating(s.ratingAfter)}
-                    </span>
-                  </div>
+                  <span className="mx-1 text-[var(--text-muted)]">→</span>
+                  <span className="font-semibold">
+                    {formatPreviewRating(s.ratingAfter)}
+                  </span>
                 </div>
               </div>
             </li>

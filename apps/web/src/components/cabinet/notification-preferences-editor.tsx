@@ -49,14 +49,19 @@ export function NotificationPreferencesEditor() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const res = await fetch("/api/me/notification-preferences");
-    const json = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setError(json.error ?? t("loadError"));
-      return;
+    try {
+      const res = await fetch("/api/me/notification-preferences");
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((json as { error?: string }).error ?? t("loadError"));
+        return;
+      }
+      setData(json as PreferencesResponse);
+    } catch {
+      setError(t("loadError"));
+    } finally {
+      setLoading(false);
     }
-    setData(json as PreferencesResponse);
   }, [t]);
 
   useEffect(() => {
@@ -67,20 +72,23 @@ export function NotificationPreferencesEditor() {
     if (item.locked) return;
     setSavingId(item.id);
     setError(null);
-
-    const res = await fetch("/api/me/notification-preferences", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notificationId: item.id, enabled: nextEnabled }),
-    });
-    const json = await res.json();
-    setSavingId(null);
-
-    if (!res.ok) {
-      setError(json.error ?? t("saveError"));
-      return;
+    try {
+      const res = await fetch("/api/me/notification-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationId: item.id, enabled: nextEnabled }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((json as { error?: string }).error ?? t("saveError"));
+        return;
+      }
+      setData(json as PreferencesResponse);
+    } catch {
+      setError(t("saveError"));
+    } finally {
+      setSavingId(null);
     }
-    setData(json as PreferencesResponse);
   }
 
   if (loading) {

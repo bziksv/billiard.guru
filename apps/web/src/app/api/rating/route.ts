@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePlayer } from "@/lib/api-sanitize";
+import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
 import { calculateRatingChange } from "@/lib/rating";
 import { prisma } from "@/lib/prisma";
 import { writeAuditLog } from "@/lib/audit";
 
+/** Legacy rating adjust — SUPERADMIN only. Prefer match-driven rating apply. */
 export async function POST(request: NextRequest) {
   try {
+    const session = await requireSuperAdmin();
     const { winnerId, loserId, matchId } = await request.json();
     if (!winnerId || !loserId) {
       return NextResponse.json({ error: "winnerId и loserId обязательны" }, { status: 400 });
@@ -53,7 +57,8 @@ export async function POST(request: NextRequest) {
     ]).then(([w, l]) => [w, l] as const);
 
     await writeAuditLog({
-      actorType: "system",
+      actorType: "admin",
+      actorId: session.playerId,
       action: "rating.recalculate",
       entityType: "match",
       entityId: matchId,
@@ -66,31 +71,40 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({
-      winner: updatedWinner,
-      loser: updatedLoser,
+      winner: sanitizePlayer(updatedWinner as unknown as Record<string, unknown>),
+      loser: sanitizePlayer(updatedLoser as unknown as Record<string, unknown>),
       change,
     });
-  } catch {
+  } catch (error) {
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     return NextResponse.json({ error: "Ошибка пересчёта" }, { status: 500 });
   }
 }
 
 export async function GET(request: NextRequest) {
-  const playerId = request.nextUrl.searchParams.get("playerId");
-  if (!playerId) {
-    return NextResponse.json({ error: "playerId обязателен" }, { status: 400 });
+  try {
+    await requireSuperAdmin();
+    const playerId = request.nextUrl.searchParams.get("playerId");
+    if (!playerId) {
+      return NextResponse.json({ error: "playerId обязателен" }, { status: 400 });
+    }
+
+    const player = await prisma.player.findUnique({
+      where: { id: playerId },
+      include: {
+        ratingHistory: { orderBy: { createdAt: "desc" }, take: 20 },
+      },
+    });
+
+    if (!player) {
+      return NextResponse.json({ error: "Не найден" }, { status: 404 });
+    }
+
+    return NextResponse.json(sanitizePlayer(player as unknown as Record<string, unknown>));
+  } catch (error) {
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
+    return NextResponse.json({ error: "Не удалось загрузить" }, { status: 500 });
   }
-
-  const player = await prisma.player.findUnique({
-    where: { id: playerId },
-    include: {
-      ratingHistory: { orderBy: { createdAt: "desc" }, take: 20 },
-    },
-  });
-
-  if (!player) {
-    return NextResponse.json({ error: "Не найден" }, { status: 404 });
-  }
-
-  return NextResponse.json(player);
 }

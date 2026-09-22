@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       if (!clubId) {
         return NextResponse.json({ error: "Укажите clubId" }, { status: 400 });
       }
-      await requireClubManageAccess(clubId);
+      await requireClubManageAccess(clubId, { readOnly: true });
     }
 
     const rows = await listSectionAuditLogs({

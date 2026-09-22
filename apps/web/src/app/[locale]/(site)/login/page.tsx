@@ -1,7 +1,7 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, Suspense, useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { CitySelect } from "@/components/admin/city-select";
@@ -13,6 +13,7 @@ import { TELEGRAM_BOT_USERNAME } from "@/lib/brand";
 import { TelegramLink } from "@/lib/contact-links";
 import { DEFAULT_PHONE_COUNTRY, formatPhoneDisplay, isPhoneOnlyAuthCountry } from "@/lib/phone";
 import { resolvePhoneApiError } from "@/lib/phone-api-error";
+import { resolvePostLoginPath } from "@/lib/safe-internal-path";
 import type { AppLocale } from "@/i18n/routing";
 
 type Step = "phone" | "register" | "confirm" | "login" | "telegram_nudge";
@@ -77,13 +78,7 @@ function LoginForm() {
         setPolling(false);
         return;
       }
-      router.push(
-        result.role === "SUPERADMIN" && next.startsWith("/admin")
-          ? next
-          : next.startsWith("/admin")
-            ? "/cabinet"
-            : next || "/cabinet",
-      );
+      router.push(resolvePostLoginPath(next, { role: result.role }));
       router.refresh();
     },
     [next, router, countryName, pendingClubOwnerRedirect],
@@ -171,49 +166,68 @@ function LoginForm() {
         return;
       }
 
-      if (data.mode === "login") {
-        setAuthFlow(data.flow === "register" ? "register" : "login");
-        const phoneOnlyAuth = isPhoneOnlyAuthCountry(countryName);
-        if (data.authMethod === "call" || phoneOnlyAuth) {
-          if (phoneOnlyAuth && data.authMethod === "telegram") {
-            await switchToCallAuth();
+      if (
+        data.mode === "continue" ||
+        data.mode === "login" ||
+        data.mode === "confirm" ||
+        data.mode === "register"
+      ) {
+        const needsProfile =
+          data.needsProfile === true || data.mode === "register";
+        const openTelegram =
+          data.openTelegram === true || data.mode === "confirm";
+        const nextChallengeToken =
+          typeof data.challengeToken === "string" ? data.challengeToken : null;
+
+        if (nextChallengeToken || data.mode === "login") {
+          setAuthFlow(needsProfile ? "register" : "login");
+          const phoneOnlyAuth = isPhoneOnlyAuthCountry(countryName);
+          const authMethod = data.authMethod ?? "telegram";
+          if (authMethod === "call" || phoneOnlyAuth) {
+            if (phoneOnlyAuth && authMethod === "telegram") {
+              await switchToCallAuth();
+              return;
+            }
+            applyCallLogin({
+              challengeToken: nextChallengeToken ?? data.challengeToken,
+              callNumber: data.callAuth?.callNumber ?? null,
+              message: data.message,
+              flow: needsProfile ? "register" : "login",
+              callAuthEnabled: data.callAuth?.enabled,
+            });
             return;
           }
-          applyCallLogin({
-            challengeToken: data.challengeToken,
-            callNumber: data.callAuth?.callNumber ?? null,
-            message: data.message,
-            confirmLink: data.confirmLink,
-            flow: data.flow,
-            callAuthEnabled: data.callAuth?.enabled,
-          });
+          setStep("login");
+          setAuthMethod("telegram");
+          setCallNumber(data.callAuth?.callNumber ?? null);
+          setCallAuthEnabled(Boolean(data.callAuth?.enabled));
+          setChallengeToken(nextChallengeToken);
+          setInfo(data.message ?? null);
+          setConfirmLink(null);
           return;
         }
-        setStep("login");
-        setAuthMethod("telegram");
-        setCallNumber(data.callAuth?.callNumber ?? null);
-        setCallAuthEnabled(Boolean(data.callAuth?.enabled));
-        setChallengeToken(data.challengeToken);
-        setInfo(data.message ?? null);
-        if (data.confirmLink) setConfirmLink(data.confirmLink);
-        return;
-      }
 
-      if (data.mode === "confirm") {
-        if (isPhoneOnlyAuthCountry(countryName)) {
-          setError(t("errors.callStartFailed"));
+        if (openTelegram) {
+          if (isPhoneOnlyAuthCountry(countryName)) {
+            setError(t("errors.callStartFailed"));
+            return;
+          }
+          setStep("confirm");
+          setAuthFlow("register");
+          setConfirmLink(null);
+          setInfo(data.message);
           return;
         }
-        setStep("confirm");
-        setAuthFlow("register");
-        setConfirmLink(data.confirmLink);
-        setInfo(data.message);
-        return;
+
+        if (needsProfile) {
+          setStep("register");
+          setAuthFlow("register");
+          setInfo(data.message);
+          return;
+        }
       }
 
-      setStep("register");
-      setAuthFlow("register");
-      setInfo(data.message);
+      setError(t("errors.generic"));
     } catch {
       setError(t("errors.serverTimeout"));
     } finally {
@@ -259,23 +273,46 @@ function LoginForm() {
         return;
       }
 
-      if (data.mode === "login" && data.authMethod === "call") {
+      const nextChallengeToken =
+        typeof data.challengeToken === "string" ? data.challengeToken : null;
+      const openTelegram =
+        data.openTelegram === true || data.mode === "confirm";
+
+      if (
+        (data.mode === "continue" || data.mode === "login") &&
+        (data.authMethod === "call" || nextChallengeToken)
+      ) {
+        if (data.authMethod === "call") {
+          setAuthFlow("register");
+          applyCallLogin({
+            challengeToken: nextChallengeToken ?? data.challengeToken,
+            callNumber: data.callAuth?.callNumber ?? null,
+            message: data.message,
+            flow: "register",
+            callAuthEnabled: data.callAuth?.enabled,
+          });
+          return;
+        }
         setAuthFlow("register");
-        applyCallLogin({
-          challengeToken: data.challengeToken,
-          callNumber: data.callAuth?.callNumber ?? null,
-          message: data.message,
-          confirmLink: data.confirmLink,
-          flow: "register",
-          callAuthEnabled: data.callAuth?.enabled,
-        });
+        setStep("login");
+        setAuthMethod("telegram");
+        setCallNumber(data.callAuth?.callNumber ?? null);
+        setCallAuthEnabled(Boolean(data.callAuth?.enabled));
+        setChallengeToken(nextChallengeToken);
+        setConfirmLink(null);
+        setInfo(data.message ?? null);
         return;
       }
 
-      setStep("confirm");
-      setAuthFlow("register");
-      setConfirmLink(data.confirmLink);
-      setInfo(data.message);
+      if (openTelegram || data.mode === "confirm") {
+        setStep("confirm");
+        setAuthFlow("register");
+        setConfirmLink(null);
+        setInfo(data.message);
+        return;
+      }
+
+      setError(t("errors.generic"));
     } catch {
       setError(t("errors.serverTimeout"));
     } finally {
@@ -335,7 +372,7 @@ function LoginForm() {
       router.refresh();
       return;
     }
-    router.push(next.startsWith("/admin") ? "/cabinet" : next || "/cabinet");
+    router.push(resolvePostLoginPath(next));
     router.refresh();
   }
 
@@ -487,6 +524,9 @@ function LoginForm() {
             disabled={
               loading ||
               !consentAccepted ||
+              !cityId ||
+              firstName.trim().length < 2 ||
+              lastName.trim().length < 2 ||
               (!registerAsPlayer && !registerAsClubOwner)
             }
             className="site-btn-primary w-full disabled:opacity-50"
@@ -504,15 +544,19 @@ function LoginForm() {
           {info && <p className="text-sm text-emerald-800 dark:text-emerald-300">{info}</p>}
           <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-600 dark:text-zinc-300">
             <li>
-              Откройте{" "}
-              <a
-                href={botLink}
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium text-emerald-700 underline dark:text-emerald-400"
-              >
-                {t("openBot")}
-              </a>
+              {t.rich("openBotStep", {
+                bot: TELEGRAM_BOT_USERNAME,
+                link: (chunks) => (
+                  <a
+                    href={botLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-emerald-700 underline dark:text-emerald-400"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
             </li>
             <li>{t("shareContact")}</li>
             <li>{t("returnAndSignIn")}</li>
@@ -643,15 +687,19 @@ function LoginForm() {
           </p>
           <ol className="list-decimal space-y-2 pl-4 text-sm text-zinc-600 dark:text-zinc-300">
             <li>
-              Откройте{" "}
-              <a
-                href={botLink}
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium text-emerald-700 underline dark:text-emerald-400"
-              >
-                {t("openBot")}
-              </a>
+              {t.rich("openBotStep", {
+                bot: TELEGRAM_BOT_USERNAME,
+                link: (chunks) => (
+                  <a
+                    href={botLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="font-medium text-emerald-700 underline dark:text-emerald-400"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
             </li>
             <li>{t("botStepStart")}</li>
             <li>{t("botStepLater")}</li>

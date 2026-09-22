@@ -747,7 +747,7 @@ export function LlbBracketMatch({
             title={
               (match.substitutions?.length ?? 0) > 0
                 ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
-                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .map((s) => `${labels.substitutionPrefix} ${s.outgoingLabel} → ${s.incomingLabel}`)
                     .join("\n")}`
                 : labels.handicapTitle(handicap!)
             }
@@ -757,7 +757,7 @@ export function LlbBracketMatch({
                 {labels.handicap}{" "}
               </span>
               {handicapShort}
-              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
+              {(match.substitutions?.length ?? 0) > 0 ? labels.substitutionDot : ""}
             </span>
           </button>
         ) : (
@@ -767,7 +767,7 @@ export function LlbBracketMatch({
             title={
               (match.substitutions?.length ?? 0) > 0
                 ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
-                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .map((s) => `${labels.substitutionPrefix} ${s.outgoingLabel} → ${s.incomingLabel}`)
                     .join("\n")}`
                 : labels.handicapTitle(handicap!)
             }
@@ -777,7 +777,7 @@ export function LlbBracketMatch({
                 {labels.handicap}{" "}
               </span>
               {handicapShort}
-              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
+              {(match.substitutions?.length ?? 0) > 0 ? labels.substitutionDot : ""}
             </span>
           </div>
         )
@@ -792,7 +792,7 @@ export function LlbBracketMatch({
             .join("; ")}
         >
           <span className="block truncate">
-            Замена:{" "}
+            {labels.substitutionPrefix}{" "}
             {match.substitutions!
               .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
               .join("; ")}

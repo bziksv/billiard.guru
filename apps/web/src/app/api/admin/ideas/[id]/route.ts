@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import {
   approveIdeaByAdmin,
   rejectIdeaByAdmin,
@@ -11,7 +11,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const session = await requireSuperAdmin();
+    const session = await requireWritableSuperAdmin();
     const { id } = await params;
     const data = ideaModerateSchema.parse(await request.json());
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Prisma } from "@/generated/prisma/client";
+import { sanitizeTournamentListPayload } from "@/lib/api-sanitize";
 import { authErrorResponse } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import {
@@ -42,7 +43,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    await requireTournamentManageAccess(id);
+    await requireTournamentManageAccess(id, { readOnly: true });
     await reopenTournamentIfBracketEmpty(id);
 
     const tournament = await prisma.tournament.findUnique({
@@ -58,11 +59,13 @@ export async function GET(
     const substitutions = await listTournamentSubstitutions(id);
 
     return NextResponse.json(
-      await withTournamentFormatLabel({
-        ...rated,
-        participantRules,
-        substitutions,
-      }),
+      sanitizeTournamentListPayload(
+        await withTournamentFormatLabel({
+          ...rated,
+          participantRules,
+          substitutions,
+        }),
+      ),
     );
   } catch (error) {
     const authResp = authErrorResponse(error);

@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, getSession } from "@/lib/auth";
+import { AuthError, authErrorResponse, getRealPlayer, getSession } from "@/lib/auth";
 import { auditActorFields, requireClubManageAccess } from "@/lib/club-manage";
+import { requireClubOwnerOnly } from "@/lib/club-staff";
 import {
   getClubConfirmState,
   regenerateClubConfirmLink,
@@ -12,13 +13,26 @@ const postSchema = z.object({
   action: z.enum(["regenerate", "send_telegram"]),
 });
 
+async function requireClubConfirmAccess(clubId: string, options?: { readOnly?: boolean }) {
+  const { player, club } = await requireClubManageAccess(clubId, options);
+  const real = await getRealPlayer();
+  if (real?.role === "SUPERADMIN") {
+    return { player, club };
+  }
+  const ownerError = requireClubOwnerOnly(club, player);
+  if (ownerError) {
+    throw new AuthError(ownerError, 403);
+  }
+  return { player, club };
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
-    await requireClubManageAccess(id);
+    await requireClubConfirmAccess(id, { readOnly: true });
     const state = await getClubConfirmState(id);
     return NextResponse.json(state);
   } catch (error) {
@@ -34,7 +48,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    await requireClubManageAccess(id);
+    await requireClubConfirmAccess(id);
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });

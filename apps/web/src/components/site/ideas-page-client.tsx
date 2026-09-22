@@ -64,15 +64,21 @@ export function IdeasPageClient({
   const [votingId, setVotingId] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
-    const res = await fetch("/api/ideas");
-    const data = await res.json();
-    setApproved(Array.isArray(data.approved) ? data.approved : []);
-    setMine(Array.isArray(data.mine) ? data.mine : []);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/ideas");
+      const data = await res.json().catch(() => ({} as { approved?: IdeaView[]; mine?: IdeaView[] }));
+      setApproved(Array.isArray(data.approved) ? data.approved : []);
+      setMine(Array.isArray(data.mine) ? data.mine : []);
+    } catch {
+      setApproved([]);
+      setMine([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    reload();
+    void reload();
   }, [reload]);
 
   async function submitIdea() {
@@ -83,22 +89,27 @@ export function IdeasPageClient({
       return;
     }
     setSubmitting(true);
-    const res = await fetch("/api/ideas", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, body }),
-    });
-    const data = await res.json();
-    setSubmitting(false);
-    if (!res.ok) {
-      setSubmitError(data.error ?? t("submitError"));
-      return;
+    try {
+      const res = await fetch("/api/ideas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, body }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setSubmitError((data as { error?: string }).error ?? t("submitError"));
+        return;
+      }
+      setTitle("");
+      setBody("");
+      setSubmitMessage(t("submitSuccess"));
+      setTab("mine");
+      await reload();
+    } catch {
+      setSubmitError(t("submitError"));
+    } finally {
+      setSubmitting(false);
     }
-    setTitle("");
-    setBody("");
-    setSubmitMessage(t("submitSuccess"));
-    setTab("mine");
-    await reload();
   }
 
   async function vote(ideaId: string, value: "LIKE" | "DISLIKE") {

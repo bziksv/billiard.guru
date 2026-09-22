@@ -375,7 +375,15 @@
         "submitting": "Publishing…",
         "submitError": "Could not publish",
         "mineEmpty": "You have no listings yet.",
-        "mineCreate": "Post your first listing"
+        "mineCreate": "Post your first listing",
+        "anyClub": "Any club / no preference",
+        "dateRequired": "Enter a date",
+        "playersNeededPlaceholder": "1, 2, 1–4, pair vs pair…",
+        "playersNeededHint": "Pick from the list or type your own: a range (1–4) or “pair vs pair”.",
+        "consentRequired": "Confirm consent to personal data processing",
+        "weekdaysRequired": "Select at least one weekday",
+        "timeFromRequired": "Enter a start time",
+        "ratingRangeInvalid": "Check the rating range"
       }
     },
     "news": {
@@ -1077,7 +1085,8 @@
       "loginFailed": "Sign-in failed",
       "loginCancelled": "Sign-in cancelled",
       "loginExpired": "Waiting time expired"
-    }
+    },
+    "openBotStep": "Open <link>the Telegram bot</link>"
   },
   "phone": {
     "validation": {
@@ -1105,5 +1114,13 @@
     "title": "This page is not available in English yet",
     "body": "We are translating the site section by section. You can read this page in Russian for now.",
     "cta": "Read in Russian"
+  },
+  "clubMap": {
+    "title": "Map — {query}",
+    "aria": "Map: {label}",
+    "cityOnly": "City: {city}",
+    "addressPending": "Address to be confirmed with the club.",
+    "openYandex": "Open in Yandex Maps →",
+    "openGoogle": "Open in Google Maps →"
   }
 }

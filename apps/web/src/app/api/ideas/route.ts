@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { AuthError, authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { AuthError, authErrorResponse, assertNotPreviewWrite, getCurrentPlayer } from "@/lib/auth";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import { createIdea } from "@/lib/idea-moderation";
 import { logger } from "@/lib/logger";
@@ -100,6 +100,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await assertNotPreviewWrite();
     const player = await getCurrentPlayer();
     if (!player) {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });

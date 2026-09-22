@@ -1,7 +1,9 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { sanitizeTournamentListPayload } from "@/lib/api-sanitize";
+import { authErrorResponse, requirePlayersDirectoryAccess, requireSuperAdmin } from "@/lib/auth";
 import { requireClubManageAccess } from "@/lib/club-manage";
+import { listClubsManagedByPlayer } from "@/lib/club-staff";
 import { writeAuditLog } from "@/lib/audit";
 import { createRequestLogger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
@@ -19,7 +21,18 @@ import { ZodError } from "zod";
 
 export async function GET() {
   try {
+    const access = await requirePlayersDirectoryAccess();
+    const where =
+      access.mode === "admin"
+        ? undefined
+        : {
+            clubId: {
+              in: (await listClubsManagedByPlayer(access.player)).map((c) => c.id),
+            },
+          };
+
     const tournaments = await prisma.tournament.findMany({
+      where,
       include: {
         club: { include: { city: { include: { country: true } } } },
         registrations: { include: { player: true } },
@@ -43,8 +56,11 @@ export async function GET() {
       },
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(await withTournamentFormatLabels(tournaments));
+    const labeled = await withTournamentFormatLabels(tournaments);
+    return NextResponse.json(sanitizeTournamentListPayload(labeled));
   } catch (error) {
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     console.error("GET /api/tournaments failed:", error);
     return NextResponse.json(
       { error: "Не удалось загрузить турниры" },

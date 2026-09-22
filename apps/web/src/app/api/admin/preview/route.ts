@@ -5,6 +5,8 @@ import {
   clearPreviewCookie,
   findPlayerForClub,
   previewCookieOptions,
+  signPreviewValue,
+  verifyPreviewValue,
   VIEW_AS_CLUB_COOKIE,
   VIEW_AS_PLAYER_COOKIE,
 } from "@/lib/impersonate";
@@ -21,8 +23,14 @@ export async function GET() {
   try {
     const session = await requireSuperAdmin();
     const cookieStore = await cookies();
-    const playerId = cookieStore.get(VIEW_AS_PLAYER_COOKIE)?.value ?? null;
-    const clubId = cookieStore.get(VIEW_AS_CLUB_COOKIE)?.value ?? null;
+    const playerId = verifyPreviewValue(
+      cookieStore.get(VIEW_AS_PLAYER_COOKIE)?.value,
+      session.playerId,
+    );
+    const clubId = verifyPreviewValue(
+      cookieStore.get(VIEW_AS_CLUB_COOKIE)?.value,
+      session.playerId,
+    );
 
     const [player, club] = await Promise.all([
       playerId ? prisma.player.findUnique({ where: { id: playerId } }) : null,
@@ -38,6 +46,7 @@ export async function GET() {
         : null,
       club: club ? { id: club.id, name: club.name } : null,
       realPlayerId: session.playerId,
+      readOnly: true,
     });
   } catch (error) {
     const authResp = authErrorResponse(error);
@@ -48,7 +57,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    const session = await requireSuperAdmin();
     const body = previewSchema.parse(await request.json());
 
     if (body.mode === "clear") {
@@ -67,8 +76,14 @@ export async function POST(request: NextRequest) {
         ok: true,
         redirect: "/cabinet",
         label: `${player.lastName} ${player.firstName}`,
+        readOnly: true,
       });
-      res.cookies.set(previewCookieOptions(VIEW_AS_PLAYER_COOKIE, player.id));
+      res.cookies.set(
+        previewCookieOptions(
+          VIEW_AS_PLAYER_COOKIE,
+          signPreviewValue(player.id, session.playerId),
+        ),
+      );
       res.cookies.set(clearPreviewCookie(VIEW_AS_CLUB_COOKIE));
       return res;
     }
@@ -86,10 +101,18 @@ export async function POST(request: NextRequest) {
       ownerPlayer: ownerPlayer
         ? `${ownerPlayer.lastName} ${ownerPlayer.firstName}`
         : null,
+      readOnly: true,
     });
-    res.cookies.set(previewCookieOptions(VIEW_AS_CLUB_COOKIE, club.id));
+    res.cookies.set(
+      previewCookieOptions(VIEW_AS_CLUB_COOKIE, signPreviewValue(club.id, session.playerId)),
+    );
     if (ownerPlayer) {
-      res.cookies.set(previewCookieOptions(VIEW_AS_PLAYER_COOKIE, ownerPlayer.id));
+      res.cookies.set(
+        previewCookieOptions(
+          VIEW_AS_PLAYER_COOKIE,
+          signPreviewValue(ownerPlayer.id, session.playerId),
+        ),
+      );
     } else {
       res.cookies.set(clearPreviewCookie(VIEW_AS_PLAYER_COOKIE));
     }

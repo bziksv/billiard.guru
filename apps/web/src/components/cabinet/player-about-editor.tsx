@@ -15,14 +15,19 @@ export function PlayerAboutEditor({ playerId }: { playerId: string }) {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const res = await fetch("/api/me/profile");
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setError(data.error ?? t("loadError"));
-      return;
+    try {
+      const res = await fetch("/api/me/profile");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("loadError"));
+        return;
+      }
+      setAbout((data as { about?: string }).about ?? "");
+    } catch {
+      setError(t("loadError"));
+    } finally {
+      setLoading(false);
     }
-    setAbout(data.about ?? "");
   }, [t]);
 
   useEffect(() => {
@@ -33,19 +38,24 @@ export function PlayerAboutEditor({ playerId }: { playerId: string }) {
     setSaving(true);
     setError(null);
     setMessage(null);
-    const res = await fetch("/api/me/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ about: about.trim() || null }),
-    });
-    const data = await res.json();
-    setSaving(false);
-    if (!res.ok) {
-      setError(data.error ?? t("saveError"));
-      return;
+    try {
+      const res = await fetch("/api/me/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ about: about.trim() || null }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("saveError"));
+        return;
+      }
+      setAbout((data as { about?: string }).about ?? "");
+      setMessage(t("aboutSaved"));
+    } catch {
+      setError(t("saveError"));
+    } finally {
+      setSaving(false);
     }
-    setAbout(data.about ?? "");
-    setMessage(t("aboutSaved"));
   }
 
   if (loading) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { writeAuditLog } from "@/lib/audit";
-import { AuthError, authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { AuthError, authErrorResponse, assertNotPreviewWrite, getCurrentPlayer } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import {
   computePlayListingExpiresAt,
@@ -103,6 +103,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await assertNotPreviewWrite();
     const player = await getCurrentPlayer();
     if (!player) {
       return NextResponse.json({ error: "Войдите, чтобы опубликовать объявление" }, { status: 401 });

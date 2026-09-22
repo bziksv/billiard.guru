@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentPlayer } from "@/lib/auth";
+import { assertNotPreviewWrite, authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { submitSelfTournamentRegistration } from "@/lib/tournament-self-register-server";
 import { z } from "zod";
 
@@ -9,6 +9,7 @@ const selfRegisterSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    await assertNotPreviewWrite();
     const player = await getCurrentPlayer();
     if (!player) {
       return NextResponse.json({ error: "Войдите, чтобы подать заявку" }, { status: 401 });
@@ -33,6 +34,8 @@ export async function POST(request: NextRequest) {
       { status: result.created ? 201 : 200 },
     );
   } catch (error) {
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     if (error instanceof Error && error.message !== "Турнир не найден") {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }

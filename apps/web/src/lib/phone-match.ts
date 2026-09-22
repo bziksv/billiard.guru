@@ -8,6 +8,14 @@ export function normalizePhoneDigits(input: string): string {
   return digits;
 }
 
+/** Strict E.164 digit equality after normalize (no substring / endsWith). */
+export function phonesMatchExactE164(a: string, b: string): boolean {
+  const da = normalizePhoneDigits(a);
+  const db = normalizePhoneDigits(b);
+  if (!da || !db) return false;
+  return da === db;
+}
+
 export function phonesMatchE164(a: string, b: string): boolean {
   const da = normalizePhoneDigits(a);
   const db = normalizePhoneDigits(b);

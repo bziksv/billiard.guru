@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePlayer } from "@/lib/api-sanitize";
 import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
 import { writeAuditLog } from "@/lib/audit";
 import { buildPlayerLatinFields } from "@/lib/latin-names";
@@ -22,7 +23,7 @@ export async function GET(
       return NextResponse.json({ error: "Игрок не найден" }, { status: 404 });
     }
 
-    return NextResponse.json(player);
+    return NextResponse.json(sanitizePlayer(player as unknown as Record<string, unknown>));
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

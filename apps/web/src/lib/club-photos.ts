@@ -1,6 +1,11 @@
 export function parseClubGalleryUrls(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((item): item is string => typeof item === "string" && item.length > 0);
+  return value.filter(
+    (item): item is string =>
+      typeof item === "string" &&
+      item.length > 0 &&
+      item.startsWith("/uploads/clubs/"),
+  );
 }
 
 export function clubPhotoUrls(club: {
@@ -24,7 +29,9 @@ export function syncClubPhotoFields(urls: string[]): {
   galleryUrls: string[] | null;
   photoUrl: string | null;
 } {
-  const clean = urls.map((u) => u.trim()).filter((u) => u.length > 0);
+  const clean = urls
+    .map((u) => u.trim())
+    .filter((u) => u.length > 0 && u.startsWith("/uploads/clubs/"));
   if (clean.length === 0) {
     return { galleryUrls: null, photoUrl: null };
   }

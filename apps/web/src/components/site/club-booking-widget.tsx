@@ -243,30 +243,35 @@ export function ClubBookingWidget({
     setSubmitting(true);
     setError(null);
     setSuccess(null);
-    const res = await fetch(`/api/clubs/${clubId}/bookings`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tableFormat: format,
-        startsAt: selectedSlot,
-        endsAt: endsAtIso,
-        playerNote: note,
-        floorItemId: selectedTableId,
-      }),
-    });
-    const data = await res.json();
-    setSubmitting(false);
-    if (!res.ok) {
-      setError(data.error ?? t("errorSubmit"));
-      return;
+    try {
+      const res = await fetch(`/api/clubs/${clubId}/bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tableFormat: format,
+          startsAt: selectedSlot,
+          endsAt: endsAtIso,
+          playerNote: note,
+          floorItemId: selectedTableId,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("errorSubmit"));
+        return;
+      }
+      setSuccess(t("success"));
+      setSelectedSlot(null);
+      setSelectedTableId(null);
+      setDurationMinutes(null);
+      setNote("");
+      void loadSlots();
+      router.refresh();
+    } catch {
+      setError(t("errorSubmit"));
+    } finally {
+      setSubmitting(false);
     }
-    setSuccess(t("success"));
-    setSelectedSlot(null);
-    setSelectedTableId(null);
-    setDurationMinutes(null);
-    setNote("");
-    void loadSlots();
-    router.refresh();
   }
 
   if (!bookingEnabled || formats.length === 0) return null;
@@ -421,7 +426,8 @@ export function ClubBookingWidget({
             <span className="club-booking-label">{t("noteLabel")}</span>
             <input
               value={note}
-              onChange={(e) => setNote(e.target.value)}
+              onChange={(e) => setNote(e.target.value.slice(0, 500))}
+              maxLength={500}
               placeholder={t("notePlaceholder")}
               className="site-input mt-1 w-full"
             />

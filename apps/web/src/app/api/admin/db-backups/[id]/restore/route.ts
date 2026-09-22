@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { restoreDbBackup } from "@/lib/db-backup-server";
 
 const bodySchema = z.object({
@@ -12,7 +12,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const { id } = await params;
     bodySchema.parse(await request.json());
     await restoreDbBackup(id);
@@ -29,9 +29,7 @@ export async function POST(
     }
     const res = authErrorResponse(error);
     if (res) return res;
-    const message =
-      error instanceof Error ? error.message : "Не удалось восстановить бэкап";
     console.error("[db-backups restore]", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Не удалось восстановить бэкап" }, { status: 500 });
   }
 }

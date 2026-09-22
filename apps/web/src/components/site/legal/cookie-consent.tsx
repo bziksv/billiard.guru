@@ -4,7 +4,12 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { SiteContainer } from "@/components/site/site-container";
-import { COOKIE_CONSENT_STORAGE_KEY, LEGAL_URLS } from "@/lib/legal";
+import {
+  hasClientAnalyticsConsent,
+  persistCookieConsentClient,
+  syncCookieConsentFromStorage,
+} from "@/lib/cookie-consent-client";
+import { LEGAL_URLS } from "@/lib/legal";
 
 export function CookieConsentPopup() {
   const t = useTranslations("cookie.consent");
@@ -12,13 +17,11 @@ export function CookieConsentPopup() {
   const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    try {
-      if (localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY) !== "accepted") {
-        setVisible(true);
-      }
-    } catch {
-      setVisible(true);
+    if (syncCookieConsentFromStorage() || hasClientAnalyticsConsent()) {
+      setVisible(false);
+      return;
     }
+    setVisible(true);
   }, []);
 
   useEffect(() => {
@@ -48,11 +51,7 @@ export function CookieConsentPopup() {
   }, [visible]);
 
   function accept() {
-    try {
-      localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, "accepted");
-    } catch {
-      /* ignore */
-    }
+    persistCookieConsentClient();
     setVisible(false);
   }
 

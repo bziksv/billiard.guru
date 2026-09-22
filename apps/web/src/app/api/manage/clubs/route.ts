@@ -1,7 +1,8 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizeClub } from "@/lib/api-sanitize";
 import { writeAuditLog } from "@/lib/audit";
-import { getCurrentPlayer } from "@/lib/auth";
+import { assertNotPreviewWrite, authErrorResponse, getCurrentPlayer } from "@/lib/auth";
 import { resolveClubCoordinates } from "@/lib/club-geocode";
 import { listClubsOwnedByPlayer } from "@/lib/impersonate";
 import { createRequestLogger } from "@/lib/logger";
@@ -17,6 +18,7 @@ export async function POST(request: NextRequest) {
   const log = createRequestLogger(requestId);
 
   try {
+    await assertNotPreviewWrite();
     const player = await getCurrentPlayer();
     if (!player) {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
@@ -84,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        ...club,
+        ...sanitizeClub(club as unknown as Record<string, unknown>),
         confirmLink,
         autoVerified: autoVerifyClub,
         telegramSent: telegram.sent,
@@ -99,6 +101,8 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     log.error({ error }, "Owner club creation failed");
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Ошибка валидации" }, { status: 400 });
     }

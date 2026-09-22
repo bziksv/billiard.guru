@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
+import type { AppLocale } from "@/i18n/routing";
 import type { BracketMatchView, SwissStandingView } from "@/lib/bracket-view";
 import { BracketPresentationShell } from "@/components/bracket/bracket-presentation-shell";
 import { PublicBracketDisplayToolbar } from "@/components/site/public-bracket-display-toolbar";
@@ -251,6 +252,7 @@ function ResultsTab({
   matchNumbers?: Record<string, number>;
 }) {
   const t = useTranslations("tournamentView.results");
+  const locale = useLocale() as AppLocale;
   const { rows, finished, preliminary, hasMatches } = standings;
 
   if (rows.length === 0 && substitutions.length === 0) {
@@ -278,7 +280,7 @@ function ResultsTab({
           <ul className="mt-2 list-disc space-y-1 pl-5">
             {substitutions.map((s) => (
               <li key={s.id}>
-                {formatSubstitutionNotice(s, matchNumbers[s.matchId] ?? null)}
+                {formatSubstitutionNotice(s, matchNumbers[s.matchId] ?? null, locale)}
               </li>
             ))}
           </ul>

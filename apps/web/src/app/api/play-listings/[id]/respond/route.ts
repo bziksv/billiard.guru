@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { writeAuditLog } from "@/lib/audit";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, assertNotPreviewWrite, getCurrentPlayer } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { notifyClubPlayListingResponse } from "@/lib/play-listing-notify";
 import { prisma } from "@/lib/prisma";
@@ -12,6 +12,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    await assertNotPreviewWrite();
     const { id: listingId } = await params;
     const player = await getCurrentPlayer();
     if (!player) {

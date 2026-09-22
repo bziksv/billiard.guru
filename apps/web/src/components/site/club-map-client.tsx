@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 export type ClubMapClientProps = {
   name: string;
@@ -11,26 +12,34 @@ export type ClubMapClientProps = {
   countryName?: string;
 };
 
-type DgisMapInstance = { remove: () => void };
-type DgisMarker = { addTo: (map: DgisMapInstance) => DgisMarker };
+type YmapsMap = {
+  destroy: () => void;
+  geoObjects: { add: (obj: unknown) => void };
+};
 
 declare global {
   interface Window {
-    DG?: {
-      then: (
-        resolve: () => void,
-        reject?: (err: unknown) => void,
-      ) => Promise<void>;
-      map: (
-        elementId: string,
-        options: { center: [number, number]; zoom: number },
-      ) => DgisMapInstance;
-      marker: (coords: [number, number]) => DgisMarker;
+    ymaps?: {
+      ready: (cb: () => void) => void;
+      Map: new (
+        element: string | HTMLElement,
+        options: { center: [number, number]; zoom: number; controls?: string[] },
+      ) => YmapsMap;
+      Placemark: new (
+        coords: [number, number],
+        properties?: Record<string, unknown>,
+        options?: Record<string, unknown>,
+      ) => unknown;
     };
   }
 }
 
-let dgisLoad: Promise<void> | null = null;
+/** Ключ JS API 2.1: https://developer.tech.yandex.ru/ — ограничение по HTTP Referer. */
+const YANDEX_MAPS_API_KEY = (
+  process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY ?? ""
+).trim();
+
+let ymapsLoad: Promise<void> | null = null;
 
 function mapLabel(
   address: string | null | undefined,
@@ -43,15 +52,15 @@ function isRussia(countryName?: string) {
   return countryName === "Россия" || countryName === "Russia";
 }
 
-function dgisMapLink(
+function yandexMapLink(
   lat: number | null,
   lng: number | null,
   query: string,
 ): string {
   if (lat != null && lng != null) {
-    return `https://2gis.ru/geo/${lng},${lat}`;
+    return `https://yandex.ru/maps/?pt=${lng},${lat}&z=16&l=map`;
   }
-  return `https://2gis.ru/search/${encodeURIComponent(query)}`;
+  return `https://yandex.ru/maps/?text=${encodeURIComponent(query)}`;
 }
 
 function googleMapLink(
@@ -69,88 +78,148 @@ function googleEmbedSrc(
   lat: number | null,
   lng: number | null,
   query: string,
+  locale: string,
 ): string {
-  const q =
-    lat != null && lng != null
-      ? `${lat},${lng}`
-      : query;
-  return `https://www.google.com/maps?q=${encodeURIComponent(q)}&hl=ru&z=16&output=embed`;
+  const q = lat != null && lng != null ? `${lat},${lng}` : query;
+  const hl = locale === "en" ? "en" : "ru";
+  return `https://www.google.com/maps?q=${encodeURIComponent(q)}&hl=${hl}&z=16&output=embed`;
 }
 
-function loadDgis(): Promise<void> {
-  if (dgisLoad) return dgisLoad;
-  dgisLoad = new Promise((resolve, reject) => {
-    if (window.DG) {
-      void window.DG.then(resolve, reject);
+/** Виджет без JS API — работает без ключа. */
+function yandexWidgetSrc(
+  lat: number,
+  lng: number,
+  locale: string,
+): string {
+  const lang = locale === "en" ? "en_US" : "ru_RU";
+  const params = new URLSearchParams({
+    ll: `${lng},${lat}`,
+    z: "16",
+    pt: `${lng},${lat},pm2rdm`,
+    lang,
+  });
+  return `https://yandex.ru/map-widget/v1/?${params.toString()}`;
+}
+
+function loadYmaps(apiKey: string, lang: string): Promise<void> {
+  if (ymapsLoad) return ymapsLoad;
+  ymapsLoad = new Promise((resolve, reject) => {
+    if (window.ymaps) {
+      window.ymaps.ready(() => resolve());
       return;
     }
     const script = document.createElement("script");
-    script.src = "https://maps.api.2gis.ru/2.0/loader.js?pkg=full";
+    const params = new URLSearchParams({
+      apikey: apiKey,
+      lang,
+    });
+    script.src = `https://api-maps.yandex.ru/2.1/?${params.toString()}`;
     script.async = true;
     script.onload = () => {
-      if (!window.DG) {
-        reject(new Error("2GIS не загрузился"));
+      if (!window.ymaps) {
+        reject(new Error("Yandex Maps load failed"));
         return;
       }
-      void window.DG.then(resolve, reject);
+      window.ymaps.ready(() => resolve());
     };
-    script.onerror = () => reject(new Error("2GIS script error"));
+    script.onerror = () => reject(new Error("Yandex Maps script error"));
     document.head.appendChild(script);
   });
-  return dgisLoad;
+  return ymapsLoad;
 }
 
 function GoogleMapEmbed({
   lat,
   lng,
   query,
+  title,
+  locale,
 }: {
   lat: number | null;
   lng: number | null;
   query: string;
+  title: string;
+  locale: string;
 }) {
   return (
     <iframe
-      title={`Карта — ${query}`}
+      title={title}
       className="club-map-frame h-80 w-full border-0"
       width="100%"
       height="320"
-      src={googleEmbedSrc(lat, lng, query)}
+      src={googleEmbedSrc(lat, lng, query, locale)}
       allowFullScreen
     />
   );
 }
 
-function DgisMapCanvas({
+function YandexMapWidget({
   lat,
   lng,
-  label,
+  title,
+  locale,
+}: {
+  lat: number;
+  lng: number;
+  title: string;
+  locale: string;
+}) {
+  return (
+    <iframe
+      title={title}
+      className="club-map-frame h-80 w-full border-0"
+      width="100%"
+      height="320"
+      src={yandexWidgetSrc(lat, lng, locale)}
+      allowFullScreen
+    />
+  );
+}
+
+function YandexMapCanvas({
+  lat,
+  lng,
+  apiKey,
+  locale,
+  markerTitle,
+  ariaLabel,
   onFailed,
 }: {
   lat: number;
   lng: number;
-  label: string;
+  apiKey: string;
+  locale: string;
+  markerTitle: string;
+  ariaLabel: string;
   onFailed: () => void;
 }) {
   const reactId = useId();
-  const mapId = `club-map-${reactId.replace(/:/g, "")}`;
+  const mapId = `club-ymap-${reactId.replace(/:/g, "")}`;
   const onFailedRef = useRef(onFailed);
   onFailedRef.current = onFailed;
 
   useEffect(() => {
-    let map: DgisMapInstance | null = null;
+    let map: YmapsMap | null = null;
     let cancelled = false;
-    const failTimer = window.setTimeout(() => onFailedRef.current(), 6000);
+    const failTimer = window.setTimeout(() => onFailedRef.current(), 8000);
+    const lang = locale === "en" ? "en_US" : "ru_RU";
 
-    void loadDgis()
+    void loadYmaps(apiKey, lang)
       .then(() => {
-        if (cancelled || !window.DG) return;
+        if (cancelled || !window.ymaps) return;
         window.clearTimeout(failTimer);
-        map = window.DG.map(mapId, {
+        map = new window.ymaps.Map(mapId, {
           center: [lat, lng],
           zoom: 16,
+          controls: ["zoomControl", "fullscreenControl"],
         });
-        window.DG.marker([lat, lng]).addTo(map);
+        map.geoObjects.add(
+          new window.ymaps.Placemark(
+            [lat, lng],
+            { balloonContent: markerTitle },
+            { preset: "islands#greenDotIcon" },
+          ),
+        );
       })
       .catch(() => {
         if (!cancelled) onFailedRef.current();
@@ -159,16 +228,16 @@ function DgisMapCanvas({
     return () => {
       cancelled = true;
       window.clearTimeout(failTimer);
-      map?.remove();
+      map?.destroy();
     };
-  }, [lat, lng, mapId]);
+  }, [apiKey, lat, lng, locale, mapId, markerTitle]);
 
   return (
     <div
       id={mapId}
       className="club-map-canvas h-80 w-full"
       role="application"
-      aria-label={`Карта: ${label}`}
+      aria-label={ariaLabel}
     />
   );
 }
@@ -181,45 +250,75 @@ export function ClubMapClient({
   cityName,
   countryName,
 }: ClubMapClientProps) {
+  const t = useTranslations("clubMap");
+  const locale = useLocale();
   const lat = latitude ?? null;
   const lng = longitude ?? null;
   const hasCoords = lat != null && lng != null;
   const label = mapLabel(address, cityName);
   const searchQuery = label || name;
   const isRu = isRussia(countryName);
-  const [useGoogleFallback, setUseGoogleFallback] = useState(!isRu);
+  const canUseYandexJs = Boolean(YANDEX_MAPS_API_KEY) && hasCoords;
+  const [useYandexWidget, setUseYandexWidget] = useState(!canUseYandexJs);
 
   if (!hasCoords && !address) {
     return (
       <p className="text-sm text-zinc-500">
-        {cityName ? `Город: ${cityName}` : "Адрес уточняется у клуба."}
+        {cityName ? t("cityOnly", { city: cityName }) : t("addressPending")}
       </p>
     );
   }
 
-  const usingDgis = isRu && !useGoogleFallback && hasCoords;
-  const externalLink = usingDgis
-    ? dgisMapLink(lat, lng, searchQuery)
+  const preferYandex = isRu || hasCoords;
+  const mapTitle = t("title", { query: searchQuery });
+  const mapAria = t("aria", { label: label || name });
+  const externalLink = preferYandex
+    ? yandexMapLink(lat, lng, searchQuery)
     : googleMapLink(lat, lng, searchQuery);
-  const externalLinkLabel = usingDgis
-    ? "Открыть в 2GIS →"
-    : "Открыть в Google Картах →";
+  const externalLinkLabel = preferYandex ? t("openYandex") : t("openGoogle");
+
+  let mapNode: ReactNode = null;
+  if (hasCoords && canUseYandexJs && !useYandexWidget) {
+    mapNode = (
+      <YandexMapCanvas
+        lat={lat!}
+        lng={lng!}
+        apiKey={YANDEX_MAPS_API_KEY}
+        locale={locale}
+        markerTitle={name}
+        ariaLabel={mapAria}
+        onFailed={() => setUseYandexWidget(true)}
+      />
+    );
+  } else if (hasCoords) {
+    mapNode = (
+      <YandexMapWidget
+        lat={lat!}
+        lng={lng!}
+        title={mapTitle}
+        locale={locale}
+      />
+    );
+  } else if (!isRu) {
+    mapNode = (
+      <GoogleMapEmbed
+        lat={lat}
+        lng={lng}
+        query={searchQuery}
+        title={mapTitle}
+        locale={locale}
+      />
+    );
+  }
 
   return (
     <div className="space-y-3">
       {label && <p className="text-sm text-zinc-300">{label}</p>}
-      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-100 dark:bg-zinc-200">
-        {hasCoords && isRu && !useGoogleFallback ? (
-          <DgisMapCanvas
-            lat={lat!}
-            lng={lng!}
-            label={label || name}
-            onFailed={() => setUseGoogleFallback(true)}
-          />
-        ) : (
-          <GoogleMapEmbed lat={lat} lng={lng} query={searchQuery} />
-        )}
-      </div>
+      {mapNode ? (
+        <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-100 dark:bg-zinc-200">
+          {mapNode}
+        </div>
+      ) : null}
       <a
         href={externalLink}
         target="_blank"

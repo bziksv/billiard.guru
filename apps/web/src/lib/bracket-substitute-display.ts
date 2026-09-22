@@ -58,7 +58,13 @@ export function attachSubstitutionsToMatches<T extends { id: string }>(
 export function formatSubstitutionNotice(
   row: TournamentSubstitutionView,
   matchNumber?: number | null,
+  locale: "ru" | "en" = "ru",
 ): string {
+  if (locale === "en") {
+    const meet =
+      matchNumber != null ? `in match #${matchNumber}` : "in a match";
+    return `${row.outgoingLabel} ${meet} was replaced by ${row.incomingLabel}`;
+  }
   const meet =
     matchNumber != null ? `во встрече №${matchNumber}` : "во встрече";
   return `${row.outgoingLabel} ${meet} заменён на ${row.incomingLabel}`;

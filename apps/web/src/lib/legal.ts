@@ -6,7 +6,13 @@ export const LEGAL_URLS = {
   personalDataConsent: "/legal/personal-data-consent",
 } as const;
 
+/** localStorage — UI баннера; cookie — проверка на API pageview. */
 export const COOKIE_CONSENT_STORAGE_KEY = "setka-cookie-consent";
+export const COOKIE_CONSENT_COOKIE = "setka_cookie_consent";
+export const COOKIE_CONSENT_VALUE = "accepted";
+export const COOKIE_CONSENT_MAX_AGE_SEC = 365 * 24 * 60 * 60;
+/** Browser event after Accept — PageviewBeacon re-fires without navigation. */
+export const COOKIE_CONSENT_EVENT = "setka-cookie-consent";
 
 export type LegalDocSlug = keyof typeof LEGAL_DOCS;
 

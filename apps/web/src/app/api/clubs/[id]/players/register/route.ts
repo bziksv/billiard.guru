@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePlayer } from "@/lib/api-sanitize";
 import { writeAuditLog } from "@/lib/audit";
-import { authErrorResponse, getSession } from "@/lib/auth";
+import { authErrorResponse, getRealPlayer, getSession } from "@/lib/auth";
+import { clubOwnedByPlayer } from "@/lib/club-access";
 import { auditActorFields, requireClubManageAccess } from "@/lib/club-manage";
 import { registerPlayerFromFormData } from "@/lib/player-register-server";
 import { Prisma } from "@/generated/prisma/client";
@@ -11,7 +13,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id: clubId } = await params;
-    await requireClubManageAccess(clubId);
+    const { player: actor, club } = await requireClubManageAccess(clubId);
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
@@ -45,13 +47,19 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       payload: { clubId, playerId: player.id, rating: player.rating },
     });
 
+    const safe = sanitizePlayer(player as unknown as Record<string, unknown>);
+    const real = await getRealPlayer();
+    const isOwnerOrSa =
+      real?.role === "SUPERADMIN" || clubOwnedByPlayer(club, actor);
+
     return NextResponse.json(
       {
-        ...player,
-        confirmLink,
+        ...safe,
+        ...(isOwnerOrSa ? { confirmLink } : {}),
         addedToClub: true,
-        message:
-          "Игрок зарегистрирован и добавлен в список игроков клуба. Подтвердите Telegram.",
+        message: isOwnerOrSa
+          ? "Игрок зарегистрирован и добавлен в список игроков клуба. Подтвердите Telegram."
+          : "Игрок зарегистрирован и добавлен в список игроков клуба.",
       },
       { status: 201 },
     );

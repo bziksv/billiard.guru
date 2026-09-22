@@ -72,6 +72,8 @@ NODE_ENV=production
 DATABASE_URL=mysql://bziksv_bil:PASSWORD@localhost:3306/bziksv_bil
 APP_URL=https://billiard.guru
 NEXT_PUBLIC_APP_URL=https://billiard.guru
+# Карта клубов (Яндекс). Без ключа — виджет map-widget. Ключ: https://developer.tech.yandex.ru/
+NEXT_PUBLIC_YANDEX_MAPS_API_KEY=...
 TELEGRAM_BOT_TOKEN=...
 TELEGRAM_BOT_USERNAME=BilliardGuruBot
 TELEGRAM_WEBHOOK_SECRET=случайная_строка

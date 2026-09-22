@@ -1,6 +1,9 @@
 "use client";
 
+import { useLocale } from "next-intl";
 import { cn } from "@/lib/cn";
+import type { AppLocale } from "@/i18n/routing";
+import { getBracketUILabels } from "@/lib/bracket-view-labels";
 
 export function BracketStreamLink({
   url,
@@ -9,6 +12,9 @@ export function BracketStreamLink({
   url: string;
   className?: string;
 }) {
+  const locale = useLocale() as AppLocale;
+  const label = getBracketUILabels(locale).watchStream;
+
   return (
     <a
       href={url}
@@ -20,8 +26,8 @@ export function BracketStreamLink({
         "bracket-stream-link inline-flex shrink-0 items-center justify-center rounded-md border border-[var(--bracket-row-border)] bg-[var(--bracket-card-bg)] p-0.5 text-[var(--bracket-meta-text)] transition-colors hover:border-emerald-500/60 hover:text-emerald-600",
         className,
       )}
-      title="Смотреть трансляцию"
-      aria-label="Смотреть трансляцию"
+      title={label}
+      aria-label={label}
     >
       <svg
         viewBox="0 0 20 20"

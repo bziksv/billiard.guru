@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, assertNotPreviewWrite, getCurrentPlayer } from "@/lib/auth";
 import { refreshCoachReviewStats, getCoachForReview } from "@/lib/coach-reviews-server";
 import { prisma } from "@/lib/prisma";
 import { translateText } from "@/lib/translation";
@@ -70,6 +70,7 @@ export async function GET(_request: NextRequest, ctx: RouteCtx) {
 
 export async function POST(request: NextRequest, ctx: RouteCtx) {
   try {
+    await assertNotPreviewWrite();
     const viewer = await getCurrentPlayer();
     if (!viewer) {
       return NextResponse.json({ error: "Войдите, чтобы оценить тренера" }, { status: 401 });

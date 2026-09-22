@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import {
   listRatingSnapshots,
   restoreRatingSnapshot,
@@ -15,7 +15,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await requireSuperAdmin();
+    const session = await requireWritableSuperAdmin();
     const { id } = await params;
     bodySchema.parse(await request.json());
     const result = await restoreRatingSnapshot({

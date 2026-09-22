@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, assertNotPreviewWrite, getCurrentPlayer } from "@/lib/auth";
 import { castIdeaVote } from "@/lib/idea-moderation";
 import { ideaVoteSchema } from "@/lib/validators";
 
@@ -7,6 +7,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    await assertNotPreviewWrite();
     const { id: ideaId } = await params;
     const player = await getCurrentPlayer();
     if (!player) {

@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getCurrentPlayer, requireSuperAdmin } from "@/lib/auth";
+import { sanitizePlayerDeep } from "@/lib/api-sanitize";
+import { authErrorResponse, assertNotPreviewWrite, getCurrentPlayer, requireSuperAdmin } from "@/lib/auth";
 import { playerCanManageClub } from "@/lib/club-staff";
 import { writeAuditLog } from "@/lib/audit";
 import { createRequestLogger } from "@/lib/logger";
@@ -156,7 +157,7 @@ export async function POST(request: NextRequest) {
     } else if (data.source === "CLUB") {
       await notifyTournamentTeamRegisteredByClub(team.id);
     }
-    return NextResponse.json(team, { status: 201 });
+    return NextResponse.json(sanitizePlayerDeep(team), { status: 201 });
   } catch (error) {
     log.error({ error }, "Team registration failed");
     const authResp = authErrorResponse(error);
@@ -173,6 +174,7 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    await assertNotPreviewWrite();
     const body = await request.json();
     const data = tournamentTeamUpdateSchema.parse(body);
 
@@ -210,7 +212,7 @@ export async function PATCH(request: NextRequest) {
         },
         include: { player1: true, player2: true, tournament: true },
       });
-      return NextResponse.json(team);
+      return NextResponse.json(sanitizePlayerDeep(team));
     }
 
     const matchCount = await prisma.tournamentMatch.count({
@@ -285,7 +287,7 @@ export async function PATCH(request: NextRequest) {
         payload: { label: teamLabel(team) },
       });
 
-      return NextResponse.json(team);
+      return NextResponse.json(sanitizePlayerDeep(team));
     }
 
     if (data.status) {
@@ -369,7 +371,7 @@ export async function PATCH(request: NextRequest) {
         await notifyTournamentTeamRegistrationRejected(team.id);
       }
 
-      return NextResponse.json(team);
+      return NextResponse.json(sanitizePlayerDeep(team));
     }
 
     return NextResponse.json({ error: "Нечего обновлять" }, { status: 400 });

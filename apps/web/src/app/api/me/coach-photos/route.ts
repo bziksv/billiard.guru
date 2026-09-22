@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, getCurrentPlayer, requireWritablePlayer } from "@/lib/auth";
 import { parseCoachGalleryUrls } from "@/lib/coach-profile";
 import { saveCoachPhotoFile } from "@/lib/coach-photo-upload";
 import { ImageProcessingError } from "@/lib/image-processing";
@@ -10,15 +10,19 @@ const MAX_PHOTOS = 12;
 
 export async function POST(request: NextRequest) {
   try {
-    const player = await getCurrentPlayer();
-    if (!player) {
-      return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
-    }
+    const player = await requireWritablePlayer();
 
     const formData = await request.formData();
     const file = formData.get("photo");
     if (!(file instanceof File) || file.size === 0) {
       return NextResponse.json({ error: "Выберите файл" }, { status: 400 });
+    }
+
+    if (!player.isCoach) {
+      return NextResponse.json(
+        { error: "Сначала включите «Я тренирую» и сохраните профиль" },
+        { status: 400 },
+      );
     }
 
     const current = parseCoachGalleryUrls(player.coachGalleryUrls);

@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { ClubOwnerSidebar } from "@/components/manage/club-owner-sidebar";
 
-type ClubOption = { id: string; name: string };
+type ClubOption = { id: string; name: string; isOwner?: boolean };
 
 function clubIdFromPath(pathname: string): string | null {
   const match = pathname.match(/^\/manage\/clubs\/([^/]+)/);

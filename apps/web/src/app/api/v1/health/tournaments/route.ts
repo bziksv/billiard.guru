@@ -15,13 +15,8 @@ export async function GET() {
       status: "ok",
       count: rows.length,
       formats: rows.map((t) => t.format),
-      node: process.version,
     });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return NextResponse.json(
-      { status: "error", message, node: process.version },
-      { status: 500 },
-    );
+  } catch {
+    return NextResponse.json({ status: "error" }, { status: 500 });
   }
 }

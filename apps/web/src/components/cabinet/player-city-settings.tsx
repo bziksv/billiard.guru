@@ -18,19 +18,24 @@ export function PlayerCitySettings({ initialCityId }: { initialCityId: string })
     setSaving(true);
     setError(null);
     setMessage(null);
-    const res = await fetch("/api/me/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cityId }),
-    });
-    const data = await res.json();
-    setSaving(false);
-    if (!res.ok) {
-      setError(data.error ?? t("saveError"));
-      return;
+    try {
+      const res = await fetch("/api/me/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cityId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("saveError"));
+        return;
+      }
+      setMessage(t("citySaved"));
+      router.refresh();
+    } catch {
+      setError(t("saveError"));
+    } finally {
+      setSaving(false);
     }
-    setMessage(t("citySaved"));
-    router.refresh();
   }
 
   return (

@@ -1,4 +1,6 @@
 import { buildLocalizedStaticMetadata } from "@/lib/seo-locale";
+import { getCurrentPlayer } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -9,6 +11,10 @@ export async function generateMetadata({
   return buildLocalizedStaticMetadata("cabinet", locale);
 }
 
-export default function CabinetLayout({ children }: { children: React.ReactNode }) {
+export default async function CabinetLayout({ children }: { children: React.ReactNode }) {
+  const player = await getCurrentPlayer();
+  if (!player) {
+    redirect("/login?next=/cabinet");
+  }
   return children;
 }

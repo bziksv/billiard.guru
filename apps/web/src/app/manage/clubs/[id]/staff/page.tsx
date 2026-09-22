@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { ManageClubStaffPage } from "@/components/manage/manage-club-staff-page";
-import { requireClubOwnerPageAccess } from "@/lib/club-owner-access";
+import {
+  requireClubOwnerPageAccess,
+  viewerIsClubOwner,
+} from "@/lib/club-owner-access";
 
 export default async function ManageClubStaffRoute({
   params,
@@ -13,6 +16,11 @@ export default async function ManageClubStaffRoute({
   if (!access.allowed) {
     if (access.reason === "login") redirect(`/login?next=/manage/clubs/${id}/staff`);
     redirect("/cabinet");
+  }
+
+  // Staff manage the club but cannot open /staff (phone list of colleagues).
+  if (!(await viewerIsClubOwner(access.club))) {
+    redirect(`/manage/clubs/${id}`);
   }
 
   return <ManageClubStaffPage clubId={id} clubName={access.club.name} />;

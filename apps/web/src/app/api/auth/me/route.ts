@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentPlayer, getSession } from "@/lib/auth";
+import { getCurrentPlayer, getRealPlayer, getSession } from "@/lib/auth";
 import {
   SESSION_COOKIE,
   clearSessionCookieOptions,
@@ -14,10 +14,13 @@ export async function GET() {
     return NextResponse.json({ user: null });
   }
 
-  const player = await getCurrentPlayer();
-  if (!player) {
+  const realPlayer = await getRealPlayer();
+  if (!realPlayer) {
     return NextResponse.json({ user: null });
   }
+
+  // Preview UI may show impersonated identity, but session cookie must stay the real admin.
+  const player = (await getCurrentPlayer()) ?? realPlayer;
 
   const response = NextResponse.json({
     user: {
@@ -34,12 +37,13 @@ export async function GET() {
       city: player.city.nameRu,
       country: player.city.country.nameRu,
       telegramUsername: player.telegramUsername,
+      realRole: realPlayer.role,
+      preview: player.id !== realPlayer.id,
     },
   });
 
-  // Скользящая сессия: роль из БД (не устаревшая из cookie).
-  if (shouldRefreshSession(session) || player.role !== session.role) {
-    const token = createSessionToken(player.id, player.role);
+  if (shouldRefreshSession(session) || realPlayer.role !== session.role) {
+    const token = createSessionToken(realPlayer.id, realPlayer.role);
     const cookie = sessionCookieOptions(token);
     response.cookies.set(cookie.name, cookie.value, {
       httpOnly: cookie.httpOnly,

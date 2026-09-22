@@ -10,7 +10,7 @@ export async function GET(
   const { id: clubId } = await params;
 
   try {
-    await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId, { readOnly: true });
 
     const count = await prisma.tableBooking.count({
       where: {

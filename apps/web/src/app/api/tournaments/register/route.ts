@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePlayerDeep } from "@/lib/api-sanitize";
 import { writeAuditLog } from "@/lib/audit";
 import {
+  assertNotPreviewWrite,
   authErrorResponse,
   getCurrentPlayer,
 } from "@/lib/auth";
 import { playerCanManageClub } from "@/lib/club-staff";
 import { prisma } from "@/lib/prisma";
-import { buildConfirmLink } from "@/lib/telegram";
 import { requireTournamentManageAccess, tournamentManageActorType } from "@/lib/tournament-manage";
 import {
   canOrganizerAddOrConfirmParticipants,
@@ -109,10 +110,7 @@ export async function POST(request: NextRequest) {
         } else if (data.source === "SELF") {
           await notifyTournamentSelfRegistered(registration.id);
         }
-        const confirmLink = player.confirmToken
-          ? buildConfirmLink(player.confirmToken)
-          : null;
-        return NextResponse.json({ ...registration, confirmLink }, { status: 200 });
+        return NextResponse.json(sanitizePlayerDeep(registration), { status: 200 });
       }
       return NextResponse.json({ error: "Игрок уже зарегистрирован" }, { status: 409 });
     }
@@ -152,11 +150,7 @@ export async function POST(request: NextRequest) {
       await notifyTournamentSelfRegistered(registration.id);
     }
 
-    const confirmLink = player.confirmToken
-      ? buildConfirmLink(player.confirmToken)
-      : null;
-
-    return NextResponse.json({ ...registration, confirmLink }, { status: 201 });
+    return NextResponse.json(sanitizePlayerDeep(registration), { status: 201 });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
@@ -169,6 +163,7 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    await assertNotPreviewWrite();
     const player = await getCurrentPlayer();
     if (!player) {
       return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
@@ -216,7 +211,7 @@ export async function PATCH(request: NextRequest) {
           data: { isLate: data.isLate },
         });
       }
-      return NextResponse.json(registration);
+      return NextResponse.json(sanitizePlayerDeep(registration));
     }
 
     const { status } = data;
@@ -337,7 +332,7 @@ export async function PATCH(request: NextRequest) {
       await notifyTournamentRegistrationRejected(registration.id);
     }
 
-    return NextResponse.json(registration);
+    return NextResponse.json(sanitizePlayerDeep(registration));
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Ошибка валидации" }, { status: 400 });

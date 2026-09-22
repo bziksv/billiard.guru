@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
 import { auditBookingStatusSummary } from "@/lib/audit-display";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, assertNotPreviewWrite, getCurrentPlayer } from "@/lib/auth";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import {
   notifyPlayerBookingCancelledByClub,
@@ -26,6 +26,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string; bookingId: string }> },
 ) {
   try {
+    await assertNotPreviewWrite();
     const { id: clubId, bookingId } = await params;
     const body = await request.json();
     const parsed = clubBookingPatchSchema.parse(body);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, assertNotPreviewWrite, getCurrentPlayer } from "@/lib/auth";
 import { parseFloorPlan } from "@/lib/club-floor-plan";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import type { ClubTableFormatId } from "@/lib/club-table-formats";
@@ -127,7 +127,7 @@ export async function GET(
 
   if (request.nextUrl.searchParams.get("list") === "1") {
     try {
-      await requireClubManageAccess(id);
+      await requireClubManageAccess(id, { readOnly: true });
       const bookings = await prisma.tableBooking.findMany({
         where: {
           clubId: id,
@@ -155,7 +155,7 @@ export async function GET(
 
   if (request.nextUrl.searchParams.get("calendar") === "1") {
     try {
-      await requireClubManageAccess(id);
+      await requireClubManageAccess(id, { readOnly: true });
       const fromParam = request.nextUrl.searchParams.get("from");
       const fromDay =
         fromParam && /^\d{4}-\d{2}-\d{2}$/.test(fromParam) ? fromParam : todayDayKey();
@@ -354,6 +354,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    await assertNotPreviewWrite();
     const player = await getCurrentPlayer();
     if (!player) {
       return NextResponse.json({ error: "Войдите, чтобы забронировать стол" }, { status: 401 });

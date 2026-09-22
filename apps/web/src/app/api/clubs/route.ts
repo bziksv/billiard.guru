@@ -1,8 +1,14 @@
 import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
+import { sanitizeClub, toPublicClubListItem } from "@/lib/api-sanitize";
 import { writeAuditLog } from "@/lib/audit";
-import { getSession } from "@/lib/auth";
+import {
+  authErrorResponse,
+  getRealPlayer,
+  getSession,
+  requireSuperAdmin,
+} from "@/lib/auth";
 import { tryAutoSendClubConfirmTelegram } from "@/lib/club-confirm-server";
 import { resolveClubCoordinates } from "@/lib/club-geocode";
 import { createRequestLogger } from "@/lib/logger";
@@ -26,11 +32,24 @@ import { buildClubLocalizedUpdate } from "@/lib/translation";
 import { buildClubLatinFields } from "@/lib/latin-names";
 
 export async function GET() {
-  const clubs = await prisma.club.findMany({
-    include: { city: { include: { country: true } } },
-    orderBy: { createdAt: "desc" },
-  });
-  return NextResponse.json(clubs);
+  try {
+    const session = await getSession();
+    const real = session ? await getRealPlayer() : null;
+    const clubs = await prisma.club.findMany({
+      include: { city: { include: { country: true } } },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (real?.role === "SUPERADMIN") {
+      return NextResponse.json(
+        clubs.map((c) => sanitizeClub(c as unknown as Record<string, unknown>)),
+      );
+    }
+
+    return NextResponse.json(clubs.map((c) => toPublicClubListItem(c)));
+  } catch {
+    return NextResponse.json({ error: "Не удалось загрузить клубы" }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -38,6 +57,7 @@ export async function POST(request: NextRequest) {
   const log = createRequestLogger(requestId);
 
   try {
+    await requireSuperAdmin();
     const body = await request.json();
 
     const phoneResult = await normalizePhoneForCity(
@@ -149,7 +169,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        ...club,
+        ...sanitizeClub(club as unknown as Record<string, unknown>),
         confirmLink,
         telegramSent: telegram.sent,
         telegramSentReason: telegram.reason ?? null,
@@ -169,6 +189,8 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     log.error({ error }, "Club registration failed");
+    const authResp = authErrorResponse(error);
+    if (authResp) return authResp;
     if (error instanceof ZodError) {
       const detail = error.issues[0]?.message ?? "Ошибка валидации";
       return NextResponse.json({ error: detail }, { status: 400 });

@@ -135,8 +135,8 @@ export function PokatatPageClient({
   }, [defaultCityId, cityId]);
 
   const clubOptions = useMemo(
-    () => [{ value: "", label: "Любой клуб / не важно" }, ...clubs.map((c) => ({ value: c.id, label: c.name }))],
-    [clubs],
+    () => [{ value: "", label: t("anyClub") }, ...clubs.map((c) => ({ value: c.id, label: c.name }))],
+    [clubs, t],
   );
 
   function toggleWeekday(day: number) {
@@ -148,7 +148,7 @@ export function PokatatPageClient({
   async function submitListing() {
     setSubmitError(null);
     if (!consentAccepted) {
-      setSubmitError("Подтвердите согласие на обработку персональных данных");
+      setSubmitError(t("consentRequired"));
       return;
     }
     setSubmitting(true);
@@ -156,12 +156,37 @@ export function PokatatPageClient({
     let playAt: string | undefined;
     if (scheduleType === "ONE_TIME") {
       if (!playDate) {
-        setSubmitError("Укажите дату");
+        setSubmitError(t("dateRequired"));
         setSubmitting(false);
         return;
       }
       const local = new Date(`${playDate}T${playTime}:00`);
       playAt = local.toISOString();
+    }
+
+    if (scheduleType === "RECURRING") {
+      if (weekdays.length === 0) {
+        setSubmitError(t("weekdaysRequired"));
+        setSubmitting(false);
+        return;
+      }
+      if (!timeFrom) {
+        setSubmitError(t("timeFromRequired"));
+        setSubmitting(false);
+        return;
+      }
+    }
+
+    const minN = ratingMin ? Number(ratingMin) : undefined;
+    const maxN = ratingMax ? Number(ratingMax) : undefined;
+    if (
+      (ratingMin && Number.isNaN(minN)) ||
+      (ratingMax && Number.isNaN(maxN)) ||
+      (minN != null && maxN != null && minN > maxN)
+    ) {
+      setSubmitError(t("ratingRangeInvalid"));
+      setSubmitting(false);
+      return;
     }
 
     const payload = {
@@ -176,29 +201,34 @@ export function PokatatPageClient({
       timeFrom: scheduleType === "RECURRING" ? timeFrom : playTime,
       timeTo: scheduleType === "RECURRING" ? timeTo : undefined,
       gameFormat: gameFormat || undefined,
-      ratingMin: ratingMin ? Number(ratingMin) : undefined,
-      ratingMax: ratingMax ? Number(ratingMax) : undefined,
+      ratingMin: minN,
+      ratingMax: maxN,
       playersNeeded: playersNeeded.trim() || "1",
     };
 
-    const res = await fetch("/api/play-listings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    const data = await res.json();
-    setSubmitting(false);
+    try {
+      const res = await fetch("/api/play-listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
 
-    if (!res.ok) {
-      setSubmitError(data.error ?? t("submitError"));
-      return;
+      if (!res.ok) {
+        setSubmitError((data as { error?: string }).error ?? t("submitError"));
+        return;
+      }
+
+      setTitle("");
+      setBody("");
+      setTab("mine");
+      router.push("/pokatat?tab=mine");
+      await reload();
+    } catch {
+      setSubmitError(t("submitError"));
+    } finally {
+      setSubmitting(false);
     }
-
-    setTitle("");
-    setBody("");
-    setTab("mine");
-    router.push("/pokatat?tab=mine");
-    await reload();
   }
 
   const tabClass = (active: boolean) =>
@@ -474,7 +504,7 @@ export function PokatatPageClient({
                       list="pokatat-players-needed"
                       value={playersNeeded}
                       onChange={(e) => setPlayersNeeded(e.target.value)}
-                      placeholder="1, 2, 1-4, пара на пару…"
+                      placeholder={t("playersNeededPlaceholder")}
                       className="site-input w-full"
                       autoComplete="off"
                     />
@@ -484,7 +514,7 @@ export function PokatatPageClient({
                       ))}
                     </datalist>
                     <p className="home-card-muted mt-1 text-xs">
-                      Выберите из списка или введите своё: диапазон (1–4) или «пара на пару».
+                      {t("playersNeededHint")}
                     </p>
                   </label>
                 </div>

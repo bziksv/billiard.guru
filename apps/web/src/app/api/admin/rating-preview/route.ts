@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import {
   DEFAULT_MIN_H2H_MATCHES,
   DEFAULT_MIN_TOURNAMENTS,
@@ -17,7 +17,7 @@ const bodySchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const body = bodySchema.parse(await request.json());
     const ratingSource = body.ratingSource ?? "SYSTEM";
     const clubId = body.clubId ?? null;

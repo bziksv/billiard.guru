@@ -39,6 +39,7 @@ import {
   handleTournamentApprovalMessage,
 } from "@/lib/tournament-approval";
 import { handleTournamentSelfRegisterCallback } from "@/lib/tournament-self-register-server";
+import { normalizePhoneDigits, phonesMatchExactE164 } from "@/lib/phone-match";
 
 export interface TelegramUpdate {
   message?: {
@@ -55,49 +56,36 @@ export interface TelegramUpdate {
   };
 }
 
-function phoneDigits(raw: string): string[] {
-  const digits = raw.replace(/\D/g, "");
-  const set = new Set<string>([digits]);
-  if (digits.startsWith("8") && digits.length === 11) {
-    set.add(`7${digits.slice(1)}`);
-  }
-  if (digits.startsWith("7") && digits.length === 11) {
-    set.add(digits.slice(1));
-  }
-  if (digits.length >= 10) {
-    set.add(digits.slice(-10));
-  }
-  return [...set];
+function contactPhoneE164Digits(contactPhone: string): string | null {
+  const digits = normalizePhoneDigits(contactPhone);
+  if (digits.length < 10) return null;
+  // Prefer 11-digit RU-style; otherwise keep normalized digits.
+  if (digits.length === 10) return `7${digits}`;
+  return digits;
 }
 
 // Привязываем по контакту всех, у кого Telegram ещё не привязан —
 // включая игроков/клубы, которых организатор добавил по телефону (isVerified: true).
 async function findUnverifiedPlayerByPhone(contactPhone: string) {
-  const variants = phoneDigits(contactPhone);
-  return prisma.player.findFirst({
-    where: {
-      telegramId: null,
-      OR: variants.flatMap((v) => [
-        { phone: { contains: v } },
-        { phone: { endsWith: v } },
-      ]),
-    },
+  const want = contactPhoneE164Digits(contactPhone);
+  if (!want) return null;
+  const candidates = await prisma.player.findMany({
+    where: { telegramId: null },
     orderBy: { createdAt: "desc" },
+    take: 500,
   });
+  return candidates.find((p) => phonesMatchExactE164(p.phone, want)) ?? null;
 }
 
 async function findUnverifiedClubByPhone(contactPhone: string) {
-  const variants = phoneDigits(contactPhone);
-  return prisma.club.findFirst({
-    where: {
-      telegramId: null,
-      OR: variants.flatMap((v) => [
-        { phone: { contains: v } },
-        { phone: { endsWith: v } },
-      ]),
-    },
+  const want = contactPhoneE164Digits(contactPhone);
+  if (!want) return null;
+  const candidates = await prisma.club.findMany({
+    where: { telegramId: null },
     orderBy: { createdAt: "desc" },
+    take: 200,
   });
+  return candidates.find((c) => phonesMatchExactE164(c.phone, want)) ?? null;
 }
 
 async function confirmPlayer(
@@ -550,16 +538,22 @@ export async function processTelegramUpdate(
       return;
     }
 
-    const anyPlayer = await prisma.player.findFirst({
-      where: {
-        OR: phoneDigits(message.contact.phone_number).flatMap((v) => [
-          { phone: { contains: v } },
-        ]),
-      },
-    });
-    if (anyPlayer?.isVerified) {
-      if (anyPlayer.telegramId === telegramId) {
-        await sendVerifiedWelcome(telegramId, anyPlayer);
+    const want = contactPhoneE164Digits(message.contact.phone_number);
+    let matched = want
+      ? await prisma.player.findFirst({
+          where: { phone: { in: [`+${want}`, want] } },
+        })
+      : null;
+    if (!matched && want) {
+      const recent = await prisma.player.findMany({
+        take: 300,
+        orderBy: { createdAt: "desc" },
+      });
+      matched = recent.find((p) => phonesMatchExactE164(p.phone, want)) ?? null;
+    }
+    if (matched?.isVerified) {
+      if (matched.telegramId === telegramId) {
+        await sendVerifiedWelcome(telegramId, matched);
       } else {
         await sendTelegramMessage(
           telegramId,

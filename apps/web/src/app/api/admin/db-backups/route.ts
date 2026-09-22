@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import {
   createDbBackup,
   getDbBackupSettings,
@@ -24,7 +24,7 @@ export async function GET() {
 
 export async function POST() {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const backup = await createDbBackup("manual");
     const [backups, settings] = await Promise.all([
       listDbBackups(),
@@ -34,9 +34,7 @@ export async function POST() {
   } catch (error) {
     const res = authErrorResponse(error);
     if (res) return res;
-    const message =
-      error instanceof Error ? error.message : "Не удалось создать бэкап";
     console.error("[db-backups POST]", error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Не удалось создать бэкап" }, { status: 500 });
   }
 }

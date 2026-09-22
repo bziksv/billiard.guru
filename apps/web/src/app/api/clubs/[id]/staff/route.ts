@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
-import { authErrorResponse } from "@/lib/auth";
+import { authErrorResponse, getRealPlayer } from "@/lib/auth";
 import { clubOwnedByPlayer } from "@/lib/club-access";
 import { requireClubManageAccess } from "@/lib/club-manage";
 import {
@@ -16,9 +16,19 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id: clubId } = await params;
-    const { player, club } = await requireClubManageAccess(clubId);
+    const { player, club } = await requireClubManageAccess(clubId, { readOnly: true });
+    const real = await getRealPlayer();
+    const isOwner =
+      real?.role === "SUPERADMIN" || clubOwnedByPlayer(club, player);
+
+    if (!isOwner) {
+      return NextResponse.json(
+        { error: "Только владелец клуба может смотреть список сотрудников" },
+        { status: 403 },
+      );
+    }
+
     const staff = await listClubStaff(clubId);
-    const isOwner = clubOwnedByPlayer(club, player);
 
     return NextResponse.json({
       staff: staff.map((row) => ({
@@ -27,7 +37,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
         createdAt: row.createdAt.toISOString(),
         player: row.player,
       })),
-      isOwner,
+      isOwner: true,
     });
   } catch (error) {
     const authResp = authErrorResponse(error);

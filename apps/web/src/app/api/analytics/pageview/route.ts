@@ -4,6 +4,7 @@ import { getSession } from "@/lib/auth";
 import { resolveVisitorCountry } from "@/lib/analytics/geo";
 import { isLikelyBot, recordPageView } from "@/lib/analytics/track-pageview";
 import { getOrCreateVisitorId, visitorCookieOptions } from "@/lib/analytics/visitor-cookie";
+import { hasMarketingAnalyticsConsent } from "@/lib/cookie-consent-server";
 
 const bodySchema = z.object({
   path: z.string().min(1).max(512),
@@ -23,6 +24,13 @@ export async function POST(request: NextRequest) {
     const parsed = bodySchema.safeParse(json);
     if (!parsed.success) {
       return NextResponse.json({ error: "Некорректные данные" }, { status: 400 });
+    }
+
+    if (parsed.data.surface === "MARKETING") {
+      const consented = await hasMarketingAnalyticsConsent();
+      if (!consented) {
+        return new NextResponse(null, { status: 204 });
+      }
     }
 
     const { id: visitorId, isNew } = await getOrCreateVisitorId();

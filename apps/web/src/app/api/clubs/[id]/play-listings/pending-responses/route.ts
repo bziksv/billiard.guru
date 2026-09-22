@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const { id: clubId } = await params;
-    await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId, { readOnly: true });
     const count = await countClubPendingPlayResponses(clubId);
     return NextResponse.json({ count });
   } catch (error) {

@@ -28,6 +28,10 @@ export type BracketUILabels = {
   winnerTo: (matchNo: number) => string;
   loserTo: (matchNo: number) => string;
   walkover: string;
+  substitution: string;
+  substitutionPrefix: string;
+  substitutionDot: string;
+  watchStream: string;
 };
 
 const LABELS: Record<AppLocale, BracketUILabels> = {
@@ -52,6 +56,10 @@ const LABELS: Record<AppLocale, BracketUILabels> = {
     winnerTo: (matchNo) => `победитель на #${matchNo}`,
     loserTo: (matchNo) => `проигравший на #${matchNo}`,
     walkover: "тех. поражение",
+    substitution: "Замена",
+    substitutionPrefix: "Замена:",
+    substitutionDot: " · замена",
+    watchStream: "Смотреть трансляцию",
   },
   en: {
     waiting: "Waiting",
@@ -74,6 +82,10 @@ const LABELS: Record<AppLocale, BracketUILabels> = {
     winnerTo: (matchNo) => `winner to #${matchNo}`,
     loserTo: (matchNo) => `loser to #${matchNo}`,
     walkover: "Walkover",
+    substitution: "Sub",
+    substitutionPrefix: "Sub:",
+    substitutionDot: " · sub",
+    watchStream: "Watch stream",
   },
 };
 

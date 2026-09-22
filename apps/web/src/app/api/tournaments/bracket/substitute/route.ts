@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     if (!tournamentId) {
       return NextResponse.json({ error: "Укажите tournamentId" }, { status: 400 });
     }
-    await requireTournamentManageAccess(tournamentId);
+    await requireTournamentManageAccess(tournamentId, { readOnly: true });
 
     const excludeTeamIds = request.nextUrl.searchParams
       .getAll("excludeTeamId")

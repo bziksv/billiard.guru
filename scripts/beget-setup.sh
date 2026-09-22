@@ -61,14 +61,8 @@ fi
 
 if ! grep -E '^[[:space:]]*DATABASE_URL=.+' "$WEB/.env" | grep -qv '^[[:space:]]*#'; then
   echo "В $WEB/.env нет строки DATABASE_URL=..."
-  echo "Сейчас в файле:"
-  sed -n '1,8p' "$WEB/.env"
-  echo ""
-  echo "Пересоздайте файл — см. docs/DEPLOY.md или:"
-  echo "  cat > $WEB/.env << 'EOF'"
-  echo "  DATABASE_URL=mysql://bziksv_bil:...@localhost:3306/bziksv_bil"
-  echo "  ..."
-  echo "  EOF"
+  echo "Не печатаем содержимое .env. Пересоздайте файл — см. docs/DEPLOY.md"
+  echo "  (шаблон: apps/web/.env.example; на Beget host БД — не localhost)."
   exit 1
 fi
 

@@ -47,7 +47,7 @@ function PlaceBadge({
   return (
     <div
       className={cn(
-        "flex shrink-0 flex-col items-center justify-center rounded-xl px-3 py-2 text-center min-w-[5rem]",
+        "flex shrink-0 flex-col items-center justify-center rounded-xl px-2.5 py-1.5 text-center min-w-[4.75rem]",
         top === 1 &&
           "bg-amber-500/15 ring-1 ring-amber-500/35 text-amber-800 dark:text-amber-200",
         top === 2 &&
@@ -60,18 +60,18 @@ function PlaceBadge({
       title={`${place} ${placeSuffix}${participants > 0 ? ` ${placeOf}` : ""}`}
     >
       {top > 0 && (
-        <span className="text-lg leading-none" aria-hidden>
+        <span className="text-base leading-none" aria-hidden>
           {placeMedal(place)}
         </span>
       )}
-      <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
+      <span className="font-mono text-base font-semibold tabular-nums leading-tight">
         {place}
       </span>
-      <span className="text-[10px] font-medium uppercase tracking-wide opacity-80">
+      <span className="text-[10px] font-medium uppercase tracking-wide opacity-80 leading-none">
         {placeSuffix}
       </span>
       {participants > 0 && (
-        <span className="mt-0.5 text-[10px] tabular-nums opacity-70">
+        <span className="mt-0.5 text-[10px] tabular-nums opacity-70 leading-none">
           {placeOf}
         </span>
       )}
@@ -136,11 +136,8 @@ export async function PlayerTournamentHistory({
           : null;
 
         return (
-          <li
-            key={r.id}
-            className="site-card flex items-stretch gap-4 px-4 py-3.5 text-sm"
-          >
-            <div className="min-w-0 flex-1">
+          <li key={r.id} className="site-card player-tournament-row">
+            <div className="player-tournament-row__body">
               <Link
                 href={`/tournaments/${r.tournament.id}`}
                 className="font-medium hover:text-emerald-400"
@@ -152,7 +149,7 @@ export async function PlayerTournamentHistory({
                 )}
               </Link>
 
-              <div className="mt-2 flex flex-wrap gap-2 text-xs">
+              <div className="mt-1.5 flex flex-wrap gap-2 text-xs">
                 <span className="inline-flex items-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2.5 py-1 font-medium text-[var(--text)]">
                   {when}
                 </span>
@@ -163,7 +160,7 @@ export async function PlayerTournamentHistory({
                 )}
               </div>
 
-              <p className="mt-2 text-zinc-500">
+              <p className="mt-1.5 text-zinc-500">
                 {localizedClubName(
                   locale,
                   r.tournament.club.name,
@@ -171,14 +168,14 @@ export async function PlayerTournamentHistory({
                 )}{" "}
                 · {tournamentStatusLabel(r.tournament.status)}
               </p>
-              <div className="mt-1.5">
+              <div className="mt-1">
                 <StatusBadge
                   status={r.status}
                   label={registrationStatusLabel(r.status)}
                 />
               </div>
             </div>
-            <div className="flex shrink-0 flex-col items-end justify-center gap-2">
+            <div className="player-tournament-row__side">
               {place && (
                 <PlaceBadge
                   place={place}

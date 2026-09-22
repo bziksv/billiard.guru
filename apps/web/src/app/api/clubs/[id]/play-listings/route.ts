@@ -18,7 +18,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id: clubId } = await params;
-    await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId, { readOnly: true });
     const payload = await loadClubPlayListingsManage(clubId);
     return NextResponse.json(payload);
   } catch (error) {

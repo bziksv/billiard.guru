@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { parseRatingPreviewFormula } from "@/lib/rating-auto-config";
 import {
   getRatingAutoConfig,
@@ -31,7 +31,7 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const body = bodySchema.parse(await request.json());
     const saved = await saveRatingAutoConfig({
       enabled: body.enabled,

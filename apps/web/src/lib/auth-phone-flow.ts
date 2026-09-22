@@ -9,7 +9,6 @@ import {
 } from "@/lib/phone-validation-errors";
 import type { AppLocale } from "@/i18n/routing";
 import { createLoginChallenge, createCallLoginChallenge } from "@/lib/login-challenge";
-import { buildConfirmLink } from "@/lib/telegram";
 import { writeAuditLog } from "@/lib/audit";
 import { buildPlayerLatinFields } from "@/lib/latin-names";
 import { playerRegisterSchema } from "@/lib/validators";
@@ -27,7 +26,6 @@ export type AuthStartResult =
       expiresAt: string;
       message: string;
       flow?: "register" | "login";
-      confirmLink?: string;
       callAuth?: {
         available: boolean;
         enabled: boolean;
@@ -35,8 +33,8 @@ export type AuthStartResult =
       };
     }
   | {
+      /** Open Telegram bot (generic link) — no confirmToken in response. */
       mode: "confirm";
-      confirmLink: string;
       message: string;
     }
   | {
@@ -44,6 +42,76 @@ export type AuthStartResult =
       phone: string;
       message: string;
     };
+
+/** Uniform public auth payload — same keys always (A2 anti-enumeration). */
+export type AuthContinuePublic = {
+  mode: "continue";
+  message: string;
+  phone: string | null;
+  challengeToken: string | null;
+  expiresAt: string | null;
+  authMethod: "telegram" | "call" | null;
+  callAuth: {
+    available: boolean;
+    enabled: boolean;
+    callNumber: string | null;
+  };
+  openTelegram: boolean;
+  needsProfile: boolean;
+};
+
+function callAuthSnapshot() {
+  return {
+    available: isNovofonCallAuthConfigured(),
+    enabled: isNovofonCallAuthEnabled(),
+    callNumber: getNovofonVerifyNumberDisplay(),
+  };
+}
+
+/** Map internal auth result → public continue DTO (no register/login mode leak). */
+export function toPublicAuthContinue(
+  result: AuthStartResult,
+  requestE164?: string | null,
+): AuthContinuePublic {
+  const callAuth = callAuthSnapshot();
+  if (result.mode === "login") {
+    return {
+      mode: "continue",
+      message: result.message,
+      phone: requestE164 ?? null,
+      challengeToken: result.challengeToken,
+      expiresAt: result.expiresAt,
+      authMethod: result.authMethod,
+      callAuth: result.callAuth ?? callAuth,
+      openTelegram: false,
+      needsProfile: false,
+    };
+  }
+  if (result.mode === "confirm") {
+    return {
+      mode: "continue",
+      message: result.message,
+      phone: requestE164 ?? null,
+      challengeToken: null,
+      expiresAt: null,
+      authMethod: null,
+      callAuth,
+      openTelegram: true,
+      needsProfile: false,
+    };
+  }
+  return {
+    mode: "continue",
+    message: result.message,
+    phone: result.phone,
+    challengeToken: null,
+    expiresAt: null,
+    authMethod: null,
+    callAuth,
+    openTelegram: false,
+    needsProfile: true,
+  };
+}
 
 async function ensureConfirmToken(playerId: string, existing: string | null) {
   const confirmToken = existing ?? randomUUID();
@@ -60,7 +128,6 @@ async function buildCallLoginResult(
   playerId: string,
   message: string,
   flow: "register" | "login" = "login",
-  confirmToken?: string,
 ): Promise<Extract<AuthStartResult, { mode: "login" }>> {
   const { token, expiresAt } = await createCallLoginChallenge(playerId);
   return {
@@ -70,7 +137,6 @@ async function buildCallLoginResult(
     challengeToken: token,
     expiresAt: expiresAt.toISOString(),
     message,
-    ...(confirmToken ? { confirmLink: buildConfirmLink(confirmToken) } : {}),
     callAuth: {
       available: true,
       enabled: true,
@@ -81,16 +147,28 @@ async function buildCallLoginResult(
 
 async function buildCallVerifyResult(
   playerId: string,
-  confirmToken: string,
   message: string,
 ): Promise<Extract<AuthStartResult, { mode: "login" }>> {
-  return buildCallLoginResult(playerId, message, "register", confirmToken);
+  return buildCallLoginResult(playerId, message, "register");
 }
 
 function callAuthUnavailableError(phoneOnlyAuth: boolean): string {
   return phoneOnlyAuth
     ? "Вход по телефону временно недоступен. Попробуйте позже."
     : "Подтверждение временно недоступно. Попробуйте позже или используйте Telegram.";
+}
+
+function genericAuthContinueMessage(phoneOnlyAuth: boolean): string {
+  return phoneOnlyAuth
+    ? "Продолжите вход: подтвердите номер коротким звонком."
+    : "Продолжите вход: подтвердите номер коротким звонком или в Telegram.";
+}
+
+async function padAuthTiming(startedAt: number, minMs = 120) {
+  const elapsed = Date.now() - startedAt;
+  if (elapsed < minMs) {
+    await new Promise((r) => setTimeout(r, minMs - elapsed));
+  }
 }
 
 export async function resolveAuthByPhone(
@@ -103,9 +181,11 @@ export async function resolveAuthByPhone(
   errorParams?: PhoneValidationErrorParams;
   result?: AuthStartResult;
 }> {
+  const startedAt = Date.now();
   const normalized = normalizePhoneAuto(String(phoneRaw), countryName);
   if (!normalized.valid || !normalized.e164) {
     const code = normalized.errorCode ?? "invalid";
+    await padAuthTiming(startedAt);
     return {
       error: formatPhoneValidationError(code, normalized.errorParams ?? {}, locale),
       errorCode: code,
@@ -115,19 +195,19 @@ export async function resolveAuthByPhone(
 
   const authCountry = countryName ?? normalized.countryName;
   const phoneOnlyAuth = isPhoneOnlyAuthCountry(authCountry);
+  const continueMsg = genericAuthContinueMessage(phoneOnlyAuth);
 
   const player = await prisma.player.findUnique({
     where: { phone: normalized.e164 },
   });
 
   if (!player) {
+    await padAuthTiming(startedAt);
     return {
       result: {
         mode: "register",
         phone: normalized.e164,
-        message: phoneOnlyAuth
-          ? "Заполните имя и город — дальше подтвердите номер коротким звонком."
-          : "Заполните имя и город — дальше подтвердите номер коротким звонком или в Telegram.",
+        message: continueMsg,
       },
     };
   }
@@ -135,15 +215,12 @@ export async function resolveAuthByPhone(
   if (player.isVerified) {
     if (phoneOnlyAuth) {
       if (!isNovofonCallAuthEnabled()) {
+        await padAuthTiming(startedAt);
         return { error: callAuthUnavailableError(true) };
       }
-      return {
-        result: await buildCallLoginResult(
-          player.id,
-          "Позвоните на указанный номер — звонок сбросится автоматически",
-          "login",
-        ),
-      };
+      const result = await buildCallLoginResult(player.id, continueMsg, "login");
+      await padAuthTiming(startedAt);
+      return { result };
     }
 
     if (player.telegramId) {
@@ -151,6 +228,7 @@ export async function resolveAuthByPhone(
         player.id,
         player.telegramId,
       );
+      await padAuthTiming(startedAt);
       return {
         result: {
           mode: "login",
@@ -158,7 +236,7 @@ export async function resolveAuthByPhone(
           flow: "login",
           challengeToken: token,
           expiresAt: expiresAt.toISOString(),
-          message: "Подтвердите вход в Telegram",
+          message: continueMsg,
           callAuth: {
             available: isNovofonCallAuthConfigured(),
             enabled: isNovofonCallAuthEnabled(),
@@ -169,41 +247,34 @@ export async function resolveAuthByPhone(
     }
 
     if (isNovofonCallAuthEnabled()) {
-      return {
-        result: await buildCallLoginResult(
-          player.id,
-          "Позвоните на указанный номер — звонок сбросится автоматически",
-          "login",
-        ),
-      };
+      const result = await buildCallLoginResult(player.id, continueMsg, "login");
+      await padAuthTiming(startedAt);
+      return { result };
     }
 
+    await padAuthTiming(startedAt);
     return { error: callAuthUnavailableError(false) };
   }
 
-  const confirmToken = await ensureConfirmToken(player.id, player.confirmToken);
+  // Keep token in DB for Telegram contact / deep-link from bot — never return it to the browser.
+  await ensureConfirmToken(player.id, player.confirmToken);
 
   if (isNovofonCallAuthEnabled()) {
-    return {
-      result: await buildCallVerifyResult(
-        player.id,
-        confirmToken,
-        "Позвоните на указанный номер с телефона, который вводили — так мы подтвердим регистрацию.",
-      ),
-    };
+    const result = await buildCallVerifyResult(player.id, continueMsg);
+    await padAuthTiming(startedAt);
+    return { result };
   }
 
   if (phoneOnlyAuth) {
+    await padAuthTiming(startedAt);
     return { error: callAuthUnavailableError(true) };
   }
 
+  await padAuthTiming(startedAt);
   return {
     result: {
       mode: "confirm",
-      confirmLink: buildConfirmLink(confirmToken),
-      message: player.isVerified
-        ? "Привяжите Telegram для входа на сайт."
-        : "Подтвердите регистрацию в Telegram (кнопка «Поделиться контактом»).",
+      message: continueMsg,
     },
   };
 }
@@ -272,7 +343,6 @@ export async function registerPlayerByPhone(input: {
       return {
         result: await buildCallVerifyResult(
           existing.id,
-          confirmToken,
           "Позвоните на указанный номер — так мы подтвердим ваш номер.",
         ),
       };
@@ -285,7 +355,6 @@ export async function registerPlayerByPhone(input: {
     return {
       result: {
         mode: "confirm" as const,
-        confirmLink: buildConfirmLink(confirmToken),
         message: "Откройте Telegram и подтвердите регистрацию.",
       },
     };
@@ -321,7 +390,6 @@ export async function registerPlayerByPhone(input: {
     return {
       result: await buildCallVerifyResult(
         player.id,
-        confirmToken,
         "Позвоните на указанный номер — так мы подтвердим ваш номер.",
       ),
     };
@@ -334,7 +402,6 @@ export async function registerPlayerByPhone(input: {
   return {
     result: {
       mode: "confirm" as const,
-      confirmLink: buildConfirmLink(confirmToken),
       message: "Откройте Telegram и подтвердите регистрацию.",
     },
   };

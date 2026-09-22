@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePlayerDeep } from "@/lib/api-sanitize";
 import { writeAuditLog } from "@/lib/audit";
 import { authErrorResponse, getSession } from "@/lib/auth";
 import { auditActorFields, requireClubManageAccess } from "@/lib/club-manage";
@@ -10,7 +11,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id: clubId } = await params;
-    await requireClubManageAccess(clubId);
+    await requireClubManageAccess(clubId, { readOnly: true });
 
     const rows = await prisma.clubPlayerRating.findMany({
       where: { clubId },
@@ -22,7 +23,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       orderBy: [{ player: { lastName: "asc" } }, { player: { firstName: "asc" } }],
     });
 
-    return NextResponse.json(rows);
+    return NextResponse.json(sanitizePlayerDeep(rows));
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       payload: { clubId, playerId: data.playerId, rating: data.rating },
     });
 
-    return NextResponse.json(row, { status: 201 });
+    return NextResponse.json(sanitizePlayerDeep(row), { status: 201 });
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

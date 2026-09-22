@@ -1,8 +1,22 @@
-import { AuthError, getCurrentPlayer, getImpersonation, getSession } from "@/lib/auth";
+import {
+  assertNotPreviewWrite,
+  AuthError,
+  getCurrentPlayer,
+  getImpersonation,
+  getSession,
+} from "@/lib/auth";
 import { playerCanManageClub } from "@/lib/club-staff";
 import { prisma } from "@/lib/prisma";
 
-export async function requireClubManageAccess(clubId: string) {
+export async function requireClubManageAccess(
+  clubId: string,
+  options?: { readOnly?: boolean },
+) {
+  // H5: preview is read-only; pass readOnly for GET handlers.
+  if (!options?.readOnly) {
+    await assertNotPreviewWrite();
+  }
+
   const session = await getSession();
   if (!session) {
     throw new AuthError("Требуется вход", 401);

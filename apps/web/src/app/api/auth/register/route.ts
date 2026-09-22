@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { registerPlayerByPhone } from "@/lib/auth-phone-flow";
+import { registerPlayerByPhone, toPublicAuthContinue } from "@/lib/auth-phone-flow";
 import { parseApiLocale } from "@/lib/phone-api-error";
 
 export async function POST(request: NextRequest) {
@@ -40,8 +40,13 @@ export async function POST(request: NextRequest) {
     if (error) {
       return NextResponse.json({ error, errorCode, errorParams }, { status: 400 });
     }
+    if (!result) {
+      return NextResponse.json({ error: "Не удалось зарегистрироваться" }, { status: 500 });
+    }
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(toPublicAuthContinue(result, String(phone)), {
+      status: 201,
+    });
   } catch (error) {
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Проверьте введённые данные" }, { status: 400 });

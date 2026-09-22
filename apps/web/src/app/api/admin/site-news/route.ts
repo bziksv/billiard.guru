@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { createSiteNews, listSiteNewsAdmin, serializeSiteNews } from "@/lib/site-news-server";
 import { siteNewsSchema } from "@/lib/validators";
 
@@ -17,7 +17,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await requireSuperAdmin();
+    const session = await requireWritableSuperAdmin();
     const data = siteNewsSchema.parse(await request.json());
     const item = await createSiteNews({
       authorId: session.playerId,

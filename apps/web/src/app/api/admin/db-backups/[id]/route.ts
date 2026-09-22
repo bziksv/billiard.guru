@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { deleteDbBackup, listDbBackups } from "@/lib/db-backup-server";
 
 export async function DELETE(
@@ -7,7 +7,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const { id } = await params;
     await deleteDbBackup(id);
     const backups = await listDbBackups();

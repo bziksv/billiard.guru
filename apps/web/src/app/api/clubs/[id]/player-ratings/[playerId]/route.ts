@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/audit";
 import { authErrorResponse, getSession } from "@/lib/auth";
+import { sanitizePlayerDeep } from "@/lib/api-sanitize";
 import { auditActorFields, requireClubManageAccess } from "@/lib/club-manage";
 import { prisma } from "@/lib/prisma";
 import { clubPlayerRatingUpdateSchema } from "@/lib/validators";
@@ -45,7 +46,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       payload: { rating: data.rating },
     });
 
-    return NextResponse.json(row);
+    return NextResponse.json(sanitizePlayerDeep(row));
   } catch (error) {
     const authResp = authErrorResponse(error);
     if (authResp) return authResp;

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, requireSuperAdmin } from "@/lib/auth";
+import { authErrorResponse, requireSuperAdmin, requireWritableSuperAdmin } from "@/lib/auth";
 import { getNotificationById } from "@/lib/notifications/catalog";
 import {
   getAllNotificationItemSettings,
@@ -42,7 +42,7 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    await requireSuperAdmin();
+    await requireWritableSuperAdmin();
     const body = patchSchema.parse(await request.json());
 
     if (body.global) {

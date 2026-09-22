@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authErrorResponse, getCurrentPlayer } from "@/lib/auth";
+import { authErrorResponse, getCurrentPlayer, requireWritablePlayer } from "@/lib/auth";
 import { parseCoachGalleryUrls } from "@/lib/coach-profile";
 import { jsonUpdateValue } from "@/lib/prisma-json";
 import { prisma } from "@/lib/prisma";
@@ -28,10 +28,7 @@ export async function GET() {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const player = await getCurrentPlayer();
-    if (!player) {
-      return NextResponse.json({ error: "Требуется вход" }, { status: 401 });
-    }
+    const player = await requireWritablePlayer();
 
     const body = await request.json();
     const data = coachProfileUpdateSchema.parse(body);

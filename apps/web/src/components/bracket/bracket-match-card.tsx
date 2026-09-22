@@ -370,7 +370,7 @@ export function BracketMatchCard({
             title={
               (match.substitutions?.length ?? 0) > 0
                 ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
-                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .map((s) => `${labels.substitutionPrefix} ${s.outgoingLabel} → ${s.incomingLabel}`)
                     .join("\n")}`
                 : labels.handicapTitle(handicap!)
             }
@@ -378,7 +378,7 @@ export function BracketMatchCard({
             <span className="bracket-match-meta-label">{labels.handicap}</span>
             <span className="bracket-match-meta-value">
               {handicapShort}
-              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
+              {(match.substitutions?.length ?? 0) > 0 ? labels.substitutionDot : ""}
             </span>
           </button>
         ) : (
@@ -387,7 +387,7 @@ export function BracketMatchCard({
             title={
               (match.substitutions?.length ?? 0) > 0
                 ? `${labels.handicapTitle(handicap!)}\n${match.substitutions!
-                    .map((s) => `Замена: ${s.outgoingLabel} → ${s.incomingLabel}`)
+                    .map((s) => `${labels.substitutionPrefix} ${s.outgoingLabel} → ${s.incomingLabel}`)
                     .join("\n")}`
                 : labels.handicapTitle(handicap!)
             }
@@ -395,7 +395,7 @@ export function BracketMatchCard({
             <span className="bracket-match-meta-label">{labels.handicap}</span>
             <span className="bracket-match-meta-value">
               {handicapShort}
-              {(match.substitutions?.length ?? 0) > 0 ? " · замена" : ""}
+              {(match.substitutions?.length ?? 0) > 0 ? labels.substitutionDot : ""}
             </span>
           </div>
         )
@@ -411,7 +411,7 @@ export function BracketMatchCard({
               .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
               .join("; ")}
           >
-            <span className="bracket-match-meta-label">Замена</span>
+            <span className="bracket-match-meta-label">{labels.substitution}</span>
             <span className="bracket-match-meta-value truncate">
               {match.substitutions!
                 .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
@@ -425,7 +425,7 @@ export function BracketMatchCard({
               .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)
               .join("; ")}
           >
-            <span className="bracket-match-meta-label">Замена</span>
+            <span className="bracket-match-meta-label">{labels.substitution}</span>
             <span className="bracket-match-meta-value truncate">
               {match.substitutions!
                 .map((s) => `${s.outgoingLabel} → ${s.incomingLabel}`)

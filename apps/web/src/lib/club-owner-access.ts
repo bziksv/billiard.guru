@@ -1,7 +1,15 @@
 import { clubOwnedByPlayer } from "@/lib/club-access";
-import { getImpersonation, getSession } from "@/lib/auth";
+import { getCurrentPlayer, getImpersonation, getRealPlayer, getSession } from "@/lib/auth";
+import { listClubsOwnedByPlayer } from "@/lib/impersonate";
 import { listClubsManagedByPlayer, playerCanManageClub } from "@/lib/club-staff";
 import { prisma } from "@/lib/prisma";
+
+export type ManageClubNavItem = {
+  id: string;
+  name: string;
+  city?: { nameRu: string } | null;
+  isOwner: boolean;
+};
 
 export async function requireClubOwnerPageAccess(clubId: string) {
   const session = await getSession();
@@ -44,7 +52,18 @@ export async function requireClubOwnerPageAccess(clubId: string) {
   return { allowed: true as const, club, preview: false as const };
 }
 
-export async function getAccessibleOwnedClubs() {
+/** True if current viewer is club owner (or SA). Staff → false. */
+export async function viewerIsClubOwner(
+  club: { phone: string; telegramId: string | null },
+): Promise<boolean> {
+  const real = await getRealPlayer();
+  if (real?.role === "SUPERADMIN") return true;
+  const player = await getCurrentPlayer();
+  if (!player) return false;
+  return clubOwnedByPlayer(club, player);
+}
+
+export async function getAccessibleOwnedClubs(): Promise<ManageClubNavItem[]> {
   const session = await getSession();
   if (!session) return [];
 
@@ -55,14 +74,26 @@ export async function getAccessibleOwnedClubs() {
       where: { id: impersonation.clubId },
       select: { id: true, name: true, city: { select: { nameRu: true } } },
     });
-    return club ? [club] : [];
+    // Preview as club → owner UX for staff nav.
+    return club ? [{ ...club, isOwner: true }] : [];
   }
 
-  const { getCurrentPlayer } = await import("@/lib/auth");
   const player = await getCurrentPlayer();
   if (!player) return [];
 
-  return listClubsManagedByPlayer(player);
+  const [managed, owned] = await Promise.all([
+    listClubsManagedByPlayer(player),
+    listClubsOwnedByPlayer(player),
+  ]);
+  const ownedIds = new Set(owned.map((c) => c.id));
+  const isSa = session.role === "SUPERADMIN";
+
+  return managed.map((c) => ({
+    id: c.id,
+    name: c.name,
+    city: c.city,
+    isOwner: isSa || ownedIds.has(c.id),
+  }));
 }
 
 export async function isClubOwnerForClub(

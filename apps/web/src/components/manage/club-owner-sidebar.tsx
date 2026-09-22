@@ -27,20 +27,23 @@ import { pendingBookingsBadgeLabel } from "@/lib/club-pending-bookings-badge";
 
 const STORAGE_KEY = "setka-manage-sidebar-collapsed";
 
-type ClubOption = { id: string; name: string };
+type ClubOption = { id: string; name: string; isOwner?: boolean };
 
-function navForClub(clubId: string) {
-  return [
+function navForClub(clubId: string, isOwner: boolean) {
+  const items = [
     { href: `/manage/clubs/${clubId}`, label: "Клуб", icon: IconClubs, exact: true },
     { href: `/manage/clubs/${clubId}/floor`, label: "План зала", icon: IconFloorPlan },
     { href: `/manage/clubs/${clubId}/tariffs`, label: "Тарифы клуба", icon: IconTariffs },
     { href: `/manage/clubs/${clubId}/players`, label: "Игроки", icon: IconPlayers },
-    { href: `/manage/clubs/${clubId}/staff`, label: "Сотрудники", icon: IconStaff },
+    ...(isOwner
+      ? [{ href: `/manage/clubs/${clubId}/staff`, label: "Сотрудники", icon: IconStaff }]
+      : []),
     { href: `/manage/clubs/${clubId}/bookings`, label: "Брони столов", icon: IconBookings },
     { href: `/manage/clubs/${clubId}/tournaments`, label: "Турниры", icon: IconTournaments },
     { href: `/manage/clubs/${clubId}/news`, label: "Новости клуба", icon: IconNews },
     { href: `/manage/clubs/${clubId}/ideas`, label: "Идеи", icon: IconIdeas },
   ] as const;
+  return items;
 }
 
 function isActive(href: string, pathname: string, exact?: boolean) {
@@ -99,8 +102,9 @@ export function ClubOwnerSidebar({
   const pathname = usePathname();
   const router = useRouter();
   const { collapsed, narrow, ready, toggle } = useAdminSidebarCollapsed(STORAGE_KEY);
-  const nav = navForClub(activeClubId);
   const activeClub = clubs.find((c) => c.id === activeClubId);
+  const isOwner = activeClub?.isOwner !== false;
+  const nav = navForClub(activeClubId, isOwner);
   const pendingBookings = usePendingBookingsBadge(activeClubId);
   const pendingBookingsBadge = pendingBookingsBadgeLabel(pendingBookings);
 

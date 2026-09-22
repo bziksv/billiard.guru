@@ -18,16 +18,25 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
-    const res = await fetch("/api/me/coach-profile");
-    const data = await res.json();
-    setLoading(false);
-    if (!res.ok) {
-      setError(data.error ?? t("loadError"));
-      return;
+    try {
+      const res = await fetch("/api/me/coach-profile");
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("loadError"));
+        return;
+      }
+      setIsCoach(Boolean((data as { isCoach?: boolean }).isCoach));
+      setCoachBio((data as { coachBio?: string }).coachBio ?? "");
+      setGallery(
+        Array.isArray((data as { coachGalleryUrls?: string[] }).coachGalleryUrls)
+          ? (data as { coachGalleryUrls: string[] }).coachGalleryUrls
+          : [],
+      );
+    } catch {
+      setError(t("loadError"));
+    } finally {
+      setLoading(false);
     }
-    setIsCoach(Boolean(data.isCoach));
-    setCoachBio(data.coachBio ?? "");
-    setGallery(Array.isArray(data.coachGalleryUrls) ? data.coachGalleryUrls : []);
   }, [t]);
 
   useEffect(() => {
@@ -38,42 +47,60 @@ export function CoachProfileEditor({ playerId }: { playerId: string }) {
     setSaving(true);
     setError(null);
     setMessage(null);
-    const res = await fetch("/api/me/coach-profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        isCoach,
-        coachBio: coachBio.trim() || null,
-        coachGalleryUrls: gallery,
-      }),
-    });
-    const data = await res.json();
-    setSaving(false);
-    if (!res.ok) {
-      setError(data.error ?? t("saveError"));
-      return;
+    try {
+      const res = await fetch("/api/me/coach-profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isCoach,
+          coachBio: coachBio.trim() || null,
+          coachGalleryUrls: gallery,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("saveError"));
+        return;
+      }
+      const savedCoach = Boolean((data as { isCoach?: boolean }).isCoach);
+      setIsCoach(savedCoach);
+      setCoachBio((data as { coachBio?: string }).coachBio ?? "");
+      setGallery(
+        Array.isArray((data as { coachGalleryUrls?: string[] }).coachGalleryUrls)
+          ? (data as { coachGalleryUrls: string[] }).coachGalleryUrls
+          : [],
+      );
+      setMessage(savedCoach ? t("coachSaved") : t("coachDisabled"));
+    } catch {
+      setError(t("saveError"));
+    } finally {
+      setSaving(false);
     }
-    const savedCoach = Boolean(data.isCoach);
-    setIsCoach(savedCoach);
-    setCoachBio(data.coachBio ?? "");
-    setGallery(Array.isArray(data.coachGalleryUrls) ? data.coachGalleryUrls : []);
-    setMessage(savedCoach ? t("coachSaved") : t("coachDisabled"));
   }
 
   async function onPhotoSelected(file: File | null) {
     if (!file) return;
     setUploading(true);
     setError(null);
-    const form = new FormData();
-    form.append("photo", file);
-    const res = await fetch("/api/me/coach-photos", { method: "POST", body: form });
-    const data = await res.json();
-    setUploading(false);
-    if (!res.ok) {
-      setError(data.error ?? t("coachUploadFailed"));
-      return;
+    try {
+      const form = new FormData();
+      form.append("photo", file);
+      const res = await fetch("/api/me/coach-photos", { method: "POST", body: form });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError((data as { error?: string }).error ?? t("coachUploadFailed"));
+        return;
+      }
+      setGallery(
+        Array.isArray((data as { coachGalleryUrls?: string[] }).coachGalleryUrls)
+          ? (data as { coachGalleryUrls: string[] }).coachGalleryUrls
+          : [],
+      );
+    } catch {
+      setError(t("coachUploadFailed"));
+    } finally {
+      setUploading(false);
     }
-    setGallery(Array.isArray(data.coachGalleryUrls) ? data.coachGalleryUrls : []);
   }
 
   function removePhoto(url: string) {
