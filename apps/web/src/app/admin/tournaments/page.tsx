@@ -314,6 +314,9 @@ export default function TournamentsPage() {
           : null,
         ratingSource: tournamentDefaults.limitByRating ? ratingSource : "SYSTEM",
         handicapHalfStep: form.get("handicapHalfStep") === "on",
+        handicapEvenExtraCancelOnFirstLoss:
+          form.get("handicapHalfStep") === "on" &&
+          form.get("handicapEvenExtraCancelOnFirstLoss") === "on",
         suppressNotifications: form.get("suppressNotifications") === "on",
         tableIds: selectedTableIds,
         tableStreams,
@@ -508,6 +511,25 @@ export default function TournamentsPage() {
               <span className="mt-1 block text-xs text-zinc-500">
                 С галкой — фора по шагу 0,5. Без галки — только целые шары по разнице рейтингов, без
                 дополнительного шара в чётных партиях.
+              </span>
+            </span>
+          </label>
+          <label className="sm:col-span-2 flex cursor-pointer items-start gap-3 pl-7 text-sm">
+            <input
+              type="checkbox"
+              name="handicapEvenExtraCancelOnFirstLoss"
+              defaultChecked={
+                tournamentDefaults.handicapHalfStep &&
+                tournamentDefaults.handicapEvenExtraCancelOnFirstLoss
+              }
+              className="mt-1 h-4 w-4 rounded border-zinc-600 bg-zinc-800 text-emerald-600"
+            />
+            <span>
+              <span className="font-medium text-zinc-200">
+                Снимать +1 в чётных, если отдающий проиграет 1-ю партию
+              </span>
+              <span className="mt-1 block text-xs text-zinc-500">
+                Только при учёте рейтинга 0,5. Иначе +1 в чётных всегда.
               </span>
             </span>
           </label>

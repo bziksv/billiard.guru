@@ -254,6 +254,7 @@ export function formatTournamentPlayerSelectLabel(
 export function formatTournamentRatingRulesSummary(tournament: {
   ratingMax?: number | null;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   ratingSource?: TournamentRatingSource;
 }): string {
   const parts: string[] = [];
@@ -264,10 +265,14 @@ export function formatTournamentRatingRulesSummary(tournament: {
   } else {
     parts.push("без лимита по рейтингу");
   }
-  parts.push(
-    tournament.handicapHalfStep !== false
-      ? "фора с учётом шага 0,5"
-      : "фора без шага 0,5 (рейтинг вниз до целого)",
-  );
+  if (tournament.handicapHalfStep !== false) {
+    parts.push(
+      tournament.handicapEvenExtraCancelOnFirstLoss
+        ? "фора с шагом 0,5; +1 в чётных снимается, если отдающий проиграет 1-ю"
+        : "фора с учётом шага 0,5",
+    );
+  } else {
+    parts.push("фора без шага 0,5 (рейтинг вниз до целого)");
+  }
   return parts.join(" · ");
 }

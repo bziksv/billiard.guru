@@ -11,6 +11,7 @@ export function TournamentRatingRulesSummary({
   tournament: {
     ratingMax?: number | null;
     handicapHalfStep?: boolean;
+    handicapEvenExtraCancelOnFirstLoss?: boolean;
     ratingSource?: TournamentRatingSource;
   };
   className?: string;

@@ -160,6 +160,7 @@ type RawTournamentBaseRow = {
   rating_max: number | null;
   rating_source: string;
   handicap_half_step: number | boolean;
+  handicap_even_extra_cancel_on_first_loss: number | boolean;
   suppress_notifications: number | boolean;
   table_ids: unknown;
   table_streams: unknown;
@@ -180,6 +181,7 @@ async function fetchTournamentBaseRaw(id: string): Promise<RawTournamentBaseRow 
       t.rating_max,
       CAST(t.rating_source AS CHAR) AS rating_source,
       t.handicap_half_step,
+      t.handicap_even_extra_cancel_on_first_loss,
       t.suppress_notifications,
       t.table_ids,
       t.table_streams,
@@ -295,6 +297,9 @@ async function findPublicTournamentByIdRaw<T extends Prisma.TournamentInclude>(
     ratingMax: base.rating_max,
     ratingSource: base.rating_source,
     handicapHalfStep: asBool(base.handicap_half_step),
+    handicapEvenExtraCancelOnFirstLoss: asBool(
+      base.handicap_even_extra_cancel_on_first_loss,
+    ),
     suppressNotifications: asBool(base.suppress_notifications),
     tableIds: base.table_ids,
     tableStreams: base.table_streams,

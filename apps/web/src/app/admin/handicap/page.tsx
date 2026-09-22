@@ -26,6 +26,8 @@ export default function HandicapPage() {
   const [ratingB, setRatingB] = useState(0);
   const [game, setGame] = useState(1);
   const [handicapHalfStep, setHandicapHalfStep] = useState(true);
+  const [evenExtraCancelOnFirstLoss, setEvenExtraCancelOnFirstLoss] = useState(false);
+  const [strongerLostFirstGame, setStrongerLostFirstGame] = useState(false);
   const [limitByRating, setLimitByRating] = useState(true);
   const [ratingMax, setRatingMax] = useState("8");
   const [ratingSource, setRatingSource] = useState<TournamentRatingSource>("SYSTEM");
@@ -42,12 +44,17 @@ export default function HandicapPage() {
       .then(
         (data: {
           handicapHalfStep: boolean;
+          handicapEvenExtraCancelOnFirstLoss?: boolean;
           limitByRating: boolean;
           ratingMax: number | null;
           ratingSource?: TournamentRatingSource;
         }) => {
           if (cancelled) return;
           setHandicapHalfStep(data.handicapHalfStep);
+          setEvenExtraCancelOnFirstLoss(
+            data.handicapHalfStep &&
+              data.handicapEvenExtraCancelOnFirstLoss === true,
+          );
           setLimitByRating(data.limitByRating);
           if (data.limitByRating && data.ratingMax != null) {
             setRatingMax(String(data.ratingMax));
@@ -78,6 +85,8 @@ export default function HandicapPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           handicapHalfStep,
+          handicapEvenExtraCancelOnFirstLoss:
+            handicapHalfStep && evenExtraCancelOnFirstLoss,
           limitByRating,
           ratingMax: limitByRating ? parsedRatingMax : null,
           ratingSource,
@@ -105,6 +114,12 @@ export default function HandicapPage() {
         ratingB: String(ratingB),
         game: String(game),
         halfStep: handicapHalfStep ? "1" : "0",
+        evenExtraCancelOnFirstLoss:
+          handicapHalfStep && evenExtraCancelOnFirstLoss ? "1" : "0",
+        strongerLostFirstGame:
+          handicapHalfStep && evenExtraCancelOnFirstLoss && strongerLostFirstGame
+            ? "1"
+            : "0",
       });
       if (parsedRatingMax != null) {
         params.set("ratingMax", String(parsedRatingMax));
@@ -142,7 +157,14 @@ export default function HandicapPage() {
               <input
                 type="checkbox"
                 checked={handicapHalfStep}
-                onChange={(e) => setHandicapHalfStep(e.target.checked)}
+                onChange={(e) => {
+                  const on = e.target.checked;
+                  setHandicapHalfStep(on);
+                  if (!on) {
+                    setEvenExtraCancelOnFirstLoss(false);
+                    setStrongerLostFirstGame(false);
+                  }
+                }}
                 className="admin-checkbox mt-0.5"
               />
               <span>
@@ -155,6 +177,29 @@ export default function HandicapPage() {
                 </span>
               </span>
             </label>
+
+            {handicapHalfStep && (
+              <label className="flex cursor-pointer items-start gap-3 pl-7 text-sm">
+                <input
+                  type="checkbox"
+                  checked={evenExtraCancelOnFirstLoss}
+                  onChange={(e) => {
+                    setEvenExtraCancelOnFirstLoss(e.target.checked);
+                    if (!e.target.checked) setStrongerLostFirstGame(false);
+                  }}
+                  className="admin-checkbox mt-0.5"
+                />
+                <span>
+                  <span className="font-medium">
+                    Снимать +1 в чётных, если отдающий проиграет 1-ю партию
+                  </span>
+                  <span className="admin-muted mt-1 block text-xs">
+                    По умолчанию выключено: +1 в чётных всегда. Включите, чтобы после поражения
+                    отдающего в первой партии дальше шла только целая часть форы.
+                  </span>
+                </span>
+              </label>
+            )}
 
             <label className="flex cursor-pointer items-start gap-3 text-sm">
               <input
@@ -256,6 +301,23 @@ export default function HandicapPage() {
             className="admin-input w-full max-w-xs px-3 py-2"
           />
         </div>
+
+        {handicapHalfStep && evenExtraCancelOnFirstLoss && (
+          <label className="flex cursor-pointer items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              checked={strongerLostFirstGame}
+              onChange={(e) => setStrongerLostFirstGame(e.target.checked)}
+              className="admin-checkbox mt-0.5"
+            />
+            <span>
+              <span className="font-medium">Сильнейший проиграл 1-ю партию</span>
+              <span className="admin-muted mt-1 block text-xs">
+                Для демо: в чётных партиях не давать дополнительный шар.
+              </span>
+            </span>
+          </label>
+        )}
 
         <button
           type="button"

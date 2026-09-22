@@ -325,6 +325,7 @@ export const tournamentSchema = z.object({
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional().default("SYSTEM"),
   handicapHalfStep: z.boolean().optional().default(true),
+  handicapEvenExtraCancelOnFirstLoss: z.boolean().optional().default(false),
   suppressNotifications: z.boolean().optional().default(false),
   tableIds: z.array(z.string().min(1)).min(1, "Выберите хотя бы один стол"),
   tableStreams: z.record(z.string().min(1), z.string().max(2000)).optional(),
@@ -405,6 +406,7 @@ export const tournamentUpdateSchema = z.object({
   ratingMax: tournamentRatingMaxSchema.nullable().optional(),
   ratingSource: tournamentRatingSourceSchema.optional(),
   handicapHalfStep: z.boolean().optional(),
+  handicapEvenExtraCancelOnFirstLoss: z.boolean().optional(),
   suppressNotifications: z.boolean().optional(),
   /** true — снять лимит рейтинга (ratingMax → null) */
   clearRatingLimit: z.boolean().optional(),
@@ -496,6 +498,18 @@ export const bracketPlaceLateSchema = z.object({
 }).refine((d) => Boolean(d.teamId || d.playerId), {
   message: "Укажите teamId или playerId",
 });
+
+export const bracketSubstituteSchema = z
+  .object({
+    tournamentId: z.string().min(1),
+    matchId: z.string().min(1),
+    side: z.union([z.literal(1), z.literal(2)]),
+    teamId: z.string().min(1).optional(),
+    playerId: z.string().min(1).optional(),
+  })
+  .refine((d) => Boolean(d.teamId || d.playerId), {
+    message: "Укажите teamId или playerId",
+  });
 
 export const bracketGenerateSchema = z
   .object({

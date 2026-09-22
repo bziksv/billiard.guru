@@ -175,6 +175,7 @@ function layoutMatchCardHeight(matchId: string, fallback = FIXED_SWISS_CARD_H): 
 function matchHasHandicap(
   match: BracketMatchView,
   halfStep = true,
+  evenExtraCancelOnFirstLoss = false,
 ): boolean {
   if (!match.team1 || !match.team2) return false;
   const r1 = teamRating(match.team1);
@@ -182,7 +183,7 @@ function matchHasHandicap(
   if (r1 === r2) return false;
   const high = Math.max(r1, r2);
   const low = Math.min(r1, r2);
-  const opts = { halfStep };
+  const opts = { halfStep, evenExtraCancelOnFirstLoss };
   const handicap = describeHandicap(high, low, opts);
   const handicapShort = describeHandicapShort(high, low, opts);
   return Boolean(handicap && handicapShort);
@@ -193,6 +194,7 @@ export type FixedSwissDisplayOpts = {
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
 };
 
 function estimateFixedSwissFooterRowCount(
@@ -248,6 +250,7 @@ export function estimateFixedSwissCardHeight(
     showCardHandicap?: boolean;
     showCardPlacement?: boolean;
     handicapHalfStep?: boolean;
+    handicapEvenExtraCancelOnFirstLoss?: boolean;
   },
 ): number {
   const matchesPerRound =
@@ -256,7 +259,11 @@ export function estimateFixedSwissCardHeight(
       : undefined;
   const hasHandicap =
     opts?.showCardHandicap !== false &&
-    matchHasHandicap(match, opts?.handicapHalfStep !== false);
+    matchHasHandicap(
+      match,
+      opts?.handicapHalfStep !== false,
+      opts?.handicapEvenExtraCancelOnFirstLoss === true,
+    );
   const hasMatchNumber = opts?.showCardMatchNumber !== false;
   return fixedSwissMatchCardHeight(
     hasHandicap,
@@ -3532,6 +3539,8 @@ export function buildFixedSwissBracketLayout(
         showCardHandicap: display?.showCardHandicap,
         showCardPlacement: display?.showCardPlacement,
         handicapHalfStep: display?.handicapHalfStep,
+        handicapEvenExtraCancelOnFirstLoss:
+          display?.handicapEvenExtraCancelOnFirstLoss,
       }),
     );
   }

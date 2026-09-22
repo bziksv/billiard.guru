@@ -722,6 +722,7 @@
       "participantsMatches": "{participants} participants · {matches} matches",
       "participantsLabel": "Participants: {range} (club rating first, then overall)",
       "handicapHalfStep": "Handicap: 0.5 steps; no handicap if the gap is under 0.5",
+      "handicapHalfStepCancelOnFirstLoss": "Handicap: 0.5 steps; +1 in even frames is cancelled if the giver loses the 1st frame",
       "handicapInteger": "Handicap: integer rating difference only (no +1 in even frames)",
       "signInToRegister": "Sign in",
       "signInSuffix": "to register for this tournament.",

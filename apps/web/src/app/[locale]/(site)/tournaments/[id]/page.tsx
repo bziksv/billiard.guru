@@ -258,6 +258,9 @@ export default async function TournamentPage({
         matches: bracketView.matches,
         standings: bracketView.standings,
         handicapHalfStep: tournament.handicapHalfStep,
+        handicapEvenExtraCancelOnFirstLoss:
+          tournament.handicapHalfStep &&
+          tournament.handicapEvenExtraCancelOnFirstLoss,
       }
     : null;
 
@@ -313,7 +316,9 @@ export default async function TournamentPage({
           )}
           <p className="mt-1 text-sm text-zinc-500">
             {tournament.handicapHalfStep
-              ? t("detail.tournament.handicapHalfStep")
+              ? tournament.handicapEvenExtraCancelOnFirstLoss
+                ? t("detail.tournament.handicapHalfStepCancelOnFirstLoss")
+                : t("detail.tournament.handicapHalfStep")
               : t("detail.tournament.handicapInteger")}
           </p>
           {tournament.description && (

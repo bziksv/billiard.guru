@@ -329,6 +329,7 @@ export function LlbBracketMatch({
   onMatchClick,
   onPlayerClick,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
   showCardMatchNumber = true,
   showCardHandicap = true,
   showCardPlacement = true,
@@ -343,6 +344,7 @@ export function LlbBracketMatch({
   onMatchClick?: (match: BracketMatchView) => void;
   onPlayerClick?: (playerId: string, preview?: TeamWithPlayers["player1"]) => void;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
@@ -427,7 +429,11 @@ export function LlbBracketMatch({
   const openResult =
     onMatchClick && canOpenResult ? () => onMatchClick(match) : undefined;
 
-  const handicapOpts = { halfStep: handicapHalfStep, locale: uiLocale };
+  const handicapOpts = {
+    halfStep: handicapHalfStep,
+    evenExtraCancelOnFirstLoss: handicapEvenExtraCancelOnFirstLoss,
+    locale: uiLocale,
+  };
   const handicap =
     match.team1 && match.team2
       ? describeHandicap(

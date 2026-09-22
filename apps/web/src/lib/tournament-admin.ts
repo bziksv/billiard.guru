@@ -101,6 +101,7 @@ export interface AdminTournament {
   ratingMax?: number | null;
   ratingSource?: "CLUB" | "SYSTEM";
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   suppressNotifications?: boolean;
   tableIds?: unknown;
   tableStreams?: unknown;

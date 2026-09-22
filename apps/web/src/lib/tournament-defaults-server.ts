@@ -17,6 +17,7 @@ export async function getTournamentDefaults(): Promise<TournamentDefaults> {
   if (!row) return { ...FALLBACK_TOURNAMENT_DEFAULTS };
   return {
     handicapHalfStep: row.handicapHalfStep,
+    handicapEvenExtraCancelOnFirstLoss: row.handicapEvenExtraCancelOnFirstLoss,
     limitByRating: row.limitByRating,
     ratingMax: row.limitByRating ? row.ratingMax : null,
     ratingSource: row.ratingSource as TournamentRatingSource,
@@ -27,17 +28,21 @@ export async function saveTournamentDefaults(
   data: TournamentDefaults,
 ): Promise<void> {
   const ratingMax = data.limitByRating ? data.ratingMax : null;
+  const evenCancel =
+    data.handicapHalfStep && data.handicapEvenExtraCancelOnFirstLoss;
   await prisma.tournamentDefaultsConfig.upsert({
     where: { id: GLOBAL_ID },
     create: {
       id: GLOBAL_ID,
       handicapHalfStep: data.handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss: evenCancel,
       limitByRating: data.limitByRating,
       ratingMax,
       ratingSource: data.ratingSource,
     },
     update: {
       handicapHalfStep: data.handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss: evenCancel,
       limitByRating: data.limitByRating,
       ratingMax,
       ratingSource: data.ratingSource,

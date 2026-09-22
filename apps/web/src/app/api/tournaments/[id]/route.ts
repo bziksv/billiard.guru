@@ -218,6 +218,14 @@ export async function PATCH(
         ...(data.handicapHalfStep !== undefined && {
           handicapHalfStep: data.handicapHalfStep,
         }),
+        ...(data.handicapHalfStep === false
+          ? { handicapEvenExtraCancelOnFirstLoss: false }
+          : data.handicapEvenExtraCancelOnFirstLoss !== undefined
+            ? {
+                handicapEvenExtraCancelOnFirstLoss:
+                  data.handicapEvenExtraCancelOnFirstLoss,
+              }
+            : {}),
         ...(data.ratingSource !== undefined && { ratingSource: data.ratingSource }),
         ...(data.suppressNotifications !== undefined && {
           suppressNotifications: data.suppressNotifications,

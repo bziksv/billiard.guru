@@ -9,6 +9,7 @@ type Props = {
   matches: BracketMatchView[];
   standings: SwissStandingView[];
   handicapHalfStep: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   display: BracketCardDisplayPrefs;
   presentation?: boolean;
 };
@@ -18,6 +19,7 @@ export function PublicTournamentBracketCanvas({
   matches,
   standings,
   handicapHalfStep,
+  handicapEvenExtraCancelOnFirstLoss = false,
   display,
   presentation = false,
 }: Props) {
@@ -27,6 +29,7 @@ export function PublicTournamentBracketCanvas({
       matches={matches}
       standings={standings}
       handicapHalfStep={handicapHalfStep}
+      handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
       showStandings={false}
       showCardMatchNumber={display.showMatchNumber}
       showCardHandicap={display.showHandicap}

@@ -75,6 +75,7 @@ export function SwissBracketView({
   highlightedPlayerId: highlightedPlayerIdProp,
   onPlayerHighlight,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
   showCardMatchNumber = true,
   showCardHandicap = true,
   showCardPlacement = true,
@@ -91,6 +92,7 @@ export function SwissBracketView({
   highlightedPlayerId?: string | null;
   onPlayerHighlight?: (playerId: string) => void;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
@@ -125,9 +127,18 @@ export function SwissBracketView({
             showCardHandicap,
             showCardPlacement,
             handicapHalfStep,
+            handicapEvenExtraCancelOnFirstLoss,
           })
         : buildSwissBracketLayout(matches),
-    [fixedGrid, matches, showCardMatchNumber, showCardHandicap, showCardPlacement, handicapHalfStep],
+    [
+      fixedGrid,
+      matches,
+      showCardMatchNumber,
+      showCardHandicap,
+      showCardPlacement,
+      handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss,
+    ],
   );
   const matchById = new Map(matches.map((m) => [m.id, m]));
   const fixedMaxRound =
@@ -708,6 +719,9 @@ export function SwissBracketView({
                   onMatchClick={onMatchClick}
                   onPlayerClick={handlePlayerHighlight}
                   handicapHalfStep={handicapHalfStep}
+                  handicapEvenExtraCancelOnFirstLoss={
+                    handicapEvenExtraCancelOnFirstLoss
+                  }
                   showCardMatchNumber={showCardMatchNumber}
                   showCardHandicap={showCardHandicap}
                   showCardPlacement={showCardPlacement}

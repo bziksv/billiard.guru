@@ -495,6 +495,8 @@ model Tournament {
   ratingSource        TournamentRatingSource   @default(SYSTEM) @map("rating_source")
   /// Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в чётных)
   handicapHalfStep    Boolean          @default(true) @map("handicap_half_step")
+  /// При half-step: снимать +1 в чётных, если отдающий проиграл 1-ю партию
+  handicapEvenExtraCancelOnFirstLoss Boolean @default(false) @map("handicap_even_extra_cancel_on_first_loss")
   /// Не слать Telegram по этому турниру (тестовые копии и отладка)
   suppressNotifications Boolean        @default(false) @map("suppress_notifications")
   /// ID столов схемы зала или virtual:FORMAT:n — под турнир
@@ -771,6 +773,7 @@ model BracketFormatConfig {
 model TournamentDefaultsConfig {
   id               String   @id @default("default")
   handicapHalfStep Boolean  @default(true) @map("handicap_half_step")
+  handicapEvenExtraCancelOnFirstLoss Boolean @default(false) @map("handicap_even_extra_cancel_on_first_loss")
   limitByRating    Boolean                  @default(true) @map("limit_by_rating")
   ratingMax        Float?                   @map("rating_max")
   ratingSource     TournamentRatingSource   @default(SYSTEM) @map("rating_source")

@@ -26,6 +26,7 @@ export function TournamentBracket({
   matches,
   standings = [],
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
   demoPreview = false,
   showStandings = true,
   showCardMatchNumber = true,
@@ -38,6 +39,7 @@ export function TournamentBracket({
   matches: BracketMatchView[];
   standings?: SwissStandingView[];
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   demoPreview?: boolean;
   showStandings?: boolean;
   showCardMatchNumber?: boolean;
@@ -72,6 +74,7 @@ export function TournamentBracket({
         standings={standings}
         fixedGrid
         handicapHalfStep={handicapHalfStep}
+        handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
         demoPreview={demoPreview}
         showStandings={showStandings}
         showCardMatchNumber={showCardMatchNumber}
@@ -89,6 +92,7 @@ export function TournamentBracket({
         matches={matches}
         standings={standings}
         handicapHalfStep={handicapHalfStep}
+        handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
         showStandings={showStandings}
         showCardMatchNumber={showCardMatchNumber}
         showCardHandicap={showCardHandicap}
@@ -105,6 +109,7 @@ export function TournamentBracket({
         matches={matches}
         withBronzeMatch={isOlympicBronzeFormat(format)}
         handicapHalfStep={handicapHalfStep}
+        handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
         showCardMatchNumber={showCardMatchNumber}
         showCardHandicap={showCardHandicap}
         showCardPlacement={showCardPlacement}
@@ -128,6 +133,9 @@ export function TournamentBracket({
                 key={match.id}
                 match={match}
                 handicapHalfStep={handicapHalfStep}
+                handicapEvenExtraCancelOnFirstLoss={
+                  handicapEvenExtraCancelOnFirstLoss
+                }
                 showCardHandicap={showCardHandicap}
                 uiLocale={uiLocale}
               />

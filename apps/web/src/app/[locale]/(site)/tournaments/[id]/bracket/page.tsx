@@ -137,6 +137,10 @@ export default async function TournamentBracketPage({
           matches={matches}
           standings={standings}
           handicapHalfStep={tournament.handicapHalfStep}
+          handicapEvenExtraCancelOnFirstLoss={
+            tournament.handicapHalfStep &&
+            tournament.handicapEvenExtraCancelOnFirstLoss
+          }
         />
 
         <p className="text-center text-xs text-zinc-600">

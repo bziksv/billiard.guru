@@ -125,6 +125,8 @@ export async function POST(request: NextRequest) {
         ratingMax: data.ratingMax,
         ratingSource: data.ratingSource,
         handicapHalfStep: data.handicapHalfStep,
+        handicapEvenExtraCancelOnFirstLoss:
+          data.handicapHalfStep && data.handicapEvenExtraCancelOnFirstLoss,
         suppressNotifications,
         tableIds: data.tableIds,
         tableStreams: tableStreamsToJson(tableStreams),

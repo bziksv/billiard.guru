@@ -528,6 +528,11 @@ export function TournamentManageView({
   const [editHandicapHalfStep, setEditHandicapHalfStep] = useState(
     t.handicapHalfStep !== false,
   );
+  const [editHandicapEvenExtraCancelOnFirstLoss, setEditHandicapEvenExtraCancelOnFirstLoss] =
+    useState(
+      t.handicapHalfStep !== false &&
+        t.handicapEvenExtraCancelOnFirstLoss === true,
+    );
   const [editLimitByRating, setEditLimitByRating] = useState(t.ratingMax != null);
   const [editRatingMax, setEditRatingMax] = useState(
     t.ratingMax != null ? String(t.ratingMax) : "8",
@@ -561,6 +566,10 @@ export function TournamentManageView({
     setEditStatus(t.status);
     setEditStartsAt(t.startsAt ? t.startsAt.slice(0, 16) : "");
     setEditHandicapHalfStep(t.handicapHalfStep !== false);
+    setEditHandicapEvenExtraCancelOnFirstLoss(
+      t.handicapHalfStep !== false &&
+        t.handicapEvenExtraCancelOnFirstLoss === true,
+    );
     setEditLimitByRating(t.ratingMax != null);
     setEditRatingMax(t.ratingMax != null ? String(t.ratingMax) : "8");
     setEditRatingSource(t.ratingSource ?? "SYSTEM");
@@ -616,6 +625,8 @@ export function TournamentManageView({
         ...(editStatus !== t.status && { status: editStatus }),
         startsAt: editStartsAt || null,
         handicapHalfStep: editHandicapHalfStep,
+        handicapEvenExtraCancelOnFirstLoss:
+          editHandicapHalfStep && editHandicapEvenExtraCancelOnFirstLoss,
         tableIds: editTableIds,
         tableStreams: editTableStreams,
         ...ratingPayload,
@@ -701,6 +712,8 @@ export function TournamentManageView({
   const showSwissPoints = swiss && protocolRows.some((row) => row.points !== undefined);
   const ratingSource = t.ratingSource ?? "SYSTEM";
   const handicapHalfStep = t.handicapHalfStep !== false;
+  const handicapEvenExtraCancelOnFirstLoss =
+    handicapHalfStep && t.handicapEvenExtraCancelOnFirstLoss === true;
   const bracketMatches = useMemo<BracketMatchView[]>(
     () =>
       t.matches.map((m) => ({
@@ -1006,7 +1019,11 @@ export function TournamentManageView({
             <input
               type="checkbox"
               checked={editHandicapHalfStep}
-              onChange={(e) => setEditHandicapHalfStep(e.target.checked)}
+              onChange={(e) => {
+                const on = e.target.checked;
+                setEditHandicapHalfStep(on);
+                if (!on) setEditHandicapEvenExtraCancelOnFirstLoss(false);
+              }}
               className="mt-1 h-4 w-4 rounded border-[var(--admin-input-border)] text-emerald-600"
             />
             <span>
@@ -1017,6 +1034,27 @@ export function TournamentManageView({
               </span>
             </span>
           </label>
+          {editHandicapHalfStep && (
+            <label className="flex cursor-pointer items-start gap-3 text-sm pl-7">
+              <input
+                type="checkbox"
+                checked={editHandicapEvenExtraCancelOnFirstLoss}
+                onChange={(e) =>
+                  setEditHandicapEvenExtraCancelOnFirstLoss(e.target.checked)
+                }
+                className="mt-1 h-4 w-4 rounded border-[var(--admin-input-border)] text-emerald-600"
+              />
+              <span>
+                <span className="font-medium text-[var(--admin-text)]">
+                  Снимать +1 в чётных, если отдающий проиграет 1-ю партию
+                </span>
+                <span className="admin-muted mt-1 block text-xs">
+                  Иначе +1 в чётных всегда. Правило применяют за столом; в уведомлениях и на
+                  сайте будет пояснение.
+                </span>
+              </span>
+            </label>
+          )}
           <label className="flex cursor-pointer items-start gap-3 text-sm">
             <input
               type="checkbox"
@@ -1186,6 +1224,8 @@ export function TournamentManageView({
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
           tournamentTables={tournamentTables}
+          playerOptions={playerOptions}
+          onUpdated={onUpdated}
         />
       )}
 
@@ -1194,12 +1234,17 @@ export function TournamentManageView({
           variant="current"
           format={t.format}
           handicapHalfStep={handicapHalfStep}
+          handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
           allMatches={bracketMatches}
           matches={currentMatches}
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
           tournamentTables={tournamentTables}
+          tournamentId={t.id}
+          allowSubstitute={!pair && !t.isPair}
+          playerOptions={playerOptions}
+          onUpdated={onUpdated}
         />
       )}
 
@@ -1208,12 +1253,17 @@ export function TournamentManageView({
           variant="upcoming"
           format={t.format}
           handicapHalfStep={handicapHalfStep}
+          handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
           allMatches={bracketMatches}
           matches={upcomingMatches}
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
           tournamentTables={tournamentTables}
+          tournamentId={t.id}
+          allowSubstitute={!pair && !t.isPair}
+          playerOptions={playerOptions}
+          onUpdated={onUpdated}
         />
       )}
 
@@ -1222,12 +1272,17 @@ export function TournamentManageView({
           variant="completed"
           format={t.format}
           handicapHalfStep={handicapHalfStep}
+          handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
           allMatches={bracketMatches}
           matches={completedMatches}
           matchNumbers={bracketMatchNumbers}
           onSaveMatchResult={onSaveMatchResult}
           onCancelMatchResult={onCancelMatchResult}
           tournamentTables={tournamentTables}
+          tournamentId={t.id}
+          allowSubstitute={false}
+          playerOptions={playerOptions}
+          onUpdated={onUpdated}
         />
       )}
 
@@ -1298,6 +1353,8 @@ export function TournamentManageView({
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
             tournamentTables={tournamentTables}
+            playerOptions={playerOptions}
+            onUpdated={onUpdated}
           />
         )}
 
@@ -1306,12 +1363,17 @@ export function TournamentManageView({
             variant="current"
             format={t.format}
             handicapHalfStep={handicapHalfStep}
+            handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
             allMatches={bracketMatches}
             matches={currentMatches}
             matchNumbers={bracketMatchNumbers}
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
             tournamentTables={tournamentTables}
+            tournamentId={t.id}
+            allowSubstitute={!pair && !t.isPair}
+            playerOptions={playerOptions}
+            onUpdated={onUpdated}
           />
         )}
 
@@ -1320,12 +1382,17 @@ export function TournamentManageView({
             variant="upcoming"
             format={t.format}
             handicapHalfStep={handicapHalfStep}
+            handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
             allMatches={bracketMatches}
             matches={upcomingMatches}
             matchNumbers={bracketMatchNumbers}
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
             tournamentTables={tournamentTables}
+            tournamentId={t.id}
+            allowSubstitute={!pair && !t.isPair}
+            playerOptions={playerOptions}
+            onUpdated={onUpdated}
           />
         )}
 
@@ -1334,12 +1401,17 @@ export function TournamentManageView({
             variant="completed"
             format={t.format}
             handicapHalfStep={handicapHalfStep}
+            handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
             allMatches={bracketMatches}
             matches={completedMatches}
             matchNumbers={bracketMatchNumbers}
             onSaveMatchResult={onSaveMatchResult}
             onCancelMatchResult={onCancelMatchResult}
             tournamentTables={tournamentTables}
+            tournamentId={t.id}
+            allowSubstitute={false}
+            playerOptions={playerOptions}
+            onUpdated={onUpdated}
           />
         )}
 
@@ -2348,6 +2420,8 @@ function BracketTab({
   onSaveMatchResult,
   onCancelMatchResult,
   tournamentTables = [],
+  playerOptions = [],
+  onUpdated,
 }: {
   t: AdminTournament;
   format: string;
@@ -2369,11 +2443,17 @@ function BracketTab({
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
   tournamentTables?: TournamentTableOption[];
+  playerOptions?: { value: string; label: string }[];
+  onUpdated?: () => void;
 }) {
   const dynamicSwiss = isDynamicSwissFormat(format);
   const excelRef = isExcelRef64Format(format);
   const fixedSwiss = isFixedSwissFormat(format);
   const olympic = isOlympicFormat(format);
+  const handicapEvenExtraCancelOnFirstLoss =
+    t.handicapHalfStep !== false &&
+    t.handicapEvenExtraCancelOnFirstLoss === true;
+  const allowSubstitute = !isPairFormat(format) && t.isPair !== true;
   const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
   const [matchSaving, setMatchSaving] = useState(false);
 
@@ -2436,6 +2516,7 @@ function BracketTab({
           matchNumbers={matchNumbers}
           withBronzeMatch={isOlympicBronzeFormat(format)}
           handicapHalfStep={t.handicapHalfStep !== false}
+          handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
           showCardMatchNumber={showCardMatchNumber}
           showCardHandicap={showCardHandicap}
           showCardPlacement={showCardPlacement}
@@ -2462,6 +2543,7 @@ function BracketTab({
         showStandings={false}
         fixedGrid={fixedSwiss}
         handicapHalfStep={t.handicapHalfStep !== false}
+          handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
         showCardMatchNumber={showCardMatchNumber}
         showCardHandicap={showCardHandicap}
         showCardPlacement={showCardPlacement}
@@ -2481,9 +2563,13 @@ function BracketTab({
         open={modalMatch !== null}
         saving={matchSaving}
         tournamentTables={tournamentTables}
+        tournamentId={t.id}
+        allowSubstitute={allowSubstitute}
+        playerOptions={playerOptions}
         onClose={() => setModalMatch(null)}
         onSave={handleSaveMatchResult}
         onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
+        onSubstituted={onUpdated}
       />
     </>
   );
@@ -2549,22 +2635,32 @@ function MatchesScheduleTab({
   variant,
   format,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
   allMatches,
   matches,
   matchNumbers,
   onSaveMatchResult,
   onCancelMatchResult,
   tournamentTables = [],
+  tournamentId,
+  allowSubstitute = false,
+  playerOptions = [],
+  onUpdated,
 }: {
   variant: "current" | "upcoming" | "completed";
   format: string;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   allMatches: BracketMatchView[];
   matches: BracketMatchView[];
   matchNumbers: Map<string, number>;
   onSaveMatchResult: (payload: MatchResultPayload) => Promise<void>;
   onCancelMatchResult?: (matchId: string) => Promise<void>;
   tournamentTables?: TournamentTableOption[];
+  tournamentId?: string;
+  allowSubstitute?: boolean;
+  playerOptions?: { value: string; label: string }[];
+  onUpdated?: () => void;
 }) {
   const [modalMatch, setModalMatch] = useState<BracketMatchView | null>(null);
   const [matchSaving, setMatchSaving] = useState(false);
@@ -2725,9 +2821,19 @@ function MatchesScheduleTab({
                     {showHandicap && (
                       <td
                         className="px-4 py-3 text-xs tournament-participant-meta"
-                        title={matchHandicapFullLabel(match, handicapHalfStep) ?? undefined}
+                        title={
+                          matchHandicapFullLabel(
+                            match,
+                            handicapHalfStep,
+                            handicapEvenExtraCancelOnFirstLoss,
+                          ) ?? undefined
+                        }
                       >
-                        {matchHandicapShortLabel(match, handicapHalfStep)}
+                        {matchHandicapShortLabel(
+                          match,
+                          handicapHalfStep,
+                          handicapEvenExtraCancelOnFirstLoss,
+                        )}
                       </td>
                     )}
                     {showTable && (
@@ -2799,9 +2905,13 @@ function MatchesScheduleTab({
         open={modalMatch !== null}
         saving={matchSaving}
         tournamentTables={tournamentTables}
+        tournamentId={tournamentId}
+        allowSubstitute={allowSubstitute}
+        playerOptions={playerOptions}
         onClose={() => setModalMatch(null)}
         onSave={handleSaveMatchResult}
         onCancel={onCancelMatchResult ? handleCancelMatchResult : undefined}
+        onSubstituted={onUpdated}
       />
     </div>
   );
@@ -2895,10 +3005,12 @@ function MatchRow({
   match,
   onSetWinner,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
 }: {
   match: Match;
   onSetWinner: (matchId: string, winnerTeamId: string) => void;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
 }) {
   const team1 = match.team1;
   const team2 = match.team2;
@@ -2916,6 +3028,7 @@ function MatchRow({
     team1 && team2
       ? describeHandicap(teamRating(team1), teamRating(team2), {
           halfStep: handicapHalfStep,
+          evenExtraCancelOnFirstLoss: handicapEvenExtraCancelOnFirstLoss,
         })
       : null;
 

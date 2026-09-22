@@ -54,4 +54,39 @@ assert.deepEqual(calculateHandicap(2.4, 1.9, { halfStep: true }), {
 assert.equal(getHandicapForGame(2.4, 1.9, 1, { halfStep: true }), 0);
 assert.equal(getHandicapForGame(2.4, 1.9, 2, { halfStep: true }), 1);
 
+// Снятие +1 в чётных после поражения отдающего в 1-й
+assert.equal(
+  describeHandicapShort(3, 1.5, {
+    halfStep: true,
+    evenExtraCancelOnFirstLoss: true,
+  }),
+  "1 в каждой партии, +1 в чётных∗",
+);
+assert.equal(
+  getHandicapForGame(3, 1.5, 2, {
+    halfStep: true,
+    evenExtraCancelOnFirstLoss: true,
+  }),
+  2,
+  "без strongerLostFirstGame — +1 в чётных как обычно",
+);
+assert.equal(
+  getHandicapForGame(3, 1.5, 2, {
+    halfStep: true,
+    evenExtraCancelOnFirstLoss: true,
+    strongerLostFirstGame: true,
+  }),
+  1,
+  "после поражения в 1-й — только целая часть",
+);
+assert.equal(
+  getHandicapForGame(3, 1.5, 2, {
+    halfStep: true,
+    evenExtraCancelOnFirstLoss: false,
+    strongerLostFirstGame: true,
+  }),
+  2,
+  "флаг снятия выключен — strongerLostFirstGame игнорируется",
+);
+
 console.log("handicap tests passed");

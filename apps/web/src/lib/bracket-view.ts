@@ -108,7 +108,11 @@ function olympicCardMinHeight(
   const showMeta = opts.showCardMatchNumber !== false;
   const showHandicap =
     opts.showCardHandicap !== false &&
-    olympicMatchHasHandicap(match, opts.handicapHalfStep !== false);
+    olympicMatchHasHandicap(
+      match,
+      opts.handicapHalfStep !== false,
+      opts.handicapEvenExtraCancelOnFirstLoss === true,
+    );
   if (!showMeta && !showHandicap) return OLYMPIC_CARD_COMPACT_MIN_H;
   return OLYMPIC_CARD_MIN_H;
 }
@@ -172,6 +176,7 @@ export type OlympicDisplayOpts = {
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   withBronzeMatch?: boolean;
 };
 
@@ -184,12 +189,13 @@ export type OlympicBracketLayout = {
 function olympicMatchHasHandicap(
   match: BracketMatchView,
   halfStep = true,
+  evenExtraCancelOnFirstLoss = false,
 ): boolean {
   if (!match.team1 || !match.team2) return false;
   const h = calculateHandicap(
     Math.max(teamRating(match.team1), teamRating(match.team2)),
     Math.min(teamRating(match.team1), teamRating(match.team2)),
-    { halfStep },
+    { halfStep, evenExtraCancelOnFirstLoss },
   );
   return h.ratingDiff > 0;
 }
@@ -209,7 +215,11 @@ export function estimateOlympicCardHeight(
   h += olympicTeamBlockHeight(match);
   if (
     opts.showCardHandicap !== false &&
-    olympicMatchHasHandicap(match, opts.handicapHalfStep !== false)
+    olympicMatchHasHandicap(
+      match,
+      opts.handicapHalfStep !== false,
+      opts.handicapEvenExtraCancelOnFirstLoss === true,
+    )
   ) {
     h += OLYMPIC_HANDICAP_H;
   }

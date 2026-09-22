@@ -14,6 +14,16 @@ export interface HandicapBreakdown {
 export type HandicapOptions = {
   /** Учитывать дробную часть рейтинга (0,5). По умолчанию true. */
   halfStep?: boolean;
+  /**
+   * При half-step: +1 в чётных снимается, если отдающий (сильнейший) проиграет 1-ю партию.
+   * Влияет на подписи; на число шаров — только если передан strongerLostFirstGame.
+   */
+  evenExtraCancelOnFirstLoss?: boolean;
+  /**
+   * Для калькулятора: сильнейший уже проиграл 1-ю партию → не давать +1 в чётных.
+   * Имеет смысл только при evenExtraCancelOnFirstLoss.
+   */
+  strongerLostFirstGame?: boolean;
   locale?: AppLocale;
 };
 
@@ -32,7 +42,13 @@ function shortPerGameLabel(balls: number, locale: AppLocale): string {
   return `${balls} в каждой партии`;
 }
 
-function shortEvenGameLabel(locale: AppLocale): string {
+function shortEvenGameLabel(
+  locale: AppLocale,
+  cancelOnFirstLoss: boolean,
+): string {
+  if (cancelOnFirstLoss) {
+    return locale === "en" ? "+1 even∗" : "+1 в чётных∗";
+  }
   return locale === "en" ? "+1 in even frames" : "+1 в чётных";
 }
 
@@ -43,7 +59,15 @@ function fullPerGameLabel(balls: number, locale: AppLocale): string {
   return `${balls} шар(а) в каждой партии`;
 }
 
-function fullEvenGameLabel(locale: AppLocale): string {
+function fullEvenGameLabel(
+  locale: AppLocale,
+  cancelOnFirstLoss: boolean,
+): string {
+  if (cancelOnFirstLoss) {
+    return locale === "en"
+      ? "1 ball in even frames (cancelled if the giver loses the 1st frame)"
+      : "1 шар в чётных партиях (снимается, если отдающий проиграет 1-ю партию)";
+  }
   return locale === "en" ? "1 ball in even frames" : "1 шар в чётных партиях";
 }
 
@@ -54,6 +78,10 @@ export function isNoHandicapLabel(value: string): boolean {
 
 function resolveHalfStep(options?: HandicapOptions): boolean {
   return options?.halfStep !== false;
+}
+
+function resolveCancelOnFirstLoss(options?: HandicapOptions): boolean {
+  return resolveHalfStep(options) && options?.evenExtraCancelOnFirstLoss === true;
 }
 
 /** Порог форы и «половинки» — ровно 0,5 без округления вверх. */
@@ -112,7 +140,9 @@ export function getHandicapForGame(
     options,
   );
   let balls = ballsEveryGame;
-  if (extraBallOnEvenGames && gameNumber % 2 === 0) {
+  const cancelActive =
+    resolveCancelOnFirstLoss(options) && options?.strongerLostFirstGame === true;
+  if (extraBallOnEvenGames && !cancelActive && gameNumber % 2 === 0) {
     balls += 1;
   }
   return balls;
@@ -128,6 +158,7 @@ export function describeHandicap(
   options?: HandicapOptions,
 ): string {
   const locale = resolveLocale(options);
+  const cancel = resolveCancelOnFirstLoss(options);
   const h = calculateHandicap(higherRating, lowerRating, options);
   if (!hasHandicap(h)) return noHandicapLabel(locale);
   const parts: string[] = [];
@@ -135,7 +166,7 @@ export function describeHandicap(
     parts.push(fullPerGameLabel(h.ballsEveryGame, locale));
   }
   if (h.extraBallOnEvenGames) {
-    parts.push(fullEvenGameLabel(locale));
+    parts.push(fullEvenGameLabel(locale, cancel));
   }
   return parts.join(", ");
 }
@@ -147,6 +178,7 @@ export function describeHandicapShort(
   options?: HandicapOptions,
 ): string {
   const locale = resolveLocale(options);
+  const cancel = resolveCancelOnFirstLoss(options);
   const h = calculateHandicap(higherRating, lowerRating, options);
   if (!hasHandicap(h)) return noHandicapLabel(locale);
   const parts: string[] = [];
@@ -154,7 +186,7 @@ export function describeHandicapShort(
     parts.push(shortPerGameLabel(h.ballsEveryGame, locale));
   }
   if (h.extraBallOnEvenGames) {
-    parts.push(shortEvenGameLabel(locale));
+    parts.push(shortEvenGameLabel(locale, cancel));
   }
   return parts.join(", ");
 }

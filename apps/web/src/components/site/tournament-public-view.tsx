@@ -39,6 +39,7 @@ export type PublicBracketPanelProps = {
   matches: BracketMatchView[];
   standings: SwissStandingView[];
   handicapHalfStep: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
 };
 
 type Props = {
@@ -397,6 +398,9 @@ function BracketTabContent({
           matches={bracket.matches}
           standings={bracket.standings}
           handicapHalfStep={bracket.handicapHalfStep}
+          handicapEvenExtraCancelOnFirstLoss={
+            bracket.handicapEvenExtraCancelOnFirstLoss === true
+          }
           display={display}
           presentation={presentation}
         />

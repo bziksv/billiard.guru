@@ -45,6 +45,7 @@ export function OlympicBracketView({
   showMatchScore = false,
   withBronzeMatch = false,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
   showCardMatchNumber = true,
   showCardHandicap = true,
   showCardPlacement = true,
@@ -60,6 +61,7 @@ export function OlympicBracketView({
   showMatchScore?: boolean;
   withBronzeMatch?: boolean;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   showCardMatchNumber?: boolean;
   showCardHandicap?: boolean;
   showCardPlacement?: boolean;
@@ -100,6 +102,7 @@ export function OlympicBracketView({
               showCardHandicap,
               showCardPlacement: showCardPlacement && !!matchNumbers,
               handicapHalfStep,
+              handicapEvenExtraCancelOnFirstLoss,
               withBronzeMatch,
             },
           )
@@ -112,6 +115,7 @@ export function OlympicBracketView({
       showCardHandicap,
       showCardPlacement,
       handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss,
       withBronzeMatch,
     ],
   );
@@ -122,6 +126,7 @@ export function OlympicBracketView({
       showCardHandicap,
       showCardPlacement: showCardPlacement && !!matchNumbers,
       handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss,
       withBronzeMatch,
     }),
     [
@@ -130,6 +135,7 @@ export function OlympicBracketView({
       showCardPlacement,
       matchNumbers,
       handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss,
       withBronzeMatch,
     ],
   );
@@ -256,6 +262,9 @@ export function OlympicBracketView({
                 onPlayerClick={handlePlayerHighlight}
                 showMatchScore={showMatchScore}
                 handicapHalfStep={handicapHalfStep}
+                handicapEvenExtraCancelOnFirstLoss={
+                  handicapEvenExtraCancelOnFirstLoss
+                }
                 showCardHandicap={showCardHandicap}
                 highlightedPlayerId={highlightedPlayerId}
                 uiLocale={uiLocale}

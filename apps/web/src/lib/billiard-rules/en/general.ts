@@ -10,6 +10,7 @@ export const BILLIARD_GENERAL_SECTIONS_EN: GuideSection[] = [
     paragraphs: [
       "On billiard.guru, handicap uses 0.5 rating steps with no rounding up: under 0.5 there is no handicap; from 0.5 — a full ball each frame and/or an extra ball in even frames. The stronger player receives the minus.",
       "Organizers can disable half-steps — then only whole ratings count (e.g. 3 vs 1.5 → a 2-ball difference, not 2.5).",
+      "They can also turn on a rule: if the player giving handicap loses the first frame, the extra ball in even frames is cancelled for the rest of the match — only the whole-ball part remains.",
       "Always check the tournament card for exact handicap rules before your match.",
     ],
   },

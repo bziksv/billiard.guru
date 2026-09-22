@@ -19,6 +19,7 @@ type Props = {
   matches: BracketMatchView[];
   standings: SwissStandingView[];
   handicapHalfStep: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
 };
 
 export function PublicTournamentBracketPanel({
@@ -28,6 +29,7 @@ export function PublicTournamentBracketPanel({
   matches,
   standings,
   handicapHalfStep,
+  handicapEvenExtraCancelOnFirstLoss = false,
 }: Props) {
   const t = useTranslations("tournamentView.bracket");
   const siteLabels = {
@@ -64,6 +66,7 @@ export function PublicTournamentBracketPanel({
           matches={matches}
           standings={standings}
           handicapHalfStep={handicapHalfStep}
+          handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
           display={display}
         />
       </div>
@@ -88,6 +91,7 @@ export function PublicTournamentBracketPanel({
           matches={matches}
           standings={standings}
           handicapHalfStep={handicapHalfStep}
+          handicapEvenExtraCancelOnFirstLoss={handicapEvenExtraCancelOnFirstLoss}
           display={display}
           presentation
         />

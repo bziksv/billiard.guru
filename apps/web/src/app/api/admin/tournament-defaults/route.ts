@@ -13,6 +13,7 @@ import {
 const patchSchema = z
   .object({
     handicapHalfStep: z.boolean(),
+    handicapEvenExtraCancelOnFirstLoss: z.boolean().optional().default(false),
     limitByRating: z.boolean(),
     ratingMax: tournamentRatingMaxSchema.nullable().optional(),
     ratingSource: tournamentRatingSourceSchema.optional(),
@@ -40,6 +41,8 @@ export async function PATCH(request: NextRequest) {
     const body = patchSchema.parse(await request.json());
     await saveTournamentDefaults({
       handicapHalfStep: body.handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss:
+        body.handicapHalfStep && body.handicapEvenExtraCancelOnFirstLoss,
       limitByRating: body.limitByRating,
       ratingMax: body.limitByRating ? (body.ratingMax ?? null) : null,
       ratingSource: body.ratingSource ?? "SYSTEM",

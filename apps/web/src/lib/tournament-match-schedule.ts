@@ -143,22 +143,30 @@ export function matchRatingsLabel(match: BracketMatchView): string {
 export function matchHandicapShortLabel(
   match: BracketMatchView,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
 ): string {
   if (!match.team1 || !match.team2) return "—";
   const high = Math.max(teamRating(match.team1), teamRating(match.team2));
   const low = Math.min(teamRating(match.team1), teamRating(match.team2));
-  return describeHandicapShort(high, low, { halfStep: handicapHalfStep });
+  return describeHandicapShort(high, low, {
+    halfStep: handicapHalfStep,
+    evenExtraCancelOnFirstLoss: handicapEvenExtraCancelOnFirstLoss,
+  });
 }
 
 /** Полная расшифровка форы (для title). */
 export function matchHandicapFullLabel(
   match: BracketMatchView,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
 ): string | null {
   if (!match.team1 || !match.team2) return null;
   const high = Math.max(teamRating(match.team1), teamRating(match.team2));
   const low = Math.min(teamRating(match.team1), teamRating(match.team2));
-  return describeHandicap(high, low, { halfStep: handicapHalfStep });
+  return describeHandicap(high, low, {
+    halfStep: handicapHalfStep,
+    evenExtraCancelOnFirstLoss: handicapEvenExtraCancelOnFirstLoss,
+  });
 }
 
 /** Колонка сетки / этап — как подписи на визуальной сетке. */

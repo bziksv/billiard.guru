@@ -1,7 +1,7 @@
 import { writeAuditLog } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/prisma";
-import { describeHandicapShort } from "@/lib/handicap";
+import { describeHandicap, describeHandicapShort } from "@/lib/handicap";
 import { formatRating } from "@/lib/rating";
 import { teamLabel } from "@/lib/pair-tournament";
 import { formatStartsAt } from "@/lib/public-display";
@@ -58,6 +58,7 @@ function linesForPlayer(
   team1: NotifyTeam | null,
   team2: NotifyTeam | null,
   handicapHalfStep: boolean,
+  handicapEvenExtraCancelOnFirstLoss: boolean,
 ): { ratingsLine: string; handicapLine: string } {
   const onTeam1 = playerOnTeam(team1, playerId);
   const onTeam2 = playerOnTeam(team2, playerId);
@@ -70,9 +71,17 @@ function linesForPlayer(
 
   const high = Math.max(notifyTeamRating(myTeam), notifyTeamRating(oppTeam));
   const low = Math.min(notifyTeamRating(myTeam), notifyTeamRating(oppTeam));
-  const short = describeHandicapShort(high, low, { halfStep: handicapHalfStep });
+  const short = describeHandicapShort(high, low, {
+    halfStep: handicapHalfStep,
+    evenExtraCancelOnFirstLoss: handicapEvenExtraCancelOnFirstLoss,
+  });
+  const full = describeHandicap(high, low, {
+    halfStep: handicapHalfStep,
+    evenExtraCancelOnFirstLoss: handicapEvenExtraCancelOnFirstLoss,
+  });
+  const label = handicapEvenExtraCancelOnFirstLoss ? full : short;
   const handicapLine =
-    short === "Без форы" ? "" : `Фора: ${short}\n`;
+    label === "Без форы" || label === "No handicap" ? "" : `Фора: ${label}\n`;
 
   return { ratingsLine, handicapLine };
 }
@@ -144,6 +153,9 @@ export async function notifyMatchStartScheduled(
   const team1Label = match.team1 ? teamLabel(match.team1) : "—";
   const team2Label = match.team2 ? teamLabel(match.team2) : "—";
   const handicapHalfStep = match.tournament.handicapHalfStep !== false;
+  const handicapEvenExtraCancelOnFirstLoss =
+    handicapHalfStep &&
+    match.tournament.handicapEvenExtraCancelOnFirstLoss === true;
 
   const recipients = new Map<
     string,
@@ -156,6 +168,7 @@ export async function notifyMatchStartScheduled(
       match.team1,
       match.team2,
       handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss,
     );
     recipients.set(player.id, {
       player,
@@ -170,6 +183,7 @@ export async function notifyMatchStartScheduled(
       match.team1,
       match.team2,
       handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss,
     );
     recipients.set(player.id, {
       player,

@@ -69,6 +69,8 @@ async function main() {
       format: (FORMAT_OVERRIDE ?? source.format) as typeof source.format,
       status: "DRAFT",
       handicapHalfStep: source.handicapHalfStep,
+      handicapEvenExtraCancelOnFirstLoss:
+        source.handicapEvenExtraCancelOnFirstLoss,
       ratingMax: source.ratingMax,
       ratingSource: source.ratingSource,
       tableIds: source.tableIds ?? undefined,

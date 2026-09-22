@@ -49,6 +49,7 @@ export type TournamentMinAggregateOutputType = {
   ratingMax: number | null
   ratingSource: $Enums.TournamentRatingSource | null
   handicapHalfStep: boolean | null
+  handicapEvenExtraCancelOnFirstLoss: boolean | null
   suppressNotifications: boolean | null
   startsAt: Date | null
   clubApprovalToken: string | null
@@ -72,6 +73,7 @@ export type TournamentMaxAggregateOutputType = {
   ratingMax: number | null
   ratingSource: $Enums.TournamentRatingSource | null
   handicapHalfStep: boolean | null
+  handicapEvenExtraCancelOnFirstLoss: boolean | null
   suppressNotifications: boolean | null
   startsAt: Date | null
   clubApprovalToken: string | null
@@ -95,6 +97,7 @@ export type TournamentCountAggregateOutputType = {
   ratingMax: number
   ratingSource: number
   handicapHalfStep: number
+  handicapEvenExtraCancelOnFirstLoss: number
   suppressNotifications: number
   tableIds: number
   tableStreams: number
@@ -130,6 +133,7 @@ export type TournamentMinAggregateInputType = {
   ratingMax?: true
   ratingSource?: true
   handicapHalfStep?: true
+  handicapEvenExtraCancelOnFirstLoss?: true
   suppressNotifications?: true
   startsAt?: true
   clubApprovalToken?: true
@@ -153,6 +157,7 @@ export type TournamentMaxAggregateInputType = {
   ratingMax?: true
   ratingSource?: true
   handicapHalfStep?: true
+  handicapEvenExtraCancelOnFirstLoss?: true
   suppressNotifications?: true
   startsAt?: true
   clubApprovalToken?: true
@@ -176,6 +181,7 @@ export type TournamentCountAggregateInputType = {
   ratingMax?: true
   ratingSource?: true
   handicapHalfStep?: true
+  handicapEvenExtraCancelOnFirstLoss?: true
   suppressNotifications?: true
   tableIds?: true
   tableStreams?: true
@@ -288,6 +294,7 @@ export type TournamentGroupByOutputType = {
   ratingMax: number | null
   ratingSource: $Enums.TournamentRatingSource
   handicapHalfStep: boolean
+  handicapEvenExtraCancelOnFirstLoss: boolean
   suppressNotifications: boolean
   tableIds: runtime.JsonValue | null
   tableStreams: runtime.JsonValue | null
@@ -336,6 +343,7 @@ export type TournamentWhereInput = {
   ratingMax?: Prisma.FloatNullableFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFilter<"Tournament"> | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolFilter<"Tournament"> | boolean
   tableIds?: Prisma.JsonNullableFilter<"Tournament">
   tableStreams?: Prisma.JsonNullableFilter<"Tournament">
@@ -365,6 +373,7 @@ export type TournamentOrderByWithRelationInput = {
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
   tableIds?: Prisma.SortOrderInput | Prisma.SortOrder
   tableStreams?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -399,6 +408,7 @@ export type TournamentWhereUniqueInput = Prisma.AtLeast<{
   ratingMax?: Prisma.FloatNullableFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFilter<"Tournament"> | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolFilter<"Tournament"> | boolean
   tableIds?: Prisma.JsonNullableFilter<"Tournament">
   tableStreams?: Prisma.JsonNullableFilter<"Tournament">
@@ -427,6 +437,7 @@ export type TournamentOrderByWithAggregationInput = {
   ratingMax?: Prisma.SortOrderInput | Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
   tableIds?: Prisma.SortOrderInput | Prisma.SortOrder
   tableStreams?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -460,6 +471,7 @@ export type TournamentScalarWhereWithAggregatesInput = {
   ratingMax?: Prisma.FloatNullableWithAggregatesFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceWithAggregatesFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolWithAggregatesFilter<"Tournament"> | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolWithAggregatesFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolWithAggregatesFilter<"Tournament"> | boolean
   tableIds?: Prisma.JsonNullableWithAggregatesFilter<"Tournament">
   tableStreams?: Prisma.JsonNullableWithAggregatesFilter<"Tournament">
@@ -484,6 +496,7 @@ export type TournamentCreateInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -513,6 +526,7 @@ export type TournamentUncheckedCreateInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -540,6 +554,7 @@ export type TournamentUpdateInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -569,6 +584,7 @@ export type TournamentUncheckedUpdateInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -597,6 +613,7 @@ export type TournamentCreateManyInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -621,6 +638,7 @@ export type TournamentUpdateManyMutationInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -646,6 +664,7 @@ export type TournamentUncheckedUpdateManyInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -687,6 +706,7 @@ export type TournamentCountOrderByAggregateInput = {
   ratingMax?: Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
   tableIds?: Prisma.SortOrder
   tableStreams?: Prisma.SortOrder
@@ -716,6 +736,7 @@ export type TournamentMaxOrderByAggregateInput = {
   ratingMax?: Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
   startsAt?: Prisma.SortOrder
   clubApprovalToken?: Prisma.SortOrder
@@ -739,6 +760,7 @@ export type TournamentMinOrderByAggregateInput = {
   ratingMax?: Prisma.SortOrder
   ratingSource?: Prisma.SortOrder
   handicapHalfStep?: Prisma.SortOrder
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.SortOrder
   suppressNotifications?: Prisma.SortOrder
   startsAt?: Prisma.SortOrder
   clubApprovalToken?: Prisma.SortOrder
@@ -866,6 +888,7 @@ export type TournamentCreateWithoutClubInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -893,6 +916,7 @@ export type TournamentUncheckedCreateWithoutClubInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -950,6 +974,7 @@ export type TournamentScalarWhereInput = {
   ratingMax?: Prisma.FloatNullableFilter<"Tournament"> | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFilter<"Tournament"> | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFilter<"Tournament"> | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFilter<"Tournament"> | boolean
   suppressNotifications?: Prisma.BoolFilter<"Tournament"> | boolean
   tableIds?: Prisma.JsonNullableFilter<"Tournament">
   tableStreams?: Prisma.JsonNullableFilter<"Tournament">
@@ -974,6 +999,7 @@ export type TournamentCreateWithoutTeamsInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1002,6 +1028,7 @@ export type TournamentUncheckedCreateWithoutTeamsInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1044,6 +1071,7 @@ export type TournamentUpdateWithoutTeamsInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1072,6 +1100,7 @@ export type TournamentUncheckedUpdateWithoutTeamsInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1098,6 +1127,7 @@ export type TournamentCreateWithoutMatchesInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1126,6 +1156,7 @@ export type TournamentUncheckedCreateWithoutMatchesInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1168,6 +1199,7 @@ export type TournamentUpdateWithoutMatchesInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1196,6 +1228,7 @@ export type TournamentUncheckedUpdateWithoutMatchesInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1222,6 +1255,7 @@ export type TournamentCreateWithoutRegistrationsInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1250,6 +1284,7 @@ export type TournamentUncheckedCreateWithoutRegistrationsInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1292,6 +1327,7 @@ export type TournamentUpdateWithoutRegistrationsInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1320,6 +1356,7 @@ export type TournamentUncheckedUpdateWithoutRegistrationsInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1346,6 +1383,7 @@ export type TournamentCreateManyClubInput = {
   ratingMax?: number | null
   ratingSource?: $Enums.TournamentRatingSource
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1370,6 +1408,7 @@ export type TournamentUpdateWithoutClubInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1397,6 +1436,7 @@ export type TournamentUncheckedUpdateWithoutClubInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1424,6 +1464,7 @@ export type TournamentUncheckedUpdateManyWithoutClubInput = {
   ratingMax?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   ratingSource?: Prisma.EnumTournamentRatingSourceFieldUpdateOperationsInput | $Enums.TournamentRatingSource
   handicapHalfStep?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  handicapEvenExtraCancelOnFirstLoss?: Prisma.BoolFieldUpdateOperationsInput | boolean
   suppressNotifications?: Prisma.BoolFieldUpdateOperationsInput | boolean
   tableIds?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   tableStreams?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -1498,6 +1539,7 @@ export type TournamentSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   ratingMax?: boolean
   ratingSource?: boolean
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: boolean
   tableStreams?: boolean
@@ -1530,6 +1572,7 @@ export type TournamentSelectScalar = {
   ratingMax?: boolean
   ratingSource?: boolean
   handicapHalfStep?: boolean
+  handicapEvenExtraCancelOnFirstLoss?: boolean
   suppressNotifications?: boolean
   tableIds?: boolean
   tableStreams?: boolean
@@ -1540,7 +1583,7 @@ export type TournamentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "nameEn" | "description" | "descriptionEn" | "clubId" | "format" | "discipline" | "gameType" | "isPair" | "status" | "ratingMax" | "ratingSource" | "handicapHalfStep" | "suppressNotifications" | "tableIds" | "tableStreams" | "startsAt" | "clubApprovalToken" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
+export type TournamentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "nameEn" | "description" | "descriptionEn" | "clubId" | "format" | "discipline" | "gameType" | "isPair" | "status" | "ratingMax" | "ratingSource" | "handicapHalfStep" | "handicapEvenExtraCancelOnFirstLoss" | "suppressNotifications" | "tableIds" | "tableStreams" | "startsAt" | "clubApprovalToken" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["tournament"]>
 export type TournamentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   club?: boolean | Prisma.ClubDefaultArgs<ExtArgs>
   registrations?: boolean | Prisma.Tournament$registrationsArgs<ExtArgs>
@@ -1590,6 +1633,10 @@ export type $TournamentPayload<ExtArgs extends runtime.Types.Extensions.Internal
      * Фора по шагу рейтинга 0,5 (false — только целая часть разницы, без +1 в чётных)
      */
     handicapHalfStep: boolean
+    /**
+     * При half-step: снимать +1 в чётных, если отдающий проиграл 1-ю партию
+     */
+    handicapEvenExtraCancelOnFirstLoss: boolean
     /**
      * Не слать Telegram по этому турниру (тестовые копии и отладка)
      */
@@ -1994,6 +2041,7 @@ export interface TournamentFieldRefs {
   readonly ratingMax: Prisma.FieldRef<"Tournament", 'Float'>
   readonly ratingSource: Prisma.FieldRef<"Tournament", 'TournamentRatingSource'>
   readonly handicapHalfStep: Prisma.FieldRef<"Tournament", 'Boolean'>
+  readonly handicapEvenExtraCancelOnFirstLoss: Prisma.FieldRef<"Tournament", 'Boolean'>
   readonly suppressNotifications: Prisma.FieldRef<"Tournament", 'Boolean'>
   readonly tableIds: Prisma.FieldRef<"Tournament", 'Json'>
   readonly tableStreams: Prisma.FieldRef<"Tournament", 'Json'>

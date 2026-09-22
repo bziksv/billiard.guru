@@ -215,6 +215,7 @@ export function BracketMatchCard({
   onPlayerClick,
   showMatchScore = false,
   handicapHalfStep = true,
+  handicapEvenExtraCancelOnFirstLoss = false,
   showCardHandicap = true,
   highlightedPlayerId = null,
   uiLocale = "ru",
@@ -229,6 +230,7 @@ export function BracketMatchCard({
   onPlayerClick?: (playerId: string, preview?: TeamPlayer) => void;
   showMatchScore?: boolean;
   handicapHalfStep?: boolean;
+  handicapEvenExtraCancelOnFirstLoss?: boolean;
   showCardHandicap?: boolean;
   highlightedPlayerId?: string | null;
   uiLocale?: AppLocale;
@@ -272,7 +274,11 @@ export function BracketMatchCard({
       ? () => onMatchClick(match)
       : undefined;
 
-  const handicapOpts = { halfStep: handicapHalfStep, locale: uiLocale };
+  const handicapOpts = {
+    halfStep: handicapHalfStep,
+    evenExtraCancelOnFirstLoss: handicapEvenExtraCancelOnFirstLoss,
+    locale: uiLocale,
+  };
   const handicap =
     match.team1 && match.team2
       ? describeHandicap(

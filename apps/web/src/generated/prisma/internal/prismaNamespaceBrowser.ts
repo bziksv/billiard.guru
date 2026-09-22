@@ -345,6 +345,7 @@ export const TournamentScalarFieldEnum = {
   ratingMax: 'ratingMax',
   ratingSource: 'ratingSource',
   handicapHalfStep: 'handicapHalfStep',
+  handicapEvenExtraCancelOnFirstLoss: 'handicapEvenExtraCancelOnFirstLoss',
   suppressNotifications: 'suppressNotifications',
   tableIds: 'tableIds',
   tableStreams: 'tableStreams',
@@ -565,6 +566,7 @@ export type BracketFormatConfigScalarFieldEnum = (typeof BracketFormatConfigScal
 export const TournamentDefaultsConfigScalarFieldEnum = {
   id: 'id',
   handicapHalfStep: 'handicapHalfStep',
+  handicapEvenExtraCancelOnFirstLoss: 'handicapEvenExtraCancelOnFirstLoss',
   limitByRating: 'limitByRating',
   ratingMax: 'ratingMax',
   ratingSource: 'ratingSource',

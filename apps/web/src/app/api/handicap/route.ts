@@ -38,12 +38,20 @@ export async function GET(request: NextRequest) {
   const ratingB = parseFloat(params.get("ratingB") ?? "0");
   const game = parseInt(params.get("game") ?? "1", 10);
   const halfStep = params.get("halfStep") !== "0";
+  const evenExtraCancelOnFirstLoss =
+    halfStep && params.get("evenExtraCancelOnFirstLoss") === "1";
+  const strongerLostFirstGame =
+    evenExtraCancelOnFirstLoss && params.get("strongerLostFirstGame") === "1";
   const ratingMax = parseOptionalRatingMax(params.get("ratingMax"));
 
   const higher = Math.max(ratingA, ratingB);
   const lower = Math.min(ratingA, ratingB);
   const strongerIsA = ratingA >= ratingB;
-  const handicapOpts = { halfStep };
+  const handicapOpts = {
+    halfStep,
+    evenExtraCancelOnFirstLoss,
+    strongerLostFirstGame,
+  };
 
   const breakdown = calculateHandicap(higher, lower, handicapOpts);
   const balls = getHandicapForGame(higher, lower, game, handicapOpts);
@@ -53,6 +61,8 @@ export async function GET(request: NextRequest) {
     ratingB,
     strongerPlayer: strongerIsA ? "A" : "B",
     halfStep,
+    evenExtraCancelOnFirstLoss,
+    strongerLostFirstGame,
     ratingMax,
     playerA: registrationEligibility(ratingA, ratingMax),
     playerB: registrationEligibility(ratingB, ratingMax),

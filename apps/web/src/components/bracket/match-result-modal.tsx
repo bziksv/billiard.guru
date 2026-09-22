@@ -16,6 +16,7 @@ import {
 import { teamLabel } from "@/lib/pair-tournament";
 import { cn } from "@/lib/cn";
 import type { TournamentTableOption } from "@/lib/tournament-stream";
+import { MatchSubstituteSection } from "@/components/bracket/match-substitute-section";
 
 export interface MatchResultPayload {
   matchId: string;
@@ -163,18 +164,26 @@ export function MatchResultModal({
   open,
   saving,
   tournamentTables = [],
+  tournamentId,
+  allowSubstitute = false,
+  playerOptions = [],
   onClose,
   onSave,
   onCancel,
+  onSubstituted,
 }: {
   match: BracketMatchView | null;
   matchNumber?: number;
   open: boolean;
   saving: boolean;
   tournamentTables?: TournamentTableOption[];
+  tournamentId?: string;
+  allowSubstitute?: boolean;
+  playerOptions?: { value: string; label: string }[];
   onClose: () => void;
   onSave: (payload: MatchResultPayload) => Promise<void>;
   onCancel?: (matchId: string) => Promise<void>;
+  onSubstituted?: () => void | Promise<void>;
 }) {
   const [team1Score, setTeam1Score] = useState("");
   const [team2Score, setTeam2Score] = useState("");
@@ -487,6 +496,23 @@ export function MatchResultModal({
               </div>
             </div>
           )}
+
+          {allowSubstitute &&
+            tournamentId &&
+            onSubstituted &&
+            !finished &&
+            (match.team1 || match.team2) && (
+              <MatchSubstituteSection
+                match={match}
+                tournamentId={tournamentId}
+                playerOptions={playerOptions}
+                disabled={saving}
+                onSubstituted={async () => {
+                  await onSubstituted();
+                  onClose();
+                }}
+              />
+            )}
 
           {tournamentTables.length > 0 && (
             <label className="block text-sm">
