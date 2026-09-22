@@ -30,6 +30,28 @@ export function canOrganizerRegisterParticipants(
   );
 }
 
+/**
+ * Добавление/подтверждение организатором: до сетки — как обычно;
+ * после сетки — только если есть вакантные bye-слоты R1 (добор опоздавших).
+ */
+export function canOrganizerAddOrConfirmParticipants(
+  tournamentStatus: string,
+  bracketFormed: boolean,
+  hasVacantRoundOneSlots = false,
+): boolean {
+  if (canOrganizerRegisterParticipants(tournamentStatus, bracketFormed)) {
+    return true;
+  }
+  if (isTournamentClosed(tournamentStatus)) return false;
+  if (!bracketFormed || !hasVacantRoundOneSlots) return false;
+  return (
+    tournamentStatus === "DRAFT" ||
+    tournamentStatus === "PENDING_CLUB_APPROVAL" ||
+    tournamentStatus === "OPEN" ||
+    tournamentStatus === "ACTIVE"
+  );
+}
+
 /** Можно ли отменить регистрацию / снять подтверждение */
 export function canCancelRegistration(
   tournamentStatus: string,

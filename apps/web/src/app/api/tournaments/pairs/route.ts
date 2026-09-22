@@ -10,7 +10,8 @@ import {
   requireTournamentManageAccess,
   tournamentManageActorType,
 } from "@/lib/tournament-manage";
-import { canOrganizerRegisterParticipants } from "@/lib/tournament-registration";
+import { canOrganizerAddOrConfirmParticipants } from "@/lib/tournament-registration";
+import { hasVacantRoundOneSlots } from "@/lib/bracket-late-place";
 
 /**
  * Сборка пар для парного турнира (флаг isPair поверх обычной сетки).
@@ -46,7 +47,9 @@ export async function POST(request: NextRequest) {
 
     const bracketFormed =
       (await prisma.tournamentMatch.count({ where: { tournamentId } })) > 0;
-    if (!canOrganizerRegisterParticipants(tournament.status, bracketFormed)) {
+    const vacantBye =
+      bracketFormed && (await hasVacantRoundOneSlots(prisma, tournamentId));
+    if (!canOrganizerAddOrConfirmParticipants(tournament.status, bracketFormed, vacantBye)) {
       return NextResponse.json(
         { error: "Сборка пар сейчас недоступна" },
         { status: 400 },

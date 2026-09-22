@@ -9,12 +9,13 @@ import { prisma } from "@/lib/prisma";
 import { buildConfirmLink } from "@/lib/telegram";
 import { requireTournamentManageAccess, tournamentManageActorType } from "@/lib/tournament-manage";
 import {
-  canOrganizerRegisterParticipants,
+  canOrganizerAddOrConfirmParticipants,
   canCancelRegistration,
   isTournamentRegistrationOpen,
 } from "@/lib/tournament-registration";
 import { reopenTournamentIfBracketEmpty } from "@/lib/tournament-registration-server";
 import { syncSoloTeamsForTournament } from "@/lib/bracket-service";
+import { hasVacantRoundOneSlots } from "@/lib/bracket-late-place";
 import {
   notifyTournamentRegisteredByClub,
   notifyTournamentRegistrationConfirmed,
@@ -41,7 +42,12 @@ export async function POST(request: NextRequest) {
       (await prisma.tournamentMatch.count({
         where: { tournamentId: data.tournamentId },
       })) > 0;
-    if (!tournament || !canOrganizerRegisterParticipants(tournament.status, bracketFormed)) {
+    const vacantBye =
+      bracketFormed && (await hasVacantRoundOneSlots(prisma, data.tournamentId));
+    if (
+      !tournament ||
+      !canOrganizerAddOrConfirmParticipants(tournament.status, bracketFormed, vacantBye)
+    ) {
       return NextResponse.json(
         { error: "Регистрация на турнир недоступна" },
         { status: 400 },
@@ -260,11 +266,21 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
       }
       if (
-        !canOrganizerRegisterParticipants(existing.tournament.status, bracketFormed) &&
+        !canOrganizerAddOrConfirmParticipants(
+          existing.tournament.status,
+          bracketFormed,
+          bracketFormed
+            ? await hasVacantRoundOneSlots(prisma, existing.tournamentId)
+            : false,
+        ) &&
         status === "CONFIRMED"
       ) {
         return NextResponse.json(
-          { error: "Подтверждать новых участников можно только пока сетка не сформирована" },
+          {
+            error: bracketFormed
+              ? "Нет свободных слотов в сетке (bye) для добора участника"
+              : "Подтверждать новых участников можно только пока сетка не сформирована",
+          },
           { status: 400 },
         );
       }

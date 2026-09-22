@@ -19,7 +19,8 @@ import {
   notifyTournamentTeamRegistrationConfirmed,
   notifyTournamentTeamRegistrationRejected,
 } from "@/lib/tournament-registration-notify";
-import { canOrganizerRegisterParticipants } from "@/lib/tournament-registration";
+import { canOrganizerAddOrConfirmParticipants } from "@/lib/tournament-registration";
+import { hasVacantRoundOneSlots } from "@/lib/bracket-late-place";
 import { assertCanAddTournamentParticipants } from "@/lib/tournament-participant-limit-server";
 import { assertPlayerEligibleForTournamentRating } from "@/lib/tournament-rating-limit-server";
 import { tournamentTeamSchema, tournamentTeamUpdateSchema } from "@/lib/validators";
@@ -57,7 +58,9 @@ export async function POST(request: NextRequest) {
       (await prisma.tournamentMatch.count({
         where: { tournamentId: data.tournamentId },
       })) > 0;
-    if (!canOrganizerRegisterParticipants(tournament.status, bracketFormed)) {
+    const vacantBye =
+      bracketFormed && (await hasVacantRoundOneSlots(prisma, data.tournamentId));
+    if (!canOrganizerAddOrConfirmParticipants(tournament.status, bracketFormed, vacantBye)) {
       return NextResponse.json(
         { error: "Регистрация на турнир недоступна" },
         { status: 400 },
@@ -317,6 +320,24 @@ export async function PATCH(request: NextRequest) {
             { error: "Отметьте «Сдал взнос» перед подтверждением" },
             { status: 400 },
           );
+        }
+        if (matchCount > 0) {
+          const vacantBye = await hasVacantRoundOneSlots(
+            prisma,
+            existing.tournamentId,
+          );
+          if (
+            !canOrganizerAddOrConfirmParticipants(
+              existing.tournament.status,
+              true,
+              vacantBye,
+            )
+          ) {
+            return NextResponse.json(
+              { error: "Нет свободных слотов в сетке (bye) для добора участника" },
+              { status: 400 },
+            );
+          }
         }
       }
 

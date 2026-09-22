@@ -14,7 +14,8 @@ import {
   slotsRemaining,
 } from "@/lib/tournament-participant-limit";
 import type { AdminTournament } from "@/lib/tournament-admin";
-import { canOrganizerRegisterParticipants } from "@/lib/tournament-registration";
+import { canOrganizerAddOrConfirmParticipants } from "@/lib/tournament-registration";
+import { vacantRoundOneSlotsFromMatches } from "@/lib/bracket-late-place-display";
 import { isPairFormat } from "@/lib/pair-tournament";
 import {
   formatTournamentPlayerSelectLabel,
@@ -49,7 +50,12 @@ export function TournamentParticipantRegistrationPanel({
   collapsible?: boolean;
 }) {
   const bracketFormed = tournament.matches.length > 0;
-  const canRegister = canOrganizerRegisterParticipants(tournament.status, bracketFormed);
+  const vacantByeCount = vacantRoundOneSlotsFromMatches(tournament.matches).length;
+  const canRegister = canOrganizerAddOrConfirmParticipants(
+    tournament.status,
+    bracketFormed,
+    vacantByeCount > 0,
+  );
   const isPair = isPairFormat(tournament.format);
   const defaultCityId = tournament.club.city?.id ?? "";
   const defaultCountryName =

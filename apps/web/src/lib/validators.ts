@@ -488,6 +488,15 @@ export const matchCancelSchema = z.object({
   matchId: z.string().min(1),
 });
 
+export const bracketPlaceLateSchema = z.object({
+  tournamentId: z.string().min(1),
+  matchId: z.string().min(1),
+  teamId: z.string().min(1).optional(),
+  playerId: z.string().min(1).optional(),
+}).refine((d) => Boolean(d.teamId || d.playerId), {
+  message: "Укажите teamId или playerId",
+});
+
 export const bracketGenerateSchema = z
   .object({
     tournamentId: z.string().min(1),

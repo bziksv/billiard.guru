@@ -76,8 +76,9 @@ import {
 } from "@/lib/tournament-admin";
 import {
   canCancelRegistration,
-  canOrganizerRegisterParticipants,
+  canOrganizerAddOrConfirmParticipants,
 } from "@/lib/tournament-registration";
+import { vacantRoundOneSlotsFromMatches } from "@/lib/bracket-late-place-display";
 import {
   TournamentParticipantRegistrationPanel,
   type TournamentRegistrationPlayer,
@@ -663,7 +664,16 @@ export function TournamentManageView({
   }, [t.matches]);
   const finalRound = rounds.at(-1)?.[0];
   const bracketLocked = t.matches.length > 0;
-  const registrationOpen = canOrganizerRegisterParticipants(t.status, bracketLocked);
+  const vacantByeSlots = useMemo(
+    () => vacantRoundOneSlotsFromMatches(t.matches),
+    [t.matches],
+  );
+  const registrationOpen = canOrganizerAddOrConfirmParticipants(
+    t.status,
+    bracketLocked,
+    vacantByeSlots.length > 0,
+  );
+  const lateJoinMode = bracketLocked && vacantByeSlots.length > 0 && registrationOpen;
   const activeTeams = ratedTournament.teams.filter(
     (team) => team.status !== "CANCELLED",
   );
@@ -675,6 +685,16 @@ export function TournamentManageView({
     "organizer",
     bracketLocked,
   );
+  const teamIdsInBracket = useMemo(() => {
+    const ids = new Set<string>();
+    for (const m of t.matches) {
+      if (m.team1?.id) ids.add(m.team1.id);
+      if (m.team2?.id) ids.add(m.team2.id);
+      if (m.team1Id) ids.add(m.team1Id);
+      if (m.team2Id) ids.add(m.team2Id);
+    }
+    return ids;
+  }, [t.matches]);
   const participantCount = pair
     ? activeTeams.length
     : t.registrations.filter((r) => r.status !== "CANCELLED").length;
@@ -1133,6 +1153,9 @@ export function TournamentManageView({
           playerOptions={playerOptions}
           bracketLocked={bracketLocked}
           registrationOpen={registrationOpen}
+          lateJoinMode={lateJoinMode}
+          vacantByeSlots={vacantByeSlots}
+          teamIdsInBracket={teamIdsInBracket}
           canModifyRegistrations={canModifyRegistrations}
           onConfirmRegistration={onConfirmRegistration}
           onRejectRegistration={onRejectRegistration}
@@ -1243,6 +1266,9 @@ export function TournamentManageView({
             playerOptions={playerOptions}
             bracketLocked={bracketLocked}
             registrationOpen={registrationOpen}
+            lateJoinMode={lateJoinMode}
+            vacantByeSlots={vacantByeSlots}
+            teamIdsInBracket={teamIdsInBracket}
             canModifyRegistrations={canModifyRegistrations}
             onConfirmRegistration={onConfirmRegistration}
             onRejectRegistration={onRejectRegistration}
@@ -1348,6 +1374,88 @@ export function TournamentManageView({
   );
 }
 
+function PlaceIntoBracketButton({
+  tournamentId,
+  teamId,
+  playerId,
+  vacantByeSlots,
+  onUpdated,
+}: {
+  tournamentId: string;
+  teamId?: string;
+  playerId?: string;
+  vacantByeSlots: ReturnType<typeof vacantRoundOneSlotsFromMatches>;
+  onUpdated: () => void;
+}) {
+  const [matchId, setMatchId] = useState(vacantByeSlots[0]?.matchId ?? "");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!vacantByeSlots.some((s) => s.matchId === matchId)) {
+      setMatchId(vacantByeSlots[0]?.matchId ?? "");
+    }
+  }, [vacantByeSlots, matchId]);
+
+  if (vacantByeSlots.length === 0) return null;
+
+  async function place() {
+    if (!matchId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/tournaments/bracket/place-late", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tournamentId,
+          matchId,
+          ...(teamId ? { teamId } : {}),
+          ...(playerId ? { playerId } : {}),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "Не удалось посадить в сетку");
+      }
+      await onUpdated();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка посадки");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-1.5 sm:w-auto">
+      <label className="flex flex-col gap-1 text-xs text-zinc-400">
+        К кому в сетку
+        <select
+          value={matchId}
+          onChange={(e) => setMatchId(e.target.value)}
+          className="rounded-lg border border-zinc-700 bg-zinc-800 px-2 py-1.5 text-sm text-zinc-100"
+        >
+          {vacantByeSlots.map((s) => (
+            <option key={s.matchId} value={s.matchId}>
+              vs {s.opponentLabel}
+              {s.byeFinished ? " (откат автопрохода)" : ""}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button
+        type="button"
+        disabled={loading || !matchId}
+        onClick={() => void place()}
+        className="admin-btn admin-btn--primary px-3 py-1.5 text-xs disabled:opacity-50"
+      >
+        {loading ? "Сажаем…" : "Поставить в сетку"}
+      </button>
+      {error && <p className="text-xs text-red-400">{error}</p>}
+    </div>
+  );
+}
+
 function ParticipantsTab({
   t,
   pair,
@@ -1359,6 +1467,9 @@ function ParticipantsTab({
   playerOptions,
   bracketLocked,
   registrationOpen,
+  lateJoinMode,
+  vacantByeSlots,
+  teamIdsInBracket,
   canModifyRegistrations,
   onConfirmRegistration,
   onRejectRegistration,
@@ -1376,6 +1487,9 @@ function ParticipantsTab({
   playerOptions: { value: string; label: string }[];
   bracketLocked: boolean;
   registrationOpen: boolean;
+  lateJoinMode: boolean;
+  vacantByeSlots: ReturnType<typeof vacantRoundOneSlotsFromMatches>;
+  teamIdsInBracket: Set<string>;
   canModifyRegistrations: boolean;
   onConfirmRegistration: (id: string) => void | Promise<void>;
   onRejectRegistration: (id: string) => void | Promise<void>;
@@ -1555,9 +1669,15 @@ function ParticipantsTab({
             </div>
           )}
           <ul className="space-y-2">
-          {bracketLocked && (
+          {bracketLocked && !lateJoinMode && (
             <p className="tournament-bracket-locked-hint">
               Сетка сформирована — состав пар зафиксирован, изменить или убрать нельзя.
+            </p>
+          )}
+          {lateJoinMode && (
+            <p className="tournament-bracket-locked-hint">
+              Есть свободные слоты (bye / ×) — можно добавить пару и посадить в сетку
+              ({vacantByeSlots.length}).
             </p>
           )}
           {activeTeams.map((team, index) => (
@@ -1567,6 +1687,13 @@ function ParticipantsTab({
               team={team}
               playerOptions={playerOptions}
               bracketLocked={bracketLocked}
+              unplaced={
+                lateJoinMode &&
+                team.status === "CONFIRMED" &&
+                !teamIdsInBracket.has(team.id)
+              }
+              vacantByeSlots={vacantByeSlots}
+              tournamentId={t.id}
               onConfirm={() => onConfirmTeam(team.id)}
               onFeePaidChange={(feePaid) => setTeamFeePaid(team.id, feePaid)}
               onIsLateChange={(isLate) => setTeamIsLate(team.id, isLate)}
@@ -1661,11 +1788,18 @@ function ParticipantsTab({
 
       {!pair && confirmedRegistrations.length > 0 && (
         <div>
-          {bracketLocked && (
+          {bracketLocked && !lateJoinMode && (
             <p className="tournament-bracket-locked-hint mb-2">
               Сетка сформирована — состав участников зафиксирован, снять или добавить
               нельзя. Рейтинг можно скорректировать (повлияет на фору в предстоящих
               встречах).
+            </p>
+          )}
+          {lateJoinMode && (
+            <p className="tournament-bracket-locked-hint mb-2">
+              Есть свободные слоты (bye / ×) в первом туре — можно добавить опоздавшего
+              и посадить его к выбранному сопернику без пересборки сетки
+              ({vacantByeSlots.length}).
             </p>
           )}
           <p className="tournament-section-label">
@@ -1674,6 +1808,9 @@ function ParticipantsTab({
           <ul className="space-y-2">
             {confirmedRegistrations.map((r, index) => {
               const team = soloTeamByPlayerId.get(r.player.id);
+              const unplaced =
+                lateJoinMode &&
+                (!team || !teamIdsInBracket.has(team.id));
               return (
               <li key={r.id} className="tournament-participant-card">
                 <ParticipantIndex index={index + 1} />
@@ -1685,6 +1822,7 @@ function ParticipantsTab({
                     phone={r.player.phone}
                     telegramUsername={r.player.telegramUsername}
                     hideRating={Boolean(team)}
+                    note={unplaced ? "вне сетки — посадите в bye" : null}
                   />
                   {team ? (
                     <div className="mt-2">
@@ -1703,13 +1841,22 @@ function ParticipantsTab({
                   <FeePaidCheckbox checked disabled onChange={async () => {}} />
                   <IsLateCheckbox
                     checked={Boolean(r.isLate)}
-                    disabled={bracketLocked}
+                    disabled={bracketLocked && !unplaced}
                     onChange={(isLate) => setRegistrationIsLate(r.id, isLate)}
                   />
                   <StatusBadge
                     status={r.status}
                     label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
                   />
+                  {unplaced && (
+                    <PlaceIntoBracketButton
+                      tournamentId={t.id}
+                      teamId={team?.id}
+                      playerId={r.player.id}
+                      vacantByeSlots={vacantByeSlots}
+                      onUpdated={onUpdated}
+                    />
+                  )}
                   {canModifyRegistrations && (
                     <RegistrationActionButton
                       variant="outline"
@@ -1746,8 +1893,7 @@ function ParticipantsTab({
                   />
                 </div>
                 <div className="tournament-participant-card-actions">
-                  {canModifyRegistrations &&
-                    registrationOpen &&
+                  {registrationOpen &&
                     (r.status === "CANCELLED" || r.status === "REJECTED") && (
                       <FeePaidCheckbox
                         checked={Boolean(r.feePaid)}
@@ -1759,8 +1905,7 @@ function ParticipantsTab({
                       status={r.status}
                       label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
                     />
-                    {canModifyRegistrations &&
-                      registrationOpen &&
+                    {registrationOpen &&
                       (r.status === "CANCELLED" || r.status === "REJECTED") && (
                         <RegistrationActionButton
                           variant="primary"
@@ -1812,7 +1957,7 @@ function ParticipantsTab({
                     status={team.status}
                     label={REGISTRATION_STATUS_LABELS[team.status] ?? team.status}
                   />
-                  {canModifyRegistrations && registrationOpen && (
+                  {registrationOpen && (
                     <RegistrationActionButton
                       variant="primary"
                       loadingLabel={
@@ -2809,6 +2954,9 @@ function PairTeamRow({
   team,
   playerOptions,
   bracketLocked,
+  unplaced = false,
+  vacantByeSlots = [],
+  tournamentId,
   onConfirm,
   onFeePaidChange,
   onIsLateChange,
@@ -2818,6 +2966,9 @@ function PairTeamRow({
   team: Team;
   playerOptions: { value: string; label: string }[];
   bracketLocked: boolean;
+  unplaced?: boolean;
+  vacantByeSlots?: ReturnType<typeof vacantRoundOneSlotsFromMatches>;
+  tournamentId: string;
   onConfirm: () => void | Promise<void>;
   onFeePaidChange: (feePaid: boolean) => void | Promise<void>;
   onIsLateChange: (isLate: boolean) => void | Promise<void>;
@@ -2968,7 +3119,7 @@ function PairTeamRow({
         {team.status !== "CANCELLED" && (
           <IsLateCheckbox
             checked={Boolean(team.isLate)}
-            disabled={bracketLocked}
+            disabled={bracketLocked && !unplaced}
             onChange={onIsLateChange}
           />
         )}
@@ -2986,6 +3137,14 @@ function PairTeamRow({
             >
               Подтвердить
             </RegistrationActionButton>
+          )}
+          {unplaced && (
+            <PlaceIntoBracketButton
+              tournamentId={tournamentId}
+              teamId={team.id}
+              vacantByeSlots={vacantByeSlots}
+              onUpdated={onUpdated}
+            />
           )}
           {!bracketLocked && team.status !== "CANCELLED" && (
             <>
