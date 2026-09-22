@@ -32,6 +32,7 @@ import {
   pickFreeTournamentTableId,
 } from "@/lib/tournament-stream";
 import { parseTournamentTableIds } from "@/lib/tournament-table-pick";
+import { applyLateArrivalSeeding } from "@/lib/late-arrival-seeding";
 import {
   buildOlympicBracket,
   buildOlympicBracketWithBronze,
@@ -89,7 +90,9 @@ function teamsSortedByTournamentRating<T extends TeamWithPlayers>(
   return [...rated].sort((a, b) => teamRating(b) - teamRating(a));
 }
 
-async function seedTeamsByTournamentRating<T extends TeamWithPlayers>(
+async function seedTeamsByTournamentRating<
+  T extends TeamWithPlayers & { isLate?: boolean | null },
+>(
   db: Db,
   tournament: { clubId: string; ratingSource?: TournamentRatingSource | null },
   teams: T[],
@@ -103,7 +106,8 @@ async function seedTeamsByTournamentRating<T extends TeamWithPlayers>(
     playerIds,
   );
   const source = tournament.ratingSource ?? "SYSTEM";
-  return teamsSortedByTournamentRating(teams, source, clubPlayerRatings);
+  const byRating = teamsSortedByTournamentRating(teams, source, clubPlayerRatings);
+  return applyLateArrivalSeeding(byRating);
 }
 
 async function assertParticipantCountForFormat(format: string, count: number) {
@@ -1177,7 +1181,7 @@ export async function generatePairBracket(db: Db, tournamentId: string) {
 async function ensureSoloTeams(db: Db, tournamentId: string) {
   const registrations = await db.tournamentRegistration.findMany({
     where: { tournamentId, status: "CONFIRMED" },
-    select: { playerId: true, source: true },
+    select: { playerId: true, source: true, feePaid: true, isLate: true },
   });
 
   if (registrations.length === 0) {
@@ -1191,7 +1195,7 @@ async function ensureSoloTeams(db: Db, tournamentId: string) {
   const playerIds = registrations.map((r) => r.playerId);
   const existingTeams = await db.tournamentTeam.findMany({
     where: { tournamentId, player1Id: { in: playerIds } },
-    select: { id: true, player1Id: true, status: true },
+    select: { id: true, player1Id: true, status: true, feePaid: true, isLate: true },
   });
   const teamByPlayer = new Map(existingTeams.map((t) => [t.player1Id, t]));
 
@@ -1202,13 +1206,23 @@ async function ensureSoloTeams(db: Db, tournamentId: string) {
     source: (typeof registrations)[0]["source"];
     status: "CONFIRMED";
     confirmedAt: Date;
+    feePaid: boolean;
+    isLate: boolean;
   }[] = [];
+  const syncFlagUpdates: { id: string; feePaid: boolean; isLate: boolean }[] = [];
 
   const now = new Date();
   for (const reg of registrations) {
     const team = teamByPlayer.get(reg.playerId);
     if (team) {
       if (team.status !== "CONFIRMED") confirmIds.push(team.id);
+      if (team.feePaid !== reg.feePaid || team.isLate !== reg.isLate) {
+        syncFlagUpdates.push({
+          id: team.id,
+          feePaid: reg.feePaid,
+          isLate: reg.isLate,
+        });
+      }
       continue;
     }
     toCreate.push({
@@ -1217,6 +1231,8 @@ async function ensureSoloTeams(db: Db, tournamentId: string) {
       source: reg.source,
       status: "CONFIRMED",
       confirmedAt: now,
+      feePaid: reg.feePaid,
+      isLate: reg.isLate,
     });
   }
 
@@ -1224,6 +1240,12 @@ async function ensureSoloTeams(db: Db, tournamentId: string) {
     await db.tournamentTeam.updateMany({
       where: { id: { in: confirmIds } },
       data: { status: "CONFIRMED", confirmedAt: now },
+    });
+  }
+  for (const sync of syncFlagUpdates) {
+    await db.tournamentTeam.update({
+      where: { id: sync.id },
+      data: { feePaid: sync.feePaid, isLate: sync.isLate },
     });
   }
   if (toCreate.length > 0) {
@@ -1786,7 +1808,10 @@ export async function saveMatchResult(db: Db, input: MatchResultInput) {
 
   await processByes(db, match.tournamentId, match.tournament.format);
 
-  const ratingChanges = await applyAutoRatingForMatch(input.matchId);
+  const ratingChanges =
+    matchStatus === "WALKOVER"
+      ? null
+      : await applyAutoRatingForMatch(input.matchId);
 
   const finalMatch = await db.tournamentMatch.findUnique({
     where: { id: input.matchId },

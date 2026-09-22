@@ -18,7 +18,8 @@ export type RatingDynamicsStep = {
   ratingBefore: number;
   ratingAfter: number;
   delta: number;
-  opponentRatingBefore: number;
+  /** Рейтинг соперника на старт встречи; null если в журнале нет. */
+  opponentRatingBefore: number | null;
 };
 
 function OpponentNameLinks({
@@ -140,13 +141,17 @@ export function PlayerRatingDynamicsSteps({
                 </div>
                 <div className="mt-0.5 text-xs text-[var(--text-muted)]">
                   <span className="hidden sm:inline">{date}</span>
-                  <span className="hidden sm:inline"> · </span>
-                  <span>
-                    {t("oppRating")}:{" "}
-                    <span className="font-mono tabular-nums">
-                      {formatPreviewRating(s.opponentRatingBefore)}
-                    </span>
-                  </span>
+                  {s.opponentRatingBefore != null ? (
+                    <>
+                      <span className="hidden sm:inline"> · </span>
+                      <span>
+                        {t("oppRating")}:{" "}
+                        <span className="font-mono tabular-nums">
+                          {formatPreviewRating(s.opponentRatingBefore)}
+                        </span>
+                      </span>
+                    </>
+                  ) : null}
                   {s.isPair ? (
                     <span className="hidden sm:inline"> · {t("pair")}</span>
                   ) : null}

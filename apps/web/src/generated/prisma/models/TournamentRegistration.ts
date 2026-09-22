@@ -32,6 +32,7 @@ export type TournamentRegistrationMinAggregateOutputType = {
   source: $Enums.RegistrationSource | null
   status: $Enums.RegistrationStatus | null
   feePaid: boolean | null
+  isLate: boolean | null
   createdAt: Date | null
   confirmedAt: Date | null
 }
@@ -44,6 +45,7 @@ export type TournamentRegistrationMaxAggregateOutputType = {
   source: $Enums.RegistrationSource | null
   status: $Enums.RegistrationStatus | null
   feePaid: boolean | null
+  isLate: boolean | null
   createdAt: Date | null
   confirmedAt: Date | null
 }
@@ -56,6 +58,7 @@ export type TournamentRegistrationCountAggregateOutputType = {
   source: number
   status: number
   feePaid: number
+  isLate: number
   createdAt: number
   confirmedAt: number
   _all: number
@@ -70,6 +73,7 @@ export type TournamentRegistrationMinAggregateInputType = {
   source?: true
   status?: true
   feePaid?: true
+  isLate?: true
   createdAt?: true
   confirmedAt?: true
 }
@@ -82,6 +86,7 @@ export type TournamentRegistrationMaxAggregateInputType = {
   source?: true
   status?: true
   feePaid?: true
+  isLate?: true
   createdAt?: true
   confirmedAt?: true
 }
@@ -94,6 +99,7 @@ export type TournamentRegistrationCountAggregateInputType = {
   source?: true
   status?: true
   feePaid?: true
+  isLate?: true
   createdAt?: true
   confirmedAt?: true
   _all?: true
@@ -179,6 +185,7 @@ export type TournamentRegistrationGroupByOutputType = {
   source: $Enums.RegistrationSource
   status: $Enums.RegistrationStatus
   feePaid: boolean
+  isLate: boolean
   createdAt: Date
   confirmedAt: Date | null
   _count: TournamentRegistrationCountAggregateOutputType | null
@@ -212,6 +219,7 @@ export type TournamentRegistrationWhereInput = {
   source?: Prisma.EnumRegistrationSourceFilter<"TournamentRegistration"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFilter<"TournamentRegistration"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFilter<"TournamentRegistration"> | boolean
+  isLate?: Prisma.BoolFilter<"TournamentRegistration"> | boolean
   createdAt?: Prisma.DateTimeFilter<"TournamentRegistration"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableFilter<"TournamentRegistration"> | Date | string | null
   tournament?: Prisma.XOR<Prisma.TournamentScalarRelationFilter, Prisma.TournamentWhereInput>
@@ -227,6 +235,7 @@ export type TournamentRegistrationOrderByWithRelationInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   tournament?: Prisma.TournamentOrderByWithRelationInput
@@ -247,6 +256,7 @@ export type TournamentRegistrationWhereUniqueInput = Prisma.AtLeast<{
   source?: Prisma.EnumRegistrationSourceFilter<"TournamentRegistration"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFilter<"TournamentRegistration"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFilter<"TournamentRegistration"> | boolean
+  isLate?: Prisma.BoolFilter<"TournamentRegistration"> | boolean
   createdAt?: Prisma.DateTimeFilter<"TournamentRegistration"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableFilter<"TournamentRegistration"> | Date | string | null
   tournament?: Prisma.XOR<Prisma.TournamentScalarRelationFilter, Prisma.TournamentWhereInput>
@@ -262,6 +272,7 @@ export type TournamentRegistrationOrderByWithAggregationInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TournamentRegistrationCountOrderByAggregateInput
@@ -280,6 +291,7 @@ export type TournamentRegistrationScalarWhereWithAggregatesInput = {
   source?: Prisma.EnumRegistrationSourceWithAggregatesFilter<"TournamentRegistration"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusWithAggregatesFilter<"TournamentRegistration"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolWithAggregatesFilter<"TournamentRegistration"> | boolean
+  isLate?: Prisma.BoolWithAggregatesFilter<"TournamentRegistration"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TournamentRegistration"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TournamentRegistration"> | Date | string | null
 }
@@ -289,6 +301,7 @@ export type TournamentRegistrationCreateInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
   tournament: Prisma.TournamentCreateNestedOneWithoutRegistrationsInput
@@ -304,6 +317,7 @@ export type TournamentRegistrationUncheckedCreateInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -313,6 +327,7 @@ export type TournamentRegistrationUpdateInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tournament?: Prisma.TournamentUpdateOneRequiredWithoutRegistrationsNestedInput
@@ -328,6 +343,7 @@ export type TournamentRegistrationUncheckedUpdateInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -340,6 +356,7 @@ export type TournamentRegistrationCreateManyInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -349,6 +366,7 @@ export type TournamentRegistrationUpdateManyMutationInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -361,6 +379,7 @@ export type TournamentRegistrationUncheckedUpdateManyInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -394,6 +413,7 @@ export type TournamentRegistrationCountOrderByAggregateInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrder
 }
@@ -406,6 +426,7 @@ export type TournamentRegistrationMaxOrderByAggregateInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrder
 }
@@ -418,6 +439,7 @@ export type TournamentRegistrationMinOrderByAggregateInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   confirmedAt?: Prisma.SortOrder
 }
@@ -553,6 +575,7 @@ export type TournamentRegistrationCreateWithoutClubInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
   tournament: Prisma.TournamentCreateNestedOneWithoutRegistrationsInput
@@ -566,6 +589,7 @@ export type TournamentRegistrationUncheckedCreateWithoutClubInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -607,6 +631,7 @@ export type TournamentRegistrationScalarWhereInput = {
   source?: Prisma.EnumRegistrationSourceFilter<"TournamentRegistration"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFilter<"TournamentRegistration"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFilter<"TournamentRegistration"> | boolean
+  isLate?: Prisma.BoolFilter<"TournamentRegistration"> | boolean
   createdAt?: Prisma.DateTimeFilter<"TournamentRegistration"> | Date | string
   confirmedAt?: Prisma.DateTimeNullableFilter<"TournamentRegistration"> | Date | string | null
 }
@@ -616,6 +641,7 @@ export type TournamentRegistrationCreateWithoutPlayerInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
   tournament: Prisma.TournamentCreateNestedOneWithoutRegistrationsInput
@@ -629,6 +655,7 @@ export type TournamentRegistrationUncheckedCreateWithoutPlayerInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -664,6 +691,7 @@ export type TournamentRegistrationCreateWithoutTournamentInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
   player: Prisma.PlayerCreateNestedOneWithoutRegistrationsInput
@@ -677,6 +705,7 @@ export type TournamentRegistrationUncheckedCreateWithoutTournamentInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -714,6 +743,7 @@ export type TournamentRegistrationCreateManyClubInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -723,6 +753,7 @@ export type TournamentRegistrationUpdateWithoutClubInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tournament?: Prisma.TournamentUpdateOneRequiredWithoutRegistrationsNestedInput
@@ -736,6 +767,7 @@ export type TournamentRegistrationUncheckedUpdateWithoutClubInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -747,6 +779,7 @@ export type TournamentRegistrationUncheckedUpdateManyWithoutClubInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -758,6 +791,7 @@ export type TournamentRegistrationCreateManyPlayerInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -767,6 +801,7 @@ export type TournamentRegistrationUpdateWithoutPlayerInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tournament?: Prisma.TournamentUpdateOneRequiredWithoutRegistrationsNestedInput
@@ -780,6 +815,7 @@ export type TournamentRegistrationUncheckedUpdateWithoutPlayerInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -791,6 +827,7 @@ export type TournamentRegistrationUncheckedUpdateManyWithoutPlayerInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -802,6 +839,7 @@ export type TournamentRegistrationCreateManyTournamentInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: Date | string
   confirmedAt?: Date | string | null
 }
@@ -811,6 +849,7 @@ export type TournamentRegistrationUpdateWithoutTournamentInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   player?: Prisma.PlayerUpdateOneRequiredWithoutRegistrationsNestedInput
@@ -824,6 +863,7 @@ export type TournamentRegistrationUncheckedUpdateWithoutTournamentInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -835,6 +875,7 @@ export type TournamentRegistrationUncheckedUpdateManyWithoutTournamentInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -849,6 +890,7 @@ export type TournamentRegistrationSelect<ExtArgs extends runtime.Types.Extension
   source?: boolean
   status?: boolean
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: boolean
   confirmedAt?: boolean
   tournament?: boolean | Prisma.TournamentDefaultArgs<ExtArgs>
@@ -866,11 +908,12 @@ export type TournamentRegistrationSelectScalar = {
   source?: boolean
   status?: boolean
   feePaid?: boolean
+  isLate?: boolean
   createdAt?: boolean
   confirmedAt?: boolean
 }
 
-export type TournamentRegistrationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "playerId" | "clubId" | "source" | "status" | "feePaid" | "createdAt" | "confirmedAt", ExtArgs["result"]["tournamentRegistration"]>
+export type TournamentRegistrationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "playerId" | "clubId" | "source" | "status" | "feePaid" | "isLate" | "createdAt" | "confirmedAt", ExtArgs["result"]["tournamentRegistration"]>
 export type TournamentRegistrationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tournament?: boolean | Prisma.TournamentDefaultArgs<ExtArgs>
   player?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
@@ -892,6 +935,10 @@ export type $TournamentRegistrationPayload<ExtArgs extends runtime.Types.Extensi
     source: $Enums.RegistrationSource
     status: $Enums.RegistrationStatus
     feePaid: boolean
+    /**
+     * Опаздывает к старту — учитывается при посеве (late–late или слабый посев).
+     */
+    isLate: boolean
     createdAt: Date
     confirmedAt: Date | null
   }, ExtArgs["result"]["tournamentRegistration"]>
@@ -1273,6 +1320,7 @@ export interface TournamentRegistrationFieldRefs {
   readonly source: Prisma.FieldRef<"TournamentRegistration", 'RegistrationSource'>
   readonly status: Prisma.FieldRef<"TournamentRegistration", 'RegistrationStatus'>
   readonly feePaid: Prisma.FieldRef<"TournamentRegistration", 'Boolean'>
+  readonly isLate: Prisma.FieldRef<"TournamentRegistration", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"TournamentRegistration", 'DateTime'>
   readonly confirmedAt: Prisma.FieldRef<"TournamentRegistration", 'DateTime'>
 }

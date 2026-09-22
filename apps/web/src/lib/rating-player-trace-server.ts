@@ -28,6 +28,8 @@ export type PlayerRatingJournalStep = {
   newRating: number;
   delta: number;
   opponentName: string | null;
+  opponentIds: string[];
+  opponentRatingBefore: number | null;
   isPair: boolean | null;
 };
 
@@ -222,10 +224,20 @@ async function loadJournal(playerId: string): Promise<PlayerRatingJournalStep[]>
           player1Id: true,
           player2Id: true,
           player1: {
-            select: { lastName: true, firstName: true, middleName: true },
+            select: {
+              id: true,
+              lastName: true,
+              firstName: true,
+              middleName: true,
+            },
           },
           player2: {
-            select: { lastName: true, firstName: true, middleName: true },
+            select: {
+              id: true,
+              lastName: true,
+              firstName: true,
+              middleName: true,
+            },
           },
         },
       },
@@ -235,10 +247,20 @@ async function loadJournal(playerId: string): Promise<PlayerRatingJournalStep[]>
           player1Id: true,
           player2Id: true,
           player1: {
-            select: { lastName: true, firstName: true, middleName: true },
+            select: {
+              id: true,
+              lastName: true,
+              firstName: true,
+              middleName: true,
+            },
           },
           player2: {
-            select: { lastName: true, firstName: true, middleName: true },
+            select: {
+              id: true,
+              lastName: true,
+              firstName: true,
+              middleName: true,
+            },
           },
         },
       },
@@ -246,43 +268,81 @@ async function loadJournal(playerId: string): Promise<PlayerRatingJournalStep[]>
   });
   const byId = new Map(matches.map((m) => [m.id, m]));
 
-  function sideLabel(
+  const oppChanges = await prisma.ratingChange.findMany({
+    where: {
+      matchId: { in: matchIds },
+      playerId: { not: playerId },
+    },
+    select: { matchId: true, playerId: true, oldRating: true },
+  });
+  const oppOldByMatch = new Map<string, Map<string, number>>();
+  for (const c of oppChanges) {
+    if (!c.matchId) continue;
+    let slot = oppOldByMatch.get(c.matchId);
+    if (!slot) {
+      slot = new Map();
+      oppOldByMatch.set(c.matchId, slot);
+    }
+    slot.set(c.playerId, c.oldRating);
+  }
+
+  function sidePlayers(
     team: {
       player1Id: string;
       player2Id: string | null;
       player1: {
+        id: string;
         lastName: string;
         firstName: string;
         middleName: string | null;
       };
       player2: {
+        id: string;
         lastName: string;
         firstName: string;
         middleName: string | null;
       } | null;
     } | null,
-  ): { name: string; isPair: boolean } {
-    if (!team) return { name: "?", isPair: false };
+  ): { ids: string[]; name: string; isPair: boolean } {
+    if (!team) return { ids: [], name: "?", isPair: false };
+    const ids = [team.player1Id];
     const a = playerDisplayName(team.player1);
     if (team.player2Id && team.player2) {
-      const b = playerDisplayName(team.player2);
-      return { name: `${a} / ${b}`, isPair: true };
+      ids.push(team.player2Id);
+      return {
+        ids,
+        name: `${a} / ${playerDisplayName(team.player2)}`,
+        isPair: true,
+      };
     }
-    return { name: a, isPair: false };
+    return { ids, name: a, isPair: false };
   }
 
   return changes.map((c) => {
     const m = c.matchId ? byId.get(c.matchId) : null;
     let opponentName: string | null = null;
+    let opponentIds: string[] = [];
+    let opponentRatingBefore: number | null = null;
     let isPair: boolean | null = null;
     const won = c.reason === "match_win";
     if (m?.team1 && m.team2) {
       const winnerIs1 = m.winnerTeamId === m.team1Id;
       const opp = won
-        ? sideLabel(winnerIs1 ? m.team2 : m.team1)
-        : sideLabel(winnerIs1 ? m.team1 : m.team2);
+        ? sidePlayers(winnerIs1 ? m.team2 : m.team1)
+        : sidePlayers(winnerIs1 ? m.team1 : m.team2);
       opponentName = opp.name;
+      opponentIds = opp.ids;
       isPair = opp.isPair;
+      const byPlayer = c.matchId ? oppOldByMatch.get(c.matchId) : undefined;
+      if (byPlayer && opp.ids.length > 0) {
+        const vals = opp.ids
+          .map((id) => byPlayer.get(id))
+          .filter((v): v is number => v != null);
+        if (vals.length > 0) {
+          opponentRatingBefore =
+            vals.reduce((a, b) => a + b, 0) / vals.length;
+        }
+      }
     }
     return {
       matchId: c.matchId,
@@ -292,6 +352,8 @@ async function loadJournal(playerId: string): Promise<PlayerRatingJournalStep[]>
       newRating: c.newRating,
       delta: c.delta,
       opponentName,
+      opponentIds,
+      opponentRatingBefore,
       isPair,
     };
   });

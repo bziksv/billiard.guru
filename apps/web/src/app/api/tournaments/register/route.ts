@@ -185,15 +185,31 @@ export async function PATCH(request: NextRequest) {
       player.role === "SUPERADMIN" ||
       (await playerCanManageClub(existing.tournament.club, player));
 
-    if (data.feePaid !== undefined && data.status === undefined) {
+    if (
+      (data.feePaid !== undefined || data.isLate !== undefined) &&
+      data.status === undefined
+    ) {
       if (!isOrganizer) {
         return NextResponse.json({ error: "Недостаточно прав" }, { status: 403 });
       }
       const registration = await prisma.tournamentRegistration.update({
         where: { id: data.id },
-        data: { feePaid: data.feePaid },
+        data: {
+          ...(data.feePaid !== undefined ? { feePaid: data.feePaid } : {}),
+          ...(data.isLate !== undefined ? { isLate: data.isLate } : {}),
+        },
         include: { player: true, tournament: true },
       });
+      if (data.isLate !== undefined) {
+        await prisma.tournamentTeam.updateMany({
+          where: {
+            tournamentId: existing.tournamentId,
+            player1Id: existing.playerId,
+            status: { not: "CANCELLED" },
+          },
+          data: { isLate: data.isLate },
+        });
+      }
       return NextResponse.json(registration);
     }
 

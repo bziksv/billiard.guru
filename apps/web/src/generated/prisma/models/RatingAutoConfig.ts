@@ -418,7 +418,7 @@ export type $RatingAutoConfigPayload<ExtArgs extends runtime.Types.Extensions.In
      */
     enabled: boolean
     /**
-     * soft | upset_only | upset_mild | mild_all | tiny_equal | elo | micro_equal
+     * soft | upset_only | upset_mild | mild_all | tiny_equal | elo | micro_equal | tiny_upset_only
      */
     formula: string
     minTournaments: number

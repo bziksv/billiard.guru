@@ -528,6 +528,8 @@ model TournamentTeam {
   source       RegistrationSource
   status       RegistrationStatus @default(PENDING)
   feePaid      Boolean            @default(false) @map("fee_paid")
+  /// Опаздывает к старту — учитывается при посеве (late–late или слабый посев).
+  isLate       Boolean            @default(false) @map("is_late")
   /// Переопределённый рейтинг пары для посева (если null — берётся сумма рейтингов игроков). Для сыгранных пар.
   ratingOverride Float?           @map("rating_override")
   seed         Int?
@@ -579,6 +581,8 @@ model TournamentRegistration {
   source       RegistrationSource
   status       RegistrationStatus @default(PENDING)
   feePaid      Boolean            @default(false) @map("fee_paid")
+  /// Опаздывает к старту — учитывается при посеве (late–late или слабый посев).
+  isLate       Boolean            @default(false) @map("is_late")
   createdAt    DateTime           @default(now()) @map("created_at")
   confirmedAt  DateTime?          @map("confirmed_at")
 

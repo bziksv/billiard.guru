@@ -24,6 +24,7 @@ export interface AdminTournamentParticipant {
   status: string;
   source?: string;
   feePaid?: boolean;
+  isLate?: boolean;
   player: {
     id: string;
     firstName: string;
@@ -39,6 +40,7 @@ export interface AdminTournamentTeam {
   id: string;
   status: string;
   feePaid?: boolean;
+  isLate?: boolean;
   seed?: number | null;
   swissPoints?: number;
   /** Переопределённый рейтинг пары (сыгранные пары); null — сумма рейтингов игроков. */

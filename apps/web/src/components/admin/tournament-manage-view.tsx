@@ -306,6 +306,48 @@ function FeePaidCheckbox({
   );
 }
 
+function IsLateCheckbox({
+  checked,
+  disabled = false,
+  onChange,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (checked: boolean) => void | Promise<void>;
+}) {
+  const [saving, setSaving] = useState(false);
+
+  async function handleChange(next: boolean) {
+    if (disabled || saving) return;
+    setSaving(true);
+    try {
+      await onChange(next);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Не удалось сохранить");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <label
+      className={cn(
+        "tournament-fee-paid-label",
+        disabled && "tournament-fee-paid-label--disabled",
+      )}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled || saving}
+        onChange={(e) => void handleChange(e.target.checked)}
+        className="h-4 w-4 rounded border-zinc-600"
+      />
+      <span>Опаздывает</span>
+    </label>
+  );
+}
+
 export type TournamentManageViewMode = "full" | "tournament" | "bracket";
 
 function defaultManageTab(
@@ -1378,6 +1420,30 @@ function ParticipantsTab({
     }
   }
 
+  async function patchRegistrationIsLate(id: string, isLate: boolean) {
+    const res = await fetch("/api/tournaments/register", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, isLate }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось сохранить отметку опоздания");
+    }
+  }
+
+  async function patchTeamIsLate(id: string, isLate: boolean) {
+    const res = await fetch("/api/tournaments/teams", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, isLate }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? "Не удалось сохранить отметку опоздания");
+    }
+  }
+
   async function setRegistrationFeePaid(id: string, feePaid: boolean) {
     await patchRegistrationFeePaid(id, feePaid);
     await onUpdated();
@@ -1385,6 +1451,16 @@ function ParticipantsTab({
 
   async function setTeamFeePaid(id: string, feePaid: boolean) {
     await patchTeamFeePaid(id, feePaid);
+    await onUpdated();
+  }
+
+  async function setRegistrationIsLate(id: string, isLate: boolean) {
+    await patchRegistrationIsLate(id, isLate);
+    await onUpdated();
+  }
+
+  async function setTeamIsLate(id: string, isLate: boolean) {
+    await patchTeamIsLate(id, isLate);
     await onUpdated();
   }
 
@@ -1493,6 +1569,7 @@ function ParticipantsTab({
               bracketLocked={bracketLocked}
               onConfirm={() => onConfirmTeam(team.id)}
               onFeePaidChange={(feePaid) => setTeamFeePaid(team.id, feePaid)}
+              onIsLateChange={(isLate) => setTeamIsLate(team.id, isLate)}
               onUpdated={onUpdated}
             />
           ))}
@@ -1553,6 +1630,10 @@ function ParticipantsTab({
                   <FeePaidCheckbox
                     checked={Boolean(r.feePaid)}
                     onChange={(feePaid) => setRegistrationFeePaid(r.id, feePaid)}
+                  />
+                  <IsLateCheckbox
+                    checked={Boolean(r.isLate)}
+                    onChange={(isLate) => setRegistrationIsLate(r.id, isLate)}
                   />
                   <div className="tournament-participant-card-buttons">
                     <RegistrationActionButton
@@ -1620,6 +1701,11 @@ function ParticipantsTab({
                 </div>
                 <div className="tournament-participant-card-actions">
                   <FeePaidCheckbox checked disabled onChange={async () => {}} />
+                  <IsLateCheckbox
+                    checked={Boolean(r.isLate)}
+                    disabled={bracketLocked}
+                    onChange={(isLate) => setRegistrationIsLate(r.id, isLate)}
+                  />
                   <StatusBadge
                     status={r.status}
                     label={REGISTRATION_STATUS_LABELS[r.status] ?? r.status}
@@ -2725,6 +2811,7 @@ function PairTeamRow({
   bracketLocked,
   onConfirm,
   onFeePaidChange,
+  onIsLateChange,
   onUpdated,
 }: {
   index: number;
@@ -2733,6 +2820,7 @@ function PairTeamRow({
   bracketLocked: boolean;
   onConfirm: () => void | Promise<void>;
   onFeePaidChange: (feePaid: boolean) => void | Promise<void>;
+  onIsLateChange: (isLate: boolean) => void | Promise<void>;
   onUpdated: () => void;
 }) {
   const [editing, setEditing] = useState(false);
@@ -2876,6 +2964,13 @@ function PairTeamRow({
         )}
         {team.status === "CONFIRMED" && (
           <FeePaidCheckbox checked disabled onChange={async () => {}} />
+        )}
+        {team.status !== "CANCELLED" && (
+          <IsLateCheckbox
+            checked={Boolean(team.isLate)}
+            disabled={bracketLocked}
+            onChange={onIsLateChange}
+          />
         )}
         <div className="tournament-participant-card-buttons">
           <StatusBadge

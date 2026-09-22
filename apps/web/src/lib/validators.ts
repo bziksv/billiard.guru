@@ -430,10 +430,15 @@ export const tournamentRegistrationPatchSchema = z
     id: z.string().min(1),
     status: z.enum(["CONFIRMED", "REJECTED", "CANCELLED"]).optional(),
     feePaid: z.boolean().optional(),
+    isLate: z.boolean().optional(),
   })
-  .refine((d) => d.status !== undefined || d.feePaid !== undefined, {
-    message: "Нечего обновлять",
-  });
+  .refine(
+    (d) =>
+      d.status !== undefined || d.feePaid !== undefined || d.isLate !== undefined,
+    {
+      message: "Нечего обновлять",
+    },
+  );
 
 export const tournamentTeamSchema = z
   .object({
@@ -458,6 +463,7 @@ export const tournamentTeamUpdateSchema = z
     name: z.string().max(120).optional().nullable(),
     status: z.enum(["CONFIRMED", "REJECTED", "CANCELLED"]).optional(),
     feePaid: z.boolean().optional(),
+    isLate: z.boolean().optional(),
   })
   .refine(
     (d) => {

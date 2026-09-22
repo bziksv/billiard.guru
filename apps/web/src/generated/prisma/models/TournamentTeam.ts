@@ -48,6 +48,7 @@ export type TournamentTeamMinAggregateOutputType = {
   source: $Enums.RegistrationSource | null
   status: $Enums.RegistrationStatus | null
   feePaid: boolean | null
+  isLate: boolean | null
   ratingOverride: number | null
   seed: number | null
   swissPoints: number | null
@@ -65,6 +66,7 @@ export type TournamentTeamMaxAggregateOutputType = {
   source: $Enums.RegistrationSource | null
   status: $Enums.RegistrationStatus | null
   feePaid: boolean | null
+  isLate: boolean | null
   ratingOverride: number | null
   seed: number | null
   swissPoints: number | null
@@ -82,6 +84,7 @@ export type TournamentTeamCountAggregateOutputType = {
   source: number
   status: number
   feePaid: number
+  isLate: number
   ratingOverride: number
   seed: number
   swissPoints: number
@@ -113,6 +116,7 @@ export type TournamentTeamMinAggregateInputType = {
   source?: true
   status?: true
   feePaid?: true
+  isLate?: true
   ratingOverride?: true
   seed?: true
   swissPoints?: true
@@ -130,6 +134,7 @@ export type TournamentTeamMaxAggregateInputType = {
   source?: true
   status?: true
   feePaid?: true
+  isLate?: true
   ratingOverride?: true
   seed?: true
   swissPoints?: true
@@ -147,6 +152,7 @@ export type TournamentTeamCountAggregateInputType = {
   source?: true
   status?: true
   feePaid?: true
+  isLate?: true
   ratingOverride?: true
   seed?: true
   swissPoints?: true
@@ -251,6 +257,7 @@ export type TournamentTeamGroupByOutputType = {
   source: $Enums.RegistrationSource
   status: $Enums.RegistrationStatus
   feePaid: boolean
+  isLate: boolean
   ratingOverride: number | null
   seed: number | null
   swissPoints: number
@@ -291,6 +298,7 @@ export type TournamentTeamWhereInput = {
   source?: Prisma.EnumRegistrationSourceFilter<"TournamentTeam"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFilter<"TournamentTeam"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFilter<"TournamentTeam"> | boolean
+  isLate?: Prisma.BoolFilter<"TournamentTeam"> | boolean
   ratingOverride?: Prisma.FloatNullableFilter<"TournamentTeam"> | number | null
   seed?: Prisma.IntNullableFilter<"TournamentTeam"> | number | null
   swissPoints?: Prisma.IntFilter<"TournamentTeam"> | number
@@ -315,6 +323,7 @@ export type TournamentTeamOrderByWithRelationInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   ratingOverride?: Prisma.SortOrderInput | Prisma.SortOrder
   seed?: Prisma.SortOrderInput | Prisma.SortOrder
   swissPoints?: Prisma.SortOrder
@@ -344,6 +353,7 @@ export type TournamentTeamWhereUniqueInput = Prisma.AtLeast<{
   source?: Prisma.EnumRegistrationSourceFilter<"TournamentTeam"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFilter<"TournamentTeam"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFilter<"TournamentTeam"> | boolean
+  isLate?: Prisma.BoolFilter<"TournamentTeam"> | boolean
   ratingOverride?: Prisma.FloatNullableFilter<"TournamentTeam"> | number | null
   seed?: Prisma.IntNullableFilter<"TournamentTeam"> | number | null
   swissPoints?: Prisma.IntFilter<"TournamentTeam"> | number
@@ -368,6 +378,7 @@ export type TournamentTeamOrderByWithAggregationInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   ratingOverride?: Prisma.SortOrderInput | Prisma.SortOrder
   seed?: Prisma.SortOrderInput | Prisma.SortOrder
   swissPoints?: Prisma.SortOrder
@@ -393,6 +404,7 @@ export type TournamentTeamScalarWhereWithAggregatesInput = {
   source?: Prisma.EnumRegistrationSourceWithAggregatesFilter<"TournamentTeam"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusWithAggregatesFilter<"TournamentTeam"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolWithAggregatesFilter<"TournamentTeam"> | boolean
+  isLate?: Prisma.BoolWithAggregatesFilter<"TournamentTeam"> | boolean
   ratingOverride?: Prisma.FloatNullableWithAggregatesFilter<"TournamentTeam"> | number | null
   seed?: Prisma.IntNullableWithAggregatesFilter<"TournamentTeam"> | number | null
   swissPoints?: Prisma.IntWithAggregatesFilter<"TournamentTeam"> | number
@@ -406,6 +418,7 @@ export type TournamentTeamCreateInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -430,6 +443,7 @@ export type TournamentTeamUncheckedCreateInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -446,6 +460,7 @@ export type TournamentTeamUpdateInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -470,6 +485,7 @@ export type TournamentTeamUncheckedUpdateInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -490,6 +506,7 @@ export type TournamentTeamCreateManyInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -503,6 +520,7 @@ export type TournamentTeamUpdateManyMutationInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -520,6 +538,7 @@ export type TournamentTeamUncheckedUpdateManyInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -558,6 +577,7 @@ export type TournamentTeamCountOrderByAggregateInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   ratingOverride?: Prisma.SortOrder
   seed?: Prisma.SortOrder
   swissPoints?: Prisma.SortOrder
@@ -581,6 +601,7 @@ export type TournamentTeamMaxOrderByAggregateInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   ratingOverride?: Prisma.SortOrder
   seed?: Prisma.SortOrder
   swissPoints?: Prisma.SortOrder
@@ -598,6 +619,7 @@ export type TournamentTeamMinOrderByAggregateInput = {
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
   feePaid?: Prisma.SortOrder
+  isLate?: Prisma.SortOrder
   ratingOverride?: Prisma.SortOrder
   seed?: Prisma.SortOrder
   swissPoints?: Prisma.SortOrder
@@ -842,6 +864,7 @@ export type TournamentTeamCreateWithoutClubInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -864,6 +887,7 @@ export type TournamentTeamUncheckedCreateWithoutClubInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -913,6 +937,7 @@ export type TournamentTeamScalarWhereInput = {
   source?: Prisma.EnumRegistrationSourceFilter<"TournamentTeam"> | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFilter<"TournamentTeam"> | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFilter<"TournamentTeam"> | boolean
+  isLate?: Prisma.BoolFilter<"TournamentTeam"> | boolean
   ratingOverride?: Prisma.FloatNullableFilter<"TournamentTeam"> | number | null
   seed?: Prisma.IntNullableFilter<"TournamentTeam"> | number | null
   swissPoints?: Prisma.IntFilter<"TournamentTeam"> | number
@@ -926,6 +951,7 @@ export type TournamentTeamCreateWithoutPlayer1Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -948,6 +974,7 @@ export type TournamentTeamUncheckedCreateWithoutPlayer1Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -974,6 +1001,7 @@ export type TournamentTeamCreateWithoutPlayer2Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -996,6 +1024,7 @@ export type TournamentTeamUncheckedCreateWithoutPlayer2Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1054,6 +1083,7 @@ export type TournamentTeamCreateWithoutTournamentInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1076,6 +1106,7 @@ export type TournamentTeamUncheckedCreateWithoutTournamentInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1118,6 +1149,7 @@ export type TournamentTeamCreateWithoutMatchesAsTeam1Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1141,6 +1173,7 @@ export type TournamentTeamUncheckedCreateWithoutMatchesAsTeam1Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1161,6 +1194,7 @@ export type TournamentTeamCreateWithoutMatchesAsTeam2Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1184,6 +1218,7 @@ export type TournamentTeamUncheckedCreateWithoutMatchesAsTeam2Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1204,6 +1239,7 @@ export type TournamentTeamCreateWithoutMatchesWonInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1227,6 +1263,7 @@ export type TournamentTeamUncheckedCreateWithoutMatchesWonInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1258,6 +1295,7 @@ export type TournamentTeamUpdateWithoutMatchesAsTeam1Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1281,6 +1319,7 @@ export type TournamentTeamUncheckedUpdateWithoutMatchesAsTeam1Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1307,6 +1346,7 @@ export type TournamentTeamUpdateWithoutMatchesAsTeam2Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1330,6 +1370,7 @@ export type TournamentTeamUncheckedUpdateWithoutMatchesAsTeam2Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1356,6 +1397,7 @@ export type TournamentTeamUpdateWithoutMatchesWonInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1379,6 +1421,7 @@ export type TournamentTeamUncheckedUpdateWithoutMatchesWonInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1397,6 +1440,7 @@ export type TournamentTeamCreateManyClubInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1410,6 +1454,7 @@ export type TournamentTeamUpdateWithoutClubInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1432,6 +1477,7 @@ export type TournamentTeamUncheckedUpdateWithoutClubInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1451,6 +1497,7 @@ export type TournamentTeamUncheckedUpdateManyWithoutClubInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1467,6 +1514,7 @@ export type TournamentTeamCreateManyPlayer1Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1483,6 +1531,7 @@ export type TournamentTeamCreateManyPlayer2Input = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1496,6 +1545,7 @@ export type TournamentTeamUpdateWithoutPlayer1Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1518,6 +1568,7 @@ export type TournamentTeamUncheckedUpdateWithoutPlayer1Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1537,6 +1588,7 @@ export type TournamentTeamUncheckedUpdateManyWithoutPlayer1Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1550,6 +1602,7 @@ export type TournamentTeamUpdateWithoutPlayer2Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1572,6 +1625,7 @@ export type TournamentTeamUncheckedUpdateWithoutPlayer2Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1591,6 +1645,7 @@ export type TournamentTeamUncheckedUpdateManyWithoutPlayer2Input = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1607,6 +1662,7 @@ export type TournamentTeamCreateManyTournamentInput = {
   source: $Enums.RegistrationSource
   status?: $Enums.RegistrationStatus
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: number | null
   seed?: number | null
   swissPoints?: number
@@ -1620,6 +1676,7 @@ export type TournamentTeamUpdateWithoutTournamentInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1642,6 +1699,7 @@ export type TournamentTeamUncheckedUpdateWithoutTournamentInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1661,6 +1719,7 @@ export type TournamentTeamUncheckedUpdateManyWithoutTournamentInput = {
   source?: Prisma.EnumRegistrationSourceFieldUpdateOperationsInput | $Enums.RegistrationSource
   status?: Prisma.EnumRegistrationStatusFieldUpdateOperationsInput | $Enums.RegistrationStatus
   feePaid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isLate?: Prisma.BoolFieldUpdateOperationsInput | boolean
   ratingOverride?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   seed?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   swissPoints?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1727,6 +1786,7 @@ export type TournamentTeamSelect<ExtArgs extends runtime.Types.Extensions.Intern
   source?: boolean
   status?: boolean
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: boolean
   seed?: boolean
   swissPoints?: boolean
@@ -1754,6 +1814,7 @@ export type TournamentTeamSelectScalar = {
   source?: boolean
   status?: boolean
   feePaid?: boolean
+  isLate?: boolean
   ratingOverride?: boolean
   seed?: boolean
   swissPoints?: boolean
@@ -1761,7 +1822,7 @@ export type TournamentTeamSelectScalar = {
   confirmedAt?: boolean
 }
 
-export type TournamentTeamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "name" | "player1Id" | "player2Id" | "clubId" | "source" | "status" | "feePaid" | "ratingOverride" | "seed" | "swissPoints" | "createdAt" | "confirmedAt", ExtArgs["result"]["tournamentTeam"]>
+export type TournamentTeamOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tournamentId" | "name" | "player1Id" | "player2Id" | "clubId" | "source" | "status" | "feePaid" | "isLate" | "ratingOverride" | "seed" | "swissPoints" | "createdAt" | "confirmedAt", ExtArgs["result"]["tournamentTeam"]>
 export type TournamentTeamInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tournament?: boolean | Prisma.TournamentDefaultArgs<ExtArgs>
   player1?: boolean | Prisma.PlayerDefaultArgs<ExtArgs>
@@ -1794,6 +1855,10 @@ export type $TournamentTeamPayload<ExtArgs extends runtime.Types.Extensions.Inte
     source: $Enums.RegistrationSource
     status: $Enums.RegistrationStatus
     feePaid: boolean
+    /**
+     * Опаздывает к старту — учитывается при посеве (late–late или слабый посев).
+     */
+    isLate: boolean
     /**
      * Переопределённый рейтинг пары для посева (если null — берётся сумма рейтингов игроков). Для сыгранных пар.
      */
@@ -2187,6 +2252,7 @@ export interface TournamentTeamFieldRefs {
   readonly source: Prisma.FieldRef<"TournamentTeam", 'RegistrationSource'>
   readonly status: Prisma.FieldRef<"TournamentTeam", 'RegistrationStatus'>
   readonly feePaid: Prisma.FieldRef<"TournamentTeam", 'Boolean'>
+  readonly isLate: Prisma.FieldRef<"TournamentTeam", 'Boolean'>
   readonly ratingOverride: Prisma.FieldRef<"TournamentTeam", 'Float'>
   readonly seed: Prisma.FieldRef<"TournamentTeam", 'Int'>
   readonly swissPoints: Prisma.FieldRef<"TournamentTeam", 'Int'>

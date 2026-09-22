@@ -190,7 +190,7 @@ export async function PATCH(request: NextRequest) {
       (await playerCanManageClub(existing.tournament.club, player));
 
     if (
-      data.feePaid !== undefined &&
+      (data.feePaid !== undefined || data.isLate !== undefined) &&
       data.status === undefined &&
       !data.player1Id &&
       !data.player2Id &&
@@ -201,7 +201,10 @@ export async function PATCH(request: NextRequest) {
       }
       const team = await prisma.tournamentTeam.update({
         where: { id: data.id },
-        data: { feePaid: data.feePaid },
+        data: {
+          ...(data.feePaid !== undefined ? { feePaid: data.feePaid } : {}),
+          ...(data.isLate !== undefined ? { isLate: data.isLate } : {}),
+        },
         include: { player1: true, player2: true, tournament: true },
       });
       return NextResponse.json(team);

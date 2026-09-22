@@ -2853,6 +2853,7 @@ export const TournamentTeamScalarFieldEnum = {
   source: 'source',
   status: 'status',
   feePaid: 'feePaid',
+  isLate: 'isLate',
   ratingOverride: 'ratingOverride',
   seed: 'seed',
   swissPoints: 'swissPoints',
@@ -2891,6 +2892,7 @@ export const TournamentRegistrationScalarFieldEnum = {
   source: 'source',
   status: 'status',
   feePaid: 'feePaid',
+  isLate: 'isLate',
   createdAt: 'createdAt',
   confirmedAt: 'confirmedAt'
 } as const

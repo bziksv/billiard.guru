@@ -87,6 +87,8 @@ export async function applyAutoRatingForMatch(
   });
   if (!match?.winnerTeamId || !match.team1 || !match.team2) return null;
   if (!match.team1Id || !match.team2Id) return null;
+  // Техпоражение (1:0 / 0:1) не меняет рейтинг.
+  if (match.status === "WALKOVER") return null;
 
   const winnerIsTeam1 = match.winnerTeamId === match.team1Id;
   const winners = teamPlayers(winnerIsTeam1 ? match.team1 : match.team2);
@@ -211,6 +213,41 @@ export async function reverseAutoRatingForMatch(matchId: string): Promise<void> 
     summary: "Откат авторейтинга после отмены встречи",
     payload: { count: changes.length },
   });
+}
+
+/**
+ * Принудительный откат авторейтинга матча: всегда возвращает Player.rating к oldRating.
+ * Нужен ремонту цепочки (после walkover обычный reverse не срабатывает — рейтинг уже ушёл дальше).
+ */
+export async function forceReverseAutoRatingForMatch(
+  matchId: string,
+): Promise<number> {
+  const changes = await prisma.ratingChange.findMany({
+    where: { matchId },
+    orderBy: { createdAt: "desc" },
+  });
+  if (changes.length === 0) return 0;
+
+  await prisma.$transaction(async (tx) => {
+    for (const c of changes) {
+      await tx.player.update({
+        where: { id: c.playerId },
+        data: { rating: c.oldRating },
+      });
+      await tx.ratingChange.delete({ where: { id: c.id } });
+    }
+  });
+
+  await writeAuditLog({
+    actorType: "system",
+    action: "rating.auto_match_force_reverse",
+    entityType: "match",
+    entityId: matchId,
+    summary: "Принудительный откат авторейтинга (ремонт)",
+    payload: { count: changes.length },
+  });
+
+  return changes.length;
 }
 
 /**

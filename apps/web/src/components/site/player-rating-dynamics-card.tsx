@@ -89,7 +89,7 @@ function RatingSparkline({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <circle cx={first.x} cy={first.y} r="3.5" fill="var(--text-muted)" />
+      <circle cx={first.x} cy={first.y} r="3.5" fill="currentColor" opacity="0.35" />
       <circle
         cx={last.x}
         cy={last.y}
@@ -112,28 +112,31 @@ export async function PlayerRatingDynamicsCard({
   } catch {
     return null;
   }
-  if (trace.steps.length === 0) return null;
 
-  const delta = trace.simulatedRating - trace.seedRating;
+  // Публичный профиль: только журнал RatingChange (как на сетке / в базе),
+  // не симуляция FINISHED-only — иначе walkover выпадает и цифры расходятся.
+  const journal = trace.journal.filter((s) => s.matchId);
+  if (journal.length === 0) return null;
+
+  const journalEnd = journal[journal.length - 1]!.newRating;
+  const delta = trace.currentRating - trace.seedRating;
   const peak = Math.max(
     trace.seedRating,
-    ...trace.steps.map((s) => s.ratingAfter),
+    ...journal.map((s) => s.newRating),
+    trace.currentRating,
   );
-  const points = [
-    trace.seedRating,
-    ...trace.steps.map((s) => s.ratingAfter),
-  ];
+  const points = [trace.seedRating, ...journal.map((s) => s.newRating)];
   const deltaTone = delta > 0 ? "up" : delta < 0 ? "down" : "neutral";
-  const stepProps = trace.steps.map((s) => ({
-    matchId: s.matchId,
+  const stepProps = journal.map((s) => ({
+    matchId: s.matchId!,
     at: s.at,
-    opponentId: s.opponentId,
-    opponentIds: s.opponentIds ?? [s.opponentId],
-    opponentName: s.opponentName,
+    opponentId: s.opponentIds[0] ?? "",
+    opponentIds: s.opponentIds,
+    opponentName: s.opponentName ?? "—",
     won: s.won,
-    isPair: s.isPair,
-    ratingBefore: s.ratingBefore,
-    ratingAfter: s.ratingAfter,
+    isPair: Boolean(s.isPair),
+    ratingBefore: s.oldRating,
+    ratingAfter: s.newRating,
     delta: s.delta,
     opponentRatingBefore: s.opponentRatingBefore,
   }));
@@ -165,7 +168,7 @@ export async function PlayerRatingDynamicsCard({
             <span>{t("chartFrom")}</span>
             <span className="font-mono tabular-nums">
               {formatPreviewRating(trace.seedRating)} →{" "}
-              {formatPreviewRating(trace.simulatedRating)}
+              {formatPreviewRating(journalEnd)}
             </span>
           </div>
           <RatingSparkline points={points} className="h-28 w-full" />
