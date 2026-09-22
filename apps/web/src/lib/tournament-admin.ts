@@ -331,6 +331,24 @@ function prelimTeamsByRating(t: AdminTournament, note: string): TournamentStandi
     .map((team, index) => standingFromTeam(t, team, index + 1, note));
 }
 
+function unplacedTeamNote(
+  t: AdminTournament,
+  team: AdminTournamentTeam,
+): string {
+  const sub = (t.substitutions ?? []).find(
+    (s) =>
+      s.outgoingTeamId === team.id ||
+      (!s.outgoingTeamId && s.outgoingPlayerId === team.player1.id),
+  );
+  if (sub) {
+    return `отдал место → ${sub.incomingLabel}`;
+  }
+  if (t.status === "FINISHED") {
+    return "вне зачёта";
+  }
+  return "в игре";
+}
+
 function computeFixedSwissStandings(t: AdminTournament): TournamentStandingRow[] {
   const matchCount = t.matches.length;
   const maxRound = t.matches.reduce((max, m) => Math.max(max, m.round), 0);
@@ -403,7 +421,9 @@ function computeFixedSwissStandings(t: AdminTournament): TournamentStandingRow[]
     );
 
   for (const team of unplaced) {
-    standings.push(standingFromTeam(t, team, null, "в игре"));
+    standings.push(
+      standingFromTeam(t, team, null, unplacedTeamNote(t, team)),
+    );
   }
 
   return appendSoloRegistrationsWithoutTeams(t, standings);

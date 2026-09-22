@@ -6,6 +6,8 @@ export type TournamentSubstitutionView = {
   id: string;
   matchId: string;
   side: 1 | 2;
+  outgoingTeamId?: string;
+  incomingTeamId?: string;
   outgoingPlayerId: string;
   outgoingLabel: string;
   incomingPlayerId: string;

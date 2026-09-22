@@ -405,6 +405,8 @@ export async function listTournamentSubstitutions(
     id: r.id,
     matchId: r.matchId,
     side: r.side === 2 ? 2 : 1,
+    outgoingTeamId: r.outgoingTeamId,
+    incomingTeamId: r.incomingTeamId,
     outgoingPlayerId: r.outgoingPlayerId,
     outgoingLabel: playerLabel(r.outgoingPlayer),
     incomingPlayerId: r.incomingPlayerId,

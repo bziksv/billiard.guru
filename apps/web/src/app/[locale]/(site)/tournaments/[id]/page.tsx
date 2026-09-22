@@ -209,6 +209,10 @@ export default async function TournamentPage({
     tournament as unknown as AdminTournament,
     clubPlayerRatings,
   );
+  const substitutions = await listTournamentSubstitutions(tournament.id);
+  if (substitutions.length > 0) {
+    adminTournament.substitutions = substitutions;
+  }
   const standings = buildPublicTournamentStandings(adminTournament);
   const participants = buildParticipantRows(
     adminTournament,
@@ -247,7 +251,6 @@ export default async function TournamentPage({
 
   const defaultTab = defaultPublicTournamentTab(standings, registrationOpen);
 
-  const substitutions = await listTournamentSubstitutions(tournament.id);
   const bracketView =
     matchCount > 0
       ? buildPublicTournamentBracketView(adminTournament, { matchStartRatings })
