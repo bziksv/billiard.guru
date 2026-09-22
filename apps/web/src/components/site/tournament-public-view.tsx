@@ -193,35 +193,45 @@ function Podium({
 
   const first = top.find((r) => r.placeSort === 1);
   const second = top.find((r) => r.placeSort === 2);
-  const third = top.find((r) => r.placeSort === 3);
+  const thirds = top.filter((r) => r.placeSort === 3);
+
+  function MedalCard({ row }: { row: PublicStandingRow }) {
+    const medal =
+      row.placeSort === 1 ? "🥇" : row.placeSort === 2 ? "🥈" : "🥉";
+    return (
+      <div
+        className={cn(
+          "home-content-card rounded-xl px-4 py-4 text-center",
+          row.placeSort === 1 && "ring-1 ring-amber-500/30",
+        )}
+      >
+        <div className="text-2xl">{medal}</div>
+        <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+          {row.placeLabel} {t("placeSuffix")}
+        </div>
+        <div className="mt-2 text-sm leading-snug">
+          <PlayerLinks row={row} />
+        </div>
+        <div className="mt-1 text-xs text-[var(--text-muted)]">{row.city}</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mb-6 grid gap-3 sm:grid-cols-3">
-      {[second, first, third].map((row, idx) => {
-        if (!row) {
-          return <div key={`empty-${idx}`} className="hidden sm:block" />;
-        }
-        const medal =
-          row.placeSort === 1 ? "🥇" : row.placeSort === 2 ? "🥈" : "🥉";
-        return (
-          <div
-            key={row.key}
-            className={cn(
-              "home-content-card rounded-xl px-4 py-4 text-center",
-              row.placeSort === 1 && "sm:order-none order-first sm:-mt-2 ring-1 ring-amber-500/30",
-            )}
-          >
-            <div className="text-2xl">{medal}</div>
-            <div className="mt-1 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-              {row.placeLabel} {t("placeSuffix")}
-            </div>
-            <div className="mt-2 text-sm leading-snug">
-              <PlayerLinks row={row} />
-            </div>
-            <div className="mt-1 text-xs text-[var(--text-muted)]">{row.city}</div>
-          </div>
-        );
-      })}
+    <div className="mb-6 grid gap-3 sm:grid-cols-3 sm:items-end">
+      <div className="order-2 sm:order-none">
+        {second ? <MedalCard row={second} /> : <div className="hidden sm:block" />}
+      </div>
+      <div className="order-1 sm:order-none sm:-mt-2">
+        {first ? <MedalCard row={first} /> : <div className="hidden sm:block" />}
+      </div>
+      <div className="order-3 flex flex-col gap-3 sm:order-none">
+        {thirds.length > 0 ? (
+          thirds.map((row) => <MedalCard key={row.key} row={row} />)
+        ) : (
+          <div className="hidden sm:block" />
+        )}
+      </div>
     </div>
   );
 }

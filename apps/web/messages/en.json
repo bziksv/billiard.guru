@@ -702,6 +702,7 @@
       "noTournaments": "No tournament entries yet.",
       "placeSuffix": "place",
       "placeOf": "of {count}",
+      "gavePlaceTo": "gave place → {name}",
       "dateTbd": "Date TBD",
       "reviewCount": "{count, plural, one {# review} other {# reviews}}",
       "noReviews": "No reviews yet"

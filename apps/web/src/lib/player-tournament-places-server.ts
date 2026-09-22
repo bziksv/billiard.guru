@@ -1,6 +1,7 @@
 import type { AdminTournament } from "@/lib/tournament-admin";
 import { PUBLIC_PARTICIPANT_STATUSES } from "@/lib/public-display";
 import { buildPublicTournamentStandings } from "@/lib/tournament-public-standings";
+import { listTournamentSubstitutions } from "@/lib/bracket-substitute";
 import { prisma } from "@/lib/prisma";
 
 /** Медаль для 1–3 места. */
@@ -11,15 +12,21 @@ export function placeMedal(placeLabel: string): string {
   return "🏅";
 }
 
+export type PlayerTournamentPlaceInfo = {
+  /** Место в протоколе («1», «5–6»), если есть. */
+  place?: string;
+  /** Кому отдал слот при mid-bracket замене. */
+  gavePlaceTo?: string;
+};
+
 /**
- * Занятое игроком место в завершённых турнирах: tournamentId → «1», «5–6».
- * Считает по протоколу сетки (как на странице турнира).
+ * Занятое игроком место и отметки о замене в завершённых турнирах.
  */
 export async function loadPlayerTournamentPlaces(
   playerId: string,
   tournaments: { id: string; status: string }[],
-): Promise<Map<string, string>> {
-  const result = new Map<string, string>();
+): Promise<Map<string, PlayerTournamentPlaceInfo>> {
+  const result = new Map<string, PlayerTournamentPlaceInfo>();
   const finishedIds = tournaments
     .filter((t) => t.status === "FINISHED")
     .map((t) => t.id);
@@ -54,12 +61,24 @@ export async function loadPlayerTournamentPlaces(
   const href = `/players/${playerId}`;
   for (const t of rows) {
     try {
-      const standings = buildPublicTournamentStandings(t as unknown as AdminTournament);
+      const substitutions = await listTournamentSubstitutions(t.id);
+      const standings = buildPublicTournamentStandings({
+        ...(t as unknown as AdminTournament),
+        substitutions,
+      });
       const row = standings.rows.find(
         (r) => r.playerHref === href || r.secondPlayerHref === href,
       );
+      const info: PlayerTournamentPlaceInfo = {};
       if (row?.placeLabel && row.placeLabel !== "—") {
-        result.set(t.id, row.placeLabel);
+        info.place = row.placeLabel;
+      }
+      const outgoing = substitutions.find((s) => s.outgoingPlayerId === playerId);
+      if (outgoing) {
+        info.gavePlaceTo = outgoing.incomingLabel;
+      }
+      if (info.place || info.gavePlaceTo) {
+        result.set(t.id, info);
       }
     } catch {
       // протокол не построился — место не показываем

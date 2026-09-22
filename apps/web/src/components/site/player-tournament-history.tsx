@@ -11,6 +11,7 @@ import {
 } from "@/lib/public-display";
 import {
   placeMedal,
+  type PlayerTournamentPlaceInfo,
 } from "@/lib/player-tournament-places-server";
 
 const PUBLIC_STATUSES = ["OPEN", "ACTIVE", "FINISHED", "DID_NOT_TAKE_PLACE"] as const;
@@ -78,12 +79,23 @@ function PlaceBadge({
   );
 }
 
+function GavePlaceBadge({ label }: { label: string }) {
+  return (
+    <div
+      className="flex max-w-[11rem] shrink-0 flex-col items-center justify-center rounded-xl bg-amber-500/10 px-3 py-2 text-center ring-1 ring-amber-500/30 text-amber-900 dark:text-amber-100"
+      title={label}
+    >
+      <span className="text-[11px] font-medium leading-snug">{label}</span>
+    </div>
+  );
+}
+
 export async function PlayerTournamentHistory({
   items,
   places,
 }: {
   items: PlayerTournamentHistoryItem[];
-  places: Map<string, string>;
+  places: Map<string, PlayerTournamentPlaceInfo>;
 }) {
   const t = await getTranslations();
   const locale = (await getLocale()) as AppLocale;
@@ -107,7 +119,8 @@ export async function PlayerTournamentHistory({
   return (
     <ul className="space-y-2">
       {items.map((r) => {
-        const place = places.get(r.tournament.id);
+        const info = places.get(r.tournament.id);
+        const place = info?.place;
         const participants = isPairFormat(r.tournament.format)
           ? r.tournament._count.teams
           : r.tournament._count.registrations;
@@ -118,6 +131,9 @@ export async function PlayerTournamentHistory({
           participants > 0
             ? t("detail.player.placeOf", { count: participants })
             : "";
+        const gavePlaceLabel = info?.gavePlaceTo
+          ? t("detail.player.gavePlaceTo", { name: info.gavePlaceTo })
+          : null;
 
         return (
           <li
@@ -162,14 +178,17 @@ export async function PlayerTournamentHistory({
                 />
               </div>
             </div>
-            {place && (
-              <PlaceBadge
-                place={place}
-                participants={participants}
-                placeSuffix={t("detail.player.placeSuffix")}
-                placeOf={placeOf}
-              />
-            )}
+            <div className="flex shrink-0 flex-col items-end justify-center gap-2">
+              {place && (
+                <PlaceBadge
+                  place={place}
+                  participants={participants}
+                  placeSuffix={t("detail.player.placeSuffix")}
+                  placeOf={placeOf}
+                />
+              )}
+              {gavePlaceLabel && <GavePlaceBadge label={gavePlaceLabel} />}
+            </div>
           </li>
         );
       })}

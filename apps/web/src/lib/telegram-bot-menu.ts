@@ -258,7 +258,7 @@ function formatTournamentsTelegram(
   page: Awaited<ReturnType<typeof loadPlayerRegistrations>>,
   total: number,
   offset: number,
-  places: Map<string, string>,
+  places: Map<string, import("@/lib/player-tournament-places-server").PlayerTournamentPlaceInfo>,
 ): string {
   if (total === 0) {
     return "🏆 <b>Мои турниры</b>\n\nПока нет регистраций.";
@@ -275,11 +275,16 @@ function formatTournamentsTelegram(
       TOURNAMENT_FORMAT_LABELS[r.tournament.format] ?? r.tournament.format;
     const tStatus = TOURNAMENT_STATUS_LABELS[r.tournament.status] ?? r.tournament.status;
     const place = places.get(r.tournament.id);
-    const placeSuffix = place ? ` · ${placeMedal(place)} ${escapeHtml(place)} место` : "";
+    const placeSuffix = place?.place
+      ? ` · ${placeMedal(place.place)} ${escapeHtml(place.place)} место`
+      : "";
+    const gaveSuffix = place?.gavePlaceTo
+      ? ` · отдал место → ${escapeHtml(place.gavePlaceTo)}`
+      : "";
     lines.push(
       `• <b>${escapeHtml(r.tournament.name)}</b>`,
       `  ${escapeHtml(status)} · ${escapeHtml(r.tournament.club.name)}`,
-      `  ${escapeHtml(format)} · ${escapeHtml(tStatus)}${placeSuffix}`,
+      `  ${escapeHtml(format)} · ${escapeHtml(tStatus)}${placeSuffix}${gaveSuffix}`,
       "",
     );
   }

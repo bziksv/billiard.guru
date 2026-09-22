@@ -702,6 +702,7 @@
       "noTournaments": "Участий пока нет.",
       "placeSuffix": "место",
       "placeOf": "из {count}",
+      "gavePlaceTo": "отдал место → {name}",
       "dateTbd": "Дата уточняется",
       "reviewCount": "{count, plural, one {# оценка} few {# оценки} many {# оценок} other {# оценок}}",
       "noReviews": "Пока нет оценок"
