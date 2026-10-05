@@ -199,12 +199,11 @@ async function revokeSwissWin(db: Db, teamId: string) {
   });
 }
 
-async function removeTeamFromSlot(
+async function removeTeamFromMatch(
   db: Db,
   tournamentId: string,
   round: number,
   slot: number,
-  teamSlot: 1 | 2,
   teamId: string,
 ) {
   const target = await db.tournamentMatch.findUnique({
@@ -214,12 +213,14 @@ async function removeTeamFromSlot(
   });
   if (!target) return;
 
-  const field = teamSlot === 1 ? "team1Id" : "team2Id";
-  if (target[field] !== teamId) return;
+  const data: { team1Id?: null; team2Id?: null } = {};
+  if (target.team1Id === teamId) data.team1Id = null;
+  if (target.team2Id === teamId) data.team2Id = null;
+  if (data.team1Id === undefined && data.team2Id === undefined) return;
 
   await db.tournamentMatch.update({
     where: { id: target.id },
-    data: { [field]: null },
+    data,
   });
 }
 
@@ -281,6 +282,31 @@ function collectAdvanceTargets(
   return targets;
 }
 
+/** Только встречи, куда эта игра реально выводит; чужие матчи тех же пар не блокируют. */
+export function blockingFinishedAdvanceMatch<
+  T extends {
+    round: number;
+    slot: number;
+    team1Id: string | null;
+    team2Id: string | null;
+    winnerTeamId: string | null;
+  },
+>(
+  allMatches: T[],
+  targets: { round: number; slot: number; teamId: string }[],
+): T | null {
+  for (const target of targets) {
+    const later = allMatches.find(
+      (m) => m.round === target.round && m.slot === target.slot,
+    );
+    if (!later?.winnerTeamId) continue;
+    if (later.team1Id === target.teamId || later.team2Id === target.teamId) {
+      return later;
+    }
+  }
+  return null;
+}
+
 export async function cancelMatchResult(db: Db, matchId: string) {
   const match = await db.tournamentMatch.findUnique({
     where: { id: matchId },
@@ -305,22 +331,6 @@ export async function cancelMatchResult(db: Db, matchId: string) {
   }
 
   const winnerId = match.winnerTeamId;
-  const loserId =
-    match.team1Id === winnerId ? match.team2Id : match.team1Id;
-  const affectedIds = [winnerId, loserId].filter(Boolean) as string[];
-
-  for (const later of allMatches) {
-    if (later.round <= match.round) continue;
-    const involves = affectedIds.some(
-      (id) => later.team1Id === id || later.team2Id === id,
-    );
-    if (involves && later.winnerTeamId) {
-      throw new Error(
-        `Нельзя отменить: участник уже сыграл встречу тура ${later.round} (слот ${later.slot}). Сначала отмените её результат.`,
-      );
-    }
-  }
-
   const fixedSwissMatchCount = usesFixedSwissGridEngine(format)
     ? allMatches.length
     : undefined;
@@ -340,13 +350,19 @@ export async function cancelMatchResult(db: Db, matchId: string) {
     fixedSwissMaxRound,
   );
 
+  const blocking = blockingFinishedAdvanceMatch(allMatches, targets);
+  if (blocking) {
+    throw new Error(
+      `Нельзя отменить: участник уже сыграл встречу тура ${blocking.round} (слот ${blocking.slot}). Сначала отмените её результат.`,
+    );
+  }
+
   for (const target of targets) {
-    await removeTeamFromSlot(
+    await removeTeamFromMatch(
       db,
       match.tournamentId,
       target.round,
       target.slot,
-      target.teamSlot,
       target.teamId,
     );
   }

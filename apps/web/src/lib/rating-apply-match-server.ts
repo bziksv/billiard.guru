@@ -186,24 +186,27 @@ export async function reverseAutoRatingForMatch(matchId: string): Promise<void> 
   });
   if (changes.length === 0) return;
 
-  await prisma.$transaction(async (tx) => {
-    for (const c of changes) {
-      const player = await tx.player.findUnique({
-        where: { id: c.playerId },
-        select: { rating: true },
-      });
-      if (!player) continue;
-      const current = roundToPreviewGrid(player.rating);
-      const expected = roundToPreviewGrid(c.newRating);
-      if (current === expected) {
-        await tx.player.update({
+  await prisma.$transaction(
+    async (tx) => {
+      for (const c of changes) {
+        const player = await tx.player.findUnique({
           where: { id: c.playerId },
-          data: { rating: c.oldRating },
+          select: { rating: true },
         });
+        if (!player) continue;
+        const current = roundToPreviewGrid(player.rating);
+        const expected = roundToPreviewGrid(c.newRating);
+        if (current === expected) {
+          await tx.player.update({
+            where: { id: c.playerId },
+            data: { rating: c.oldRating },
+          });
+        }
+        await tx.ratingChange.delete({ where: { id: c.id } });
       }
-      await tx.ratingChange.delete({ where: { id: c.id } });
-    }
-  });
+    },
+    { timeout: 30_000 },
+  );
 
   await writeAuditLog({
     actorType: "system",
@@ -228,15 +231,18 @@ export async function forceReverseAutoRatingForMatch(
   });
   if (changes.length === 0) return 0;
 
-  await prisma.$transaction(async (tx) => {
-    for (const c of changes) {
-      await tx.player.update({
-        where: { id: c.playerId },
-        data: { rating: c.oldRating },
-      });
-      await tx.ratingChange.delete({ where: { id: c.id } });
-    }
-  });
+  await prisma.$transaction(
+    async (tx) => {
+      for (const c of changes) {
+        await tx.player.update({
+          where: { id: c.playerId },
+          data: { rating: c.oldRating },
+        });
+        await tx.ratingChange.delete({ where: { id: c.id } });
+      }
+    },
+    { timeout: 30_000 },
+  );
 
   await writeAuditLog({
     actorType: "system",
