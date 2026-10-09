@@ -134,6 +134,8 @@ export async function PlayerTournamentHistory({
         const gavePlaceLabel = info?.gavePlaceTo
           ? t("detail.player.gavePlaceTo", { name: info.gavePlaceTo })
           : null;
+        const showPartner = Boolean(info?.partnerName);
+        const showMatchStats = (info?.played ?? 0) > 0;
 
         return (
           <li key={r.id} className="site-card player-tournament-row">
@@ -156,6 +158,31 @@ export async function PlayerTournamentHistory({
                 {participants > 0 && (
                   <span className="inline-flex items-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2.5 py-1 font-medium tabular-nums text-[var(--text)]">
                     {t("tournamentCard.participants", { count: participants })}
+                  </span>
+                )}
+                {showPartner && info?.partnerName && (
+                  <span className="inline-flex items-center gap-1 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2.5 py-1 font-medium text-[var(--text)]">
+                    <span className="opacity-70">
+                      {t("detail.player.withPartnerPrefix")}
+                    </span>
+                    {info.partnerHref ? (
+                      <Link
+                        href={info.partnerHref}
+                        className="text-emerald-600 hover:underline dark:text-emerald-400"
+                      >
+                        {info.partnerName}
+                      </Link>
+                    ) : (
+                      <span>{info.partnerName}</span>
+                    )}
+                  </span>
+                )}
+                {showMatchStats && (
+                  <span className="inline-flex items-center rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-muted)] px-2.5 py-1 font-medium tabular-nums text-[var(--text)]">
+                    {t("detail.player.matchStats", {
+                      played: info!.played!,
+                      winRate: Math.round((info!.winRate ?? 0) * 100),
+                    })}
                   </span>
                 )}
               </div>

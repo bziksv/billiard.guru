@@ -359,6 +359,25 @@ async function loadJournal(playerId: string): Promise<PlayerRatingJournalStep[]>
   });
 }
 
+/** Публичная карточка профиля: только журнал RatingChange, без прогона всех матчей. */
+export async function loadPlayerRatingDynamicsPublic(playerId: string): Promise<{
+  seedRating: number;
+  currentRating: number;
+  journal: PlayerRatingJournalStep[];
+} | null> {
+  const player = await prisma.player.findUnique({
+    where: { id: playerId },
+    select: { rating: true, ratingBase: true },
+  });
+  if (!player) return null;
+  const journal = await loadJournal(playerId);
+  return {
+    seedRating: player.ratingBase,
+    currentRating: player.rating,
+    journal,
+  };
+}
+
 export async function buildPlayerRatingTrace(
   playerId: string,
   formulaOverride?: RatingPreviewFormula,

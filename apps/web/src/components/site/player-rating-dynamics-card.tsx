@@ -1,8 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { SiteCard } from "@/components/site/site-card";
 import { PlayerRatingDynamicsSteps } from "@/components/site/player-rating-dynamics-steps";
 import { formatPreviewDelta, formatPreviewRating } from "@/lib/rating-preview";
-import { buildPlayerRatingTrace } from "@/lib/rating-player-trace-server";
+import { loadPlayerRatingDynamicsPublic } from "@/lib/rating-player-trace-server";
 
 function StatTile({
   label,
@@ -106,15 +106,16 @@ export async function PlayerRatingDynamicsCard({
   playerId: string;
 }) {
   const t = await getTranslations("playerRatingDynamics");
+  const locale = (await getLocale()) === "en" ? "en-GB" : "ru-RU";
   let trace;
   try {
-    trace = await buildPlayerRatingTrace(playerId);
+    trace = await loadPlayerRatingDynamicsPublic(playerId);
   } catch {
     return null;
   }
+  if (!trace) return null;
 
-  // Публичный профиль: только журнал RatingChange (как на сетке / в базе),
-  // не симуляция FINISHED-only — иначе walkover выпадает и цифры расходятся.
+  // Публичный профиль: только журнал RatingChange (как на сетке / в базе).
   const journal = trace.journal.filter((s) => s.matchId);
   if (journal.length === 0) return null;
 
@@ -140,6 +141,21 @@ export async function PlayerRatingDynamicsCard({
     delta: s.delta,
     opponentRatingBefore: s.opponentRatingBefore,
   }));
+  const stepLabels = {
+    recentTitle: t("recentTitle"),
+    colResult: t("colResult"),
+    colOpponent: t("colOpponent"),
+    colDelta: t("colDelta"),
+    colRating: t("colRating"),
+    oppRating: t("oppRating"),
+    win: t("win"),
+    loss: t("loss"),
+    pair: t("pair"),
+    back: t("back"),
+    forward: t("forward"),
+    pageOfTemplate: t("pageOf", { from: "{from}", to: "{to}", total: "{total}" }),
+    dateLocale: locale,
+  };
 
   return (
     <section>
@@ -174,7 +190,7 @@ export async function PlayerRatingDynamicsCard({
           <RatingSparkline points={points} className="h-28 w-full" />
         </div>
 
-        <PlayerRatingDynamicsSteps steps={stepProps} />
+        <PlayerRatingDynamicsSteps steps={stepProps} labels={stepLabels} />
       </SiteCard>
     </section>
   );

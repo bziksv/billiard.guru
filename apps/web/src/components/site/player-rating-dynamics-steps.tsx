@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatPreviewDelta, formatPreviewRating } from "@/lib/rating-preview";
 
@@ -21,6 +20,35 @@ export type RatingDynamicsStep = {
   /** Рейтинг соперника на старт встречи; null если в журнале нет. */
   opponentRatingBefore: number | null;
 };
+
+export type RatingDynamicsStepLabels = {
+  recentTitle: string;
+  colResult: string;
+  colOpponent: string;
+  colDelta: string;
+  colRating: string;
+  oppRating: string;
+  win: string;
+  loss: string;
+  pair: string;
+  back: string;
+  forward: string;
+  /** Шаблон с плейсхолдерами {from}, {to}, {total}. */
+  pageOfTemplate: string;
+  dateLocale: string;
+};
+
+function formatPageOf(
+  template: string,
+  from: number,
+  to: number,
+  total: number,
+): string {
+  return template
+    .replaceAll("{from}", String(from))
+    .replaceAll("{to}", String(to))
+    .replaceAll("{total}", String(total));
+}
 
 function OpponentNameLinks({
   name,
@@ -57,11 +85,11 @@ function OpponentNameLinks({
 
 export function PlayerRatingDynamicsSteps({
   steps,
+  labels,
 }: {
   steps: RatingDynamicsStep[];
+  labels: RatingDynamicsStepLabels;
 }) {
-  const t = useTranslations("playerRatingDynamics");
-  const locale = useLocale() === "en" ? "en-GB" : "ru-RU";
   const ordered = useMemo(() => [...steps].reverse(), [steps]);
   const pageCount = Math.max(1, Math.ceil(ordered.length / PAGE_SIZE));
   const [page, setPage] = useState(0);
@@ -76,26 +104,26 @@ export function PlayerRatingDynamicsSteps({
   return (
     <div className="mt-5 border-t border-[var(--border-subtle)] pt-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold">{t("recentTitle")}</h3>
+        <h3 className="text-sm font-semibold">{labels.recentTitle}</h3>
         {pageCount > 1 && (
           <span className="text-xs tabular-nums text-[var(--text-muted)]">
-            {t("pageOf", { from, to, total: ordered.length })}
+            {formatPageOf(labels.pageOfTemplate, from, to, ordered.length)}
           </span>
         )}
       </div>
 
       <div className="rating-dynamics-head">
-        <span>{t("colResult")}</span>
-        <span>{t("colOpponent")}</span>
-        <span className="text-right">{t("colDelta")}</span>
-        <span className="text-right">{t("colRating")}</span>
+        <span>{labels.colResult}</span>
+        <span>{labels.colOpponent}</span>
+        <span className="text-right">{labels.colDelta}</span>
+        <span className="text-right">{labels.colRating}</span>
       </div>
 
       <ul className="space-y-2">
         {slice.map((s) => {
           const up = s.delta > 0;
           const down = s.delta < 0;
-          const date = new Date(s.at).toLocaleDateString(locale, {
+          const date = new Date(s.at).toLocaleDateString(labels.dateLocale, {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
@@ -121,11 +149,11 @@ export function PlayerRatingDynamicsSteps({
                       : "bg-rose-500/12 text-rose-700 dark:text-rose-300"
                   }`}
                 >
-                  {s.won ? t("win") : t("loss")}
+                  {s.won ? labels.win : labels.loss}
                 </span>
                 <span className="rating-dynamics-row__mobile-date text-xs text-[var(--text-muted)]">
                   {date}
-                  {s.isPair ? ` · ${t("pair")}` : ""}
+                  {s.isPair ? ` · ${labels.pair}` : ""}
                 </span>
               </div>
 
@@ -145,7 +173,7 @@ export function PlayerRatingDynamicsSteps({
                         ·{" "}
                       </span>
                       <span>
-                        {t("oppRating")}:{" "}
+                        {labels.oppRating}:{" "}
                         <span className="font-mono tabular-nums">
                           {formatPreviewRating(s.opponentRatingBefore)}
                         </span>
@@ -155,7 +183,7 @@ export function PlayerRatingDynamicsSteps({
                   {s.isPair ? (
                     <span className="rating-dynamics-row__desktop-date">
                       {" "}
-                      · {t("pair")}
+                      · {labels.pair}
                     </span>
                   ) : null}
                 </div>
@@ -163,7 +191,7 @@ export function PlayerRatingDynamicsSteps({
 
               <div className="rating-dynamics-row__stat">
                 <span className="rating-dynamics-row__mobile-label text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
-                  {t("colDelta")}
+                  {labels.colDelta}
                 </span>
                 <span
                   className={`inline-flex min-w-[3.5rem] justify-center rounded-lg px-2 py-0.5 font-mono text-sm font-bold tabular-nums ${deltaClass}`}
@@ -174,7 +202,7 @@ export function PlayerRatingDynamicsSteps({
 
               <div className="rating-dynamics-row__stat">
                 <span className="rating-dynamics-row__mobile-label text-[10px] uppercase tracking-wide text-[var(--text-muted)]">
-                  {t("colRating")}
+                  {labels.colRating}
                 </span>
                 <div className="font-mono text-sm tabular-nums leading-snug">
                   <span className="text-[var(--text-muted)]">
@@ -199,10 +227,10 @@ export function PlayerRatingDynamicsSteps({
             disabled={safePage >= pageCount - 1}
             onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
           >
-            ← {t("back")}
+            ← {labels.back}
           </button>
           <span className="text-xs tabular-nums text-[var(--text-muted)]">
-            {t("pageOf", { from, to, total: ordered.length })}
+            {formatPageOf(labels.pageOfTemplate, from, to, ordered.length)}
           </span>
           <button
             type="button"
@@ -210,7 +238,7 @@ export function PlayerRatingDynamicsSteps({
             disabled={safePage <= 0}
             onClick={() => setPage((p) => Math.max(0, p - 1))}
           >
-            {t("forward")} →
+            {labels.forward} →
           </button>
         </div>
       )}

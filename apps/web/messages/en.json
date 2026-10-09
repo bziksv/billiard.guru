@@ -713,7 +713,9 @@
       "gavePlaceTo": "gave place → {name}",
       "dateTbd": "Date TBD",
       "reviewCount": "{count, plural, one {# review} other {# reviews}}",
-      "noReviews": "No reviews yet"
+      "noReviews": "No reviews yet",
+      "withPartnerPrefix": "Partner:",
+      "matchStats": "{played, plural, one {# match} other {# matches}} · {winRate}% wins"
     },
     "coach": {
       "city": "City",

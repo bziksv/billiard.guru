@@ -713,7 +713,9 @@
       "gavePlaceTo": "отдал место → {name}",
       "dateTbd": "Дата уточняется",
       "reviewCount": "{count, plural, one {# оценка} few {# оценки} many {# оценок} other {# оценок}}",
-      "noReviews": "Пока нет оценок"
+      "noReviews": "Пока нет оценок",
+      "withPartnerPrefix": "Партнёр:",
+      "matchStats": "{played, plural, one {# встреча} few {# встречи} many {# встреч} other {# встреч}} · {winRate}% побед"
     },
     "coach": {
       "city": "Город",

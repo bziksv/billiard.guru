@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Link } from "@/i18n/navigation";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -11,11 +12,14 @@ import { localizedPlayerName } from "@/lib/latin-names";
 import { prisma } from "@/lib/prisma";
 import { PlayerStatsCard } from "@/components/site/player-stats-card";
 import { PlayerRatingDynamicsCard } from "@/components/site/player-rating-dynamics-card";
-import { PlayerTournamentHistory } from "@/components/site/player-tournament-history";
+import {
+  PlayerTournamentHistory,
+  type PlayerTournamentHistoryItem,
+} from "@/components/site/player-tournament-history";
 import { computePlayerMatchStats } from "@/lib/player-stats";
 import { loadPlayerTournamentPlaces } from "@/lib/player-tournament-places-server";
 import { buildLocalizedPlayerDetailMetadata } from "@/lib/seo-locale";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 
 export async function generateMetadata({
   params,
@@ -23,6 +27,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string; id: string }>;
 }): Promise<Metadata> {
   const { locale, id } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations("detail.notFound");
   const player = await prisma.player.findUnique({
     where: { id },
@@ -45,12 +50,62 @@ export async function generateMetadata({
     id,
     locale,
   );
-  // Неподтверждённые игроки (добавлены клубом, без привязки Telegram) видны
-  // в протоколах турниров, но в каталог не попадают — не индексируем.
   if (!player.isVerified) {
     metadata.robots = { index: false, follow: true };
   }
   return metadata;
+}
+
+async function PlayerStatsSection({
+  playerId,
+  locale,
+}: {
+  playerId: string;
+  locale: string;
+}) {
+  setRequestLocale(locale);
+  const stats = await computePlayerMatchStats(playerId);
+  return <PlayerStatsCard stats={stats} />;
+}
+
+async function PlayerDynamicsSection({
+  playerId,
+  locale,
+}: {
+  playerId: string;
+  locale: string;
+}) {
+  setRequestLocale(locale);
+  return <PlayerRatingDynamicsCard playerId={playerId} />;
+}
+
+async function PlayerTournamentsSection({
+  playerId,
+  locale,
+  registrations,
+}: {
+  playerId: string;
+  locale: string;
+  registrations: PlayerTournamentHistoryItem[];
+}) {
+  setRequestLocale(locale);
+  const places = await loadPlayerTournamentPlaces(
+    playerId,
+    registrations.map((r) => ({
+      id: r.tournament.id,
+      status: r.tournament.status,
+    })),
+  );
+  return <PlayerTournamentHistory items={registrations} places={places} />;
+}
+
+function SectionFallback({ className }: { className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-2xl bg-[var(--bg-muted)] ${className ?? "h-40"}`}
+      aria-hidden
+    />
+  );
 }
 
 export default async function PlayerPage({
@@ -58,7 +113,8 @@ export default async function PlayerPage({
 }: {
   params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id } = await params;
+  const { id, locale: localeParam } = await params;
+  setRequestLocale(localeParam);
   const t = await getTranslations();
   const locale = (await getLocale()) as AppLocale;
 
@@ -87,15 +143,6 @@ export default async function PlayerPage({
   });
 
   if (!player) notFound();
-
-  const stats = await computePlayerMatchStats(player.id);
-  const places = await loadPlayerTournamentPlaces(
-    player.id,
-    player.registrations.map((r) => ({
-      id: r.tournament.id,
-      status: r.tournament.status,
-    })),
-  );
 
   return (
     <>
@@ -141,9 +188,13 @@ export default async function PlayerPage({
           )}
         </SiteCard>
 
-        <PlayerStatsCard stats={stats} />
+        <Suspense fallback={<SectionFallback className="h-56" />}>
+          <PlayerStatsSection playerId={player.id} locale={localeParam} />
+        </Suspense>
 
-        <PlayerRatingDynamicsCard playerId={player.id} />
+        <Suspense fallback={<SectionFallback className="h-64" />}>
+          <PlayerDynamicsSection playerId={player.id} locale={localeParam} />
+        </Suspense>
 
         {player.about?.trim() && (
           <section>
@@ -156,10 +207,13 @@ export default async function PlayerPage({
 
         <section>
           <h2 className="site-section-title mb-3">{t("detail.player.tournaments")}</h2>
-          <PlayerTournamentHistory
-            items={player.registrations}
-            places={places}
-          />
+          <Suspense fallback={<SectionFallback className="h-48" />}>
+            <PlayerTournamentsSection
+              playerId={player.id}
+              locale={localeParam}
+              registrations={player.registrations}
+            />
+          </Suspense>
         </section>
       </PageMain>
     </>
