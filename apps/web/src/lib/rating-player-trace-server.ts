@@ -338,9 +338,13 @@ async function loadJournal(playerId: string): Promise<PlayerRatingJournalStep[]>
         const vals = opp.ids
           .map((id) => byPlayer.get(id))
           .filter((v): v is number => v != null);
-        if (vals.length > 0) {
-          opponentRatingBefore =
-            vals.reduce((a, b) => a + b, 0) / vals.length;
+        // Как на сетке: пара = сумма рейтингов, не среднее.
+        if (vals.length === opp.ids.length) {
+          opponentRatingBefore = roundToPreviewGrid(
+            vals.reduce((a, b) => a + b, 0),
+          );
+        } else if (!opp.isPair && vals.length === 1) {
+          opponentRatingBefore = vals[0]!;
         }
       }
     }
