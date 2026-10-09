@@ -336,7 +336,7 @@ export async function PATCH(request: NextRequest) {
             )
           ) {
             return NextResponse.json(
-              { error: "Нет свободных слотов в сетке (bye) для добора участника" },
+              { error: "Нет свободных крестов в сетке для добора участника" },
               { status: 400 },
             );
           }

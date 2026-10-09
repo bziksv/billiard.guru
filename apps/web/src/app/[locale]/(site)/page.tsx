@@ -102,7 +102,7 @@ export default async function HomePage({
         orderBy: { name: "asc" },
         take: 4,
       }),
-      loadHomeTopByRating(geo, 5),
+      loadHomeTopByRating(geo, 10),
       loadHomeTopByWinRate(geo, 10),
       loadHomePlayAnnouncements(geo, locale),
     ]);

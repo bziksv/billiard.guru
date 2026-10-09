@@ -1792,7 +1792,7 @@ function ParticipantsTab({
           )}
           {lateJoinMode && (
             <p className="tournament-bracket-locked-hint">
-              Есть свободные слоты (bye / ×) — можно добавить пару и посадить в сетку
+              Есть свободные кресты — можно добавить пару и посадить в сетку
               ({vacantByeSlots.length}).
             </p>
           )}
@@ -1913,7 +1913,7 @@ function ParticipantsTab({
           )}
           {lateJoinMode && (
             <p className="tournament-bracket-locked-hint mb-2">
-              Есть свободные слоты (bye / ×) в первом туре — можно добавить опоздавшего
+              Есть свободные кресты в первом туре — можно добавить опоздавшего
               и посадить его к выбранному сопернику без пересборки сетки
               ({vacantByeSlots.length}).
             </p>
@@ -1938,7 +1938,7 @@ function ParticipantsTab({
                     phone={r.player.phone}
                     telegramUsername={r.player.telegramUsername}
                     hideRating={Boolean(team)}
-                    note={unplaced ? "вне сетки — посадите в bye" : null}
+                    note={unplaced ? "вне сетки — посадите в свободный крест" : null}
                   />
                   {team ? (
                     <div className="mt-2">

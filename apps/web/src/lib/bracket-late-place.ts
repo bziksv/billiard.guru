@@ -135,11 +135,11 @@ export async function placeTeamIntoMatchSlot(
 
   const format = match.tournament.format;
   if (isDynamicSwissFormat(format)) {
-    throw new Error("Посадка в bye недоступна для по-турового Swiss");
+    throw new Error("Посадка в свободный крест недоступна для по-турового Swiss");
   }
   if (!isOlympicFormat(format) && !usesFixedSwissGridEngine(format)) {
     throw new Error(
-      "Посадка в bye доступна только для олимпийской и фиксированной швейцарской сетки",
+      "Посадка в свободный крест доступна только для олимпийской и фиксированной швейцарской сетки",
     );
   }
   if (match.round !== 1) {

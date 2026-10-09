@@ -298,7 +298,7 @@ export async function loadHomeTopByRating(
   take = 8,
 ): Promise<HomePlayerCardItem[]> {
   return prisma.player.findMany({
-    where: playerGeoWhere(geo),
+    where: playerGeoWhere(geo, { verifiedOnly: false }),
     include: { city: { select: { nameRu: true, nameEn: true } } },
     orderBy: [{ rating: "desc" }, { lastName: "asc" }],
     take,
@@ -311,7 +311,7 @@ export async function loadHomeTopByWinRate(
   take = 8,
 ): Promise<HomePlayerCardItem[]> {
   const players = await prisma.player.findMany({
-    where: playerGeoWhere(geo),
+    where: playerGeoWhere(geo, { verifiedOnly: false }),
     include: { city: { select: { nameRu: true, nameEn: true } } },
     orderBy: [{ rating: "desc" }, { lastName: "asc" }],
   });

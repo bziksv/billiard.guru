@@ -273,7 +273,7 @@ export async function PATCH(request: NextRequest) {
         return NextResponse.json(
           {
             error: bracketFormed
-              ? "Нет свободных слотов в сетке (bye) для добора участника"
+              ? "Нет свободных крестов в сетке для добора участника"
               : "Подтверждать новых участников можно только пока сетка не сформирована",
           },
           { status: 400 },

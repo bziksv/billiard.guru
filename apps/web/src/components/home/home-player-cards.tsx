@@ -44,7 +44,7 @@ function PlayerCard({
   return (
     <Link
       href={`/players/${player.id}`}
-      className={`home-player-card home-content-card-solid group w-[210px] shrink-0 overflow-hidden rounded-2xl ${
+      className={`home-player-card home-content-card-solid group w-full overflow-hidden rounded-2xl ${
         index < 3 ? RANK_CARD_CLASS[index] : ""
       }`}
     >
@@ -121,7 +121,7 @@ export async function HomePlayerCards({
   }
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {players.map((player, index) => (
         <PlayerCard
           key={player.id}
