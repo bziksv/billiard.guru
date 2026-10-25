@@ -272,7 +272,7 @@ export function formatTournamentRatingRulesSummary(tournament: {
         : "фора с учётом шага 0,5",
     );
   } else {
-    parts.push("фора без шага 0,5 (рейтинг вниз до целого)");
+    parts.push("фора от разницы без шага 0,5 (только целые шары)");
   }
   return parts.join(" · ");
 }

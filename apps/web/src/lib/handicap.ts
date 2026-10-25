@@ -1,4 +1,6 @@
-/** Фора: при halfStep — шаг 0,5 (полный шар в каждой, половинный — +1 в чётных).
+/** Фора всегда от разницы рейтингов (не от целых частей каждого).
+ * При halfStep — ещё +1 в чётных, если дробная часть разницы ≥ 0,5.
+ * Без halfStep — только целые шары от разницы, без +1 в чётных.
  * Без округления вверх: при разнице < 0,5 форы нет.
  */
 
@@ -115,14 +117,19 @@ export function calculateHandicap(
     };
   }
 
-  // Без шага 0,5: для форы берём целую часть каждого рейтинга (1,5 → 1, 3,5 → 3).
-  const diff = Math.max(
-    0,
-    Math.floor(higherRating) - Math.floor(lowerRating),
-  );
+  // Без шага 0,5: тоже от разницы рейтингов (не от floor каждого),
+  // но только целые шары в каждой партии, без +1 в чётных.
+  // 3.05 vs 2.75 → 0.3 → без форы; 3 vs 1.5 → 1.5 → 1 в каждой.
+  if (raw + EPS < HALF) {
+    return {
+      ratingDiff: 0,
+      ballsEveryGame: 0,
+      extraBallOnEvenGames: false,
+    };
+  }
   return {
-    ratingDiff: diff,
-    ballsEveryGame: diff,
+    ratingDiff: raw,
+    ballsEveryGame: Math.floor(raw + EPS),
     extraBallOnEvenGames: false,
   };
 }

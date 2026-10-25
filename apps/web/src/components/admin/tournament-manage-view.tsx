@@ -1037,8 +1037,8 @@ export function TournamentManageView({
             <span>
               <span className="font-medium text-[var(--admin-text)]">Учитывать рейтинг 0,5</span>
               <span className="admin-muted mt-1 block text-xs">
-                Включено: шаг 0,5 и +1 в чётных. Выключено: 1,5 → 1 для форы (3 vs 1,5 → 2
-                шара).
+                Включено: от разницы + шаг 0,5 (+1 в чётных). Выключено: тоже от разницы,
+                но только целые шары (3 vs 1,5 → 1 в каждой, без +1 в чётных).
               </span>
             </span>
           </label>
