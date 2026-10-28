@@ -17,7 +17,10 @@ type ClubConfirmState = {
     isVerified: boolean;
   } | null;
   canSendTelegram: boolean;
+  canBindFromOwner: boolean;
 };
+
+type ConfirmAction = "regenerate" | "send_telegram" | "bind_from_owner";
 
 export function ClubConfirmPanel({
   clubId,
@@ -72,7 +75,7 @@ export function ClubConfirmPanel({
     void load();
   }, [load]);
 
-  async function runAction(action: "regenerate" | "send_telegram") {
+  async function runAction(action: ConfirmAction) {
     setError(null);
     setMessage(null);
     const res = await fetch(`/api/clubs/${clubId}/confirm`, {
@@ -89,9 +92,11 @@ export function ClubConfirmPanel({
     setMessage(
       action === "regenerate"
         ? "Новая ссылка сгенерирована"
-        : isManage
-          ? "Сообщение отправлено в ваш Telegram"
-          : "Сообщение отправлено в Telegram владельцу",
+        : action === "bind_from_owner"
+          ? "Telegram клуба привязан из профиля владельца"
+          : isManage
+            ? "Сообщение отправлено в ваш Telegram"
+            : "Сообщение отправлено в Telegram владельцу",
     );
   }
 
@@ -113,17 +118,26 @@ export function ClubConfirmPanel({
     );
   }
 
+  const needsTelegram = !state.telegramId;
+  const badgeStatus = state.telegramId
+    ? "CONFIRMED"
+    : state.isVerified
+      ? "PENDING"
+      : "PENDING";
+  const badgeLabel = state.telegramId
+    ? "Подтверждён"
+    : state.isVerified
+      ? "Нужен Telegram"
+      : "Ожидает Telegram";
+
   return (
     <section className={sectionClass}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className={titleClass}>Подтверждение владения</h2>
-        <StatusBadge
-          status={state.isVerified ? "CONFIRMED" : "PENDING"}
-          label={state.isVerified ? "Подтверждён" : "Ожидает Telegram"}
-        />
+        <StatusBadge status={badgeStatus} label={badgeLabel} />
       </div>
 
-      {state.isVerified ? (
+      {!needsTelegram ? (
         <div className={cn(secondaryClass, "space-y-1")}>
           <p>
             Telegram клуба:{" "}
@@ -131,12 +145,10 @@ export function ClubConfirmPanel({
               <span className={isManage ? "font-mono text-zinc-200" : "admin-code"}>
                 @{state.telegramUsername}
               </span>
-            ) : state.telegramId ? (
+            ) : (
               <span className={isManage ? "font-mono text-zinc-200" : "admin-code"}>
                 {state.telegramId}
               </span>
-            ) : (
-              "—"
             )}
           </p>
           {!isManage && state.ownerPlayer && (
@@ -148,10 +160,28 @@ export function ClubConfirmPanel({
         </div>
       ) : (
         <>
+          {state.isVerified && (
+            <p
+              className={cn(
+                "rounded-lg border px-3 py-2 text-sm",
+                isManage
+                  ? "border-amber-700/50 bg-amber-950/30 text-amber-200"
+                  : "border-amber-300 bg-amber-50 text-amber-900",
+              )}
+            >
+              Владение подтверждено по телефону, но Telegram клуба ещё не привязан.
+              Без этого нельзя создавать турниры.
+            </p>
+          )}
+
           <p className={secondaryClass}>
-            {isManage
-              ? "Подтвердите клуб в Telegram — откройте ссылку или нажмите «Отправить в Telegram», чтобы получить кнопку в боте."
-              : "Владелец должен открыть ссылку в Telegram и подтвердить клуб. Телефон владельца — в блоке «Телефоны» ниже."}
+            {state.canBindFromOwner
+              ? isManage
+                ? "Ваш Telegram уже в профиле — нажмите «Привязать мой Telegram», либо откройте ссылку в боте."
+                : "У владельца уже есть Telegram в профиле — можно привязать его к клубу одной кнопкой или отправить ссылку в бот."
+              : isManage
+                ? "Подтвердите клуб в Telegram — откройте ссылку или нажмите «Отправить в Telegram»."
+                : "Владелец должен открыть ссылку в Telegram и подтвердить клуб. Телефон владельца — в блоке «Телефоны» ниже."}
           </p>
 
           {!isManage && state.ownerPlayer && (
@@ -180,6 +210,15 @@ export function ClubConfirmPanel({
           )}
 
           <div className="flex flex-wrap gap-3">
+            {state.canBindFromOwner && (
+              <AsyncButton
+                onClick={() => runAction("bind_from_owner")}
+                loadingLabel="Привязка…"
+                className={btnPrimary}
+              >
+                {isManage ? "Привязать мой Telegram" : "Привязать Telegram владельца"}
+              </AsyncButton>
+            )}
             <AsyncButton
               onClick={() => runAction("regenerate")}
               loadingLabel="Генерация…"
@@ -191,9 +230,9 @@ export function ClubConfirmPanel({
               onClick={() => runAction("send_telegram")}
               loadingLabel="Отправка…"
               disabled={!state.canSendTelegram}
-              className={btnPrimary}
+              className={state.canBindFromOwner ? btnSecondary : btnPrimary}
             >
-              {isManage ? "Отправить в Telegram" : "Отправить в Telegram"}
+              Отправить в Telegram
             </AsyncButton>
           </div>
 

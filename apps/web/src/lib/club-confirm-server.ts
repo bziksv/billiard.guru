@@ -16,6 +16,8 @@ export type ClubConfirmState = {
     isVerified: boolean;
   } | null;
   canSendTelegram: boolean;
+  /** Владелец уже привязал личный Telegram — можно скопировать на клуб одной кнопкой. */
+  canBindFromOwner: boolean;
 };
 
 async function loadClub(clubId: string) {
@@ -37,12 +39,21 @@ async function loadOwnerPlayer(phone: string) {
   });
 }
 
+/** Клубу нужна привязка Telegram (авто-verify без telegramId или ещё не подтверждён). */
+export function clubNeedsTelegramBind(club: {
+  isVerified: boolean;
+  telegramId: string | null;
+}): boolean {
+  return !club.telegramId;
+}
+
 function toConfirmState(
   club: Awaited<ReturnType<typeof loadClub>>,
   owner: Awaited<ReturnType<typeof loadOwnerPlayer>>,
 ): ClubConfirmState {
+  const needsBind = clubNeedsTelegramBind(club);
   const confirmLink =
-    !club.isVerified && club.confirmToken ? buildConfirmLink(club.confirmToken) : null;
+    needsBind && club.confirmToken ? buildConfirmLink(club.confirmToken) : null;
   const ownerTelegramId = owner?.telegramId ?? null;
 
   return {
@@ -58,15 +69,15 @@ function toConfirmState(
           isVerified: owner.isVerified,
         }
       : null,
-    canSendTelegram: !club.isVerified && !!ownerTelegramId,
+    canSendTelegram: needsBind && !!ownerTelegramId,
+    canBindFromOwner: needsBind && !!ownerTelegramId,
   };
 }
 
-/** Для неподтверждённого клуба гарантирует наличие confirmToken. */
+/** Токен нужен, пока у клуба нет telegramId (даже если isVerified уже true). */
 export async function ensureClubConfirmToken(clubId: string) {
   const club = await loadClub(clubId);
-  if (club.isVerified) return club;
-
+  if (club.telegramId) return club;
   if (club.confirmToken) return club;
 
   return prisma.club.update({
@@ -88,8 +99,8 @@ export type ClubConfirmActor = {
 
 export async function regenerateClubConfirmLink(clubId: string, actor: ClubConfirmActor) {
   const club = await loadClub(clubId);
-  if (club.isVerified) {
-    throw new Error("Клуб уже подтверждён");
+  if (club.telegramId) {
+    throw new Error("Telegram клуба уже привязан");
   }
 
   const token = randomUUID();
@@ -104,10 +115,53 @@ export async function regenerateClubConfirmLink(clubId: string, actor: ClubConfi
     action: "club.confirm.link_regenerate",
     entityType: "club",
     entityId: clubId,
-    summary: "Новая ссылка подтверждения клуба",
+    summary: "Новая ссылка привязки Telegram клуба",
   });
 
   const owner = await loadOwnerPlayer(updated.phone);
+  return toConfirmState(updated, owner);
+}
+
+/**
+ * Если владелец уже подтвердил личный Telegram — сразу проставить club.telegramId
+ * (типичный кейс autoVerify без привязки бота к клубу).
+ */
+export async function bindClubTelegramFromOwner(
+  clubId: string,
+  actor: ClubConfirmActor,
+) {
+  const club = await loadClub(clubId);
+  if (club.telegramId) {
+    const owner = await loadOwnerPlayer(club.phone);
+    return toConfirmState(club, owner);
+  }
+
+  const owner = await loadOwnerPlayer(club.phone);
+  if (!owner?.telegramId) {
+    throw new Error(
+      "У владельца нет привязанного Telegram. Попросите открыть бота /start с профиля.",
+    );
+  }
+
+  const updated = await prisma.club.update({
+    where: { id: clubId },
+    data: {
+      telegramId: owner.telegramId,
+      isVerified: true,
+      confirmToken: null,
+    },
+  });
+
+  await writeAuditLog({
+    actorType: actor.actorType === "player" ? "club" : actor.actorType,
+    actorId: actor.actorId,
+    action: "club.telegram.bind_from_owner",
+    entityType: "club",
+    entityId: clubId,
+    summary: "Telegram клуба взят из профиля владельца",
+    payload: { ownerPlayerId: owner.id, telegramId: owner.telegramId },
+  });
+
   return toConfirmState(updated, owner);
 }
 
@@ -131,8 +185,8 @@ async function deliverClubConfirmTelegram(
   owner: NonNullable<Awaited<ReturnType<typeof loadOwnerPlayer>>>,
   audit: ConfirmTelegramAudit,
 ): Promise<ClubConfirmTelegramSendResult> {
-  if (club.isVerified) {
-    return { sent: false, reason: "Клуб уже подтверждён" };
+  if (club.telegramId) {
+    return { sent: false, reason: "Telegram клуба уже привязан" };
   }
   if (!club.confirmToken) {
     return { sent: false, reason: "Нет токена подтверждения" };
@@ -202,8 +256,8 @@ export async function tryAutoSendClubConfirmTelegram(
 
 export async function sendClubConfirmTelegram(clubId: string, actor: ClubConfirmActor) {
   const club = await ensureClubConfirmToken(clubId);
-  if (club.isVerified) {
-    throw new Error("Клуб уже подтверждён");
+  if (club.telegramId) {
+    throw new Error("Telegram клуба уже привязан");
   }
 
   const owner = await loadOwnerPlayer(club.phone);

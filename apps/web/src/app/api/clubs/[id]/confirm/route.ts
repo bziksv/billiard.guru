@@ -4,13 +4,14 @@ import { AuthError, authErrorResponse, getRealPlayer, getSession } from "@/lib/a
 import { auditActorFields, requireClubManageAccess } from "@/lib/club-manage";
 import { requireClubOwnerOnly } from "@/lib/club-staff";
 import {
+  bindClubTelegramFromOwner,
   getClubConfirmState,
   regenerateClubConfirmLink,
   sendClubConfirmTelegram,
 } from "@/lib/club-confirm-server";
 
 const postSchema = z.object({
-  action: z.enum(["regenerate", "send_telegram"]),
+  action: z.enum(["regenerate", "send_telegram", "bind_from_owner"]),
 });
 
 async function requireClubConfirmAccess(clubId: string, options?: { readOnly?: boolean }) {
@@ -60,7 +61,9 @@ export async function POST(
     const state =
       body.action === "regenerate"
         ? await regenerateClubConfirmLink(id, actor)
-        : await sendClubConfirmTelegram(id, actor);
+        : body.action === "bind_from_owner"
+          ? await bindClubTelegramFromOwner(id, actor)
+          : await sendClubConfirmTelegram(id, actor);
 
     return NextResponse.json(state);
   } catch (error) {

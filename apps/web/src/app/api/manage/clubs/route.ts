@@ -44,7 +44,10 @@ export async function POST(request: NextRequest) {
 
     const coords = await resolveClubCoordinates(data.address ?? null, data.cityId);
     const autoVerifyClub = player.registerAsClubOwner;
-    const confirmToken = autoVerifyClub ? null : randomUUID();
+    // Auto-verify без telegramId блокирует создание турниров — копируем Telegram владельца, если есть.
+    const ownerTelegramId =
+      autoVerifyClub && player.telegramId ? player.telegramId : null;
+    const confirmToken = ownerTelegramId ? null : randomUUID();
 
     const club = await prisma.club.create({
       data: {
@@ -58,6 +61,8 @@ export async function POST(request: NextRequest) {
         longitude: coords.longitude,
         confirmToken,
         isVerified: autoVerifyClub,
+        telegramId: ownerTelegramId,
+        telegramUsername: ownerTelegramId ? player.telegramUsername : null,
       },
       include: { city: { include: { country: true } } },
     });
